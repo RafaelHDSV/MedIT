@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import Dashboard from '../pages/Dashboard/Dashboard'
+import ExampleTable from '../pages/ExampleTable/ExampleTable'
 import Login from '../pages/Login/Login'
 import SignUp from '../pages/SignUp/SignUp'
 import AuthRoute from './AuthRoute'
@@ -35,6 +36,15 @@ function AppRoutes() {
           element={
             <AuthRoute>
               <Dashboard />
+            </AuthRoute>
+          }
+        />
+
+        <Route
+          path='/example-table'
+          element={
+            <AuthRoute>
+              <ExampleTable />
             </AuthRoute>
           }
         />
