@@ -10,10 +10,15 @@ export default function Login() {
     navigate('/')
   }
 
+  function handleSignIn() {
+    navigate('/signup')
+  }
+
   return (
     <div>
       <h1>Login</h1>
       <button onClick={handleLogin}>Entrar</button>
+      <button onClick={handleSignIn}>Criar conta</button>
     </div>
   )
 }
