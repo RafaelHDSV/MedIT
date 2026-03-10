@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom'
+import { Button, Flex, Typography } from 'antd'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 export default function Login() {
@@ -10,15 +11,14 @@ export default function Login() {
     navigate('/')
   }
 
-  function handleSignIn() {
-    navigate('/signup')
-  }
-
   return (
     <div>
-      <h1>Login</h1>
-      <button onClick={handleLogin}>Entrar</button>
-      <button onClick={handleSignIn}>Criar conta</button>
+      <Typography.Title level={1}>Login</Typography.Title>
+
+      <Flex gap={16}>
+        <Button onClick={handleLogin}>Entrar</Button>
+        <Link to='/signup'>Ainda não possui uma conta? Cadastrar-se</Link>
+      </Flex>
     </div>
   )
 }
