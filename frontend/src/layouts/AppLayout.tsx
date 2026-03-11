@@ -1,13 +1,14 @@
 import { Outlet } from 'react-router-dom'
+import styles from './AppLayout.module.scss'
 
 export default function AppLayout() {
   return (
-    <div>
-      <header>MedFlow</header>
+    <section className={styles.section}>
+      <nav className={styles.nav}>MedFlow</nav>
 
-      <main>
+      <main className={styles.main}>
         <Outlet />
       </main>
-    </div>
+    </section>
   )
 }

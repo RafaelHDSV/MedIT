@@ -1,0 +1,12 @@
+.section {
+  display: flex;
+  background-color: var(--background);
+  height: 100vh;
+}
+
+.nav {
+  background-color: var(--white);
+  border-right: 1px solid var(--border);
+  width: 15rem;
+  height: 100%;
+}
