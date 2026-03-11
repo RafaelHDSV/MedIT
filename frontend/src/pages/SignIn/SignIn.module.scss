@@ -6,19 +6,6 @@
   width: 100%;
 }
 
-.title {
-  font-weight: 500;
-  font-size: 42px;
-
-  strong {
-    color: var(--primary-color) !important;
-  }
-
-  span {
-    color: var(--secondary-color) !important;
-  }
-}
-
 .form {
   display: flex;
   flex-direction: column;

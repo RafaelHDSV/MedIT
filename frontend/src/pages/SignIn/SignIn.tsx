@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { routes } from '../../constants/routes'
 import { useAuth } from '../../hooks/useAuth'
 import styles from './SignIn.module.scss'
+import Logo from '@/layouts/components/Logo/Logo'
 
 export default function SignIn() {
   const { login } = useAuth()
@@ -17,10 +18,7 @@ export default function SignIn() {
   return (
     <div className={styles.content}>
       <aside className={styles.form}>
-        <div className={styles.title}>
-          <strong>Med</strong>
-          <span>Flow</span>
-        </div>
+        <Logo />
 
         <Input value='email@teste.com' />
         <Input value='senha' />
