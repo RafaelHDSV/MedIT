@@ -7,6 +7,7 @@ import SignIn from '../pages/SignIn/SignIn'
 import SignUp from '../pages/SignUp/SignUp'
 import AuthRoute from './AuthRoute'
 import UnauthRoute from './UnauthRoute'
+import DoctorDetails from '../pages/DoctorDetails/DoctorDetails'
 
 function AppRoutes() {
   return (
@@ -41,6 +42,7 @@ function AppRoutes() {
         >
           <Route path={routes.DASHBOARD} element={<Dashboard />} />
           <Route path={routes.EXAMPLE_TABLE} element={<ExampleTable />} />
+          <Route path={routes.DOCTOR_DETAILS} element={<DoctorDetails />} />
         </Route>
       </Routes>
     </BrowserRouter>
