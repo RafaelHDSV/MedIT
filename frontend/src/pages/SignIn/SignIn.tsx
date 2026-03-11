@@ -1,14 +1,15 @@
 import { Button, Flex, Typography } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
+import { routes } from '../../constants/routes'
 import { useAuth } from '../../hooks/useAuth'
 
-export default function Login() {
+export default function SignIn() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
   function handleLogin() {
     login('email@email.com', '123456')
-    navigate('/')
+    navigate(routes.DASHBOARD)
   }
 
   return (
@@ -17,7 +18,7 @@ export default function Login() {
 
       <Flex gap={16}>
         <Button onClick={handleLogin}>Entrar</Button>
-        <Link to='/signup'>Ainda não possui uma conta? Cadastrar-se</Link>
+        <Link to={routes.SIGNUP}>Ainda não possui uma conta? Cadastrar-se</Link>
       </Flex>
     </div>
   )
