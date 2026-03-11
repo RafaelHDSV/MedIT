@@ -1,12 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { routes } from '../constants/routes'
-import AppLayout from '../layouts/AppLayout'
-import Dashboard from '../pages/Dashboard/Dashboard'
-import ExampleTable from '../pages/ExampleTable/ExampleTable'
-import SignIn from '../pages/SignIn/SignIn'
-import SignUp from '../pages/SignUp/SignUp'
-import AuthRoute from './AuthRoute'
 import UnauthRoute from './UnauthRoute'
+import AuthRoute from './AuthRoute'
+import * as pages from '../pages/routerPages'
 
 function AppRoutes() {
   return (
@@ -15,33 +11,27 @@ function AppRoutes() {
         {/* Rotas públicas */}
         <Route
           path={routes.SIGNIN}
-          element={
-            <UnauthRoute>
-              <SignIn />
-            </UnauthRoute>
-          }
+          element={<UnauthRoute>{<pages.SignIn />}</UnauthRoute>}
         />
 
         <Route
           path={routes.SIGNUP}
-          element={
-            <UnauthRoute>
-              <SignUp />
-            </UnauthRoute>
-          }
+          element={<UnauthRoute>{<pages.SignUp />}</UnauthRoute>}
         />
 
         {/* Rotas privadas */}
         <Route
           element={
             <AuthRoute>
-              <AppLayout />
+              <pages.AppLayout />
             </AuthRoute>
           }
         >
-          <Route path={routes.DASHBOARD} element={<Dashboard />} />
-          <Route path={routes.EXAMPLE_TABLE} element={<ExampleTable />} />
+          <Route path={routes.DASHBOARD} element={<pages.Dashboard />} />
+          <Route path={routes.EXAMPLE_TABLE} element={<pages.ExampleTable />} />
         </Route>
+
+        <Route path='*' element={<pages.NotFound />} />
       </Routes>
     </BrowserRouter>
   )
