@@ -1,5 +1,5 @@
-@import './styles/abstract/variables.scss';
-@import './styles/abstract/fonts.scss';
+@use './styles/abstract/variables.scss' as *;
+@use './styles/abstract/fonts.scss' as *;
 
 * {
   box-sizing: border-box;
