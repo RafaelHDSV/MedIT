@@ -1,6 +1,18 @@
 .nav {
   background-color: var(--white);
   border-right: 1px solid var(--border);
-  width: 15rem;
+  padding: 1rem;
+  width: 20rem;
   height: 100%;
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .icon {
+      font-size: 2rem;
+      color: var(--primary-color);
+    }
+  }
 }
