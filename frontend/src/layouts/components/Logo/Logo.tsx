@@ -1,8 +1,12 @@
 import styles from './Logo.module.scss'
 
-function Logo() {
+interface ILogoProps {
+  fontSize?: number
+}
+
+function Logo({ fontSize = 42 }: ILogoProps) {
   return (
-    <div className={styles.title}>
+    <div className={styles.title} style={{ fontSize }}>
       <strong>Med</strong>
       <span>Flow</span>
     </div>
