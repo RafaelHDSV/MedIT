@@ -1,6 +1,8 @@
+import type DoctorTable from "../pages/DoctorTable/DoctorTable";
+
 export const routes = {
   SIGNIN: '/sign-in',
   SIGNUP: '/sign-up',
   DASHBOARD: '/',
-  EXAMPLE_TABLE: '/example-table'
+  DoctorTable: '/DoctorTable'
 }

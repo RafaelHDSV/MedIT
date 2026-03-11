@@ -1,6 +1,6 @@
 import { Table } from 'antd'
 import { useDoctorTable } from './hooks/useColumns'
-import './ListaMedicos.module.scss' 
+import './DoctorTable.module.scss' 
 
 function DoctorTable() {
   const columns = useDoctorTable()

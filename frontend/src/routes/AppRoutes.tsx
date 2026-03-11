@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { routes } from '../constants/routes'
 import AppLayout from '../layouts/AppLayout'
 import Dashboard from '../pages/Dashboard/Dashboard'
-import ExampleTable from '../pages/DoctorTable/DoctorTable'
+import DoctorTable from '../pages/DoctorTable/DoctorTable'
 import SignIn from '../pages/SignIn/SignIn'
 import SignUp from '../pages/SignUp/SignUp'
 import AuthRoute from './AuthRoute'
@@ -40,7 +40,7 @@ function AppRoutes() {
           }
         >
           <Route path={routes.DASHBOARD} element={<Dashboard />} />
-          <Route path={routes.EXAMPLE_TABLE} element={<ExampleTable />} />
+          <Route path={routes.DoctorTable} element={<DoctorTable />} />
         </Route>
       </Routes>
     </BrowserRouter>
