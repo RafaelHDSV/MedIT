@@ -29,6 +29,9 @@ function SideBar() {
                 }
                 end={route.path === ROUTES.DASHBOARD.path}
               >
+                {route.icon && (
+                  <route.icon size={26} className={styles.linkIcon} />
+                )}
                 {route.name}
               </NavLink>
             </li>
