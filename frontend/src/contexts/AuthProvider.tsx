@@ -1,12 +1,13 @@
 import { useState, type ReactNode } from 'react'
-import { AuthContext, type User } from './AuthContext'
+import { AuthContext } from './AuthContext'
+import { Roles, type IUser } from '@/interfaces/IUser'
 
 interface Props {
   children: ReactNode
 }
 
 export function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<User | null>(() => {
+  const [user, setUser] = useState<IUser | null>(() => {
     const stored = localStorage.getItem('user')
     return stored ? JSON.parse(stored) : null
   })
@@ -14,7 +15,9 @@ export function AuthProvider({ children }: Props) {
   function login(email: string, password: string) {
     const fakeUser = {
       id: '1',
-      name: 'Rafael',
+      shortName: 'Rafael Vieira',
+      name: 'Rafael Henrique de Sousa Vieira',
+      role: Roles.ADMIN,
       email,
       password
     }
