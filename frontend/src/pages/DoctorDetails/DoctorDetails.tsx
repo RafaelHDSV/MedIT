@@ -1,3 +1,5 @@
+import "./DoctorDetails.scss"
+
 interface Doctor {
   nome: string
   idade: number
@@ -40,67 +42,75 @@ function DoctorDetails() {
               {doctor.idade} anos | {doctor.genero}
             </p>
           </div>
-          <div>
+          <div className="status">
             <span>{doctor.status}</span>
           </div>
         </div>
-        <div>
-          <section>
-            <h3>Dados Pessoais</h3>
-
-            <div>
-              <span>CPF</span>
-              <span>{doctor.cpf}</span>
-            </div>
-
-            <div>
-              <span>CRM</span>
-              <span>{doctor.crm}</span>
-            </div>
-
-            <div>
-              <span>Especialidade</span>
-              <span>{doctor.especialidade}</span>
-            </div>
-
-            <div>
-              <span>Telefone</span>
-              <span>{doctor.telefone}</span>
-            </div>
-
-            <div>
-              <span>Data de Nascimento</span>
-              <span>{doctor.dataNascimento}</span>
-            </div>
-          </section>
-          <section>
-            <section>
-              <h3>Último Atendimento</h3>
-
-              <div>
-                <span>Queixa do Paciente</span>
-                <span>Febre e dores</span>
-              </div>
-              <div>
-                <span>Sugestão IA</span>
-                <span>Dengue (87%)</span>
-              </div>
-              <div>
-                <span>Definição Médica</span>
-                <span>Dengue</span>
-              </div>
-              <div>
-                <span>Tempo de atendimento</span>
-                <span>20 min</span>
-              </div>
-              <div>
-                <span>Data</span>
-                <span>12/01/2025</span>
-              </div>
-            </section>
-          </section>
-        </div>
       </header>
+      <div>
+        <section>
+          <h3>Dados Pessoais</h3>
+
+          <div>
+            <span>CPF</span>
+            <span>{doctor.cpf}</span>
+          </div>
+
+          <div>
+            <span>CRM</span>
+            <span>{doctor.crm}</span>
+          </div>
+
+          <div>
+            <span>Especialidade</span>
+            <span>{doctor.especialidade}</span>
+          </div>
+
+          <div>
+            <span>Telefone</span>
+            <span>{doctor.telefone}</span>
+          </div>
+
+          <div>
+            <span>Data de Nascimento</span>
+            <span>{doctor.dataNascimento}</span>
+          </div>
+        </section>
+
+        <section>
+          <h3>Último Atendimento</h3>
+
+          <div>
+            <span>Queixa do Paciente</span>
+            <span>Febre e dores</span>
+          </div>
+          <div>
+            <span>Sugestão IA</span>
+            <span>Dengue (87%)</span>
+          </div>
+          <div>
+            <span>Definição Médica</span>
+            <span>Dengue</span>
+          </div>
+          <div>
+            <span>Tempo de Atendimento</span>
+            <span>20 min</span>
+          </div>
+          <div>
+            <span>Data</span>
+            <span>12/01/2025</span>
+          </div>
+        </section>
+      </div>
+      <section>
+        <h3>Hístorico de Atendimentos</h3>
+        <ul>
+          <li>12/01/2025 - Consulta - Gripe </li>
+          <li>08/11/2024 - Emergência - Entorse</li>
+          <li>15/06/2024 - Rotina - Check-up</li>
+          <li>22/03/2024 - Consulta - Alergia</li>
+        </ul>
+      </section>
     </main>
   )
 }
