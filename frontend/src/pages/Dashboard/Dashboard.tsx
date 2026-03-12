@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom'
-import { routes } from '../../constants/routes'
 import { useAuth } from '../../hooks/useAuth'
+import { ROUTES } from '@/routes/constants'
 
 function Dashboard() {
   const navigate = useNavigate()
   const { logout } = useAuth()
 
   function handleGoToExampleTable() {
-    navigate(routes.EXAMPLE_TABLE)
+    navigate(ROUTES.EXAMPLE_TABLE.path)
   }
 
   function handleExit() {

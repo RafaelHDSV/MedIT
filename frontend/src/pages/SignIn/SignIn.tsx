@@ -1,10 +1,10 @@
 import SignInImage from '@/assets/signin-image.svg'
 import { Button, Flex, Input } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
-import { routes } from '../../constants/routes'
 import { useAuth } from '../../hooks/useAuth'
 import styles from './SignIn.module.scss'
 import Logo from '@/layouts/components/Logo/Logo'
+import { ROUTES } from '@/routes/constants'
 
 export default function SignIn() {
   const { login } = useAuth()
@@ -12,7 +12,7 @@ export default function SignIn() {
 
   function handleLogin() {
     login('email@email.com', '123456')
-    navigate(routes.DASHBOARD)
+    navigate(ROUTES.DASHBOARD.path)
   }
 
   return (
@@ -25,7 +25,7 @@ export default function SignIn() {
 
         <Flex gap={16}>
           <Button onClick={handleLogin}>Entrar</Button>
-          <Link to={routes.SIGNUP}>
+          <Link to={ROUTES.SIGNUP.path}>
             Ainda não possui uma conta? Cadastrar-se
           </Link>
         </Flex>

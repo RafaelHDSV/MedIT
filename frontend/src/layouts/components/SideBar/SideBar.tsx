@@ -2,14 +2,8 @@ import { ListIcon } from '@phosphor-icons/react'
 import Logo from '../Logo/Logo'
 import styles from './SideBar.module.scss'
 import { NavLink } from 'react-router-dom'
-import { routes } from '@/constants/routes'
-
-const sidebarRoutes = [
-  { label: 'Dashboard', path: routes.DASHBOARD },
-  { label: 'Tabela de Exemplo', path: routes.EXAMPLE_TABLE },
-  { label: 'Entrar', path: routes.SIGNIN },
-  { label: 'Cadastrar', path: routes.SIGNUP }
-]
+import routes from '@/routes/routes'
+import { ROUTES } from '@/routes/constants'
 
 function SideBar() {
   return (
@@ -19,7 +13,7 @@ function SideBar() {
         <Logo fontSize={32} />
       </header>
       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-        {sidebarRoutes.map((route) => (
+        {routes.map((route) => (
           <li key={route.path} style={{ margin: '1rem 0' }}>
             <NavLink
               to={route.path}
@@ -29,9 +23,9 @@ function SideBar() {
                 fontWeight: isActive ? 'bold' : 'normal',
                 fontSize: '1.1rem'
               })}
-              end={route.path === routes.DASHBOARD}
+              end={route.path === ROUTES.DASHBOARD.path}
             >
-              {route.label}
+              {route.name}
             </NavLink>
           </li>
         ))}

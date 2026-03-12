@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { routes } from '../constants/routes'
 import UnauthRoute from './UnauthRoute'
 import AuthRoute from './AuthRoute'
 import * as pages from '../pages/routerPages'
+import { ROUTES } from './constants'
 
 function AppRoutes() {
   return (
@@ -10,12 +10,12 @@ function AppRoutes() {
       <Routes>
         {/* Rotas públicas */}
         <Route
-          path={routes.SIGNIN}
+          path={ROUTES.SIGNIN.path}
           element={<UnauthRoute>{<pages.SignIn />}</UnauthRoute>}
         />
 
         <Route
-          path={routes.SIGNUP}
+          path={ROUTES.SIGNUP.path}
           element={<UnauthRoute>{<pages.SignUp />}</UnauthRoute>}
         />
 
@@ -27,8 +27,11 @@ function AppRoutes() {
             </AuthRoute>
           }
         >
-          <Route path={routes.DASHBOARD} element={<pages.Dashboard />} />
-          <Route path={routes.EXAMPLE_TABLE} element={<pages.ExampleTable />} />
+          <Route path={ROUTES.DASHBOARD.path} element={<pages.Dashboard />} />
+          <Route
+            path={ROUTES.EXAMPLE_TABLE.path}
+            element={<pages.ExampleTable />}
+          />
         </Route>
 
         <Route path='*' element={<pages.NotFound />} />

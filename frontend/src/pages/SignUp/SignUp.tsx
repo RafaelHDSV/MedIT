@@ -1,11 +1,11 @@
+import { ROUTES } from '@/routes/constants'
 import { useNavigate } from 'react-router-dom'
-import { routes } from '../../constants/routes'
 
 function SignUp() {
   const navigate = useNavigate()
 
   function handleLogin() {
-    navigate(routes.SIGNIN)
+    navigate(ROUTES.SIGNIN.path)
   }
 
   return (
