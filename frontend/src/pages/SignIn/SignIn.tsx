@@ -1,4 +1,4 @@
-import SignInImage from '@/assets/signin-image.svg'
+import UnauthImage from '@/assets/unauth-image.svg'
 import { Button, Flex, Form, Input } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
@@ -42,7 +42,7 @@ export default function SignIn() {
       </aside>
 
       <aside className={styles.image}>
-        <img src={SignInImage} alt='Sign In' />
+        <img src={UnauthImage} alt='Sign In' />
       </aside>
     </div>
   )
