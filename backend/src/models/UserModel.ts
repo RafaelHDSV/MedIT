@@ -1,9 +1,22 @@
 import mongoose from 'mongoose'
 
+export const Roles = {
+  ADMIN: 'ADMIN',
+  DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
+  PACIENT: 'PACIENT'
+} as const
+export type Roles = (typeof Roles)[keyof typeof Roles]
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
+  },
+  role: {
+    type: String,
+    required: true,
+    enum: Object.values(Roles)
   },
   email: {
     type: String,
@@ -13,10 +26,6 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
   }
 })
 

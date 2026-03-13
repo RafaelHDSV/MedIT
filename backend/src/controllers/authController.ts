@@ -1,23 +1,24 @@
-import { Request, Response } from "express"
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
+import { Request, Response } from 'express'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
-import User from "../models/User.js"
+import User from '../models/UserModel.js'
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body
+    const { name, role, email, password } = req.body
 
     const userExists = await User.findOne({ email })
 
     if (userExists) {
-      return res.status(400).json({ message: "Usuário já existe" })
+      return res.status(400).json({ message: 'Usuário já existe' })
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const user = await User.create({
       name,
+      role,
       email,
       password: hashedPassword
     })
@@ -34,20 +35,18 @@ export const login = async (req: Request, res: Response) => {
   const user = await User.findOne({ email })
 
   if (!user) {
-    return res.status(400).json({ message: "Usuário não encontrado" })
+    return res.status(400).json({ message: 'Usuário não encontrado' })
   }
 
   const validPassword = await bcrypt.compare(password, user.password)
 
   if (!validPassword) {
-    return res.status(400).json({ message: "Senha inválida" })
+    return res.status(400).json({ message: 'Senha inválida' })
   }
 
-  const token = jwt.sign(
-    { id: user._id },
-    process.env.JWT_SECRET as string,
-    { expiresIn: "1d" }
-  )
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+    expiresIn: '1d'
+  })
 
   return res.json({
     token,
