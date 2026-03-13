@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
 import { Roles, type IUser } from '@/interfaces/IUser'
+import { api } from '@/api/api'
 
 interface Props {
   children: ReactNode
@@ -12,7 +13,7 @@ export function AuthProvider({ children }: Props) {
     return stored ? JSON.parse(stored) : null
   })
 
-  function login(email: string, password: string) {
+  async function login(email: string, password: string) {
     const fakeUser = {
       id: '1',
       shortName: 'Rafael Vieira',
@@ -21,14 +22,26 @@ export function AuthProvider({ children }: Props) {
       email,
       password
     }
+    try {
+      const response = await api.post('/auth/login', {
+        email,
+        password
+      })
 
-    setUser(fakeUser)
-    localStorage.setItem('user', JSON.stringify(fakeUser))
+      const { token, user } = response.data
+
+      setUser(user ?? fakeUser)
+      localStorage.setItem('user', JSON.stringify(user ?? fakeUser))
+      localStorage.setItem('token', token ?? 'fakeToken')
+    } catch (error) {
+      console.error('Erro no login', error)
+    }
   }
 
   function logout() {
     setUser(null)
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
   }
 
   return (
