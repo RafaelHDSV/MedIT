@@ -2,11 +2,12 @@ import UnauthImage from '@/assets/unauth-image.svg'
 import { api } from '@/api/api'
 import Logo from '@/layouts/components/Logo/Logo'
 import { ROUTES } from '@/routes/constants'
-import { Button, Flex, Form, Input } from 'antd'
+import { Button, Flex, Form, Input, message } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from './SignUp.module.scss'
 import { useForm } from 'antd/es/form/Form'
 import { useAuth } from '@/hooks/useAuth'
+import { Roles } from '@/interfaces/IUser'
 
 function SignUp() {
   const { login } = useAuth()
@@ -19,14 +20,16 @@ function SignUp() {
   const handleRegister = async () => {
     await api.post('/auth/register', {
       name,
+      role: Roles.PACIENT,
       email,
       password
     })
+    message.success('Usuário criado com sucesso!')
 
-    alert('Usuário criado')
-
-    await login(email, password)
-    navigate(ROUTES.DASHBOARD.path)
+    setTimeout(() => {
+      login(email, password)
+      navigate(ROUTES.DASHBOARD.path)
+    }, 1000)
   }
 
   return (

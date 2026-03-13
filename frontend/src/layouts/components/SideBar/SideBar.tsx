@@ -9,6 +9,7 @@ import { UserRoles } from '@/interfaces/IUser'
 import { stringToColor } from '@/utils/stringToColor'
 import { getContrastColor } from '@/utils/getContrastColor'
 import { getInitials } from '@/utils/getInitials'
+import getShortName from '@/utils/getShortName'
 
 function SidebarItems() {
   const location = useLocation()
@@ -41,9 +42,10 @@ function SidebarItems() {
 
 function User() {
   const { user, logout } = useAuth()
-  const bgColor = stringToColor(user?.shortName ?? '')
+  const shortName = getShortName(user?.name)
+  const bgColor = stringToColor(shortName)
   const textColor = getContrastColor(bgColor)
-  const initials = getInitials(user?.shortName ?? '')
+  const initials = getInitials(shortName)
 
   return (
     <button className={styles.user} onClick={logout}>
@@ -56,7 +58,7 @@ function User() {
         </div>
 
         <div className={styles.userInfo}>
-          <strong>{user?.shortName}</strong>
+          <strong>{shortName}</strong>
           {user?.role && <p>{UserRoles[user.role]}</p>}
         </div>
       </div>

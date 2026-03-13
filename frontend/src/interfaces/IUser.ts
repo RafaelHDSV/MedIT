@@ -14,8 +14,7 @@ export const UserRoles = {
 } as const
 
 export interface IUser {
-  id: string
-  shortName: string
+  _id: string
   name: string
   role: Roles
   email: string
