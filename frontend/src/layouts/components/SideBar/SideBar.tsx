@@ -9,47 +9,54 @@ import Logo from '../Logo/Logo'
 import styles from './SideBar.module.scss'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ROUTES } from '@/routes/constants'
-import routes, { type IRoute } from '@/routes/routes'
+import routes, { type ProgressStatus } from '@/routes/routes'
 import { useAuth } from '@/hooks/useAuth'
 import { Roles, UserRoles } from '@/interfaces/IUser'
 import { stringToColor } from '@/utils/stringToColor'
 import { getContrastColor } from '@/utils/getContrastColor'
 import { getInitials } from '@/utils/getInitials'
 import getShortName from '@/utils/getShortName'
-import { Tag } from 'antd'
+import { Tag, Tooltip } from 'antd'
+import { useMemo } from 'react'
+
+interface IProgressTagProps {
+  status?: ProgressStatus
+}
+function ProgressTag({ status }: IProgressTagProps) {
+  const { tooltip, color, icon } = useMemo(() => {
+    const unknownState = {
+      tooltip: 'Desconhecido',
+      color: 'red',
+      icon: <XIcon />
+    }
+    if (!status) return unknownState
+
+    switch (status) {
+      case 'not_started':
+        return { tooltip: 'Não iniciado', color: 'red', icon: <XIcon /> }
+      case 'in_progress':
+        return {
+          tooltip: 'Em andamento',
+          color: 'blue',
+          icon: <HourglassMediumIcon />
+        }
+      case 'completed':
+        return { tooltip: 'Concluído', color: 'green', icon: <CheckIcon /> }
+      default:
+        return unknownState
+    }
+  }, [status])
+
+  return (
+    <Tooltip title={tooltip}>
+      <Tag color={color}>{icon}</Tag>
+    </Tooltip>
+  )
+}
 
 function SidebarItems() {
   const { user } = useAuth()
   const location = useLocation()
-
-  const getProgressStatus = (route: IRoute) => {
-    switch (route.meta?.progress) {
-      case 'not_started':
-        return (
-          <Tag color='red'>
-            <XIcon />
-          </Tag>
-        )
-      case 'in_progress':
-        return (
-          <Tag color='blue'>
-            <HourglassMediumIcon />
-          </Tag>
-        )
-      case 'completed':
-        return (
-          <Tag color='green'>
-            <CheckIcon />
-          </Tag>
-        )
-      default:
-        return (
-          <Tag color='red'>
-            <XIcon />
-          </Tag>
-        )
-    }
-  }
 
   return (
     <ul className={styles.menuList}>
@@ -72,7 +79,9 @@ function SidebarItems() {
                 )}
                 {route.name}
               </div>
-              {user?.role === Roles.ADMIN && getProgressStatus(route)}
+              {user?.role === Roles.ADMIN && (
+                <ProgressTag status={route.meta?.progress} />
+              )}
             </NavLink>
           </li>
         ))}
@@ -103,7 +112,7 @@ function User() {
         </div>
       </div>
 
-      <SignOutIcon className={styles.icon} size={24} />
+      <SignOutIcon className={styles.icon} size={22} />
     </button>
   )
 }
