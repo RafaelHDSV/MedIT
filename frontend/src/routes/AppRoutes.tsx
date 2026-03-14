@@ -21,6 +21,7 @@ function AppRoutes() {
 
         {/* Rotas privadas */}
         <Route
+          path='/auth'
           element={
             <AuthRoute>
               <pages.AppLayout />

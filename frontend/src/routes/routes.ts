@@ -24,12 +24,12 @@ export interface IRoute {
 const signIn: IRoute = {
   name: ROUTES.SIGNIN.name,
   path: ROUTES.SIGNIN.path,
-  meta: { hidden: true, progress: ProgressStatus.NOT_STARTED }
+  meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
 const signUp: IRoute = {
   name: ROUTES.SIGNUP.name,
   path: ROUTES.SIGNUP.path,
-  meta: { hidden: true, progress: ProgressStatus.NOT_STARTED }
+  meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
 const dashboard: IRoute = {
   name: ROUTES.DASHBOARD.name,
