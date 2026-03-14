@@ -1,7 +1,7 @@
 import { useAuth } from '@/hooks/useAuth'
 import { Roles } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
-import routes, { type IRoute, type IRouteGroup } from '@/routes/routes'
+import routes, { type IRoute } from '@/routes/routes'
 import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
@@ -22,30 +22,80 @@ function SidebarItems() {
     }))
   }
 
+  const renderedGroups = new Set<string>()
+
   const renderRoute = (route: IRoute) => {
     if (route.meta?.hidden) return null
+
+    if (route.meta?.group) {
+      const groupName = route.meta.group.name
+      if (renderedGroups.has(groupName)) return null
+      renderedGroups.add(groupName)
+
+      const groupRoutes = routes.filter(
+        (r) => r.meta?.group?.name === groupName && !r.meta?.hidden
+      )
+      const isOpen = openGroups[groupName] || false
+      return (
+        <li key={groupName}>
+          <div className={styles.link} onClick={() => toggleGroup(groupName)}>
+            <div className={styles.linkContent}>
+              {route.meta.group.icon && (
+                <route.meta.group.icon size={20} className={styles.linkIcon} />
+              )}
+              <span>{groupName}</span>
+            </div>
+            {isOpen ? <CaretUpIcon size={20} /> : <CaretDownIcon size={20} />}
+          </div>
+          {isOpen && (
+            <ul className={styles.groupList}>
+              {groupRoutes.map((r) => (
+                <li key={r.path}>
+                  <NavLink
+                    to={r.path}
+                    className={({ isActive }) => {
+                      const baseClass =
+                        isActive || location.pathname === r.path
+                          ? styles.activeLink
+                          : styles.link
+                      const groupClass = styles.linkGroup
+                      return `${baseClass} ${groupClass}`
+                    }}
+                    end={r.path === ROUTES.DASHBOARD.path}
+                  >
+                    <div className={styles.linkContent}>
+                      {r.icon && (
+                        <r.icon size={22} className={styles.linkIcon} />
+                      )}
+                      {r.name}
+                    </div>
+                    {user?.role === Roles.ADMIN && (
+                      <ProgressTag status={r.meta?.progress} />
+                    )}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      )
+    }
 
     return (
       <li key={route.path}>
         <NavLink
           to={route.path}
-          className={({ isActive }) => {
-            const baseClass =
-              isActive || location.pathname === route.path
-                ? styles.activeLink
-                : styles.link
-
-            const groupClass = route.meta?.group ? styles.linkGroup : ''
-
-            return `${baseClass} ${groupClass}`
-          }}
+          className={({ isActive }) =>
+            isActive || location.pathname === route.path
+              ? styles.activeLink
+              : styles.link
+          }
           end={route.path === ROUTES.DASHBOARD.path}
         >
           <div className={styles.linkContent}>
             {route.icon && <route.icon size={22} className={styles.linkIcon} />}
             {route.name}
           </div>
-
           {user?.role === Roles.ADMIN && (
             <ProgressTag status={route.meta?.progress} />
           )}
@@ -54,75 +104,7 @@ function SidebarItems() {
     )
   }
 
-  const groupedRoutes = routes.reduce<{
-    noGroup: IRoute[]
-    groups: Record<string, { group: IRouteGroup; routes: IRoute[] }>
-  }>(
-    (acc, route) => {
-      if (route.meta?.hidden) return acc
-
-      const group = route.meta?.group
-
-      if (!group) {
-        acc.noGroup.push(route)
-        return acc
-      }
-
-      if (!acc.groups[group.name]) {
-        acc.groups[group.name] = {
-          group,
-          routes: []
-        }
-      }
-
-      acc.groups[group.name].routes.push(route)
-
-      return acc
-    },
-    {
-      noGroup: [],
-      groups: {}
-    }
-  )
-
-  const renderGroup = (
-    groupName: string,
-    groupData: { group: IRouteGroup; routes: IRoute[] }
-  ) => {
-    const isOpen = openGroups[groupName] || false
-
-    return (
-      <li key={groupName}>
-        <div className={styles.link} onClick={() => toggleGroup(groupName)}>
-          <div className={styles.linkContent}>
-            {groupData.group.icon && (
-              <groupData.group.icon size={20} className={styles.linkIcon} />
-            )}
-
-            <span>{groupName}</span>
-          </div>
-
-          {isOpen ? <CaretUpIcon size={22} /> : <CaretDownIcon size={22} />}
-        </div>
-
-        {isOpen && (
-          <ul className={styles.groupList}>
-            {groupData.routes.map(renderRoute)}
-          </ul>
-        )}
-      </li>
-    )
-  }
-
-  return (
-    <ul className={styles.menuList}>
-      {groupedRoutes.noGroup.map(renderRoute)}
-
-      {Object.entries(groupedRoutes.groups).map(([groupName, groupData]) =>
-        renderGroup(groupName, groupData)
-      )}
-    </ul>
-  )
+  return <ul className={styles.menuList}>{routes.map(renderRoute)}</ul>
 }
 
 function SideBar() {
