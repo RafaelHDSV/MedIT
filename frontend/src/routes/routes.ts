@@ -50,7 +50,7 @@ const dashboard: IRoute = {
 const doctors: IRoute = {
   name: ROUTES.DOCTORS.name,
   path: ROUTES.DOCTORS.path,
-  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED },
+  meta: { hidden: false, progress: ProgressStatus.IN_PROGRESS },
   icon: AmbulanceIcon
 }
 

@@ -1,4 +1,10 @@
-import { ListIcon, SignOutIcon } from '@phosphor-icons/react'
+import {
+  CheckIcon,
+  HourglassMediumIcon,
+  ListIcon,
+  SignOutIcon,
+  XIcon
+} from '@phosphor-icons/react'
 import Logo from '../Logo/Logo'
 import styles from './SideBar.module.scss'
 import { NavLink, useLocation } from 'react-router-dom'
@@ -19,13 +25,29 @@ function SidebarItems() {
   const getProgressStatus = (route: IRoute) => {
     switch (route.meta?.progress) {
       case 'not_started':
-        return <Tag color='red'>Não iniciado</Tag>
+        return (
+          <Tag color='red'>
+            <XIcon />
+          </Tag>
+        )
       case 'in_progress':
-        return <Tag color='blue'>Em progresso</Tag>
+        return (
+          <Tag color='blue'>
+            <HourglassMediumIcon />
+          </Tag>
+        )
       case 'completed':
-        return <Tag color='green'>Concluído</Tag>
+        return (
+          <Tag color='green'>
+            <CheckIcon />
+          </Tag>
+        )
       default:
-        return <Tag color='red'>Não iniciado</Tag>
+        return (
+          <Tag color='red'>
+            <XIcon />
+          </Tag>
+        )
     }
   }
 
@@ -44,10 +66,12 @@ function SidebarItems() {
               }
               end={route.path === ROUTES.DASHBOARD.path}
             >
-              {route.icon && (
-                <route.icon size={26} className={styles.linkIcon} />
-              )}
-              {route.name}
+              <div className={styles.linkContent}>
+                {route.icon && (
+                  <route.icon size={22} className={styles.linkIcon} />
+                )}
+                {route.name}
+              </div>
               {user?.role === Roles.ADMIN && getProgressStatus(route)}
             </NavLink>
           </li>
