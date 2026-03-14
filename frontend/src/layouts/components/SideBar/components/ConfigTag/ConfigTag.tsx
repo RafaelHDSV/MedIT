@@ -1,6 +1,7 @@
 import { GearIcon } from '@phosphor-icons/react'
 import { Modal, Typography } from 'antd'
 import { useState } from 'react'
+import ProgressTag, { ProgressStatus } from '../ProgressTag/ProgressTag'
 import styles from './ConfigTag.module.scss'
 
 interface IConfigModalProps {
@@ -48,6 +49,8 @@ function ConfigTag() {
       >
         <GearIcon size={22} />
         <span>Configurações</span>
+
+        <ProgressTag status={ProgressStatus.IN_PROGRESS} />
       </button>
     </>
   )

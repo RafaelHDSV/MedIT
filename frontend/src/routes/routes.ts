@@ -1,3 +1,4 @@
+import { ProgressStatus } from '@/layouts/components/SideBar/components/ProgressTag/ProgressTag'
 import {
   AmbulanceIcon,
   ChartBarIcon,
@@ -7,14 +8,6 @@ import {
   type Icon
 } from '@phosphor-icons/react'
 import { ROUTE_GROUP, ROUTES } from './constants'
-
-const ProgressStatus = {
-  NOT_STARTED: 'not_started',
-  IN_PROGRESS: 'in_progress',
-  COMPLETED: 'completed'
-} as const
-export type ProgressStatus =
-  (typeof ProgressStatus)[keyof typeof ProgressStatus]
 
 export interface IRouteGroup {
   name: string

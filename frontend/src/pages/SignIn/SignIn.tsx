@@ -1,11 +1,11 @@
 import UnauthImage from '@/assets/unauth-image.svg'
+import Logo from '@/layouts/components/Logo/Logo'
+import { ROUTES } from '@/routes/constants'
 import { Button, Flex, Form, Input } from 'antd'
+import { useForm } from 'antd/es/form/Form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import styles from './SignIn.module.scss'
-import Logo from '@/layouts/components/Logo/Logo'
-import { ROUTES } from '@/routes/constants'
-import { useForm } from 'antd/es/form/Form'
 
 export default function SignIn() {
   const { login } = useAuth()

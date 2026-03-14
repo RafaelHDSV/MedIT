@@ -1,13 +1,25 @@
-import type { ProgressStatus } from "@/routes/routes"
-import { CheckIcon, HourglassMediumIcon, XIcon } from "@phosphor-icons/react"
-import { Tag, Tooltip } from "antd"
-import { useMemo } from "react"
+import { useAuth } from '@/hooks/useAuth'
+import { Roles } from '@/interfaces/IUser'
+import { CheckIcon, HourglassMediumIcon, XIcon } from '@phosphor-icons/react'
+import { Tag, Tooltip } from 'antd'
+import { useMemo } from 'react'
+
+export const ProgressStatus = {
+  NOT_STARTED: 'not_started',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed'
+} as const
+export type ProgressStatus =
+  (typeof ProgressStatus)[keyof typeof ProgressStatus]
 
 interface IProgressTagProps {
   status?: ProgressStatus
 }
 
 function ProgressTag({ status }: IProgressTagProps) {
+  const { user } = useAuth()
+  const isAdmin = user?.role === Roles.ADMIN
+
   const { tooltip, color, icon } = useMemo(() => {
     const unknownState = {
       tooltip: 'Desconhecido',
@@ -31,6 +43,8 @@ function ProgressTag({ status }: IProgressTagProps) {
         return unknownState
     }
   }, [status])
+
+  if (!isAdmin) return
 
   return (
     <Tooltip title={tooltip}>

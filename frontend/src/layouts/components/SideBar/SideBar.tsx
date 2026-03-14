@@ -11,10 +11,14 @@ import ProgressTag from './components/ProgressTag/ProgressTag'
 import UserTag from './components/UserTag/UserTag'
 import styles from './SideBar.module.scss'
 
+const INITIAL_GROUPS_STATE = { Usuários: true }
+
 function SidebarItems() {
   const { user } = useAuth()
   const location = useLocation()
-  const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>({})
+  const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>(
+    INITIAL_GROUPS_STATE
+  )
 
   const toggleGroup = (groupName: string) => {
     setOpenGroups((prev) => ({
@@ -97,9 +101,8 @@ function SidebarItems() {
             {route.icon && <route.icon size={22} className={styles.linkIcon} />}
             {route.name}
           </div>
-          {user?.role === Roles.ADMIN && (
-            <ProgressTag status={route.meta?.progress} />
-          )}
+
+          <ProgressTag status={route.meta?.progress} />
         </NavLink>
       </li>
     )
