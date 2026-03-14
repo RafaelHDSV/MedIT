@@ -15,13 +15,13 @@ app.use(express.json())
 
 connectDatabase()
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('API funcionando')
+app.get('/', (_req: Request, res: Response) => {
+  res.send('Back-end funcionando com sucesso!')
 })
 
 app.use('/auth', authRoutes)
 app.use('/users', userRoutes)
 
 app.listen(process.env.PORT, () => {
-  console.log('Servidor rodando')
+  console.log(`Servidor está rodando em http://localhost:${process.env.PORT}`)
 })
