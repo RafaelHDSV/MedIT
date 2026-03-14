@@ -23,38 +23,3 @@
   background: var(--primary-opaque);
   font-weight: bold;
 }
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.settingRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.addTask {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.taskList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-}
-
-.taskItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.taskDone {
-  text-decoration: line-through;
-  opacity: 0.6;
-}
