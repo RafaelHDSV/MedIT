@@ -6,6 +6,7 @@ import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
+import ConfigTag from './components/ConfigTag/ConfigTag'
 import ProgressTag from './components/ProgressTag/ProgressTag'
 import UserTag from './components/UserTag/UserTag'
 import styles from './SideBar.module.scss'
@@ -119,7 +120,10 @@ function SideBar() {
         <SidebarItems />
       </div>
 
-      <UserTag />
+      <div className={styles.footer}>
+        <ConfigTag />
+        <UserTag />
+      </div>
     </nav>
   )
 }
