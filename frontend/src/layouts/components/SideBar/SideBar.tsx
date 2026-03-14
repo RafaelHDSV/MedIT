@@ -1,119 +1,127 @@
-import {
-  CheckIcon,
-  HourglassMediumIcon,
-  ListIcon,
-  SignOutIcon,
-  XIcon
-} from '@phosphor-icons/react'
-import Logo from '../Logo/Logo'
-import styles from './SideBar.module.scss'
-import { NavLink, useLocation } from 'react-router-dom'
-import { ROUTES } from '@/routes/constants'
-import routes, { type ProgressStatus } from '@/routes/routes'
 import { useAuth } from '@/hooks/useAuth'
-import { Roles, UserRoles } from '@/interfaces/IUser'
-import { stringToColor } from '@/utils/stringToColor'
-import { getContrastColor } from '@/utils/getContrastColor'
-import { getInitials } from '@/utils/getInitials'
-import getShortName from '@/utils/getShortName'
-import { Tag, Tooltip } from 'antd'
-import { useMemo } from 'react'
-
-interface IProgressTagProps {
-  status?: ProgressStatus
-}
-function ProgressTag({ status }: IProgressTagProps) {
-  const { tooltip, color, icon } = useMemo(() => {
-    const unknownState = {
-      tooltip: 'Desconhecido',
-      color: 'red',
-      icon: <XIcon />
-    }
-    if (!status) return unknownState
-
-    switch (status) {
-      case 'not_started':
-        return { tooltip: 'Não iniciado', color: 'red', icon: <XIcon /> }
-      case 'in_progress':
-        return {
-          tooltip: 'Em andamento',
-          color: 'blue',
-          icon: <HourglassMediumIcon />
-        }
-      case 'completed':
-        return { tooltip: 'Concluído', color: 'green', icon: <CheckIcon /> }
-      default:
-        return unknownState
-    }
-  }, [status])
-
-  return (
-    <Tooltip title={tooltip}>
-      <Tag color={color}>{icon}</Tag>
-    </Tooltip>
-  )
-}
+import { Roles } from '@/interfaces/IUser'
+import { ROUTES } from '@/routes/constants'
+import routes, { type IRoute, type IRouteGroup } from '@/routes/routes'
+import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
+import Logo from '../Logo/Logo'
+import ProgressTag from './components/ProgressTag/ProgressTag'
+import UserTag from './components/UserTag/UserTag'
+import styles from './SideBar.module.scss'
 
 function SidebarItems() {
   const { user } = useAuth()
   const location = useLocation()
+  const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>({})
+
+  const toggleGroup = (groupName: string) => {
+    setOpenGroups((prev) => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }))
+  }
+
+  const renderRoute = (route: IRoute) => {
+    if (route.meta?.hidden) return null
+
+    return (
+      <li key={route.path}>
+        <NavLink
+          to={route.path}
+          className={({ isActive }) => {
+            const baseClass =
+              isActive || location.pathname === route.path
+                ? styles.activeLink
+                : styles.link
+
+            const groupClass = route.meta?.group ? styles.linkGroup : ''
+
+            return `${baseClass} ${groupClass}`
+          }}
+          end={route.path === ROUTES.DASHBOARD.path}
+        >
+          <div className={styles.linkContent}>
+            {route.icon && <route.icon size={22} className={styles.linkIcon} />}
+            {route.name}
+          </div>
+
+          {user?.role === Roles.ADMIN && (
+            <ProgressTag status={route.meta?.progress} />
+          )}
+        </NavLink>
+      </li>
+    )
+  }
+
+  const groupedRoutes = routes.reduce<{
+    noGroup: IRoute[]
+    groups: Record<string, { group: IRouteGroup; routes: IRoute[] }>
+  }>(
+    (acc, route) => {
+      if (route.meta?.hidden) return acc
+
+      const group = route.meta?.group
+
+      if (!group) {
+        acc.noGroup.push(route)
+        return acc
+      }
+
+      if (!acc.groups[group.name]) {
+        acc.groups[group.name] = {
+          group,
+          routes: []
+        }
+      }
+
+      acc.groups[group.name].routes.push(route)
+
+      return acc
+    },
+    {
+      noGroup: [],
+      groups: {}
+    }
+  )
+
+  const renderGroup = (
+    groupName: string,
+    groupData: { group: IRouteGroup; routes: IRoute[] }
+  ) => {
+    const isOpen = openGroups[groupName] || false
+
+    return (
+      <li key={groupName}>
+        <div className={styles.link} onClick={() => toggleGroup(groupName)}>
+          <div className={styles.linkContent}>
+            {groupData.group.icon && (
+              <groupData.group.icon size={20} className={styles.linkIcon} />
+            )}
+
+            <span>{groupName}</span>
+          </div>
+
+          {isOpen ? <CaretUpIcon size={22} /> : <CaretDownIcon size={22} />}
+        </div>
+
+        {isOpen && (
+          <ul className={styles.groupList}>
+            {groupData.routes.map(renderRoute)}
+          </ul>
+        )}
+      </li>
+    )
+  }
 
   return (
     <ul className={styles.menuList}>
-      {routes
-        .filter((route) => route.meta?.hidden !== true)
-        .map((route) => (
-          <li key={route.path}>
-            <NavLink
-              to={route.path}
-              className={({ isActive }) =>
-                isActive || location.pathname === route.path
-                  ? styles.activeLink
-                  : styles.link
-              }
-              end={route.path === ROUTES.DASHBOARD.path}
-            >
-              <div className={styles.linkContent}>
-                {route.icon && (
-                  <route.icon size={22} className={styles.linkIcon} />
-                )}
-                {route.name}
-              </div>
-              {user?.role === Roles.ADMIN && (
-                <ProgressTag status={route.meta?.progress} />
-              )}
-            </NavLink>
-          </li>
-        ))}
+      {groupedRoutes.noGroup.map(renderRoute)}
+
+      {Object.entries(groupedRoutes.groups).map(([groupName, groupData]) =>
+        renderGroup(groupName, groupData)
+      )}
     </ul>
-  )
-}
-
-function User() {
-  const { user, logout } = useAuth()
-  const shortName = getShortName(user?.name)
-  const bgColor = stringToColor(shortName)
-  const textColor = getContrastColor(bgColor)
-  const initials = getInitials(shortName)
-
-  return (
-    <button className={styles.user} onClick={logout}>
-      <div className={styles.userContent}>
-        <div
-          className={styles.avatar}
-          style={{ backgroundColor: bgColor, color: textColor }}
-        >
-          {initials}
-        </div>
-
-        <div className={styles.userInfo}>
-          <strong>{shortName}</strong>
-          {user?.role && <p>{UserRoles[user.role]}</p>}
-        </div>
-      </div>
-
-      <SignOutIcon className={styles.icon} size={22} />
-    </button>
   )
 }
 
@@ -129,7 +137,7 @@ function SideBar() {
         <SidebarItems />
       </div>
 
-      <User />
+      <UserTag />
     </nav>
   )
 }

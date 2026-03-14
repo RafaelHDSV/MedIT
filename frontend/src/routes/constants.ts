@@ -1,3 +1,9 @@
+import { UsersThreeIcon } from '@phosphor-icons/react'
+
+export const ROUTE_GROUP = {
+  USERS: { name: 'Usuários', icon: UsersThreeIcon }
+}
+
 export const ROUTES = {
   SIGNIN: { name: 'Login', path: '/' },
   SIGNUP: { name: 'Cadastro', path: '/sign-up' },

@@ -6,7 +6,7 @@ import {
   StethoscopeIcon,
   type Icon
 } from '@phosphor-icons/react'
-import { ROUTES } from './constants'
+import { ROUTE_GROUP, ROUTES } from './constants'
 
 const ProgressStatus = {
   NOT_STARTED: 'not_started',
@@ -16,7 +16,13 @@ const ProgressStatus = {
 export type ProgressStatus =
   (typeof ProgressStatus)[keyof typeof ProgressStatus]
 
+export interface IRouteGroup {
+  name: string
+  icon?: Icon
+}
+
 interface MetaConfiguration {
+  group?: IRouteGroup
   hidden?: boolean
   progress?: ProgressStatus
 }
@@ -50,21 +56,33 @@ const dashboard: IRoute = {
 const doctors: IRoute = {
   name: ROUTES.DOCTORS.name,
   path: ROUTES.DOCTORS.path,
-  meta: { hidden: false, progress: ProgressStatus.IN_PROGRESS },
+  meta: {
+    group: ROUTE_GROUP.USERS,
+    hidden: false,
+    progress: ProgressStatus.IN_PROGRESS
+  },
   icon: AmbulanceIcon
 }
 
 const nurses: IRoute = {
   name: ROUTES.NURSE.name,
   path: ROUTES.NURSE.path,
-  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED },
+  meta: {
+    group: ROUTE_GROUP.USERS,
+    hidden: false,
+    progress: ProgressStatus.NOT_STARTED
+  },
   icon: StethoscopeIcon
 }
 
 const patients: IRoute = {
   name: ROUTES.PATIENTS.name,
   path: ROUTES.PATIENTS.path,
-  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED },
+  meta: {
+    group: ROUTE_GROUP.USERS,
+    hidden: false,
+    progress: ProgressStatus.NOT_STARTED
+  },
   icon: FirstAidIcon
 }
 
