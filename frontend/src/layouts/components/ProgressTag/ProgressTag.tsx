@@ -22,7 +22,6 @@ function ProgressTag({ status }: IProgressTagProps) {
   const { canSeeProgressStatus } = useSettings()
   const isAdmin = user?.role === Roles.ADMIN
 
-
   const { tooltip, color, icon } = useMemo(() => {
     const unknownState = {
       tooltip: 'Desconhecido',

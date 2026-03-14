@@ -1,8 +1,16 @@
-import { useDevTasks } from "@/hooks/useDevTasks"
-import { useSettings } from "@/hooks/useSettings"
-import { Button, Checkbox, Divider, Input, Modal, Switch, Typography } from "antd"
-import { useState } from "react"
-import styles from "./ConfigModal.module.scss"
+import { useDevTasks } from '@/hooks/useDevTasks'
+import { useSettings } from '@/hooks/useSettings'
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Input,
+  Modal,
+  Switch,
+  Typography
+} from 'antd'
+import { useState } from 'react'
+import styles from './ConfigModal.module.scss'
 
 interface IConfigModalProps {
   isModalOpen: boolean
