@@ -3,21 +3,36 @@ import Logo from '../Logo/Logo'
 import styles from './SideBar.module.scss'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ROUTES } from '@/routes/constants'
-import routes from '@/routes/routes'
+import routes, { type IRoute } from '@/routes/routes'
 import { useAuth } from '@/hooks/useAuth'
-import { UserRoles } from '@/interfaces/IUser'
+import { Roles, UserRoles } from '@/interfaces/IUser'
 import { stringToColor } from '@/utils/stringToColor'
 import { getContrastColor } from '@/utils/getContrastColor'
 import { getInitials } from '@/utils/getInitials'
 import getShortName from '@/utils/getShortName'
+import { Tag } from 'antd'
 
 function SidebarItems() {
+  const { user } = useAuth()
   const location = useLocation()
+
+  const getProgressStatus = (route: IRoute) => {
+    switch (route.meta?.progress) {
+      case 'not_started':
+        return <Tag color='red'>Não iniciado</Tag>
+      case 'in_progress':
+        return <Tag color='blue'>Em progresso</Tag>
+      case 'completed':
+        return <Tag color='green'>Concluído</Tag>
+      default:
+        return <Tag color='red'>Não iniciado</Tag>
+    }
+  }
 
   return (
     <ul className={styles.menuList}>
       {routes
-        .filter((route) => route.authed)
+        .filter((route) => route.meta?.hidden !== true)
         .map((route) => (
           <li key={route.path}>
             <NavLink
@@ -33,6 +48,7 @@ function SidebarItems() {
                 <route.icon size={26} className={styles.linkIcon} />
               )}
               {route.name}
+              {user?.role === Roles.ADMIN && getProgressStatus(route)}
             </NavLink>
           </li>
         ))}

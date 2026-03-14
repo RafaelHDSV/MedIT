@@ -1,33 +1,46 @@
 import { ChartBarIcon, type Icon } from '@phosphor-icons/react'
 import { ROUTES } from './constants'
 
-interface IRoute {
+const ProgressStatus = {
+  NOT_STARTED: 'not_started',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed'
+} as const
+export type ProgressStatus =
+  (typeof ProgressStatus)[keyof typeof ProgressStatus]
+
+interface MetaConfiguration {
+  hidden?: boolean
+  progress?: ProgressStatus
+}
+
+export interface IRoute {
   name: string
   path: string
-  authed: boolean
   icon?: Icon
+  meta?: MetaConfiguration
 }
 
 const signIn: IRoute = {
   name: ROUTES.SIGNIN.name,
   path: ROUTES.SIGNIN.path,
-  authed: false
+  meta: { hidden: true, progress: ProgressStatus.NOT_STARTED }
 }
 const signUp: IRoute = {
   name: ROUTES.SIGNUP.name,
   path: ROUTES.SIGNUP.path,
-  authed: false
+  meta: { hidden: true, progress: ProgressStatus.NOT_STARTED }
 }
 const dashboard: IRoute = {
   name: ROUTES.DASHBOARD.name,
   path: ROUTES.DASHBOARD.path,
-  authed: true,
+  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED },
   icon: ChartBarIcon
 }
 const exampleTable: IRoute = {
   name: ROUTES.EXAMPLE_TABLE.name,
   path: ROUTES.EXAMPLE_TABLE.path,
-  authed: true
+  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED }
 }
 
 const routes: IRoute[] = [signIn, signUp, dashboard, exampleTable]
