@@ -29,10 +29,6 @@ function AppRoutes() {
           }
         >
           <Route path={ROUTES.DASHBOARD.path} element={<pages.Dashboard />} />
-          <Route
-            path={ROUTES.EXAMPLE_TABLE.path}
-            element={<pages.ExampleTable />}
-          />
         </Route>
 
         <Route path='*' element={<pages.NotFound />} />

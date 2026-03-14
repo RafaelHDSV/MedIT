@@ -26,23 +26,20 @@ const signIn: IRoute = {
   path: ROUTES.SIGNIN.path,
   meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
+
 const signUp: IRoute = {
   name: ROUTES.SIGNUP.name,
   path: ROUTES.SIGNUP.path,
   meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
+
 const dashboard: IRoute = {
   name: ROUTES.DASHBOARD.name,
   path: ROUTES.DASHBOARD.path,
   meta: { hidden: false, progress: ProgressStatus.NOT_STARTED },
   icon: ChartBarIcon
 }
-const exampleTable: IRoute = {
-  name: ROUTES.EXAMPLE_TABLE.name,
-  path: ROUTES.EXAMPLE_TABLE.path,
-  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED }
-}
 
-const routes: IRoute[] = [signIn, signUp, dashboard, exampleTable]
+const routes: IRoute[] = [signIn, signUp, dashboard]
 
 export default routes
