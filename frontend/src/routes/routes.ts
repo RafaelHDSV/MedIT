@@ -1,4 +1,4 @@
-import { ProgressStatus } from '@/layouts/components/SideBar/components/ProgressTag/ProgressTag'
+import { ProgressStatus } from '@/layouts/components/ProgressTag/ProgressTag'
 import {
   AmbulanceIcon,
   ChartBarIcon,

@@ -1,7 +1,8 @@
+import { useSettings } from '@/hooks/useSettings'
 import { GearIcon } from '@phosphor-icons/react'
-import { Modal, Typography } from 'antd'
+import { Modal, Switch, Typography } from 'antd'
 import { useState } from 'react'
-import ProgressTag, { ProgressStatus } from '../ProgressTag/ProgressTag'
+import ProgressTag, { ProgressStatus } from '../../../ProgressTag/ProgressTag'
 import styles from './ConfigTag.module.scss'
 
 interface IConfigModalProps {
@@ -10,6 +11,8 @@ interface IConfigModalProps {
 }
 
 function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
+  const { canSeeProgressStatus, setCanSeeProgressStatus } = useSettings()
+
   function closeModal() {
     setIsModalOpen(false)
   }
@@ -28,7 +31,12 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
       onCancel={closeModal}
       footer={null}
       centered
-    ></Modal>
+    >
+      <Switch
+        checked={canSeeProgressStatus}
+        onChange={(checked) => setCanSeeProgressStatus(checked)}
+      />
+    </Modal>
   )
 }
 

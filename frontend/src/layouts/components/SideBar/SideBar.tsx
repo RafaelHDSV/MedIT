@@ -1,20 +1,17 @@
-import { useAuth } from '@/hooks/useAuth'
-import { Roles } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import routes, { type IRoute } from '@/routes/routes'
 import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
+import ProgressTag from '../ProgressTag/ProgressTag'
 import ConfigTag from './components/ConfigTag/ConfigTag'
-import ProgressTag from './components/ProgressTag/ProgressTag'
 import UserTag from './components/UserTag/UserTag'
 import styles from './SideBar.module.scss'
 
 const INITIAL_GROUPS_STATE = { Usuários: true }
 
 function SidebarItems() {
-  const { user } = useAuth()
   const location = useLocation()
   const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>(
     INITIAL_GROUPS_STATE
@@ -74,9 +71,8 @@ function SidebarItems() {
                       )}
                       {r.name}
                     </div>
-                    {user?.role === Roles.ADMIN && (
-                      <ProgressTag status={r.meta?.progress} />
-                    )}
+
+                    <ProgressTag status={r.meta?.progress} />
                   </NavLink>
                 </li>
               ))}
