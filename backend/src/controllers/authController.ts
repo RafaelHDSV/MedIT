@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 
+import { JWT_SECRET } from '../globals/Config.js'
 import User from '../models/UserModel.js'
 
 export const register = async (req: Request, res: Response) => {
@@ -42,7 +43,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Senha inválida' })
   }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+  const token = jwt.sign({ id: user._id }, JWT_SECRET as string, {
     expiresIn: '1d'
   })
 

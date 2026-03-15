@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import express, { Request, Response } from 'express'
 
 import connectDatabase from './config/database.js'
+import { PORT } from './globals/Config.js'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 
@@ -22,6 +23,6 @@ app.get('/', (_req: Request, res: Response) => {
 app.use('/auth', authRoutes)
 app.use('/users', userRoutes)
 
-app.listen(process.env.PORT, () => {
-  console.log(`Servidor está rodando em http://localhost:${process.env.PORT}`)
+app.listen(PORT, () => {
+  console.log(`Servidor está rodando em http://localhost:${PORT}`)
 })

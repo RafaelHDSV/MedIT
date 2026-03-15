@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import { JWT_SECRET } from '../globals/Config.js'
 
 export const authMiddleware = (
   req: Request,
@@ -13,7 +14,7 @@ export const authMiddleware = (
   }
 
   try {
-    const decoded = jwt.verify(token, String(process.env.JWT_SECRET))
+    const decoded = jwt.verify(token, String(JWT_SECRET))
 
     req.userId = (decoded as { id: string }).id
 

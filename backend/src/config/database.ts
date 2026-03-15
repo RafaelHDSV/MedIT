@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
+import { MONGO_URL } from '../globals/Config.js'
 
 async function connectDatabase() {
   try {
-    await mongoose.connect(String(process.env.MONGO_URL))
+    await mongoose.connect(String(MONGO_URL))
 
     console.log('MongoDB conectado com sucesso!')
   } catch (error) {
