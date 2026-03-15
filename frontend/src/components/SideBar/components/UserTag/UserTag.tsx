@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/useAuth'
-import { UserRoles } from '@/interfaces/IUser'
+import { UserRolesLabels } from '@/interfaces/IUser'
 import { getContrastColor } from '@/utils/getContrastColor'
 import { getInitials } from '@/utils/getInitials'
 import getShortName from '@/utils/getShortName'
@@ -34,7 +34,7 @@ function UserTag({ isCompact }: IUserTagProps) {
 
           <div className={styles.userInfo}>
             <strong>{shortName}</strong>
-            {user?.role && <p>{UserRoles[user.role]}</p>}
+            {user?.role && <p>{UserRolesLabels[user.role]}</p>}
           </div>
         </div>
       ) : (

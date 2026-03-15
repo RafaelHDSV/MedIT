@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth'
 import { useSettings } from '@/hooks/useSettings'
-import { Roles } from '@/interfaces/IUser'
+import { UserRoles } from '@/interfaces/IUser'
 import { CheckIcon, HourglassMediumIcon, XIcon } from '@phosphor-icons/react'
 import { Tag, Tooltip } from 'antd'
 import { useMemo } from 'react'
@@ -20,7 +20,7 @@ interface IProgressTagProps {
 function ProgressTag({ status }: IProgressTagProps) {
   const { user } = useAuth()
   const { canSeeProgressStatus } = useSettings()
-  const isAdmin = user?.role === Roles.ADMIN
+  const isAdmin = user?.role === UserRoles.ADMIN
 
   const { tooltip, color, icon } = useMemo(() => {
     const unknownState = {

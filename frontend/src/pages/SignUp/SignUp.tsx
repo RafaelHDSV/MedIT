@@ -4,7 +4,7 @@ import InputText from '@/components/InputText/InputText'
 import Logo from '@/components/Logo/Logo'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
-import { Roles } from '@/interfaces/IUser'
+import { UserRolesLabels } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Button, Flex, Form, Input, message } from 'antd'
@@ -38,7 +38,7 @@ function SignUp() {
 
       await api.post('/auth/register', {
         ...values,
-        role: Roles.PATIENT
+        role: UserRolesLabels.PATIENT
       })
 
       message.success('Usuário criado com sucesso!')

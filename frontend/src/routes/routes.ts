@@ -8,7 +8,7 @@ import {
   StethoscopeIcon,
   type Icon
 } from '@phosphor-icons/react'
-import { Roles } from '../interfaces/IUser'
+import { UserRoles } from '../interfaces/IUser'
 import { ROUTE_GROUP, ROUTES } from './constants'
 
 export interface IRouteGroup {
@@ -20,7 +20,7 @@ interface MetaConfiguration {
   group?: IRouteGroup
   hidden?: boolean
   progress?: ProgressStatus
-  levels?: Roles[]
+  levels?: UserRoles[]
 }
 
 export interface IRoute {
@@ -49,7 +49,12 @@ const dashboard: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.ADMIN, Roles.DOCTOR, Roles.NURSE, Roles.PATIENT]
+    levels: [
+      UserRoles.ADMIN,
+      UserRoles.DOCTOR,
+      UserRoles.NURSE,
+      UserRoles.PATIENT
+    ]
   }
 }
 
@@ -61,7 +66,7 @@ const doctors: IRoute = {
     group: ROUTE_GROUP.USERS,
     hidden: false,
     progress: ProgressStatus.IN_PROGRESS,
-    levels: [Roles.ADMIN]
+    levels: [UserRoles.ADMIN]
   }
 }
 
@@ -71,7 +76,7 @@ const doctorDetails: IRoute = {
   meta: {
     hidden: true,
     progress: ProgressStatus.IN_PROGRESS,
-    levels: [Roles.ADMIN]
+    levels: [UserRoles.ADMIN]
   }
 }
 
@@ -83,7 +88,7 @@ const nurses: IRoute = {
     group: ROUTE_GROUP.USERS,
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.ADMIN]
+    levels: [UserRoles.ADMIN]
   }
 }
 
@@ -95,7 +100,7 @@ const patients: IRoute = {
     group: ROUTE_GROUP.USERS,
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.ADMIN, Roles.DOCTOR, Roles.NURSE]
+    levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE]
   }
 }
 
@@ -106,7 +111,12 @@ const medications: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.ADMIN, Roles.DOCTOR, Roles.NURSE, Roles.PATIENT]
+    levels: [
+      UserRoles.ADMIN,
+      UserRoles.DOCTOR,
+      UserRoles.NURSE,
+      UserRoles.PATIENT
+    ]
   }
 }
 
@@ -117,7 +127,7 @@ const attendances: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.DOCTOR]
+    levels: [UserRoles.DOCTOR]
   }
 }
 
@@ -128,7 +138,7 @@ const triages: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.NURSE]
+    levels: [UserRoles.NURSE]
   }
 }
 
