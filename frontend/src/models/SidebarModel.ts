@@ -1,4 +1,4 @@
-import type { Roles } from "@/interfaces/IUser"
+import type { Roles } from '@/interfaces/IUser'
 
 const SidebarModel = {
   hasAcessByLevel: (routeLevel?: Roles[], userLevel?: Roles) => {
