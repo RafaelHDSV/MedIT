@@ -1,3 +1,5 @@
+import { useAuth } from '@/hooks/useAuth'
+import SidebarModel from '@/models/SidebarModel'
 import { ROUTES } from '@/routes/constants'
 import routes, { type IRoute } from '@/routes/routes'
 import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
@@ -12,6 +14,7 @@ import styles from './SideBar.module.scss'
 const INITIAL_GROUPS_STATE = { Usuários: true }
 
 function SidebarItems() {
+  const { user } = useAuth()
   const location = useLocation()
   const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>(
     INITIAL_GROUPS_STATE
@@ -27,7 +30,11 @@ function SidebarItems() {
   const renderedGroups = new Set<string>()
 
   const renderRoute = (route: IRoute) => {
-    if (route.meta?.hidden) return null
+    const hasAcessByLevel = SidebarModel.hasAcessByLevel(
+      route.meta?.levels,
+      user?.role
+    )
+    if (route.meta?.hidden || !hasAcessByLevel) return null
 
     if (route.meta?.group) {
       const groupName = route.meta.group.name
@@ -35,8 +42,13 @@ function SidebarItems() {
       renderedGroups.add(groupName)
 
       const groupRoutes = routes.filter(
-        (r) => r.meta?.group?.name === groupName && !r.meta?.hidden
+        (r) =>
+          r.meta?.group?.name === groupName &&
+          !r.meta?.hidden &&
+          SidebarModel.hasAcessByLevel(r.meta?.levels, user?.role)
       )
+      if (!groupRoutes.length) return null
+
       const isOpen = openGroups[groupName] || false
       return (
         <li key={groupName}>

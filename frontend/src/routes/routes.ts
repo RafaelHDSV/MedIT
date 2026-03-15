@@ -7,6 +7,7 @@ import {
   StethoscopeIcon,
   type Icon
 } from '@phosphor-icons/react'
+import { Roles } from '../interfaces/IUser'
 import { ROUTE_GROUP, ROUTES } from './constants'
 
 export interface IRouteGroup {
@@ -18,6 +19,7 @@ interface MetaConfiguration {
   group?: IRouteGroup
   hidden?: boolean
   progress?: ProgressStatus
+  levels?: Roles[]
 }
 
 export interface IRoute {
@@ -42,48 +44,59 @@ const signUp: IRoute = {
 const dashboard: IRoute = {
   name: ROUTES.DASHBOARD.name,
   path: ROUTES.DASHBOARD.path,
-  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED },
-  icon: ChartBarIcon
+  icon: ChartBarIcon,
+  meta: {
+    hidden: false,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [Roles.ADMIN]
+  }
 }
 
 const doctors: IRoute = {
   name: ROUTES.DOCTORS.name,
   path: ROUTES.DOCTORS.path,
+  icon: AmbulanceIcon,
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.IN_PROGRESS
-  },
-  icon: AmbulanceIcon
+    progress: ProgressStatus.IN_PROGRESS,
+    levels: [Roles.ADMIN]
+  }
 }
 
 const nurses: IRoute = {
   name: ROUTES.NURSE.name,
   path: ROUTES.NURSE.path,
+  icon: StethoscopeIcon,
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED
-  },
-  icon: StethoscopeIcon
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [Roles.ADMIN]
+  }
 }
 
 const patients: IRoute = {
   name: ROUTES.PATIENTS.name,
   path: ROUTES.PATIENTS.path,
+  icon: FirstAidIcon,
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED
-  },
-  icon: FirstAidIcon
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [Roles.ADMIN]
+  }
 }
 
 const medications: IRoute = {
   name: ROUTES.MEDICAMENTS.name,
   path: ROUTES.MEDICAMENTS.path,
-  meta: { hidden: false, progress: ProgressStatus.NOT_STARTED },
-  icon: PillIcon
+  icon: PillIcon,
+  meta: {
+    hidden: false,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [Roles.ADMIN]
+  }
 }
 
 const routes: IRoute[] = [
