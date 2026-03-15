@@ -5,7 +5,7 @@ import User from '../models/UserModel.js'
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, role, email, password } = req.body
+    const { name, cpf, role, email, password } = req.body
 
     const userExists = await User.findOne({ email })
 
@@ -15,6 +15,7 @@ export const register = async (req: Request, res: Response) => {
 
     const user = await User.create({
       name,
+      cpf,
       role,
       email,
       password

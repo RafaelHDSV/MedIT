@@ -10,6 +10,7 @@ export type Roles = (typeof Roles)[keyof typeof Roles]
 
 export interface IUser extends IBaseInterface {
   name: string
+  cpf: string
   role: Roles
   email: string
   password?: string

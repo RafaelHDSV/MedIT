@@ -20,6 +20,17 @@ const UserSchema = new mongoose.Schema<
         message: 'O nome deve conter pelo menos nome e sobrenome.'
       }
     },
+    cpf: {
+      type: String,
+      required: [true, 'O CPF é obrigatório'],
+      unique: true,
+      validate: {
+        validator: function (v: string) {
+          return /^\d{11}$/.test(v)
+        },
+        message: 'Por favor, insira um CPF válido (apenas números, 11 dígitos).'
+      }
+    },
     role: {
       type: String,
       required: [true, 'O papel é obrigatório'],

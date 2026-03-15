@@ -16,6 +16,7 @@ import { useState } from 'react'
 
 interface ISignUpFormErrors {
   name?: string
+  cpf?: string
   email?: string
   password?: string
 }
@@ -26,6 +27,7 @@ function SignUp() {
   const navigate = useNavigate()
   const [fieldErrors, setFieldErrors] = useState<ISignUpFormErrors>({})
   const name = Form.useWatch('name', formRef)
+  const cpf = Form.useWatch('cpf', formRef)
   const email = Form.useWatch('email', formRef)
   const password = Form.useWatch('password', formRef)
 
@@ -34,6 +36,7 @@ function SignUp() {
     try {
       await api.post('/auth/register', {
         name,
+        cpf,
         role: Roles.PATIENT,
         email,
         password
@@ -82,6 +85,16 @@ function SignUp() {
           >
             <Input placeholder='Nome' type='text' />
           </Form.Item>
+
+          <Form.Item
+            label='CPF'
+            name='cpf'
+            validateStatus={fieldErrors.cpf ? 'error' : ''}
+            help={fieldErrors.cpf}
+          >
+            <Input placeholder='CPF' type='text' />
+          </Form.Item>
+
           <Form.Item
             label='Email'
             name='email'
@@ -90,6 +103,7 @@ function SignUp() {
           >
             <Input placeholder='Email' type='email' />
           </Form.Item>
+
           <Form.Item
             label='Senha'
             name='password'
