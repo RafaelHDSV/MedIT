@@ -1,4 +1,4 @@
-import "./DoctorDetails.scss"
+import './DoctorDetails.scss'
 
 interface Doctor {
   nome: string
@@ -11,6 +11,11 @@ interface Doctor {
   especialidade: string
   telefone: string
   dataNascimento: string
+}
+interface Atendimento {
+  data: string
+  tipo: string
+  descricao: string
 }
 
 const doctor: Doctor = {
@@ -27,10 +32,18 @@ const doctor: Doctor = {
 }
 
 function DoctorDetails() {
+  const historico: Atendimento[] = [
+    { data: '12/01/2025', tipo: 'Consulta', descricao: 'Gripe' },
+    { data: '08/11/2024', tipo: 'Emergência', descricao: 'Entorse' },
+    { data: '15/06/2024', tipo: 'Rotina', descricao: 'Check-up' },
+    { data: '22/03/2024', tipo: 'Consulta', descricao: 'Alergia' }
+  ]
+
   return (
     <main>
       <header>
         <h2>Médico</h2>
+
         <div>
           <div>
             <span>FL</span>
@@ -42,11 +55,13 @@ function DoctorDetails() {
               {doctor.idade} anos | {doctor.genero}
             </p>
           </div>
-          <div className="status">
+
+          <div className='status'>
             <span>{doctor.status}</span>
           </div>
         </div>
       </header>
+
       <div>
         <section>
           <h3>Dados Pessoais</h3>
@@ -84,31 +99,41 @@ function DoctorDetails() {
             <span>Queixa do Paciente</span>
             <span>Febre e dores</span>
           </div>
+
           <div>
             <span>Sugestão IA</span>
             <span>Dengue (87%)</span>
           </div>
+
           <div>
             <span>Definição Médica</span>
             <span>Dengue</span>
           </div>
+
           <div>
             <span>Tempo de Atendimento</span>
             <span>20 min</span>
           </div>
+
           <div>
             <span>Data</span>
             <span>12/01/2025</span>
           </div>
         </section>
       </div>
-      <section>
-        <h3>Hístorico de Atendimentos</h3>
+
+      <section className='historicoDeAtendimentos'>
+        <h3>Histórico de Atendimentos</h3>
+
         <ul>
-          <li>12/01/2025 - Consulta - Gripe </li>
-          <li>08/11/2024 - Emergência - Entorse</li>
-          <li>15/06/2024 - Rotina - Check-up</li>
-          <li>22/03/2024 - Consulta - Alergia</li>
+          {historico.map((item, index) => (
+            <li key={index}>
+              <span>{item.data}</span>
+              <span>
+                {item.tipo} - {item.descricao}
+              </span>
+            </li>
+          ))}
         </ul>
       </section>
     </main>
