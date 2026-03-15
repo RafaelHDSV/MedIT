@@ -11,5 +11,7 @@ export const ROUTES = {
   DOCTORS: { name: 'Médicos', path: '/auth/doctors' },
   NURSE: { name: 'Enfermeiros', path: '/auth/nurses' },
   PATIENTS: { name: 'Pacientes', path: '/auth/patients' },
-  MEDICAMENTS: { name: 'Medicamentos', path: '/auth/medications' }
+  MEDICAMENTS: { name: 'Medicamentos', path: '/auth/medications' },
+  ATTENDANCES: { name: 'Histórico de atendimentos', path: '/auth/attendances' },
+  TRIAGES: { name: 'Histórico de triagens', path: '/auth/triages' }
 }

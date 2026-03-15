@@ -1,6 +1,7 @@
 import { ProgressStatus } from '@/layouts/components/ProgressTag/ProgressTag'
 import {
   AmbulanceIcon,
+  CalendarDotsIcon,
   ChartBarIcon,
   FirstAidIcon,
   PillIcon,
@@ -48,7 +49,7 @@ const dashboard: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.ADMIN]
+    levels: [Roles.ADMIN, Roles.DOCTOR, Roles.NURSE, Roles.PATIENT]
   }
 }
 
@@ -84,7 +85,7 @@ const patients: IRoute = {
     group: ROUTE_GROUP.USERS,
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.ADMIN]
+    levels: [Roles.ADMIN, Roles.DOCTOR, Roles.NURSE]
   }
 }
 
@@ -95,14 +96,39 @@ const medications: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [Roles.ADMIN]
+    levels: [Roles.ADMIN, Roles.DOCTOR, Roles.NURSE, Roles.PATIENT]
   }
 }
+
+const attendances: IRoute = {
+  name: ROUTES.ATTENDANCES.name,
+  path: ROUTES.ATTENDANCES.path,
+  icon: CalendarDotsIcon,
+  meta: {
+    hidden: false,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [Roles.DOCTOR]
+  }
+}
+
+const triages: IRoute = {
+  name: ROUTES.TRIAGES.name,
+  path: ROUTES.TRIAGES.path,
+  icon: CalendarDotsIcon,
+  meta: {
+    hidden: false,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [Roles.NURSE]
+  }
+}
+
 
 const routes: IRoute[] = [
   signIn,
   signUp,
   dashboard,
+  attendances,
+  triages,
   doctors,
   nurses,
   patients,

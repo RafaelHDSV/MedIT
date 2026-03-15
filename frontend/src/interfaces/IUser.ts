@@ -2,7 +2,7 @@ export const Roles = {
   ADMIN: 'ADMIN',
   DOCTOR: 'DOCTOR',
   NURSE: 'NURSE',
-  PACIENT: 'PACIENT'
+  PATIENT: 'PATIENT'
 } as const
 export type Roles = (typeof Roles)[keyof typeof Roles]
 
@@ -10,7 +10,7 @@ export const UserRoles = {
   ADMIN: 'Administrador(a)',
   DOCTOR: 'Médico(a)',
   NURSE: 'Enfermeiro(a)',
-  PACIENT: 'Paciente'
+  PATIENT: 'Paciente'
 } as const
 
 export interface IUser {
