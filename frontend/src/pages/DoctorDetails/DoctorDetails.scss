@@ -3,11 +3,16 @@ main {
   font-family: Arial, Helvetica, sans-serif;
   background-color: #fafaf8;
 }
-main > div {
+.cards {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   margin-top: 20px;
-  align-items: stretch;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+.cards > section {
+  width: calc(50% - 10px);
 }
 header {
   margin-bottom: 25px;
@@ -16,23 +21,24 @@ header h2 {
   font-size: 24px;
   margin-bottom: 15px;
 }
+
 header > div {
   display: flex;
   align-items: center;
   gap: 15px;
 }
-
 header > div > div:first-child {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   background-color: #e8553d;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 25%;
   border: 1px solid #e5e7eb;
   font-weight: bold;
+  font-size: 24px;
 }
 
 header > div > div:nth-child(2) {
@@ -54,7 +60,6 @@ section {
   background-color: white;
   border-radius: 8px;
   padding: 20px;
-  flex: 1;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -64,6 +69,10 @@ section h3 {
   margin-bottom: 20px;
   font-size: 18px;
   font-weight: bold;
+  color: #e8553d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 section div {
@@ -98,6 +107,30 @@ section ul li {
 section ul li:last-child {
   border-bottom: none;
 }
+section ul li span:first-child {
+  font-weight: 600;
+}
+
+section ul li span:last-child {
+  color: #555;
+}
 .historicoDeAtendimentos {
   margin-top: 20px;
+}
+.doctor-info {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.idade {
+  color: #555;
+}
+
+.genero {
+  color: #555;
+}
+
+.separador {
+  margin: 0 6px;
+  color: #555;
 }

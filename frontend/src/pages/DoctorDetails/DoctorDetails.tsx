@@ -1,5 +1,6 @@
 import './DoctorDetails.scss'
-
+import { CalendarDots } from '@phosphor-icons/react'
+import { ChartBar } from '@phosphor-icons/react'
 interface Doctor {
   nome: string
   idade: number
@@ -51,8 +52,10 @@ function DoctorDetails() {
 
           <div>
             <h3>{doctor.nome}</h3>
-            <p>
-              {doctor.idade} anos | {doctor.genero}
+            <p className='doctor-info'>
+              <span className='idade'>{doctor.idade} anos</span>
+              <span className='separador'>|</span>
+              <span className='genero'>{doctor.genero}</span>
             </p>
           </div>
 
@@ -62,7 +65,7 @@ function DoctorDetails() {
         </div>
       </header>
 
-      <div>
+      <div className='cards'>
         <section>
           <h3>Dados Pessoais</h3>
 
@@ -93,7 +96,10 @@ function DoctorDetails() {
         </section>
 
         <section>
-          <h3>Último Atendimento</h3>
+          <h3>
+            <CalendarDots size={25} />
+            Último Atendimento
+          </h3>
 
           <div>
             <span>Queixa do Paciente</span>
@@ -107,7 +113,7 @@ function DoctorDetails() {
 
           <div>
             <span>Definição Médica</span>
-            <span>Dengue</span>
+            <span>Dengue✅</span>
           </div>
 
           <div>
@@ -120,22 +126,24 @@ function DoctorDetails() {
             <span>12/01/2025</span>
           </div>
         </section>
+
+        <section className='historicoDeAtendimentos'>
+          <h3>
+            <ChartBar size={25} />
+            Histórico de Atendimentos
+          </h3>
+          <ul>
+            {historico.map((item, index) => (
+              <li key={index}>
+                <span>{item.data}</span>
+                <span>
+                  {item.tipo} - {item.descricao}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
-
-      <section className='historicoDeAtendimentos'>
-        <h3>Histórico de Atendimentos</h3>
-
-        <ul>
-          {historico.map((item, index) => (
-            <li key={index}>
-              <span>{item.data}</span>
-              <span>
-                {item.tipo} - {item.descricao}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
     </main>
   )
 }
