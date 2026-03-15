@@ -1,14 +1,15 @@
 import { api } from '@/api/api'
 import UnauthImage from '@/assets/unauth-image.svg'
+import Logo from '@/components/Logo/Logo'
 import { useAuth } from '@/hooks/useAuth'
 import { Roles } from '@/interfaces/IUser'
-import Logo from '@/layouts/components/Logo/Logo'
 import { ROUTES } from '@/routes/constants'
 import { Button, Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from './SignUp.module.scss'
 
+import InputText from '@/components/InputText/InputText'
 import type { IError } from '@/interfaces/IError'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
@@ -92,7 +93,7 @@ function SignUp() {
             validateStatus={fieldErrors.cpf ? 'error' : ''}
             help={fieldErrors.cpf}
           >
-            <Input placeholder='CPF' type='text' />
+            <InputText mask='cpf' placeholder='CPF' />
           </Form.Item>
 
           <Form.Item

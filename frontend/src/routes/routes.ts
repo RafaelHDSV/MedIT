@@ -1,4 +1,4 @@
-import { ProgressStatus } from '@/layouts/components/ProgressTag/ProgressTag'
+import { ProgressStatus } from '@/components/ProgressTag/ProgressTag'
 import {
   AmbulanceIcon,
   CalendarDotsIcon,
@@ -121,7 +121,6 @@ const triages: IRoute = {
     levels: [Roles.NURSE]
   }
 }
-
 
 const routes: IRoute[] = [
   signIn,

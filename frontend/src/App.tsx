@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
+import { LayoutSpinner } from './components/LayoutSpinner/LayoutSpinner'
 import { AuthProvider } from './contexts/AuthContext/AuthProvider'
 import { SettingsProvider } from './contexts/SettingsContext/SettingsProvider'
-import { LayoutSpinner } from './layouts/components/LayoutSpinner/LayoutSpinner'
 import AppRoutes from './routes/AppRoutes'
 
 function App() {
