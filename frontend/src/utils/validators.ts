@@ -37,24 +37,24 @@ const onlyNumbers = (value: string): boolean => {
   return numberRegex.test(value)
 }
 
-const signInIdentifier = (value: string): string | null => {
-  if (!value) return 'Campo obrigatório'
+const signInIdentifier = (value: string): boolean => {
+  if (!value) return false
 
   const clean = value.trim()
   const numbers = clean.replace(/\D/g, '')
 
   if (onlyNumbers(numbers)) {
     if (!isValidCPF(numbers)) {
-      return 'CPF inválido'
+      return false
     }
-    return null
+    return true
   }
 
   if (!isEmail(clean)) {
-    return 'Email inválido'
+    return false
   }
 
-  return null
+  return true
 }
 
 export type ValidatorEnum =
@@ -66,7 +66,7 @@ export type ValidatorEnum =
 function validators(
   value: string | number | undefined | null | object | boolean,
   validator?: ValidatorEnum
-): string | boolean | null {
+): boolean {
   if (!value || typeof value === 'object') return false
   if (!validator) return true
 

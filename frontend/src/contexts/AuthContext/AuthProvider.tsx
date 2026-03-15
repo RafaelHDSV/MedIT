@@ -1,6 +1,10 @@
 import { api } from '@/api/api'
+import type { IError } from '@/interfaces/IError'
 import { type IUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
+import { message } from 'antd'
+import type { AxiosError } from 'axios'
+import axios from 'axios'
 import { useState, type ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
 
@@ -34,8 +38,15 @@ export function AuthProvider({ children }: Props) {
       setUser(formattedUser)
       localStorage.setItem('user', JSON.stringify(formattedUser))
       localStorage.setItem('token', token)
-    } catch (error) {
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.log(error)
+
       console.error('Erro no login', error)
+      message.error(
+        error.response?.data?.message || 'Email/CPF ou senha inválidos'
+      )
     }
   }
 
