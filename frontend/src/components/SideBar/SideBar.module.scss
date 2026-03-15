@@ -33,6 +33,7 @@
   gap: 1rem;
 
   .icon {
+    min-width: 32px;
     font-size: 2rem;
     color: var(--primary-color);
     transition: all ease-in-out 0.15s;

@@ -6,7 +6,7 @@ import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
-import ProgressTag from '../ProgressTag/ProgressTag'
+import ProgressTag, { ProgressStatus } from '../ProgressTag/ProgressTag'
 import ConfigTag from './components/ConfigTag/ConfigTag'
 import UserTag from './components/UserTag/UserTag'
 import styles from './SideBar.module.scss'
@@ -136,6 +136,7 @@ function SideBar() {
             onClick={() => setIsCompact(!isCompact)}
           />
           <Logo fontSize={32} isCompact={isCompact} />
+          <ProgressTag status={ProgressStatus.COMPLETED} />
         </header>
 
         <SidebarItems isCompact={isCompact} />
