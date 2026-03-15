@@ -65,6 +65,16 @@ const doctors: IRoute = {
   }
 }
 
+const doctorDetails: IRoute = {
+  name: ROUTES.DOCTORS_DETAILS.name,
+  path: ROUTES.DOCTORS_DETAILS.path,
+  meta: {
+    hidden: true,
+    progress: ProgressStatus.IN_PROGRESS,
+    levels: [Roles.ADMIN]
+  }
+}
+
 const nurses: IRoute = {
   name: ROUTES.NURSE.name,
   path: ROUTES.NURSE.path,
@@ -129,6 +139,7 @@ const routes: IRoute[] = [
   attendances,
   triages,
   doctors,
+  doctorDetails,
   nurses,
   patients,
   medications

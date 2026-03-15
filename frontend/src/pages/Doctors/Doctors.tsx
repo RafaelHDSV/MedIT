@@ -1,14 +1,28 @@
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
-import { Flex } from 'antd'
+import { ROUTES } from '@/routes/constants'
+import { Button, Flex } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
 function Doctors() {
+  const navigate = useNavigate()
+
   return (
-    <Flex gap={16} align='center'>
-      <h1>Doctors</h1>
-      <ProgressTag status={ProgressStatus.NOT_STARTED} />
-    </Flex>
+    <div>
+      <Flex gap={16} align='center'>
+        <h1>Doctors</h1>
+        <ProgressTag status={ProgressStatus.NOT_STARTED} />
+      </Flex>
+
+      <Button
+        onClick={() =>
+          navigate(ROUTES.DOCTORS_DETAILS.path.replace(':id', '1'))
+        }
+      >
+        Abrir detalhes
+      </Button>
+    </div>
   )
 }
 
