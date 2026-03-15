@@ -1,4 +1,4 @@
-import type { _maskEnum } from '@/utils/masks'
+import type { MaskEnum } from '@/utils/masks'
 import masks from '@/utils/masks'
 import {
   Input as AntInput,
@@ -9,7 +9,7 @@ import {
 import { useState, type RefObject } from 'react'
 
 interface IInputProps extends InputProps {
-  mask?: _maskEnum
+  mask?: MaskEnum
   value?: string | number | undefined
   loading?: boolean
   inputRef?: RefObject<InputRef | null>
@@ -24,7 +24,7 @@ export default function InputText({
   ...rest
 }: IInputProps) {
   const [valueMask, setValueMask] = useState(value)
-  const maxLengthList: Partial<Record<_maskEnum, number>> = {
+  const maxLengthList: Partial<Record<MaskEnum, number>> = {
     cpf: 14
   }
 

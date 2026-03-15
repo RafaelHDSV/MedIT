@@ -9,11 +9,11 @@ const cpfMask = (value: string | undefined) => {
     .replace(/(-\d{2})\d+?$/, '$1')
 }
 
-export type _maskEnum = 'cpf'
+export type MaskEnum = 'cpf'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
-  mask?: _maskEnum
+  mask?: MaskEnum
 ): string {
   if (!value || typeof value === 'object') return ''
 

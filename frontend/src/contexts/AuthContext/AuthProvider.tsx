@@ -1,7 +1,8 @@
+import { api } from '@/api/api'
+import { type IUser } from '@/interfaces/IUser'
+import type { LoginPayload } from '@/pages/SignIn/SignIn'
 import { useState, type ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
-import { type IUser } from '@/interfaces/IUser'
-import { api } from '@/api/api'
 
 interface Props {
   children: ReactNode
@@ -13,10 +14,11 @@ export function AuthProvider({ children }: Props) {
     return stored ? JSON.parse(stored) : null
   })
 
-  async function login(email: string, password: string) {
+  async function login({ email, cpf, password }: LoginPayload) {
     try {
       const response = await api.post('/auth/login', {
         email,
+        cpf,
         password
       })
       const { token, user } = response.data

@@ -29,9 +29,14 @@ export const register = async (req: Request, res: Response) => {
 }
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body
+  const { email, cpf, password } = req.body
 
-  const user = await User.findOne({ email })
+  let user = null
+  if (email) {
+    user = await User.findOne({ email })
+  } else if (cpf) {
+    user = await User.findOne({ cpf })
+  }
 
   if (!user) {
     return res.status(400).json({ message: 'Usuário não encontrado' })
