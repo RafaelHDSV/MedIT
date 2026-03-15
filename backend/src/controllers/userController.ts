@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import User from '../models/UserModel.js'
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (_req: Request, res: Response) => {
   const users = await User.find().select('-password')
   res.json(users)
 }

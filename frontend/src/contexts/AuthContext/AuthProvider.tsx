@@ -30,7 +30,7 @@ export function AuthProvider({ children }: Props) {
         password
       })
 
-      const { token, user } = response.data
+      const { accessToken, refreshToken, user } = response.data
 
       const formattedUser: IUser = {
         _id: user._id,
@@ -42,7 +42,8 @@ export function AuthProvider({ children }: Props) {
       setUser(formattedUser)
 
       localStorage.setItem('user', JSON.stringify(formattedUser))
-      localStorage.setItem('token', token)
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
 
       return true
     } catch (err) {
@@ -59,10 +60,16 @@ export function AuthProvider({ children }: Props) {
     }
   }
 
-  function logout() {
-    setUser(null)
+  async function logout() {
+    const refreshToken = localStorage.getItem('refreshToken')
+
+    await api.post('/auth/logout', { refreshToken })
+
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
-    localStorage.removeItem('token')
+
+    setUser(null)
   }
 
   return (

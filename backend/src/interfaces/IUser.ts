@@ -14,6 +14,7 @@ export interface IUser extends IBaseInterface {
   role: Roles
   email: string
   password?: string
+  refreshToken?: string
 }
 
 export interface IUserMethods {

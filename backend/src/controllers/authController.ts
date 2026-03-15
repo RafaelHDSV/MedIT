@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-
-import { JWT_SECRET } from '../globals/Config.js'
+import { JWT_REFRESH_SECRET, JWT_SECRET } from '../globals/Config.js'
 import User from '../models/UserModel.js'
+import generateTokens from '../utils/generateTokens.js'
 
+// /register
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, cpf, role, email, password } = req.body
@@ -28,6 +29,7 @@ export const register = async (req: Request, res: Response) => {
   }
 }
 
+// /login
 export const login = async (req: Request, res: Response) => {
   const { email, cpf, password } = req.body
 
@@ -42,18 +44,60 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Usuário não encontrado' })
   }
 
+  const { accessToken, refreshToken } = generateTokens(user._id)
+  user.refreshToken = refreshToken
+  await user.save()
+
   const validPassword = await user.comparePassword(password)
 
   if (!validPassword) {
     return res.status(400).json({ message: 'Senha inválida' })
   }
 
-  const token = jwt.sign({ id: user._id }, JWT_SECRET as string, {
-    expiresIn: '1d'
-  })
-
   return res.json({
-    token,
+    accessToken,
+    refreshToken,
     user
   })
+}
+
+// /refresh
+export const refresh = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: 'Refresh token inválido' })
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET!) as any
+
+    const user = await User.findById(decoded.userId)
+
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(403).json({ message: 'Token inválido' })
+    }
+
+    const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET!, {
+      expiresIn: '15m'
+    })
+
+    return res.json({ accessToken })
+  } catch {
+    return res.status(403).json({ message: 'Token inválido' })
+  }
+}
+
+// /logout
+export const logout = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body
+
+  const user = await User.findOne({ refreshToken })
+
+  if (user) {
+    user.refreshToken = undefined
+    await user.save()
+  }
+
+  res.json({ message: 'Logout realizado' })
 }
