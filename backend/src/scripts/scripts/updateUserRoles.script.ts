@@ -6,12 +6,12 @@ const updateUserRoles: Script = {
   description: 'Atualiza os papéis dos usuários no banco',
 
   async run() {
+    const from = 'PACIENT'
+    const to = 'PATIENT'
+
     console.log('Atualizando papéis dos usuários...')
 
-    const result = await User.updateMany(
-      { role: 'PACIENT' },
-      { $set: { role: 'PATIENT' } }
-    )
+    const result = await User.updateMany({ role: from }, { $set: { role: to } })
 
     console.log(`${result.modifiedCount} papéis atualizados!`)
   }

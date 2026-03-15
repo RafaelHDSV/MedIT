@@ -66,7 +66,5 @@ UserSchema.methods.comparePassword = async function (password: string) {
   return bcrypt.compare(password, this.password)
 }
 
-UserSchema.index({ email: 1 })
-
 type UserModel = mongoose.Model<IUser, {}, IUserMethods>
 export default mongoose.model<IUser, UserModel>('User', UserSchema)

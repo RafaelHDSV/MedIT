@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
-import { connectDatabase } from '../config/database.js'
+import connectDatabase from '../config/database.js'
 import { Script } from './types.js'
 
 dotenv.config()
@@ -16,7 +16,9 @@ async function loadScripts(): Promise<Script[]> {
 
   const files = fs
     .readdirSync(scriptsDir)
-    .filter((file) => file.endsWith('.script.ts'))
+    .filter(
+      (file) => file.endsWith('.script.ts') || file.endsWith('.script.js')
+    )
 
   const scripts: Script[] = []
 
@@ -30,11 +32,11 @@ async function loadScripts(): Promise<Script[]> {
 }
 
 async function run() {
-  connectDatabase()
+  await connectDatabase()
 
   const scripts = await loadScripts()
   if (!scripts.length) {
-    console.error('Nenhum script registrado em src/scripts/index.ts')
+    console.error('Nenhum script encontrado na pasta scripts')
     process.exit(1)
   }
 
