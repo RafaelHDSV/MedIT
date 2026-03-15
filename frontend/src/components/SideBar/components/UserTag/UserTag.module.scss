@@ -54,3 +54,17 @@
     }
   }
 }
+
+.compact {
+  justify-content: center;
+  height: 3rem;
+
+  .userInfo {
+    display: none;
+  }
+
+  .icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+  }
+}

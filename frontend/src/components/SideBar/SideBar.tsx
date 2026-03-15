@@ -13,7 +13,11 @@ import styles from './SideBar.module.scss'
 
 const INITIAL_GROUPS_STATE = { Usuários: true }
 
-function SidebarItems() {
+interface ISidebarItemsProps {
+  isCompact: boolean
+}
+
+function SidebarItems({ isCompact }: ISidebarItemsProps) {
   const { user } = useAuth()
   const location = useLocation()
   const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>(
@@ -36,7 +40,7 @@ function SidebarItems() {
     )
     if (route.meta?.hidden || !hasAcessByLevel) return null
 
-    if (route.meta?.group) {
+    if (route.meta?.group && !isCompact) {
       const groupName = route.meta.group.name
       if (renderedGroups.has(groupName)) return null
       renderedGroups.add(groupName)
@@ -81,7 +85,7 @@ function SidebarItems() {
                       {r.icon && (
                         <r.icon size={22} className={styles.linkIcon} />
                       )}
-                      {r.name}
+                      {!isCompact ? r.name : ''}
                     </div>
 
                     <ProgressTag status={r.meta?.progress} />
@@ -107,7 +111,7 @@ function SidebarItems() {
         >
           <div className={styles.linkContent}>
             {route.icon && <route.icon size={22} className={styles.linkIcon} />}
-            {route.name}
+            {!isCompact ? route.name : ''}
           </div>
 
           <ProgressTag status={route.meta?.progress} />
@@ -120,20 +124,26 @@ function SidebarItems() {
 }
 
 function SideBar() {
+  const [isCompact, setIsCompact] = useState(false)
+
   return (
-    <nav className={styles.nav}>
+    <nav className={`${styles.nav} ${isCompact ? styles.compact : ''}`}>
       <div className={styles.main}>
         <header className={styles.header}>
-          <ListIcon className={styles.icon} size={32} />
-          <Logo fontSize={32} />
+          <ListIcon
+            className={styles.icon}
+            size={32}
+            onClick={() => setIsCompact(!isCompact)}
+          />
+          <Logo fontSize={32} isCompact={isCompact} />
         </header>
 
-        <SidebarItems />
+        <SidebarItems isCompact={isCompact} />
       </div>
 
       <div className={styles.footer}>
-        <ConfigTag />
-        <UserTag />
+        <ConfigTag isCompact={isCompact} />
+        <UserTag isCompact={isCompact} />
       </div>
     </nav>
   )

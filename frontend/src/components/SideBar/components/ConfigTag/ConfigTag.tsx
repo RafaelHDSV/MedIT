@@ -4,7 +4,11 @@ import ProgressTag, { ProgressStatus } from '../../../ProgressTag/ProgressTag'
 import styles from './ConfigTag.module.scss'
 import ConfigModal from './components/ConfigModal/ConfigModal'
 
-function ConfigTag() {
+interface IConfigTagProps {
+  isCompact: boolean
+}
+
+function ConfigTag({ isCompact }: IConfigTagProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   function openModal() {
@@ -16,11 +20,11 @@ function ConfigTag() {
       <ConfigModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
 
       <button
-        className={`${styles.tag} ${isModalOpen ? styles.activeTag : ''}`}
+        className={`${styles.tag} ${isModalOpen ? styles.activeTag : ''} ${isCompact ? styles.compact : ''}`}
         onClick={openModal}
       >
         <GearIcon size={22} />
-        <span>Configurações</span>
+        {!isCompact ? <span>Configurações</span> : null}
 
         <ProgressTag status={ProgressStatus.IN_PROGRESS} />
       </button>
