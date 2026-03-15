@@ -1,103 +1,101 @@
-import './DoctorDetails.scss'
-import { CalendarDots } from '@phosphor-icons/react'
-import { ChartBar } from '@phosphor-icons/react'
-interface Doctor {
-  nome: string
-  idade: number
-  genero: string
-  status: string
+import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import {
+  UserGender,
+  UserGendersLabels,
+  UserRoles,
+  type IUser
+} from '@/interfaces/IUser'
+import { getInitials } from '@/utils/getInitials'
+import { CalendarDotsIcon, ChartBarIcon } from '@phosphor-icons/react'
+import styles from './DoctorDetails.module.scss'
 
-  cpf: string
-  crm: string
-  especialidade: string
-  telefone: string
-  dataNascimento: string
-}
-interface Atendimento {
-  data: string
-  tipo: string
-  descricao: string
-}
-
-const doctor: Doctor = {
-  nome: 'Fernando Luís',
-  idade: 58,
-  genero: 'Masculino',
-  status: 'Em plantão',
-
+const mockedDoctor: IUser = {
+  name: 'Fernando Luís',
   cpf: '328.189.110-10',
+  role: UserRoles.DOCTOR,
+  email: 'fernando.luis@example.com',
+  password: 'password123',
+  age: 58,
+  gender: UserGender.MALE,
+  cellphone: 15999991234,
+  birthDate: new Date('1968-09-15'),
   crm: '117101',
-  especialidade: 'Pediatria',
-  telefone: '(15) 99999-1234',
-  dataNascimento: '15/09/1968'
+  specialization: 'Pediatria'
 }
+
+interface Attendance {
+  type: string
+  description: string
+  date: Date
+}
+
+const mockedAttendance: Attendance[] = [
+  { type: 'Consulta', description: 'Gripe', date: new Date('01/12/2025') },
+  { type: 'Emergência', description: 'Entorse', date: new Date('11/08/2024') },
+  { type: 'Rotina', description: 'Check-up', date: new Date('06/15/2024') },
+  { type: 'Consulta', description: 'Alergia', date: new Date('03/22/2024') }
+]
 
 function DoctorDetails() {
-  const historico: Atendimento[] = [
-    { data: '12/01/2025', tipo: 'Consulta', descricao: 'Gripe' },
-    { data: '08/11/2024', tipo: 'Emergência', descricao: 'Entorse' },
-    { data: '15/06/2024', tipo: 'Rotina', descricao: 'Check-up' },
-    { data: '22/03/2024', tipo: 'Consulta', descricao: 'Alergia' }
-  ]
+  const initials = getInitials(mockedDoctor.name)
 
   return (
-    <main>
-      <header>
-        <h2>Médico</h2>
+    <div className={styles.container}>
+      <AuthLayoutHeader />
 
-        <div>
-          <div>
-            <span>FL</span>
-          </div>
+      <header className={styles.header}>
+        <div className={styles.avatar}>{initials}</div>
 
-          <div>
-            <h3>{doctor.nome}</h3>
-            <p className='doctor-info'>
-              <span className='idade'>{doctor.idade} anos</span>
-              <span className='separador'>|</span>
-              <span className='genero'>{doctor.genero}</span>
-            </p>
-          </div>
+        <div className={styles.doctorInfo}>
+          <h2>{mockedDoctor.name}</h2>
 
-          <div className='status'>
-            <span>{doctor.status}</span>
-          </div>
+          <p>
+            <span>{mockedDoctor.age} anos</span>
+            <span className={styles.separator}>•</span>
+            <span>
+              {mockedDoctor.gender && UserGendersLabels[mockedDoctor.gender]}
+            </span>
+          </p>
+        </div>
+
+        <div className={styles.status}>
+          <span>Em plantão</span>
         </div>
       </header>
 
-      <div className='cards'>
-        <section>
+      <div className={styles.cards}>
+        <section className={styles.card}>
           <h3>Dados Pessoais</h3>
 
           <div>
             <span>CPF</span>
-            <span>{doctor.cpf}</span>
+            <span>{mockedDoctor.cpf}</span>
           </div>
 
           <div>
             <span>CRM</span>
-            <span>{doctor.crm}</span>
+            <span>{mockedDoctor.crm}</span>
           </div>
 
           <div>
             <span>Especialidade</span>
-            <span>{doctor.especialidade}</span>
+            <span>{mockedDoctor.specialization}</span>
           </div>
 
           <div>
             <span>Telefone</span>
-            <span>{doctor.telefone}</span>
+            <span>{mockedDoctor.cellphone}</span>
           </div>
 
           <div>
             <span>Data de Nascimento</span>
-            <span>{doctor.dataNascimento}</span>
+            <span>{mockedDoctor.birthDate?.toLocaleDateString()}</span>
           </div>
         </section>
 
-        <section>
+        <section className={styles.card}>
           <h3>
-            <CalendarDots size={25} />
+            <CalendarDotsIcon size={22} />
             Último Atendimento
           </h3>
 
@@ -113,7 +111,7 @@ function DoctorDetails() {
 
           <div>
             <span>Definição Médica</span>
-            <span>Dengue✅</span>
+            <span>Dengue ✅</span>
           </div>
 
           <div>
@@ -127,24 +125,28 @@ function DoctorDetails() {
           </div>
         </section>
 
-        <section className='historicoDeAtendimentos'>
+        <section className={`${styles.card} ${styles.history}`}>
           <h3>
-            <ChartBar size={25} />
+            <ChartBarIcon size={22} />
             Histórico de Atendimentos
           </h3>
+
           <ul>
-            {historico.map((item, index) => (
+            {mockedAttendance.map((item, index) => (
               <li key={index}>
-                <span>{item.data}</span>
-                <span>
-                  {item.tipo} - {item.descricao}
+                <span className={styles.date}>
+                  {item.date.toLocaleDateString()}
+                </span>
+
+                <span className={styles.description}>
+                  {item.type} - {item.description}
                 </span>
               </li>
             ))}
           </ul>
         </section>
       </div>
-    </main>
+    </div>
   )
 }
 
