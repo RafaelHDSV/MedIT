@@ -40,9 +40,8 @@ export default function SignIn() {
         payload.cpf = identifier.replace(/\D/g, '')
       }
 
-      await login(payload)
-
-      navigate(ROUTES.DASHBOARD.path)
+      const success = await login(payload)
+      if (success) navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
       console.error(err)
       message.error('Email/CPF ou senha inválidos')

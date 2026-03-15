@@ -4,7 +4,7 @@ import { createContext } from 'react'
 
 export interface AuthContextType {
   user: IUser | null
-  login: (payload: LoginPayload) => void
+  login: (payload: LoginPayload) => Promise<boolean>
   logout: () => void
 }
 

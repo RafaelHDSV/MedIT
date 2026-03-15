@@ -43,13 +43,12 @@ function SignUp() {
 
       message.success('Usuário criado com sucesso!')
 
-      await login({
+      const success = await login({
         email: values.email,
-        cpf: values.cpf,
         password: values.password
       })
 
-      navigate(ROUTES.DASHBOARD.path)
+      if (success) navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>

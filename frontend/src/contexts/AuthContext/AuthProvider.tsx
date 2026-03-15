@@ -18,35 +18,44 @@ export function AuthProvider({ children }: Props) {
     return stored ? JSON.parse(stored) : null
   })
 
-  async function login({ email, cpf, password }: LoginPayload) {
+  async function login({
+    email,
+    cpf,
+    password
+  }: LoginPayload): Promise<boolean> {
     try {
       const response = await api.post('/auth/login', {
         email,
         cpf,
         password
       })
+
       const { token, user } = response.data
 
       const formattedUser: IUser = {
         _id: user._id,
         name: user.name,
         role: user.role,
-        email: user.email,
-        password: user.password
+        email: user.email
       }
 
       setUser(formattedUser)
+
       localStorage.setItem('user', JSON.stringify(formattedUser))
       localStorage.setItem('token', token)
+
+      return true
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
+      if (!axios.isAxiosError(err)) return false
+
       const error = err as AxiosError<IError>
-      console.log(error)
 
       console.error('Erro no login', error)
       message.error(
         error.response?.data?.message || 'Email/CPF ou senha inválidos'
       )
+
+      return false
     }
   }
 
