@@ -1,5 +1,5 @@
 function Medications() {
-  return <p>Medications</p>
+  return <h1>Medications</h1>
 }
 
 export default Medications

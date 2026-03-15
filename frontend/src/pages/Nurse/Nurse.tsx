@@ -1,5 +1,5 @@
 function Nurse() {
-  return <p>Nurse</p>
+  return <h1>Nurse</h1>
 }
 
 export default Nurse

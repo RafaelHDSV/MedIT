@@ -1,5 +1,5 @@
 function Attendances() {
-  return <p>Attendances</p>
+  return <h1>Attendances</h1>
 }
 
 export default Attendances

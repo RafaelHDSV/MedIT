@@ -1,5 +1,5 @@
 function Patients() {
-  return <p>Patients</p>
+  return <h1>Patients</h1>
 }
 
 export default Patients

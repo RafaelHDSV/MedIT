@@ -1,5 +1,5 @@
 function Triages() {
-  return <p>Triages</p>
+  return <h1>Triages</h1>
 }
 
 export default Triages
