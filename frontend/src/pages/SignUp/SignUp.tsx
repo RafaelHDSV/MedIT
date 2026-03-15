@@ -44,7 +44,7 @@ function SignUp() {
       })
       message.success('Usuário criado com sucesso!')
       setTimeout(() => {
-        login(email, password)
+        login({ email, cpf, password })
         navigate(ROUTES.DASHBOARD.path)
       }, 1000)
     } catch (err) {
@@ -83,6 +83,7 @@ function SignUp() {
             name='name'
             validateStatus={fieldErrors.name ? 'error' : ''}
             help={fieldErrors.name}
+            rules={[{ required: true, message: 'Campo obrigatório' }]}
           >
             <Input placeholder='Nome' type='text' />
           </Form.Item>
@@ -92,6 +93,7 @@ function SignUp() {
             name='cpf'
             validateStatus={fieldErrors.cpf ? 'error' : ''}
             help={fieldErrors.cpf}
+            rules={[{ required: true, message: 'Campo obrigatório' }]}
           >
             <InputText mask='cpf' placeholder='CPF' />
           </Form.Item>
@@ -101,6 +103,7 @@ function SignUp() {
             name='email'
             validateStatus={fieldErrors.email ? 'error' : ''}
             help={fieldErrors.email}
+            rules={[{ required: true, message: 'Campo obrigatório' }]}
           >
             <Input placeholder='Email' type='email' />
           </Form.Item>
@@ -110,6 +113,7 @@ function SignUp() {
             name='password'
             validateStatus={fieldErrors.password ? 'error' : ''}
             help={fieldErrors.password}
+            rules={[{ required: true, message: 'Campo obrigatório' }]}
           >
             <Input placeholder='Senha' type='password' minLength={6} />
           </Form.Item>
