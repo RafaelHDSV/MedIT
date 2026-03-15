@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 import User from '../models/UserModel.js'
@@ -14,13 +13,11 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Usuário já existe' })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-
     const user = await User.create({
       name,
       role,
       email,
-      password: hashedPassword
+      password
     })
 
     return res.status(201).json(user)
@@ -38,7 +35,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Usuário não encontrado' })
   }
 
-  const validPassword = await bcrypt.compare(password, user.password)
+  const validPassword = await user.comparePassword(password)
 
   if (!validPassword) {
     return res.status(400).json({ message: 'Senha inválida' })

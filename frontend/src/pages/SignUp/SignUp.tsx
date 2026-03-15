@@ -9,27 +9,63 @@ import { useForm } from 'antd/es/form/Form'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from './SignUp.module.scss'
 
+import type { IError } from '@/interfaces/IError'
+import type { AxiosError } from 'axios'
+import axios from 'axios'
+import { useState } from 'react'
+
+interface ISignUpFormErrors {
+  name?: string
+  email?: string
+  password?: string
+}
+
 function SignUp() {
   const { login } = useAuth()
   const [formRef] = useForm()
   const navigate = useNavigate()
+  const [fieldErrors, setFieldErrors] = useState<ISignUpFormErrors>({})
   const name = Form.useWatch('name', formRef)
   const email = Form.useWatch('email', formRef)
   const password = Form.useWatch('password', formRef)
 
   const handleRegister = async () => {
-    await api.post('/auth/register', {
-      name,
-      role: Roles.PATIENT,
-      email,
-      password
-    })
-    message.success('Usuário criado com sucesso!')
+    setFieldErrors({})
+    try {
+      await api.post('/auth/register', {
+        name,
+        role: Roles.PATIENT,
+        email,
+        password
+      })
+      message.success('Usuário criado com sucesso!')
+      setTimeout(() => {
+        login(email, password)
+        navigate(ROUTES.DASHBOARD.path)
+      }, 1000)
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const error = err as AxiosError<IError>
 
-    setTimeout(() => {
-      login(email, password)
-      navigate(ROUTES.DASHBOARD.path)
-    }, 1000)
+        if (error.response?.data?.errors) {
+          const errors = error.response.data.errors
+          const formatted: { [key: string]: string } = {}
+
+          Object.keys(errors).forEach((key) => {
+            formatted[key] = errors[key].message
+          })
+
+          setFieldErrors(formatted)
+          message.error('Por favor, corrija os campos destacados.')
+        } else if (error.response?.data?.message) {
+          message.error(error.response.data.message)
+        } else {
+          message.error('Erro ao cadastrar usuário.')
+        }
+      } else {
+        message.error('Erro ao cadastrar usuário.')
+      }
+    }
   }
 
   return (
@@ -38,14 +74,29 @@ function SignUp() {
         <Logo />
 
         <Form form={formRef} layout='vertical'>
-          <Form.Item label='Nome' name='name'>
+          <Form.Item
+            label='Nome'
+            name='name'
+            validateStatus={fieldErrors.name ? 'error' : ''}
+            help={fieldErrors.name}
+          >
             <Input placeholder='Nome' type='text' />
           </Form.Item>
-          <Form.Item label='Email' name='email'>
+          <Form.Item
+            label='Email'
+            name='email'
+            validateStatus={fieldErrors.email ? 'error' : ''}
+            help={fieldErrors.email}
+          >
             <Input placeholder='Email' type='email' />
           </Form.Item>
-          <Form.Item label='Senha' name='password'>
-            <Input placeholder='Senha' type='password' />
+          <Form.Item
+            label='Senha'
+            name='password'
+            validateStatus={fieldErrors.password ? 'error' : ''}
+            help={fieldErrors.password}
+          >
+            <Input placeholder='Senha' type='password' minLength={6} />
           </Form.Item>
 
           <Flex gap={16}>
