@@ -1,10 +1,25 @@
-:root {
-  --primary-color: #E8553D;
-}
+@use './styles/abstract/variables.scss' as *;
+@use './styles/abstract/fonts.scss' as *;
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   text-decoration: none;
+}
+
+body {
+  font-family: 'Figtree', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
 }

@@ -1,13 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { routes } from '../constants/routes'
-import AppLayout from '../layouts/AppLayout'
-import Dashboard from '../pages/Dashboard/Dashboard'
-import ExampleTable from '../pages/ExampleTable/ExampleTable'
-import SignIn from '../pages/SignIn/SignIn'
-import SignUp from '../pages/SignUp/SignUp'
+import * as pages from '../pages/routerPages'
 import AuthRoute from './AuthRoute'
+import { ROUTES } from './constants'
 import UnauthRoute from './UnauthRoute'
-import DoctorDetails from '../pages/DoctorDetails/DoctorDetails'
 
 function AppRoutes() {
   return (
@@ -15,35 +10,41 @@ function AppRoutes() {
       <Routes>
         {/* Rotas públicas */}
         <Route
-          path={routes.SIGNIN}
-          element={
-            <UnauthRoute>
-              <SignIn />
-            </UnauthRoute>
-          }
+          path={ROUTES.SIGNIN.path}
+          element={<UnauthRoute>{<pages.SignIn />}</UnauthRoute>}
         />
 
         <Route
-          path={routes.SIGNUP}
-          element={
-            <UnauthRoute>
-              <SignUp />
-            </UnauthRoute>
-          }
+          path={ROUTES.SIGNUP.path}
+          element={<UnauthRoute>{<pages.SignUp />}</UnauthRoute>}
         />
 
         {/* Rotas privadas */}
         <Route
+          path='/auth'
           element={
             <AuthRoute>
-              <AppLayout />
+              <pages.AppLayout />
             </AuthRoute>
           }
         >
-          <Route path={routes.DASHBOARD} element={<Dashboard />} />
-          <Route path={routes.EXAMPLE_TABLE} element={<ExampleTable />} />
-          <Route path={routes.DOCTOR_DETAILS} element={<DoctorDetails />} />
+          <Route path={ROUTES.DASHBOARD.path} element={<pages.Dashboard />} />
+          <Route path={ROUTES.DOCTORS.path} element={<pages.Doctors />} />
+          <Route path={ROUTES.DOCTOR_DETAILS.path} element={<pages.DoctorDetails />} />
+          <Route path={ROUTES.NURSE.path} element={<pages.Nurse />} />
+          <Route path={ROUTES.PATIENTS.path} element={<pages.Patients />} />
+          <Route
+            path={ROUTES.MEDICAMENTS.path}
+            element={<pages.Medications />}
+          />
+          <Route
+            path={ROUTES.ATTENDANCES.path}
+            element={<pages.Attendances />}
+          />
+          <Route path={ROUTES.TRIAGES.path} element={<pages.Triages />} />
         </Route>
+
+        <Route path='*' element={<pages.NotFound />} />
       </Routes>
     </BrowserRouter>
   )

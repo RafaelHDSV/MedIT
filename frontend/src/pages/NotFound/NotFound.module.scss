@@ -1,0 +1,40 @@
+.content {
+  display: flex;
+  height: 100vh;
+  background: var(--background);
+}
+
+.form {
+  width: 50%;
+  padding: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+  height: 100vh;
+  background: linear-gradient(
+    130deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 100%
+  );
+
+  img {
+    max-width: 420px;
+  }
+}
+
+.code {
+  font-size: 72px !important;
+  font-weight: 700;
+  color: var(--primary-color) !important;
+}
+
+.actions {
+  margin-top: 8px;
+}

@@ -1,25 +1,14 @@
-import { useNavigate } from 'react-router-dom'
-import { routes } from '../../constants/routes'
-import { useAuth } from '../../hooks/useAuth'
+import ProgressTag, {
+  ProgressStatus
+} from '@/components/ProgressTag/ProgressTag'
+import { Flex } from 'antd'
 
 function Dashboard() {
-  const navigate = useNavigate()
-  const { logout } = useAuth()
-
-  function handleGoToExampleTable() {
-    navigate(routes.EXAMPLE_TABLE)
-  }
-
-  function handleExit() {
-    logout()
-  }
-
   return (
-    <div>
-      <div>Dashboard</div>
-      <button onClick={handleGoToExampleTable}>Tabela de exemplo</button>
-      <button onClick={handleExit}>Sair</button>
-    </div>
+    <Flex gap={16} align='center'>
+      <h1>Dashboard</h1>
+      <ProgressTag status={ProgressStatus.NOT_STARTED} />
+    </Flex>
   )
 }
 
