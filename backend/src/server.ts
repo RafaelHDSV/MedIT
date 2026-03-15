@@ -1,13 +1,10 @@
 import cors from 'cors'
-import dotenv from 'dotenv'
 import express, { Request, Response } from 'express'
 
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
-
-dotenv.config()
 
 const app = express()
 
