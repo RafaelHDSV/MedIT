@@ -7,7 +7,7 @@ interface IAuthLayoutHeaderProps {
   marginBottom?: number
 }
 
-function AuthLayoutHeader({ marginBottom = 32 }: IAuthLayoutHeaderProps) {
+function AuthLayoutHeader({ marginBottom = 16 }: IAuthLayoutHeaderProps) {
   const location = useLocation()
   const currentRoute = routes.find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)

@@ -5,8 +5,6 @@ import ProgressTag, {
 import { useAuth } from '@/hooks/useAuth'
 import { UserRoles } from '@/interfaces/IUser'
 import {
-  BedIcon,
-  BombIcon,
   CheckCircleIcon,
   DoorOpenIcon,
   HourglassIcon,
@@ -25,11 +23,11 @@ function Dashboard() {
       case UserRoles.ADMIN:
         return [
           { Icon: DoorOpenIcon, value: '142', label: 'Entradas' },
-          { Icon: CheckCircleIcon, value: '96', label: 'Atendidos' },
           { Icon: HourglassIcon, value: '46', label: 'Em atendimento' },
-          { Icon: BedIcon, value: '52%', label: 'Ocupação' },
-          { Icon: TimerIcon, value: '23min', label: 'Tempo médio' },
-          { Icon: BombIcon, value: '8', label: 'Risco alto' }
+          { Icon: CheckCircleIcon, value: '96', label: 'Atendidos' },
+          // { Icon: BedIcon, value: '52%', label: 'Ocupação' },
+          { Icon: TimerIcon, value: '23min', label: 'Tempo médio' }
+          // { Icon: BombIcon, value: '8', label: 'Risco alto' }
         ]
       case UserRoles.DOCTOR:
         return [

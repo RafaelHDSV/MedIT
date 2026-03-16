@@ -7,6 +7,12 @@
   gap: 1rem;
   background-color: var(--white);
   border: 1px solid var(--border);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-0.5rem);
+  }
 
   .icon {
     display: flex;
