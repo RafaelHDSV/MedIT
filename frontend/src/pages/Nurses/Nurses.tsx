@@ -19,7 +19,7 @@ function Nurses() {
       <Button
         onClick={() => navigate(ROUTES.NURSES_DETAILS.path.replace(':id', '1'))}
       >
-        Abrir detalhes
+        Abrir detalhes de usuário exemplo
       </Button>
     </div>
   )

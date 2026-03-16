@@ -21,7 +21,7 @@ function Patients() {
           navigate(ROUTES.PATIENTS_DETAILS.path.replace(':id', '1'))
         }
       >
-        Abrir detalhes
+        Abrir detalhes de usuário exemplo
       </Button>
     </div>
   )

@@ -26,7 +26,7 @@ function Doctors() {
           )
         }
       >
-        Abrir detalhes
+        Abrir detalhes de usuário exemplo
       </Button>
     </div>
   )
