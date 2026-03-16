@@ -62,7 +62,7 @@ function DoctorDetails() {
   }, [params.id])
 
   return (
-    <div className={styles.container}>
+    <section>
       <AuthLayoutHeader />
       <UserDetailsHeader
         name={doctor?.name}
@@ -126,7 +126,7 @@ function DoctorDetails() {
           loading={loading}
         />
       </div>
-    </div>
+    </section>
   )
 }
 
