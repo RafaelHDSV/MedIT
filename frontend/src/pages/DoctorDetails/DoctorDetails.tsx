@@ -1,11 +1,12 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import UserBall from '@/components/UserBall/UserBall'
+import type { IAttendance } from '@/interfaces/IAttendance'
 import {
   UserGender,
   UserGendersLabels,
   UserRoles,
   type IUser
 } from '@/interfaces/IUser'
-import { getInitials } from '@/utils/getInitials'
 import { CalendarDotsIcon, ChartBarIcon } from '@phosphor-icons/react'
 import styles from './DoctorDetails.module.scss'
 
@@ -23,13 +24,7 @@ const mockedDoctor: IUser = {
   specialization: 'Pediatria'
 }
 
-interface Attendance {
-  type: string
-  description: string
-  date: Date
-}
-
-const mockedAttendance: Attendance[] = [
+const mockedAttendance: IAttendance[] = [
   { type: 'Consulta', description: 'Gripe', date: new Date('01/12/2025') },
   { type: 'Emergência', description: 'Entorse', date: new Date('11/08/2024') },
   { type: 'Rotina', description: 'Check-up', date: new Date('06/15/2024') },
@@ -37,14 +32,12 @@ const mockedAttendance: Attendance[] = [
 ]
 
 function DoctorDetails() {
-  const initials = getInitials(mockedDoctor.name)
-
   return (
     <div className={styles.container}>
       <AuthLayoutHeader />
 
       <header className={styles.header}>
-        <div className={styles.avatar}>{initials}</div>
+        <UserBall name={mockedDoctor.name} size={64} fontSize={26} />
 
         <div className={styles.doctorInfo}>
           <h2>{mockedDoctor.name}</h2>

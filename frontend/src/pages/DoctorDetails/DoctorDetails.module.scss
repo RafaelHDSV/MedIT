@@ -11,19 +11,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-.avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  background: var(--primary-color);
-  color: var(--white);
-  font-weight: 700;
-  font-size: 26px;
-}
-
 .doctorInfo {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,33 @@
+import { getContrastColor } from '@/utils/getContrastColor'
+import { getInitials } from '@/utils/getInitials'
+import { stringToColor } from '@/utils/stringToColor'
+import styles from './UserBall.module.scss'
+
+interface IUserBallProps {
+  name: string
+  size?: number
+  fontSize?: number
+}
+
+function UserBall({ name, size = 40, fontSize = 14 }: IUserBallProps) {
+  const bgColor = stringToColor(name)
+  const textColor = getContrastColor(bgColor)
+  const initials = getInitials(name)
+
+  return (
+    <div
+      className={styles.avatar}
+      style={{
+        backgroundColor: bgColor,
+        color: textColor,
+        width: size,
+        height: size,
+        fontSize: fontSize
+      }}
+    >
+      {initials}
+    </div>
+  )
+}
+
+export default UserBall
