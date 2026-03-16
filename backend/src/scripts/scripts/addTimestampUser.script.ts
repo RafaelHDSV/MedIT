@@ -1,6 +1,7 @@
 import UserModel from '../../models/UserModel.js'
+import { Script } from '../types.js'
 
-const addTimestampUser = {
+const addTimestampUser: Script = {
   name: 'add-timestamp-user',
   description:
     'Adiciona o campo createdAt e updatedAt para os usuários que não possuem',
