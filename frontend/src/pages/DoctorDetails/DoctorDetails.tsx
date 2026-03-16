@@ -54,7 +54,7 @@ function DoctorDetails() {
           error.response?.data?.message || 'Erro ao carregar detalhes do médico'
         )
       } finally {
-        setLoading(true)
+        setLoading(false)
       }
     }
 
