@@ -5,41 +5,35 @@
 
 .header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
-}
 
-.doctorInfo {
-  display: flex;
-  flex-direction: column;
+  .headerContent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 
-  h2 {
-    font-size: 24px;
-    color: var(--black);
-  }
+    .doctorInfo {
+      display: flex;
+      flex-direction: column;
 
-  p {
-    font-size: 1rem;
-    color: var(--gray);
-  }
-}
+      h2 {
+        font-size: 24px;
+        color: var(--black);
+      }
 
-.separator {
-  margin: 0 0.5rem;
-}
+      p {
+        font-size: 1rem;
+        color: var(--gray);
+      }
+    }
 
-.status {
-  margin-left: auto;
-
-  span {
-    background: var(--primary-opaque);
-    color: var(--primary-color);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 14px;
-    font-weight: 500;
+    .separator {
+      margin: 0 0.5rem;
+    }
   }
 }
 

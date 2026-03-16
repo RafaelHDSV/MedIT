@@ -1,4 +1,5 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import Tag, { TagStatuses } from '@/components/Tag/Tag'
 import UserBall from '@/components/UserBall/UserBall'
 import type { IAttendance } from '@/interfaces/IAttendance'
 import {
@@ -37,23 +38,23 @@ function DoctorDetails() {
       <AuthLayoutHeader />
 
       <header className={styles.header}>
-        <UserBall name={mockedDoctor.name} size={64} fontSize={26} />
+        <div className={styles.headerContent}>
+          <UserBall name={mockedDoctor.name} size={64} fontSize={26} />
 
-        <div className={styles.doctorInfo}>
-          <h2>{mockedDoctor.name}</h2>
+          <div className={styles.doctorInfo}>
+            <h2>{mockedDoctor.name}</h2>
 
-          <p>
-            <span>{mockedDoctor.age} anos</span>
-            <span className={styles.separator}>•</span>
-            <span>
-              {mockedDoctor.gender && UserGendersLabels[mockedDoctor.gender]}
-            </span>
-          </p>
+            <p>
+              <span>{mockedDoctor.age} anos</span>
+              <span className={styles.separator}>•</span>
+              <span>
+                {mockedDoctor.gender && UserGendersLabels[mockedDoctor.gender]}
+              </span>
+            </p>
+          </div>
         </div>
 
-        <div className={styles.status}>
-          <span>Em plantão</span>
-        </div>
+        <Tag status={TagStatuses.WARNING}>Em plantão</Tag>
       </header>
 
       <div className={styles.cards}>
