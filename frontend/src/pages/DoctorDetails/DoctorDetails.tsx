@@ -54,16 +54,12 @@ function DoctorDetails() {
           error.response?.data?.message || 'Erro ao carregar detalhes do médico'
         )
       } finally {
-        setLoading(false)
+        setLoading(true)
       }
     }
 
     fetchDoctorDetails()
   }, [params.id])
-
-  if (loading) {
-    return <h2>Loading...</h2>
-  }
 
   return (
     <div className={styles.container}>
@@ -74,6 +70,7 @@ function DoctorDetails() {
         gender={doctor?.gender}
         statusTag={TagStatuses.WARNING}
         statusTagText='Em plantão'
+        loading={loading}
       />
 
       <div className={styles.cards}>
@@ -96,6 +93,7 @@ function DoctorDetails() {
               value: dayjs(doctor?.birthDate).format('DD/MM/YYYY')
             }
           ]}
+          loading={loading}
         />
         <UserDetailsCard
           Icon={CalendarDotsIcon}
@@ -116,6 +114,7 @@ function DoctorDetails() {
             },
             { label: 'Data', value: mockedLastAttendance.date }
           ]}
+          loading={loading}
         />
         <UserDetailsCard
           Icon={ChartBarIcon}
@@ -124,6 +123,7 @@ function DoctorDetails() {
             label: item.date.toLocaleDateString(),
             value: `${item.type} - ${item.description}`
           }))}
+          loading={loading}
         />
       </div>
     </div>

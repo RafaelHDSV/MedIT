@@ -1,4 +1,5 @@
 import type { Icon } from '@phosphor-icons/react'
+import { Skeleton } from 'antd'
 import styles from './UserDetailsCard.module.scss'
 
 interface IDetailsItemProps {
@@ -19,9 +20,27 @@ interface IUserDetailsCardProps {
   Icon: Icon
   title: string
   itens: IDetailsItemProps[]
+  loading?: boolean
 }
 
-function UserDetailsCard({ Icon, title, itens }: IUserDetailsCardProps) {
+function UserDetailsCard({
+  Icon,
+  title,
+  itens,
+  loading = false
+}: IUserDetailsCardProps) {
+  if (loading) {
+    return (
+      <section className={styles.card}>
+        <Skeleton active title={false} paragraph={{ rows: 1 }} />
+
+        {itens.map(() => (
+          <Skeleton.Button className={styles.itemSkeleton} active />
+        ))}
+      </section>
+    )
+  }
+
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>
