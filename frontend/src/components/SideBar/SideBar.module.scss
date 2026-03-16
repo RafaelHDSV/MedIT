@@ -37,10 +37,10 @@
     color: var(--primary-color);
     transition: all ease-in-out 0.15s;
     cursor: pointer;
+  }
 
-    &:hover {
-      transform: rotate(90deg);
-    }
+  .iconActive {
+    transform: rotate(90deg);
   }
 }
 

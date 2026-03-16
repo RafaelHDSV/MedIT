@@ -131,7 +131,7 @@ function SideBar() {
       <div className={styles.main}>
         <header className={styles.header}>
           <ListIcon
-            className={styles.icon}
+            className={`${styles.icon} ${isCompact ? styles.iconActive : ''}`}
             size={32}
             onClick={() => setIsCompact(!isCompact)}
           />
