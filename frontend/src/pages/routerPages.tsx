@@ -14,8 +14,14 @@ export const Doctors = lazy(() => import('../pages/Doctors/Doctors'))
 export const DoctorDetails = lazy(
   () => import('../pages/DoctorDetails/DoctorDetails')
 )
-export const Nurse = lazy(() => import('../pages/Nurse/Nurse'))
+export const Nurses = lazy(() => import('../pages/Nurses/Nurses'))
+export const NursesDetails = lazy(
+  () => import('../pages/NursesDetails/NursesDetails')
+)
 export const Patients = lazy(() => import('../pages/Patients/Patients'))
+export const PatientsDetails = lazy(
+  () => import('../pages/PatientsDetails/PatientsDetails')
+)
 export const Medications = lazy(
   () => import('../pages/Medications/Medications')
 )

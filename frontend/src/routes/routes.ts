@@ -81,12 +81,22 @@ const doctorDetails: IRoute = {
 }
 
 const nurses: IRoute = {
-  name: ROUTES.NURSE.name,
-  path: ROUTES.NURSE.path,
+  name: ROUTES.NURSES.name,
+  path: ROUTES.NURSES.path,
   icon: StethoscopeIcon,
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [UserRoles.ADMIN]
+  }
+}
+
+const nurseDetails: IRoute = {
+  name: ROUTES.NURSES_DETAILS.name,
+  path: ROUTES.NURSES_DETAILS.path,
+  meta: {
+    hidden: true,
     progress: ProgressStatus.NOT_STARTED,
     levels: [UserRoles.ADMIN]
   }
@@ -99,6 +109,16 @@ const patients: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE]
+  }
+}
+
+const patientDetails: IRoute = {
+  name: ROUTES.PATIENTS_DETAILS.name,
+  path: ROUTES.PATIENTS_DETAILS.path,
+  meta: {
+    hidden: true,
     progress: ProgressStatus.NOT_STARTED,
     levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE]
   }
@@ -151,7 +171,9 @@ const routes: IRoute[] = [
   doctors,
   doctorDetails,
   nurses,
+  nurseDetails,
   patients,
+  patientDetails,
   medications
 ]
 

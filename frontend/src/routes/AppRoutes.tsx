@@ -34,8 +34,16 @@ function AppRoutes() {
             path={ROUTES.DOCTORS_DETAILS.path}
             element={<pages.DoctorDetails />}
           />
-          <Route path={ROUTES.NURSE.path} element={<pages.Nurse />} />
+          <Route path={ROUTES.NURSES.path} element={<pages.Nurses />} />
+          <Route
+            path={ROUTES.NURSES_DETAILS.path}
+            element={<pages.NursesDetails />}
+          />
           <Route path={ROUTES.PATIENTS.path} element={<pages.Patients />} />
+          <Route
+            path={ROUTES.PATIENTS_DETAILS.path}
+            element={<pages.PatientsDetails />}
+          />
           <Route
             path={ROUTES.MEDICAMENTS.path}
             element={<pages.Medications />}

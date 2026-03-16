@@ -6,7 +6,7 @@ import { ROUTES } from '@/routes/constants'
 import { Button, Flex } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
-function Patients() {
+function Nurses() {
   const navigate = useNavigate()
 
   return (
@@ -17,9 +17,7 @@ function Patients() {
       </Flex>
 
       <Button
-        onClick={() =>
-          navigate(ROUTES.PATIENTS_DETAILS.path.replace(':id', '1'))
-        }
+        onClick={() => navigate(ROUTES.NURSES_DETAILS.path.replace(':id', '1'))}
       >
         Abrir detalhes
       </Button>
@@ -27,4 +25,4 @@ function Patients() {
   )
 }
 
-export default Patients
+export default Nurses

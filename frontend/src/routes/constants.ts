@@ -10,8 +10,13 @@ export const ROUTES = {
   DASHBOARD: { name: 'Dashboard', path: '/auth/dashboard' },
   DOCTORS: { name: 'Médicos', path: '/auth/doctors' },
   DOCTORS_DETAILS: { name: 'Detalhes do médico', path: '/auth/doctors/:id' },
-  NURSE: { name: 'Enfermeiros', path: '/auth/nurses' },
+  NURSES: { name: 'Enfermeiros', path: '/auth/nurses' },
+  NURSES_DETAILS: { name: 'Detalhes do enfermeiro', path: '/auth/nurses/:id' },
   PATIENTS: { name: 'Pacientes', path: '/auth/patients' },
+  PATIENTS_DETAILS: {
+    name: 'Detalhes do paciente',
+    path: '/auth/patients/:id'
+  },
   MEDICAMENTS: { name: 'Medicamentos', path: '/auth/medications' },
   ATTENDANCES: { name: 'Histórico de atendimentos', path: '/auth/attendances' },
   TRIAGES: { name: 'Histórico de triagens', path: '/auth/triages' }
