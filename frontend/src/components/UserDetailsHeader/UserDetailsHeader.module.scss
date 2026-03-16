@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+
+  .headerContent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .doctorInfo {
+      display: flex;
+      flex-direction: column;
+
+      h2 {
+        font-size: 24px;
+        color: var(--black);
+      }
+
+      p {
+        font-size: 1rem;
+        color: var(--gray);
+      }
+    }
+
+    .separator {
+      margin: 0 0.5rem;
+    }
+  }
+}

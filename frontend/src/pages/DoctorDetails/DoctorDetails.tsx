@@ -1,14 +1,13 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import Tag, { TagStatuses } from '@/components/Tag/Tag'
-import UserBall from '@/components/UserBall/UserBall'
+import { TagStatuses } from '@/components/Tag/Tag'
+import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
+import { UserGender, UserRoles, type IUser } from '@/interfaces/IUser'
 import {
-  UserGender,
-  UserGendersLabels,
-  UserRoles,
-  type IUser
-} from '@/interfaces/IUser'
-import { CalendarDotsIcon, ChartBarIcon } from '@phosphor-icons/react'
+  CalendarDotsIcon,
+  ChartBarIcon,
+  DatabaseIcon
+} from '@phosphor-icons/react'
 import styles from './DoctorDetails.module.scss'
 
 const mockedDoctor: IUser = {
@@ -36,30 +35,20 @@ function DoctorDetails() {
   return (
     <div className={styles.container}>
       <AuthLayoutHeader />
-
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <UserBall name={mockedDoctor.name} size={64} fontSize={26} />
-
-          <div className={styles.doctorInfo}>
-            <h2>{mockedDoctor.name}</h2>
-
-            <p>
-              <span>{mockedDoctor.age} anos</span>
-              <span className={styles.separator}>•</span>
-              <span>
-                {mockedDoctor.gender && UserGendersLabels[mockedDoctor.gender]}
-              </span>
-            </p>
-          </div>
-        </div>
-
-        <Tag status={TagStatuses.WARNING}>Em plantão</Tag>
-      </header>
+      <UserDetailsHeader
+        name={mockedDoctor.name}
+        age={mockedDoctor.age || 0}
+        gender={mockedDoctor.gender}
+        statusTag={TagStatuses.WARNING}
+        statusTagText='Em plantão'
+      />
 
       <div className={styles.cards}>
         <section className={styles.card}>
-          <h3>Dados Pessoais</h3>
+          <h3>
+            <DatabaseIcon size={22} />
+            Dados Pessoais
+          </h3>
 
           <div>
             <span>CPF</span>
