@@ -1,14 +1,20 @@
 import routes from '@/routes/routes'
-import { useLocation } from 'react-router-dom'
+import { matchPath, useLocation } from 'react-router-dom'
 import styles from './AuthLayoutHeader.module.scss'
 
-function AuthLayoutHeader() {
+interface IAuthLayoutHeaderProps {
+  marginBottom?: number
+}
+
+function AuthLayoutHeader({ marginBottom = 32 }: IAuthLayoutHeaderProps) {
   const location = useLocation()
-  const currentRoute = routes.find((route) => route.path === location.pathname)
-  const routeName = currentRoute ? currentRoute.name : ''
+  const currentRoute = routes.find((route) =>
+    matchPath({ path: route.path, end: true }, location.pathname)
+  )
+  const routeName = currentRoute?.name ?? ''
 
   return (
-    <header>
+    <header style={{ marginBottom }}>
       <h2 className={styles.title}>{routeName}</h2>
     </header>
   )
