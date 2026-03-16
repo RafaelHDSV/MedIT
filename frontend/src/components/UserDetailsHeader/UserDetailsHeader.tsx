@@ -4,8 +4,8 @@ import UserBall from '../UserBall/UserBall'
 import styles from './UserDetailsHeader.module.scss'
 
 interface IUserDetailsHeaderProps {
-  name: string
-  age: number
+  name?: string
+  age?: number
   gender?: UserGender
   statusTag?: TagStatuses
   statusTagText?: string
@@ -21,7 +21,7 @@ function UserDetailsHeader({
   return (
     <header className={styles.header}>
       <div className={styles.headerContent}>
-        <UserBall name={name} size={64} fontSize={26} />
+        {name && <UserBall name={name} size={64} fontSize={26} />}
 
         <div className={styles.doctorInfo}>
           <h2>{name}</h2>

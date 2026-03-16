@@ -1,30 +1,22 @@
+import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
-import { UserGender, UserRoles, type IUser } from '@/interfaces/IUser'
+import type { IError } from '@/interfaces/IError'
+import { type IUser } from '@/interfaces/IUser'
 import masks from '@/utils/masks'
 import {
   CalendarDotsIcon,
   ChartBarIcon,
   DatabaseIcon
 } from '@phosphor-icons/react'
+import { message } from 'antd'
+import axios, { AxiosError } from 'axios'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 import styles from './DoctorDetails.module.scss'
-
-const mockedDoctor: IUser = {
-  name: 'Fernando Luís',
-  cpf: '32818911010',
-  role: UserRoles.DOCTOR,
-  email: 'fernando.luis@example.com',
-  password: 'password123',
-  age: 58,
-  gender: UserGender.MALE,
-  cellphone: 15999991234,
-  birthDate: new Date('1968-09-15'),
-  crm: '117101',
-  specialization: 'Pediatria'
-}
 
 const mockedLastAttendance = {
   patientComplaint: 'Febre e dores',
@@ -42,13 +34,42 @@ const mockedAttendanceRecords: IAttendance[] = [
 ]
 
 function DoctorDetails() {
+  const [doctor, setDoctor] = useState<IUser | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchDoctorDetails() {
+      setLoading(true)
+
+      try {
+        const response = await api.get('/users/69b6d98f1f2cc36419496a16')
+        setDoctor(response.data)
+      } catch (err) {
+        if (!axios.isAxiosError(err)) return
+        const error = err as AxiosError<IError>
+        console.error(error)
+        message.error(
+          error.response?.data?.message || 'Erro ao carregar detalhes do médico'
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDoctorDetails()
+  }, [])
+
+  if (loading) {
+    return <h2>Loading...</h2>
+  }
+
   return (
     <div className={styles.container}>
       <AuthLayoutHeader />
       <UserDetailsHeader
-        name={mockedDoctor.name}
-        age={mockedDoctor.age || 0}
-        gender={mockedDoctor.gender}
+        name={doctor?.name}
+        age={doctor?.age}
+        gender={doctor?.gender}
         statusTag={TagStatuses.WARNING}
         statusTagText='Em plantão'
       />
@@ -58,19 +79,19 @@ function DoctorDetails() {
           Icon={DatabaseIcon}
           title='Dados Pessoais'
           itens={[
-            { label: 'CPF', value: masks(mockedDoctor.cpf, 'cpf') },
-            { label: 'CRM', value: mockedDoctor.crm },
+            { label: 'CPF', value: masks(doctor?.cpf, 'cpf') },
+            { label: 'CRM', value: doctor?.crm },
             {
               label: 'Especialidade',
-              value: mockedDoctor.specialization
+              value: doctor?.specialization
             },
             {
               label: 'Telefone',
-              value: masks(mockedDoctor.cellphone, 'cellphone')
+              value: masks(doctor?.cellphone, 'cellphone')
             },
             {
               label: 'Data de Nascimento',
-              value: mockedDoctor.birthDate?.toLocaleDateString()
+              value: dayjs(doctor?.birthDate).format('DD/MM/YYYY')
             }
           ]}
         />
