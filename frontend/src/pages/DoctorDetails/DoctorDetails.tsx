@@ -16,6 +16,7 @@ import { message } from 'antd'
 import axios, { AxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import styles from './DoctorDetails.module.scss'
 
 const mockedLastAttendance = {
@@ -34,6 +35,7 @@ const mockedAttendanceRecords: IAttendance[] = [
 ]
 
 function DoctorDetails() {
+  const params = useParams<{ id: string }>()
   const [doctor, setDoctor] = useState<IUser | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -42,7 +44,7 @@ function DoctorDetails() {
       setLoading(true)
 
       try {
-        const response = await api.get('/users/69b6d98f1f2cc36419496a16')
+        const response = await api.get(`/users/${params.id}`)
         setDoctor(response.data)
       } catch (err) {
         if (!axios.isAxiosError(err)) return
@@ -57,7 +59,7 @@ function DoctorDetails() {
     }
 
     fetchDoctorDetails()
-  }, [])
+  }, [params.id])
 
   if (loading) {
     return <h2>Loading...</h2>
