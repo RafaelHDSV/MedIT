@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import mongoose, { HydratedDocument } from 'mongoose'
-import { IUser, IUserMethods, Roles } from '../interfaces/IUser.js'
+import { IUser, IUserMethods, Roles, UserGender } from '../interfaces/IUser.js'
 
 const UserSchema = new mongoose.Schema<
   IUser,
@@ -48,6 +48,26 @@ const UserSchema = new mongoose.Schema<
       type: String,
       required: [true, 'A senha é obrigatória'],
       minlength: [6, 'A senha deve ter pelo menos 6 caracteres']
+    },
+    age: {
+      type: Number,
+      min: [0, 'A idade deve ser um número positivo']
+    },
+    gender: {
+      type: String,
+      enum: Object.values(UserGender)
+    },
+    cellphone: {
+      type: Number
+    },
+    birthDate: {
+      type: Date
+    },
+    crm: {
+      type: String
+    },
+    specialization: {
+      type: String
     },
     refreshToken: {
       type: String

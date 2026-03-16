@@ -1,9 +1,9 @@
 import express from 'express'
 import {
-  getUsers,
+  deleteUser,
   getUser,
-  updateUser,
-  deleteUser
+  getUsers,
+  updateUser
 } from '../controllers/userController.js'
 
 import { authMiddleware } from '../middlewares/authMiddleware.js'
