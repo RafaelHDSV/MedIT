@@ -7,16 +7,22 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization
+  const authHeader = req.headers.authorization
 
-  if (!token) {
+  if (!authHeader) {
     return res.status(401).json({ message: 'Token não fornecido' })
   }
 
-  try {
-    const decoded = jwt.verify(token, String(JWT_SECRET))
+  const token = authHeader.split(' ')[1]
 
-    req.userId = (decoded as { id: string }).id
+  if (!token) {
+    return res.status(401).json({ message: 'Token mal formatado' })
+  }
+
+  try {
+    const decoded = jwt.verify(token, String(JWT_SECRET)) as { userId: string }
+
+    req.userId = decoded.userId
 
     next()
   } catch {
