@@ -21,6 +21,7 @@ interface MetaConfiguration {
   hidden?: boolean
   progress?: ProgressStatus
   levels?: UserRoles[]
+  canGoBack?: boolean
 }
 
 export interface IRoute {
@@ -76,7 +77,8 @@ const doctorDetails: IRoute = {
   meta: {
     hidden: true,
     progress: ProgressStatus.IN_PROGRESS,
-    levels: [UserRoles.ADMIN]
+    levels: [UserRoles.ADMIN],
+    canGoBack: true
   }
 }
 
@@ -98,7 +100,8 @@ const nurseDetails: IRoute = {
   meta: {
     hidden: true,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [UserRoles.ADMIN]
+    levels: [UserRoles.ADMIN],
+    canGoBack: true
   }
 }
 
@@ -120,7 +123,8 @@ const patientDetails: IRoute = {
   meta: {
     hidden: true,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE]
+    levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE],
+    canGoBack: true
   }
 }
 

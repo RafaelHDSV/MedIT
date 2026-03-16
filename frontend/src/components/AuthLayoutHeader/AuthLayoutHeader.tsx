@@ -1,4 +1,5 @@
 import routes from '@/routes/routes'
+import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { matchPath, useLocation } from 'react-router-dom'
 import styles from './AuthLayoutHeader.module.scss'
 
@@ -11,10 +12,20 @@ function AuthLayoutHeader({ marginBottom = 32 }: IAuthLayoutHeaderProps) {
   const currentRoute = routes.find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)
   )
-  const routeName = currentRoute?.name ?? ''
+  const { name: routeName, meta } = currentRoute ?? {}
+  const { canGoBack } = meta ?? {}
+
+  function handleGoBack() {
+    window.history.back()
+  }
 
   return (
-    <header style={{ marginBottom }}>
+    <header className={styles.header} style={{ marginBottom }}>
+      {canGoBack && (
+        <button className={styles.backButton} onClick={handleGoBack}>
+          <ArrowLeftIcon size={28} />
+        </button>
+      )}
       <h2 className={styles.title}>{routeName}</h2>
     </header>
   )
