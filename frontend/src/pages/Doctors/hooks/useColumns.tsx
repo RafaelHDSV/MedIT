@@ -1,22 +1,24 @@
+import type { IUser } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
+import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { IDoctorList } from '../Doctors'
 
 export function useDoctorsColumns() {
   const navigate = useNavigate()
 
   const handleNavigateToDetails = useCallback(
-    (id: string) => {
-      navigate(ROUTES.DOCTORS_DETAILS.path.replace(':id', id))
+    (id: ObjectId | undefined) => {
+      if (!id) return
+      navigate(ROUTES.DOCTORS_DETAILS.path.replace(':id', id.toString()))
     },
     [navigate]
   )
 
-  const columns: ColumnsType<IDoctorList> = useMemo(
+  const columns: ColumnsType<IUser> = useMemo(
     () => [
       {
         title: 'ID',

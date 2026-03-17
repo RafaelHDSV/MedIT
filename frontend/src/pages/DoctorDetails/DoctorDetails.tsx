@@ -45,7 +45,8 @@ function DoctorDetails() {
 
       try {
         const response = await api.get(`/users/${params.id}`)
-        setDoctor(response.data)
+        const data = response.data
+        setDoctor(data)
       } catch (err) {
         if (!axios.isAxiosError(err)) return
         const error = err as AxiosError<IError>

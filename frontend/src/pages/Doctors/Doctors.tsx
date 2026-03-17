@@ -1,38 +1,45 @@
+import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
-import { ROUTES } from '@/routes/constants'
-import { Button, Flex, Table } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import type { IError } from '@/interfaces/IError'
+import type { IUser } from '@/interfaces/IUser'
+import { Flex, message, Table } from 'antd'
+import type { AxiosError } from 'axios'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 import styles from './DoctorTable.module.scss'
 import { useDoctorsColumns } from './hooks/useColumns'
 
-export interface IDoctorList {
-  _id: string
-  name: string
-  cpf: string
-  email: string
-  birthDate: string
-  cellphone: string
-  crm: string
-}
-
 function Doctors() {
   const columns = useDoctorsColumns()
-  const navigate = useNavigate()
+  const [doctors, setDoctors] = useState<IUser[]>([])
+  const [loading, setLoading] = useState(false)
 
-  const data: IDoctorList[] = Array(25)
-    .fill(0)
-    .map((_, index) => ({
-      _id: (index + 1).toString(),
-      name: 'John Brown',
-      cpf: '53443242334',
-      email: 'rafael@gmail.com',
-      birthDate: '2004-08-20',
-      cellphone: '15995728883',
-      crm: '10999'
-    }))
+  useEffect(() => {
+    async function fetchDoctors() {
+      setLoading(true)
+
+      try {
+        const response = await api.get('/users/role/doctor')
+        const data = response.data
+        setDoctors(data)
+      } catch (err) {
+        if (!axios.isAxiosError(err)) return
+        const error = err as AxiosError<IError>
+        console.error(error)
+        message.error(
+          error.response?.data?.message ||
+            'Erro ao carregar a listagem de médicos'
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDoctors()
+  }, [])
 
   return (
     <div>
@@ -41,24 +48,12 @@ function Doctors() {
         <ProgressTag status={ProgressStatus.NOT_STARTED} />
       </Flex>
 
-      <Button
-        onClick={() =>
-          navigate(
-            ROUTES.DOCTORS_DETAILS.path.replace(
-              ':id',
-              '69b6d98f1f2cc36419496a16'
-            )
-          )
-        }
-      >
-        Abrir detalhes de usuário exemplo
-      </Button>
-
       <Table
         className={styles.doctorTable}
         rowKey='_id'
-        dataSource={data}
+        dataSource={doctors}
         columns={columns}
+        loading={loading}
         pagination={{ pageSize: 10 }}
         size='middle'
         bordered={false}
