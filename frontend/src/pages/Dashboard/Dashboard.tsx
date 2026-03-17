@@ -7,7 +7,7 @@ function Dashboard() {
   const { logout } = useAuth()
 
   function handleGoToExampleTable() {
-    navigate(routes.EXAMPLE_TABLE)
+    navigate(routes.DoctorTable)
   }
 
   function handleExit() {
