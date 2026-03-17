@@ -119,7 +119,5 @@ UserSchema.pre('save', async function (this: HydratedDocument<IUser>) {
   this.number = counter.value
 })
 
-UserSchema.index({ role: 1, number: 1 }, { unique: true })
-
 type UserModel = mongoose.Model<IUser, {}, IUserMethods>
 export default mongoose.model<IUser, UserModel>('User', UserSchema)
