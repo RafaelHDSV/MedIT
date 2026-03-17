@@ -10,7 +10,7 @@ import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './DoctorTable.module.scss'
-import { useDoctorsColumns } from './hooks/useColumns'
+import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
 function Doctors() {
   const columns = useDoctorsColumns()

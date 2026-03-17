@@ -22,8 +22,8 @@ export function useDoctorsColumns() {
     () => [
       {
         title: 'ID',
-        dataIndex: '_id',
-        key: '_id'
+        dataIndex: 'number',
+        key: 'number'
       },
       {
         title: 'Nome',
