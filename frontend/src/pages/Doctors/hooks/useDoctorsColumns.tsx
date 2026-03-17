@@ -1,5 +1,6 @@
 import type { IUser } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
+import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
@@ -58,7 +59,8 @@ export function useDoctorsColumns() {
         title: 'Data de Nascimento',
         dataIndex: 'birthDate',
         key: 'birthDate',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY')
+        render: (date: Date | string) =>
+          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate({ birthDate: date })} anos)`
       },
       {
         title: 'Telefone',
@@ -70,6 +72,18 @@ export function useDoctorsColumns() {
         title: 'CRM',
         dataIndex: 'crm',
         key: 'crm'
+      },
+      {
+        title: 'Criado em',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
+        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
+      },
+      {
+        title: 'Atualizado em',
+        dataIndex: 'updatedAt',
+        key: 'updatedAt',
+        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
       }
     ],
     [handleNavigateToDetails]
