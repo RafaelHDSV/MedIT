@@ -12,7 +12,11 @@ function AuthLayoutHeader({ marginBottom = 16 }: IAuthLayoutHeaderProps) {
   const currentRoute = routes.find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)
   )
-  const { name: routeName, meta } = currentRoute ?? {}
+  const {
+    name: routeName,
+    description: routeDescription,
+    meta
+  } = currentRoute ?? {}
   const { canGoBack } = meta ?? {}
 
   function handleGoBack() {
@@ -26,7 +30,11 @@ function AuthLayoutHeader({ marginBottom = 16 }: IAuthLayoutHeaderProps) {
           <ArrowLeftIcon size={28} />
         </button>
       )}
-      <h2 className={styles.title}>{routeName}</h2>
+
+      <div className={styles.textContainer}>
+        <h2 className={styles.title}>{routeName}</h2>
+        <p className={styles.description}>{routeDescription}</p>
+      </div>
     </header>
   )
 }

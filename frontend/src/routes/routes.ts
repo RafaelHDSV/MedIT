@@ -26,6 +26,7 @@ interface MetaConfiguration {
 
 export interface IRoute {
   name: string
+  description?: string
   path: string
   icon?: Icon
   meta?: MetaConfiguration
@@ -33,18 +34,21 @@ export interface IRoute {
 
 const signIn: IRoute = {
   name: ROUTES.SIGNIN.name,
+  description: ROUTES.SIGNIN.description,
   path: ROUTES.SIGNIN.path,
   meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
 
 const signUp: IRoute = {
   name: ROUTES.SIGNUP.name,
+  description: ROUTES.SIGNUP.description,
   path: ROUTES.SIGNUP.path,
   meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
 
 const dashboard: IRoute = {
   name: ROUTES.DASHBOARD.name,
+  description: ROUTES.DASHBOARD.description,
   path: ROUTES.DASHBOARD.path,
   icon: ChartBarIcon,
   meta: {
@@ -61,6 +65,7 @@ const dashboard: IRoute = {
 
 const doctors: IRoute = {
   name: ROUTES.DOCTORS.name,
+  description: ROUTES.DOCTORS.description,
   path: ROUTES.DOCTORS.path,
   icon: AmbulanceIcon,
   meta: {
@@ -73,6 +78,7 @@ const doctors: IRoute = {
 
 const doctorDetails: IRoute = {
   name: ROUTES.DOCTORS_DETAILS.name,
+  description: ROUTES.DOCTORS_DETAILS.description,
   path: ROUTES.DOCTORS_DETAILS.path,
   meta: {
     hidden: true,
@@ -84,6 +90,7 @@ const doctorDetails: IRoute = {
 
 const nurses: IRoute = {
   name: ROUTES.NURSES.name,
+  description: ROUTES.NURSES.description,
   path: ROUTES.NURSES.path,
   icon: StethoscopeIcon,
   meta: {
@@ -96,6 +103,7 @@ const nurses: IRoute = {
 
 const nurseDetails: IRoute = {
   name: ROUTES.NURSES_DETAILS.name,
+  description: ROUTES.NURSES_DETAILS.description,
   path: ROUTES.NURSES_DETAILS.path,
   meta: {
     hidden: true,
@@ -107,6 +115,7 @@ const nurseDetails: IRoute = {
 
 const patients: IRoute = {
   name: ROUTES.PATIENTS.name,
+  description: ROUTES.PATIENTS.description,
   path: ROUTES.PATIENTS.path,
   icon: FirstAidIcon,
   meta: {
@@ -119,6 +128,7 @@ const patients: IRoute = {
 
 const patientDetails: IRoute = {
   name: ROUTES.PATIENTS_DETAILS.name,
+  description: ROUTES.PATIENTS_DETAILS.description,
   path: ROUTES.PATIENTS_DETAILS.path,
   meta: {
     hidden: true,
@@ -130,6 +140,7 @@ const patientDetails: IRoute = {
 
 const medications: IRoute = {
   name: ROUTES.MEDICAMENTS.name,
+  description: ROUTES.MEDICAMENTS.description,
   path: ROUTES.MEDICAMENTS.path,
   icon: PillIcon,
   meta: {
@@ -146,6 +157,7 @@ const medications: IRoute = {
 
 const attendances: IRoute = {
   name: ROUTES.ATTENDANCES.name,
+  description: ROUTES.ATTENDANCES.description,
   path: ROUTES.ATTENDANCES.path,
   icon: CalendarDotsIcon,
   meta: {
@@ -157,6 +169,7 @@ const attendances: IRoute = {
 
 const triages: IRoute = {
   name: ROUTES.TRIAGES.name,
+  description: ROUTES.TRIAGES.description,
   path: ROUTES.TRIAGES.path,
   icon: CalendarDotsIcon,
   meta: {
