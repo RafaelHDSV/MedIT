@@ -1,25 +1,79 @@
-import { useNavigate } from 'react-router-dom'
-import { routes } from '../../constants/routes'
-import { useAuth } from '../../hooks/useAuth'
+import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import ProgressTag, {
+  ProgressStatus
+} from '@/components/ProgressTag/ProgressTag'
+import { useAuth } from '@/hooks/useAuth'
+import { UserRoles } from '@/interfaces/IUser'
+import {
+  CheckCircleIcon,
+  DoorOpenIcon,
+  HourglassIcon,
+  TimerIcon,
+  UsersThreeIcon
+} from '@phosphor-icons/react'
+import { Flex } from 'antd'
+import { useMemo } from 'react'
+import styles from './Dashboard.module.scss'
+import DashboardCard from './DashboardCard/DashboardCard'
 
 function Dashboard() {
-  const navigate = useNavigate()
-  const { logout } = useAuth()
-
-  function handleGoToExampleTable() {
-    navigate(routes.EXAMPLE_TABLE)
-  }
-
-  function handleExit() {
-    logout()
-  }
+  const { user } = useAuth()
+  const cardsData = useMemo(() => {
+    switch (user?.role) {
+      case UserRoles.ADMIN:
+        return [
+          { Icon: DoorOpenIcon, value: '142', label: 'Entradas' },
+          { Icon: HourglassIcon, value: '46', label: 'Em atendimento' },
+          { Icon: CheckCircleIcon, value: '96', label: 'Atendidos' },
+          // { Icon: BedIcon, value: '52%', label: 'Ocupação' },
+          { Icon: TimerIcon, value: '23min', label: 'Tempo médio' }
+          // { Icon: BombIcon, value: '8', label: 'Risco alto' }
+        ]
+      case UserRoles.DOCTOR:
+        return [
+          { Icon: HourglassIcon, value: '14', label: 'Pacientes aguardando' },
+          {
+            Icon: CheckCircleIcon,
+            value: '96',
+            label: 'Atendimentos realizados'
+          },
+          { Icon: TimerIcon, value: '18min', label: 'Tempo médio' },
+          {
+            Icon: UsersThreeIcon,
+            value: '52%',
+            label: 'Assertividade IA vs Médico'
+          }
+        ]
+      case UserRoles.NURSE:
+        return [
+          { Icon: HourglassIcon, value: '25', label: 'Pacientes aguardando' },
+          {
+            Icon: CheckCircleIcon,
+            value: '96',
+            label: 'Pacientes triados hoje'
+          },
+          { Icon: TimerIcon, value: '18min', label: 'Tempo médio' }
+        ]
+      case UserRoles.PATIENT:
+        return []
+      default:
+        return []
+    }
+  }, [user?.role])
 
   return (
-    <div>
-      <div>Dashboard</div>
-      <button onClick={handleGoToExampleTable}>Tabela de exemplo</button>
-      <button onClick={handleExit}>Sair</button>
-    </div>
+    <section>
+      <Flex gap={16} align='center'>
+        <AuthLayoutHeader />
+        <ProgressTag status={ProgressStatus.NOT_STARTED} />
+      </Flex>
+
+      <div className={styles.cardsContainer}>
+        {cardsData.map(({ Icon, value, label }) => (
+          <DashboardCard key={label} Icon={Icon} value={value} label={label} />
+        ))}
+      </div>
+    </section>
   )
 }
 

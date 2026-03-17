@@ -1,0 +1,30 @@
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 40%;
+  padding: 0 2rem;
+}
+
+.image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+  height: 100vh;
+  background: linear-gradient(
+    130deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 100%
+  );
+}

@@ -1,11 +1,18 @@
-import { AuthProvider } from './contexts/AuthProvider'
+import { Suspense } from 'react'
+import { LayoutSpinner } from './components/LayoutSpinner/LayoutSpinner'
+import { AuthProvider } from './contexts/AuthContext/AuthProvider'
+import { SettingsProvider } from './contexts/SettingsContext/SettingsProvider'
 import AppRoutes from './routes/AppRoutes'
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <Suspense fallback={<LayoutSpinner />}>
+      <AuthProvider>
+        <SettingsProvider>
+          <AppRoutes />
+        </SettingsProvider>
+      </AuthProvider>
+    </Suspense>
   )
 }
 

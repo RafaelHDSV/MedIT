@@ -1,0 +1,49 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  gap: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-0.5rem);
+  }
+
+  .cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color);
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  .itemSkeleton {
+    width: 100%;
+
+    :global {
+      .ant-skeleton-button {
+        width: 100%;
+        height: 2rem;
+      }
+    }
+  }
+
+  .detailsItem {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+
+    .label {
+      font-weight: 600;
+      padding-bottom: 0.25rem;
+    }
+
+    .value {
+      color: var(--gray);
+    }
+  }
+}
