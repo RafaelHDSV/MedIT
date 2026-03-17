@@ -1,4 +1,4 @@
-import type { ObjectId } from "mongoose"
+import type { ObjectId } from 'mongoose'
 
 export interface IBaseInterface {
   _id?: ObjectId
