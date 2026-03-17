@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import User from '../models/UserModel.js'
 
 export const getUsers = async (_req: Request, res: Response) => {
-  const users = await User.find().select('-password')
+  const users = await User.find().sort({ createdAt: -1 }).select('-password')
   if (!users) {
     return res.status(404).json({ message: 'Nenhum usuário encontrado' })
   }
@@ -12,9 +12,9 @@ export const getUsers = async (_req: Request, res: Response) => {
 
 export const getUsersByRole = async (req: Request, res: Response) => {
   const { role } = req.params
-  const users = await User.find({ role: String(role).toUpperCase() }).select(
-    '-password'
-  )
+  const users = await User.find({ role: String(role).toUpperCase() })
+    .sort({ createdAt: -1 })
+    .select('-password')
   if (!users || users.length === 0) {
     return res.status(404).json({ message: 'Nenhum usuário encontrado' })
   }
