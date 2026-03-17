@@ -80,11 +80,6 @@ function DoctorDetails() {
           title='Dados Pessoais'
           itens={[
             { label: 'CPF', value: masks(doctor?.cpf, 'cpf') },
-            { label: 'CRM', value: doctor?.crm },
-            {
-              label: 'Especialidade',
-              value: doctor?.specialization
-            },
             {
               label: 'Telefone',
               value: masks(doctor?.cellphone, 'cellphone')
@@ -92,7 +87,12 @@ function DoctorDetails() {
             {
               label: 'Data de Nascimento',
               value: dayjs(doctor?.birthDate).format('DD/MM/YYYY')
-            }
+            },
+            {
+              label: 'Especialidade',
+              value: doctor?.specialization
+            },
+            { label: 'CRM', value: doctor?.crm }
           ]}
           loading={loading}
         />
