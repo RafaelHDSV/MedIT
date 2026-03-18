@@ -32,8 +32,19 @@
     }
   }
 
+  .unauthTitle {
+    font-size: 32px;
+    font-weight: 600;
+    padding-bottom: 0.25rem;
+  }
+
   .description {
     font-size: 16px;
     color: var(--gray);
+  }
+
+  .unauthDescription {
+    font-size: 16px;
+    color: var(--light-gray);
   }
 }

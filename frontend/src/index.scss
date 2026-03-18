@@ -2,9 +2,9 @@
 @use './styles/abstract/fonts.scss' as *;
 
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   text-decoration: none;
 }
 

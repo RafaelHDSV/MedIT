@@ -4,10 +4,11 @@ import { matchPath, useLocation } from 'react-router-dom'
 import styles from './AuthLayoutHeader.module.scss'
 
 interface IAuthLayoutHeaderProps {
+  type?: 'unauth'
   marginBottom?: number
 }
 
-function AuthLayoutHeader({ marginBottom = 16 }: IAuthLayoutHeaderProps) {
+function AuthLayoutHeader({ type, marginBottom = 16 }: IAuthLayoutHeaderProps) {
   const location = useLocation()
   const currentRoute = routes.find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)
@@ -23,6 +24,24 @@ function AuthLayoutHeader({ marginBottom = 16 }: IAuthLayoutHeaderProps) {
     window.history.back()
   }
 
+  const titleStyles = () => {
+    switch (type) {
+      case 'unauth':
+        return styles.unauthTitle
+      default:
+        return styles.title
+    }
+  }
+
+  const descriptionStyles = () => {
+    switch (type) {
+      case 'unauth':
+        return styles.unauthDescription
+      default:
+        return styles.description
+    }
+  }
+
   return (
     <header className={styles.header} style={{ marginBottom }}>
       <div className={styles.textContainer}>
@@ -32,10 +51,10 @@ function AuthLayoutHeader({ marginBottom = 16 }: IAuthLayoutHeaderProps) {
               <ArrowLeftIcon size={28} />
             </button>
           )}
-          <h2 className={styles.title}>{routeName}</h2>
+          <h2 className={titleStyles()}>{routeName}</h2>
         </div>
 
-        <p className={styles.description}>{routeDescription}</p>
+        <p className={descriptionStyles()}>{routeDescription}</p>
       </div>
     </header>
   )
