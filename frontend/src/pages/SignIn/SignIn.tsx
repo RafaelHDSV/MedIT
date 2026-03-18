@@ -1,6 +1,5 @@
 import Button from '@/components/Button/Button'
 import { ROUTES } from '@/routes/constants'
-import masks from '@/utils/masks'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
@@ -19,7 +18,6 @@ export default function SignIn() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [formRef] = useForm()
-  const [inputType, setInputType] = useState<'cpf' | 'email' | undefined>()
   const [loading, setLoading] = useState(false)
 
   async function handleLogin() {
@@ -33,10 +31,11 @@ export default function SignIn() {
 
       const payload: LoginPayload = { password }
 
-      if (validators(identifier, 'email')) {
-        payload.email = identifier
+      const cleanIdentifier = identifier.trim()
+      if (validators(cleanIdentifier, 'email')) {
+        payload.email = cleanIdentifier
       } else {
-        payload.cpf = identifier.replace(/\D/g, '')
+        payload.cpf = cleanIdentifier
       }
 
       const success = await login(payload)
@@ -46,20 +45,6 @@ export default function SignIn() {
       message.error('Email/CPF ou senha inválidos')
     } finally {
       setLoading(false)
-    }
-  }
-
-  function handleIdentifierChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value
-    if (
-      validators(value.replace(/\D/g, ''), 'onlyNumbers') &&
-      value.replace(/\D/g, '').length <= 11
-    ) {
-      setInputType('cpf')
-      formRef.setFieldsValue({ identifier: masks(value, 'cpf') })
-    } else {
-      setInputType('email')
-      formRef.setFieldsValue({ identifier: value })
     }
   }
 
@@ -74,15 +59,6 @@ export default function SignIn() {
         label='CPF ou Email'
         name='identifier'
         className={styles.input}
-        normalize={(value) => {
-          const numbers = value.replace(/\D/g, '')
-
-          if (numbers.length <= 11) {
-            return masks(numbers, 'cpf')
-          }
-
-          return value
-        }}
         rules={[
           { required: true, message: 'Informe seu CPF ou email' },
           {
@@ -97,8 +73,11 @@ export default function SignIn() {
       >
         <Input
           placeholder='Digite seu CPF ou email'
-          onChange={handleIdentifierChange}
-          maxLength={inputType === 'cpf' ? 14 : 100}
+          maxLength={
+            validators(formRef.getFieldValue('identifier'), 'validCpf')
+              ? 14
+              : 200
+          }
         />
       </Form.Item>
       <Form.Item

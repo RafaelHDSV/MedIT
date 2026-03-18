@@ -39,22 +39,12 @@ const onlyNumbers = (value: string): boolean => {
 
 const signInIdentifier = (value: string): boolean => {
   if (!value) return false
-
   const clean = value.trim()
-  const numbers = clean.replace(/\D/g, '')
 
-  if (onlyNumbers(numbers)) {
-    if (!isValidCPF(numbers)) {
-      return false
-    }
-    return true
-  }
+  const isOnlyNumbers = /^\d+$/.test(clean)
+  if (isOnlyNumbers) return isValidCPF(clean)
 
-  if (!isEmail(clean)) {
-    return false
-  }
-
-  return true
+  return isEmail(clean)
 }
 
 export type ValidatorEnum =

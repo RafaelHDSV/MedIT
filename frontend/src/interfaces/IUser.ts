@@ -30,6 +30,7 @@ export interface IUser extends IBaseInterface, IDoctor {
   name: string
   cpf: string
   role: UserRoles
+  number: number
   email: string
   password?: string
   age?: number

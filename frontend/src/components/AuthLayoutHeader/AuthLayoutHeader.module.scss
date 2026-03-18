@@ -4,26 +4,32 @@
   gap: 0.5rem;
 }
 
-.backButton {
-  background: none;
-  border: none;
-  padding: 0;
-  transition: 150ms ease;
-  cursor: pointer;
-
-  &:hover {
-    color: var(--primary-color);
-  }
-}
-
 .textContainer {
   display: flex;
   flex-direction: column;
 
-  .title {
-    font-size: 24px;
-    font-weight: 600;
-    padding-bottom: 0.25rem;
+  .titleContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .backButton {
+      background: none;
+      border: none;
+      padding: 0;
+      transition: 150ms ease;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      padding-bottom: 0.25rem;
+    }
   }
 
   .unauthTitle {
