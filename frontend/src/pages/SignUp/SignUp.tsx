@@ -70,78 +70,73 @@ function SignUp() {
   }
 
   return (
-    <>
-      <h2>Bem-vindo de volta</h2>
-      <p>Acesse sua conta para continuar</p>
+    <Form form={formRef} layout='vertical' onFinish={handleRegister}>
+      <Form.Item
+        label='Nome'
+        name='name'
+        validateStatus={fieldErrors.name ? 'error' : ''}
+        help={fieldErrors.name}
+        rules={[{ required: true, message: 'Campo obrigatório' }]}
+      >
+        <Input placeholder='Digite seu nome' type='text' />
+      </Form.Item>
 
-      <Form form={formRef} layout='vertical' onFinish={handleRegister}>
-        <Form.Item
-          label='Nome'
-          name='name'
-          validateStatus={fieldErrors.name ? 'error' : ''}
-          help={fieldErrors.name}
-          rules={[{ required: true, message: 'Campo obrigatório' }]}
-        >
-          <Input placeholder='Digite seu nome' type='text' />
-        </Form.Item>
-
-        <Form.Item
-          label='CPF'
-          name='cpf'
-          rules={[
-            { required: true, message: 'Informe seu CPF' },
-            {
-              validator(_, value) {
-                const error = validators(value, 'validCpf')
-                return error
-                  ? Promise.resolve()
-                  : Promise.reject(new Error('CPF inválido'))
-              }
+      <Form.Item
+        label='CPF'
+        name='cpf'
+        rules={[
+          { required: true, message: 'Informe seu CPF' },
+          {
+            validator(_, value) {
+              const error = validators(value, 'validCpf')
+              return error
+                ? Promise.resolve()
+                : Promise.reject(new Error('CPF inválido'))
             }
-          ]}
-        >
-          <InputText mask='cpf' placeholder='Digite seu CPF' />
-        </Form.Item>
+          }
+        ]}
+      >
+        <InputText mask='cpf' placeholder='Digite seu CPF' />
+      </Form.Item>
 
-        <Form.Item
-          label='Email'
-          name='email'
-          rules={[
-            { required: true, message: 'Informe seu email' },
-            {
-              validator(_, value) {
-                const error = validators(value, 'email')
-                return error
-                  ? Promise.resolve()
-                  : Promise.reject(new Error('Email inválido'))
-              }
+      <Form.Item
+        label='Email'
+        name='email'
+        rules={[
+          { required: true, message: 'Informe seu email' },
+          {
+            validator(_, value) {
+              const error = validators(value, 'email')
+              return error
+                ? Promise.resolve()
+                : Promise.reject(new Error('Email inválido'))
             }
-          ]}
-        >
-          <Input placeholder='Digite seu email' type='email' />
-        </Form.Item>
+          }
+        ]}
+      >
+        <Input placeholder='Digite seu email' type='email' />
+      </Form.Item>
 
-        <Form.Item
-          label='Senha'
-          name='password'
-          validateStatus={fieldErrors.password ? 'error' : ''}
-          help={fieldErrors.password}
-          rules={[
-            { required: true, message: 'Campo obrigatório' },
-            { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
-          ]}
-        >
-          <Input.Password placeholder='Digite sua senha' />
-        </Form.Item>
+      <Form.Item
+        label='Senha'
+        name='password'
+        validateStatus={fieldErrors.password ? 'error' : ''}
+        help={fieldErrors.password}
+        rules={[
+          { required: true, message: 'Campo obrigatório' },
+          { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+        ]}
+      >
+        <Input.Password placeholder='Digite sua senha' />
+      </Form.Item>
 
-        <Flex gap={16}>
-          <Button type='primary' loading={loading} htmlType='submit'>
-            Cadastrar
-          </Button>
-          <Link to={ROUTES.SIGNIN.path}>Já possui uma conta? Entrar</Link>
-        </Flex>
-      </Form>
-    </>
+      <Flex gap={16}>
+        <Button type='primary' loading={loading} htmlType='submit'>
+          Cadastrar
+        </Button>
+        <Link to={ROUTES.SIGNIN.path}>Já possui uma conta? Entrar</Link>
+      </Flex>
+    </Form>
   )
 }
 

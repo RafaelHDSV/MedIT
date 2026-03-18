@@ -1,5 +1,6 @@
 import UnauthImage3 from '@/assets/unauth-image-3.svg'
 import UnauthImage from '@/assets/unauth-image.svg'
+import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Logo from '@/components/Logo/Logo'
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
@@ -17,6 +18,8 @@ export default function UnauthLayout() {
     <div className={styles.content}>
       <aside className={styles.form}>
         <Logo />
+
+        <AuthLayoutHeader type='unauth' />
 
         <Outlet />
       </aside>

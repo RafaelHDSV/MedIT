@@ -5,7 +5,7 @@ interface ILogoProps {
   isCompact?: boolean
 }
 
-function Logo({ fontSize = 36, isCompact = false }: ILogoProps) {
+function Logo({ fontSize = 32, isCompact = false }: ILogoProps) {
   if (isCompact) {
     return (
       <div className={styles.title} style={{ fontSize }}>

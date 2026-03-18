@@ -63,68 +63,63 @@ export default function SignIn() {
   }
 
   return (
-    <>
-      <h2>Bem-vindo de volta</h2>
-      <p>Acesse sua conta para continuar</p>
+    <Form form={formRef} layout='vertical' onFinish={handleLogin}>
+      <Form.Item
+        label='CPF ou Email'
+        name='identifier'
+        className={styles.input}
+        normalize={(value) => {
+          const numbers = value.replace(/\D/g, '')
 
-      <Form form={formRef} layout='vertical' onFinish={handleLogin}>
-        <Form.Item
-          label='CPF ou Email'
-          name='identifier'
-          className={styles.input}
-          normalize={(value) => {
-            const numbers = value.replace(/\D/g, '')
+          if (numbers.length <= 11) {
+            return masks(numbers, 'cpf')
+          }
 
-            if (numbers.length <= 11) {
-              return masks(numbers, 'cpf')
+          return value
+        }}
+        rules={[
+          { required: true, message: 'Informe seu CPF ou email' },
+          {
+            validator(_, value) {
+              const error = validators(value, 'signInIdentifier')
+              return error
+                ? Promise.resolve()
+                : Promise.reject(new Error('CPF ou email inválido'))
             }
+          }
+        ]}
+      >
+        <Input
+          placeholder='Digite seu CPF ou email'
+          onChange={handleIdentifierChange}
+          maxLength={inputType === 'cpf' ? 14 : 100}
+        />
+      </Form.Item>
+      <Form.Item
+        label='Senha'
+        name='password'
+        className={styles.input}
+        rules={[
+          { required: true, message: 'Informe sua senha' },
+          { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+        ]}
+      >
+        <Input.Password placeholder='Digite sua senha' />
+      </Form.Item>
 
-            return value
-          }}
-          rules={[
-            { required: true, message: 'Informe seu CPF ou email' },
-            {
-              validator(_, value) {
-                const error = validators(value, 'signInIdentifier')
-                return error
-                  ? Promise.resolve()
-                  : Promise.reject(new Error('CPF ou email inválido'))
-              }
-            }
-          ]}
+      <Flex vertical gap={16}>
+        <Button
+          className={styles.loginButton}
+          type='primary'
+          loading={loading}
+          htmlType='submit'
         >
-          <Input
-            placeholder='Digite seu CPF ou email'
-            onChange={handleIdentifierChange}
-            maxLength={inputType === 'cpf' ? 14 : 100}
-          />
-        </Form.Item>
-        <Form.Item
-          label='Senha'
-          name='password'
-          className={styles.input}
-          rules={[
-            { required: true, message: 'Informe sua senha' },
-            { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
-          ]}
-        >
-          <Input.Password placeholder='Digite sua senha' />
-        </Form.Item>
-
-        <Flex vertical gap={16}>
-          <Button
-            className={styles.loginButton}
-            type='primary'
-            loading={loading}
-            htmlType='submit'
-          >
-            Entrar
-          </Button>
-          <Link className={styles.signUpLink} to={ROUTES.SIGNUP.path}>
-            Ainda não possui uma conta? Cadastrar-se
-          </Link>
-        </Flex>
-      </Form>
-    </>
+          Entrar
+        </Button>
+        <Link className={styles.signUpLink} to={ROUTES.SIGNUP.path}>
+          Ainda não possui uma conta? Cadastrar-se
+        </Link>
+      </Flex>
+    </Form>
   )
 }
