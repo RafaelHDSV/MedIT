@@ -1,3 +1,4 @@
+import UnauthImage3 from '@/assets/unauth-image-3.svg'
 import UnauthImage from '@/assets/unauth-image.svg'
 import Logo from '@/components/Logo/Logo'
 import { useState } from 'react'
@@ -6,7 +7,7 @@ import styles from './UnauthLayout.module.scss'
 
 export default function UnauthLayout() {
   const [imageIndex, setImageIndex] = useState(0)
-  const imageSource = [UnauthImage, '/SignIn.png']
+  const imageSource = [UnauthImage, '/SignIn.png', UnauthImage3]
 
   function handleImageClick() {
     setImageIndex((imageIndex + 1) % imageSource.length)
