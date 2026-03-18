@@ -1,0 +1,22 @@
+// src/pages/SignUp/SignUp.scss
+
+// Importamos o estilo do SignIn para não ter que repetir código
+@import '../SignInJOTA/SignIn.scss';
+
+// Aqui você pode adicionar apenas o que for específico do Cadastro, se precisar.
+// Como o formulário de cadastro tem mais campos, talvez você precise 
+// ajustar a altura da caixa se ela ficar muito grande:
+
+.signin-container {
+  .form-side {
+    .content-wrapper {
+      // Se precisar de mais espaço, podemos ajustar o max-width aqui
+      max-width: 400px; 
+
+      // Ajuste para não ficar colado no topo em telas menores
+      @media (max-width: 900px) {
+        margin-top: 20px;
+      }
+    }
+  }
+}
