@@ -25,14 +25,16 @@ function AuthLayoutHeader({ marginBottom = 16 }: IAuthLayoutHeaderProps) {
 
   return (
     <header className={styles.header} style={{ marginBottom }}>
-      {canGoBack && (
-        <button className={styles.backButton} onClick={handleGoBack}>
-          <ArrowLeftIcon size={28} />
-        </button>
-      )}
-
       <div className={styles.textContainer}>
-        <h2 className={styles.title}>{routeName}</h2>
+        <div className={styles.titleContainer}>
+          {canGoBack && (
+            <button className={styles.backButton} onClick={handleGoBack}>
+              <ArrowLeftIcon size={28} />
+            </button>
+          )}
+          <h2 className={styles.title}>{routeName}</h2>
+        </div>
+
         <p className={styles.description}>{routeDescription}</p>
       </div>
     </header>
