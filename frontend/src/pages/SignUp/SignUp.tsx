@@ -1,16 +1,18 @@
 import { api } from '@/api/api'
+import Button from '@/components/Button/Button'
 import InputText from '@/components/InputText/InputText'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
 import { UserRolesLabels } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
-import { Button, Flex, Form, Input, message } from 'antd'
+import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import styles from './SignUp.module.scss'
 
 interface ISignUpFormErrors {
   name?: string
@@ -70,10 +72,16 @@ function SignUp() {
   }
 
   return (
-    <Form form={formRef} layout='vertical' onFinish={handleRegister}>
+    <Form
+      form={formRef}
+      className={styles.form}
+      layout='vertical'
+      onFinish={handleRegister}
+    >
       <Form.Item
         label='Nome'
         name='name'
+        className={styles.input}
         validateStatus={fieldErrors.name ? 'error' : ''}
         help={fieldErrors.name}
         rules={[{ required: true, message: 'Campo obrigatório' }]}
@@ -84,6 +92,7 @@ function SignUp() {
       <Form.Item
         label='CPF'
         name='cpf'
+        className={styles.input}
         rules={[
           { required: true, message: 'Informe seu CPF' },
           {
@@ -102,6 +111,7 @@ function SignUp() {
       <Form.Item
         label='Email'
         name='email'
+        className={styles.input}
         rules={[
           { required: true, message: 'Informe seu email' },
           {
@@ -120,6 +130,7 @@ function SignUp() {
       <Form.Item
         label='Senha'
         name='password'
+        className={styles.input}
         validateStatus={fieldErrors.password ? 'error' : ''}
         help={fieldErrors.password}
         rules={[
@@ -130,11 +141,14 @@ function SignUp() {
         <Input.Password placeholder='Digite sua senha' />
       </Form.Item>
 
-      <Flex gap={16}>
-        <Button type='primary' loading={loading} htmlType='submit'>
+      <Flex vertical>
+        <Button htmlType='submit' loading={loading}>
           Cadastrar
         </Button>
-        <Link to={ROUTES.SIGNIN.path}>Já possui uma conta? Entrar</Link>
+
+        <Link className={styles.signUpLink} to={ROUTES.SIGNIN.path}>
+          <p>Já possui uma conta? Entrar</p>
+        </Link>
       </Flex>
     </Form>
   )

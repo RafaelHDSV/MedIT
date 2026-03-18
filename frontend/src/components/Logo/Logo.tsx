@@ -1,14 +1,15 @@
 import styles from './Logo.module.scss'
 
 interface ILogoProps {
+  className?: string
   fontSize?: number
   isCompact?: boolean
 }
 
-function Logo({ fontSize = 36, isCompact = false }: ILogoProps) {
+function Logo({ className, fontSize = 36, isCompact = false }: ILogoProps) {
   if (isCompact) {
     return (
-      <div className={styles.title} style={{ fontSize }}>
+      <div className={`${styles.title} ${className}`} style={{ fontSize }}>
         <strong>M</strong>
         <span>F</span>
       </div>
@@ -16,7 +17,7 @@ function Logo({ fontSize = 36, isCompact = false }: ILogoProps) {
   }
 
   return (
-    <div className={styles.title} style={{ fontSize }}>
+    <div className={`${styles.title} ${className}`} style={{ fontSize }}>
       <strong>Med</strong>
       <span>Flow</span>
     </div>
