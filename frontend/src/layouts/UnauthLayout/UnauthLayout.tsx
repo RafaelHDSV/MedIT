@@ -19,9 +19,10 @@ export default function UnauthLayout() {
       <aside className={styles.form}>
         <Logo />
 
-        <AuthLayoutHeader type='unauth' />
-
-        <Outlet />
+        <div className={styles.formContent}>
+          <AuthLayoutHeader type='unauth' />
+          <Outlet />
+        </div>
       </aside>
 
       <aside className={styles.image}>

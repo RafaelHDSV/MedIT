@@ -63,7 +63,12 @@ export default function SignIn() {
   }
 
   return (
-    <Form form={formRef} layout='vertical' onFinish={handleLogin}>
+    <Form
+      form={formRef}
+      className={styles.form}
+      layout='vertical'
+      onFinish={handleLogin}
+    >
       <Form.Item
         label='CPF ou Email'
         name='identifier'
@@ -107,7 +112,7 @@ export default function SignIn() {
         <Input.Password placeholder='Digite sua senha' />
       </Form.Item>
 
-      <Flex vertical gap={16}>
+      <Flex vertical>
         <Button
           className={styles.loginButton}
           type='primary'
@@ -116,8 +121,9 @@ export default function SignIn() {
         >
           Entrar
         </Button>
+
         <Link className={styles.signUpLink} to={ROUTES.SIGNUP.path}>
-          Ainda não possui uma conta? Cadastrar-se
+          <p>Ainda não possui uma conta? Cadastrar-se</p>
         </Link>
       </Flex>
     </Form>
