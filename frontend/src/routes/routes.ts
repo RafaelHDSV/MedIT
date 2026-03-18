@@ -39,10 +39,24 @@ const signIn: IRoute = {
   meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
 
+const signInJOTA: IRoute = {
+  name: ROUTES.SIGNINJOTA.name,
+  description: ROUTES.SIGNINJOTA.description,
+  path: ROUTES.SIGNINJOTA.path,
+  meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
+}
+
 const signUp: IRoute = {
   name: ROUTES.SIGNUP.name,
   description: ROUTES.SIGNUP.description,
   path: ROUTES.SIGNUP.path,
+  meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
+}
+
+const signUpJOTA: IRoute = {
+  name: ROUTES.SIGNUPJOTA.name,
+  description: ROUTES.SIGNUPJOTA.description,
+  path: ROUTES.SIGNUPJOTA.path,
   meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
 }
 
@@ -181,7 +195,9 @@ const triages: IRoute = {
 
 const routes: IRoute[] = [
   signIn,
+  signInJOTA,
   signUp,
+  signUpJOTA,
   dashboard,
   attendances,
   triages,

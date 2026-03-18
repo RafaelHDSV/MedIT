@@ -6,7 +6,9 @@ export const NotFound = lazy(() => import('../pages/NotFound/NotFound'))
 
 // UNAUTH PAGES
 export const SignIn = lazy(() => import('../pages/SignIn/SignIn'))
+export const SignInJOTA = lazy(() => import('../pages/SignInJOTA/SignIn'))
 export const SignUp = lazy(() => import('../pages/SignUp/SignUp'))
+export const SignUpJOTA = lazy(() => import('../pages/SignUpJOTA/SignUp'))
 
 // AUTH PAGES
 export const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'))
