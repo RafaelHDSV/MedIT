@@ -64,15 +64,22 @@ export default function SignIn() {
     }
   }
 
+  const imageSource = [UnauthImage, '/SignIn.png']
+  const [imageIndex, setImageIndex] = useState(0)
+
   return (
     <div className={styles.content}>
       <aside className={styles.form}>
         <Logo />
 
+        <h2>Bem-vindo de volta</h2>
+        <p>Acesse sua conta para continuar</p>
+
         <Form form={formRef} layout='vertical' onFinish={handleLogin}>
           <Form.Item
             label='CPF ou Email'
             name='identifier'
+            className={styles.input}
             normalize={(value) => {
               const numbers = value.replace(/\D/g, '')
 
@@ -103,6 +110,7 @@ export default function SignIn() {
           <Form.Item
             label='Senha'
             name='password'
+            className={styles.input}
             rules={[
               { required: true, message: 'Informe sua senha' },
               { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
@@ -111,11 +119,16 @@ export default function SignIn() {
             <Input.Password placeholder='Digite sua senha' />
           </Form.Item>
 
-          <Flex gap={16}>
-            <Button type='primary' loading={loading} htmlType='submit'>
+          <Flex vertical gap={16}>
+            <Button
+              className={styles.loginButton}
+              type='primary'
+              loading={loading}
+              htmlType='submit'
+            >
               Entrar
             </Button>
-            <Link to={ROUTES.SIGNUP.path}>
+            <Link className={styles.signUpLink} to={ROUTES.SIGNUP.path}>
               Ainda não possui uma conta? Cadastrar-se
             </Link>
           </Flex>
@@ -123,7 +136,12 @@ export default function SignIn() {
       </aside>
 
       <aside className={styles.image}>
-        <img src={UnauthImage} alt='Sign In' />
+        <img
+          src={imageSource[imageIndex]}
+          alt='Ilustração MedFlow'
+          onClick={() => setImageIndex((imageIndex + 1) % imageSource.length)}
+        />
+        <h3>Plataforma de Apoio à Triagem e Fluxo Hospitalar</h3>
       </aside>
     </div>
   )

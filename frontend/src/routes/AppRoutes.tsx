@@ -14,17 +14,8 @@ function AppRoutes() {
           element={<UnauthRoute>{<pages.SignIn />}</UnauthRoute>}
         />
         <Route
-          path={ROUTES.SIGNINJOTA.path}
-          element={<UnauthRoute>{<pages.SignInJOTA />}</UnauthRoute>}
-        />
-
-        <Route
           path={ROUTES.SIGNUP.path}
           element={<UnauthRoute>{<pages.SignUp />}</UnauthRoute>}
-        />
-        <Route
-          path={ROUTES.SIGNUPJOTA.path}
-          element={<UnauthRoute>{<pages.SignUpJOTA />}</UnauthRoute>}
         />
 
         {/* Rotas privadas */}

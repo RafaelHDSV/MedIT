@@ -10,20 +10,10 @@ export const ROUTES = {
     description: 'Acesse sua conta para utilizar o sistema.',
     path: '/'
   },
-  SIGNINJOTA: {
-    name: 'Login JOTA',
-    description: 'Acesse sua conta para utilizar o sistema.',
-    path: '/sign-in-jota'
-  },
   SIGNUP: {
     name: 'Cadastro',
     description: 'Crie uma nova conta para acessar a plataforma.',
     path: '/sign-up'
-  },
-  SIGNUPJOTA: {
-    name: 'Cadastro JOTA',
-    description: 'Crie uma nova conta para acessar a plataforma.',
-    path: '/sign-up-jota'
   },
   DASHBOARD: {
     name: 'Dashboard',
