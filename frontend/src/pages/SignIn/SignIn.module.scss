@@ -42,23 +42,6 @@
     }
   }
 
-  .loginButton {
-    --ant-color-primary-hover: var(--secondary-color);
-    --ant-color-primary-active: var(--secondary-color);
-
-    width: 100%;
-    height: 48px;
-    background-color: var(--primary-color);
-    color: var(--white);
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 16px;
-    font-weight: 600;
-    margin-top: 1rem;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
   .signUpLink {
     margin-top: 1rem;
     text-align: center;

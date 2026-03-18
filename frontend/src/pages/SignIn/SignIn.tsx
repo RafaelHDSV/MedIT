@@ -1,7 +1,8 @@
+import Button from '@/components/Button/Button'
 import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import validators from '@/utils/validators'
-import { Button, Flex, Form, Input, message } from 'antd'
+import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -113,12 +114,7 @@ export default function SignIn() {
       </Form.Item>
 
       <Flex vertical>
-        <Button
-          className={styles.loginButton}
-          type='primary'
-          loading={loading}
-          htmlType='submit'
-        >
+        <Button htmlType='submit' loading={loading}>
           Entrar
         </Button>
 
