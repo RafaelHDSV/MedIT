@@ -1,7 +1,10 @@
 import { lazy } from 'react'
 
 // LAYOUTS
-export const AppLayout = lazy(() => import('../layouts/AppLayout'))
+export const AuthLayout = lazy(() => import('../layouts/AuthLayout/AuthLayout'))
+export const UnauthLayout = lazy(
+  () => import('../layouts/UnauthLayout/UnauthLayout')
+)
 export const NotFound = lazy(() => import('../pages/NotFound/NotFound'))
 
 // UNAUTH PAGES

@@ -10,20 +10,29 @@ function AppRoutes() {
       <Routes>
         {/* Rotas públicas */}
         <Route
-          path={ROUTES.SIGNIN.path}
-          element={<UnauthRoute>{<pages.SignIn />}</UnauthRoute>}
-        />
-        <Route
-          path={ROUTES.SIGNUP.path}
-          element={<UnauthRoute>{<pages.SignUp />}</UnauthRoute>}
-        />
+          path='/'
+          element={
+            <UnauthRoute>
+              <pages.UnauthLayout />
+            </UnauthRoute>
+          }
+        >
+          <Route
+            path={ROUTES.SIGNIN.path}
+            element={<UnauthRoute>{<pages.SignIn />}</UnauthRoute>}
+          />
+          <Route
+            path={ROUTES.SIGNUP.path}
+            element={<UnauthRoute>{<pages.SignUp />}</UnauthRoute>}
+          />
+        </Route>
 
         {/* Rotas privadas */}
         <Route
           path='/auth'
           element={
             <AuthRoute>
-              <pages.AppLayout />
+              <pages.AuthLayout />
             </AuthRoute>
           }
         >
