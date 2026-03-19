@@ -6,13 +6,13 @@ export const ROUTE_GROUP = {
 
 export const ROUTES = {
   SIGNIN: {
-    name: 'Login',
-    description: 'Acesse sua conta para utilizar o sistema.',
+    name: 'Bem-vindo de volta',
+    description: 'Acesse sua conta para continuar',
     path: '/'
   },
   SIGNUP: {
-    name: 'Cadastro',
-    description: 'Crie uma nova conta para acessar a plataforma.',
+    name: 'Crie sua conta',
+    description: 'Cadastre-se para começar a usar o sistema',
     path: '/sign-up'
   },
   DASHBOARD: {

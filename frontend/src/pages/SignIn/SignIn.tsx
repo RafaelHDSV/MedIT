@@ -1,8 +1,7 @@
-import UnauthImage from '@/assets/unauth-image.svg'
-import Logo from '@/components/Logo/Logo'
+import Button from '@/components/Button/Button'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
-import { Button, Flex, Form, Input, message } from 'antd'
+import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -50,60 +49,58 @@ export default function SignIn() {
   }
 
   return (
-    <div className={styles.content}>
-      <aside className={styles.form}>
-        <Logo />
+    <Form
+      form={formRef}
+      className={styles.form}
+      layout='vertical'
+      onFinish={handleLogin}
+    >
+      <Form.Item
+        label='CPF ou Email'
+        name='identifier'
+        className={styles.input}
+        rules={[
+          { required: true, message: 'Informe seu CPF ou email' },
+          {
+            validator(_, value) {
+              const error = validators(value, 'signInIdentifier')
+              return error
+                ? Promise.resolve()
+                : Promise.reject(new Error('CPF ou email inválido'))
+            }
+          }
+        ]}
+      >
+        <Input
+          placeholder='Digite seu CPF ou email'
+          maxLength={
+            validators(formRef.getFieldValue('identifier'), 'validCpf')
+              ? 14
+              : 200
+          }
+        />
+      </Form.Item>
+      <Form.Item
+        label='Senha'
+        name='password'
+        className={styles.input}
+        rules={[
+          { required: true, message: 'Informe sua senha' },
+          { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+        ]}
+      >
+        <Input.Password placeholder='Digite sua senha' />
+      </Form.Item>
 
-        <Form form={formRef} layout='vertical' onFinish={handleLogin}>
-          <Form.Item
-            label='CPF ou Email'
-            name='identifier'
-            rules={[
-              { required: true, message: 'Informe seu CPF ou email' },
-              {
-                validator(_, value) {
-                  const error = validators(value, 'signInIdentifier')
-                  return error
-                    ? Promise.resolve()
-                    : Promise.reject(new Error('CPF ou email inválido'))
-                }
-              }
-            ]}
-          >
-            <Input
-              placeholder='Digite seu CPF ou email'
-              maxLength={
-                validators(formRef.getFieldValue('identifier'), 'validCpf')
-                  ? 14
-                  : 200
-              }
-            />
-          </Form.Item>
-          <Form.Item
-            label='Senha'
-            name='password'
-            rules={[
-              { required: true, message: 'Informe sua senha' },
-              { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
-            ]}
-          >
-            <Input.Password placeholder='Digite sua senha' />
-          </Form.Item>
+      <Flex vertical>
+        <Button htmlType='submit' loading={loading}>
+          Entrar
+        </Button>
 
-          <Flex gap={16}>
-            <Button type='primary' loading={loading} htmlType='submit'>
-              Entrar
-            </Button>
-            <Link to={ROUTES.SIGNUP.path}>
-              Ainda não possui uma conta? Cadastrar-se
-            </Link>
-          </Flex>
-        </Form>
-      </aside>
-
-      <aside className={styles.image}>
-        <img src={UnauthImage} alt='Sign In' />
-      </aside>
-    </div>
+        <Link className={styles.signUpLink} to={ROUTES.SIGNUP.path}>
+          <p>Ainda não possui uma conta? Cadastrar-se</p>
+        </Link>
+      </Flex>
+    </Form>
   )
 }
