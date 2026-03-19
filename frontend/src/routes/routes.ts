@@ -107,7 +107,7 @@ const nurseDetails: IRoute = {
   path: ROUTES.NURSES_DETAILS.path,
   meta: {
     hidden: true,
-    progress: ProgressStatus.NOT_STARTED,
+    progress: ProgressStatus.COMPLETED,
     levels: [UserRoles.ADMIN],
     canGoBack: true
   }
