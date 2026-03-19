@@ -1,21 +1,15 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
-import type { IError } from '@/interfaces/IError'
-import type { IUser } from '@/interfaces/IUser'
-import { Flex, message, Table } from 'antd'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import styles from './NursesTable.module.scss'
+import styles from '@/styles/UserTable.module.scss'
+import { Flex, Table } from 'antd'
 import { useNursesColumns } from './hooks/useNursesColumns'
 
 function Nurses() {
   const columns = useNursesColumns()
 
-const data = [
+  const data = [
     {
       number: '1',
       name: 'John Brown',
@@ -107,7 +101,6 @@ const data = [
       coren: '10999'
     }
   ]
-  
 
   return (
     <div>
@@ -116,9 +109,8 @@ const data = [
         <ProgressTag status={ProgressStatus.NOT_STARTED} />
       </Flex>
 
-    
       <Table
-        className={styles.nursesTable}
+        className={styles.userTable}
         rowKey='_id'
         dataSource={data}
         columns={columns}
@@ -126,9 +118,6 @@ const data = [
         size='middle'
         bordered={false}
         scroll={{ x: 'max-content' }}
-
-        
-        
       />
     </div>
   )

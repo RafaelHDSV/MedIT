@@ -5,11 +5,11 @@ import ProgressTag, {
 } from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
 import type { IUser } from '@/interfaces/IUser'
+import styles from '@/styles/UserTable.module.scss'
 import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import styles from './DoctorTable.module.scss'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
 function Doctors() {
@@ -45,11 +45,11 @@ function Doctors() {
     <div>
       <Flex gap={16} align='center'>
         <AuthLayoutHeader />
-        <ProgressTag status={ProgressStatus.NOT_STARTED} />
+        <ProgressTag status={ProgressStatus.COMPLETED} />
       </Flex>
 
       <Table
-        className={styles.doctorTable}
+        className={styles.userTable}
         rowKey='_id'
         dataSource={doctors}
         columns={columns}

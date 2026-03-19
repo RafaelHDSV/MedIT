@@ -71,7 +71,7 @@ const doctors: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.IN_PROGRESS,
+    progress: ProgressStatus.COMPLETED,
     levels: [UserRoles.ADMIN]
   }
 }
@@ -96,7 +96,7 @@ const nurses: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED,
+    progress: ProgressStatus.IN_PROGRESS,
     levels: [UserRoles.ADMIN]
   }
 }
@@ -121,7 +121,7 @@ const patients: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED,
+    progress: ProgressStatus.IN_PROGRESS,
     levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE]
   }
 }

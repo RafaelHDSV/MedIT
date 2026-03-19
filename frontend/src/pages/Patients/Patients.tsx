@@ -1,21 +1,15 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
-import type { IError } from '@/interfaces/IError'
-import type { IUser } from '@/interfaces/IUser'
-import { Flex, message, Table } from 'antd'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import styles from './PatientsTable.module.scss'
+import styles from '@/styles/UserTable.module.scss'
+import { Flex, Table } from 'antd'
 import { usePatientsColumns } from './hooks/usePatientsColumns'
 
 function Patients() {
   const columns = usePatientsColumns()
 
-const data = [
+  const data = [
     {
       number: '1',
       name: 'John Brown',
@@ -116,7 +110,7 @@ const data = [
       </Flex>
 
       <Table
-        className={styles.patientsTable}
+        className={styles.userTable}
         rowKey='_id'
         dataSource={data}
         columns={columns}

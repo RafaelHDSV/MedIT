@@ -12,9 +12,9 @@ export function useDoctorsColumns() {
   const navigate = useNavigate()
 
   const handleNavigateToDetails = useCallback(
-    (id: ObjectId | undefined) => {
-      if (!id) return
-      navigate(ROUTES.DOCTORS_DETAILS.path.replace(':id', id.toString()))
+    (_id: ObjectId | undefined) => {
+      if (!_id) return
+      navigate(ROUTES.DOCTORS_DETAILS.path.replace(':id', _id.toString()))
     },
     [navigate]
   )
