@@ -1,10 +1,48 @@
-:root {
-  --primary-color: #E8553D;
-}
+@use './styles/abstract/variables.scss' as *;
+@use './styles/abstract/fonts.scss' as *;
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   text-decoration: none;
+}
+
+body {
+  font-family: 'Figtree', sans-serif;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary-color) transparent;
+  scrollbar-gutter: stable;
+}
+
+::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
 }

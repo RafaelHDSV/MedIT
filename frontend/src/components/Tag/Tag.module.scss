@@ -1,0 +1,26 @@
+.tag {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.sucess {
+  background: var(--sucess-opaque);
+  color: var(--sucess-color);
+}
+
+.warning {
+  background: var(--warning-opaque);
+  color: var(--warning-color);
+}
+
+.error {
+  background: var(--error-opaque);
+  color: var(--error-color);
+}
+
+.info {
+  background: var(--info-opaque);
+  color: var(--info-color);
+}
