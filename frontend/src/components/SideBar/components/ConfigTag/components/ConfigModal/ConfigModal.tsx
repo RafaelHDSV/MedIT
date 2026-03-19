@@ -5,10 +5,12 @@ import {
   Checkbox,
   Divider,
   Input,
+  message,
   Modal,
   Switch,
   Typography
 } from 'antd'
+import TextArea from 'antd/es/input/TextArea'
 import { useState } from 'react'
 import styles from './ConfigModal.module.scss'
 
@@ -21,6 +23,8 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   const { canSeeProgressStatus, setCanSeeProgressStatus } = useSettings()
   const { tasks, addTask, toggleTask, removeTask } = useDevTasks()
   const [newTask, setNewTask] = useState('')
+  const [tasksJson, setTasksJson] = useState('')
+  const [visibleEditInput, setVisibleEditInput] = useState(false)
 
   function closeModal() {
     setIsModalOpen(false)
@@ -30,6 +34,18 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
     if (!newTask.trim()) return
     addTask(newTask)
     setNewTask('')
+  }
+
+  function handleToggleEdit() {
+    setVisibleEditInput((prev) => {
+      const next = !prev
+
+      if (!prev) {
+        setTasksJson(JSON.stringify(tasks, null, 2))
+      }
+
+      return next
+    })
   }
 
   return (
@@ -59,6 +75,39 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
             onChange={(checked) => setCanSeeProgressStatus(checked)}
           />
         </div>
+
+        <div className={styles.settingRow}>
+          <span>Alterar ordenação</span>
+
+          <Button onClick={handleToggleEdit}>Editar</Button>
+        </div>
+
+        {visibleEditInput && (
+          <>
+            <TextArea
+              rows={15}
+              value={tasksJson}
+              onChange={(e) => setTasksJson(e.target.value)}
+            />
+
+            <Button
+              type='primary'
+              onClick={() => {
+                try {
+                  const parsed = JSON.parse(tasksJson)
+
+                  localStorage.setItem('devTasks', JSON.stringify(parsed))
+
+                  window.location.reload()
+                } catch {
+                  message.error('JSON inválido')
+                }
+              }}
+            >
+              Salvar alterações
+            </Button>
+          </>
+        )}
       </div>
 
       <Divider />
