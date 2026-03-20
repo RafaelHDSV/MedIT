@@ -14,7 +14,23 @@ export default function UnauthLayout() {
   )
   const isSignInPage = currentRoute?.path === '/'
   const [imageIndex, setImageIndex] = useState(0)
-  const imageSource = [UnauthImage, '/SignIn.png', UnauthImage3]
+  const imageSource = [
+    UnauthImage,
+    UnauthImage3,
+    '/image1.png',
+    '/image2.png',
+    '/image3.png',
+    '/image4.png'
+    // TODO: Gerar as imagens restantes pela IA e adicionar
+    // '/image5.png',
+    // '/image6.png',
+    // '/image7.png',
+    // '/image8.png'
+  ]
+
+  setTimeout(() => {
+    setImageIndex((imageIndex + 1) % imageSource.length)
+  }, 3000)
 
   function handleImageClick() {
     setImageIndex((imageIndex + 1) % imageSource.length)
