@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import mongoose, { HydratedDocument } from 'mongoose'
 import { IUser, IUserMethods, Roles, UserGender } from '../interfaces/IUser.js'
+import CounterModel from './CounterModel.js'
 
 const UserSchema = new mongoose.Schema<
   IUser,
@@ -31,6 +32,10 @@ const UserSchema = new mongoose.Schema<
         message: 'Por favor, insira um CPF válido (apenas números, 11 dígitos).'
       }
     },
+    number: {
+      type: Number,
+      unique: true
+    },
     role: {
       type: String,
       required: [true, 'O papel é obrigatório'],
@@ -48,10 +53,6 @@ const UserSchema = new mongoose.Schema<
       type: String,
       required: [true, 'A senha é obrigatória'],
       minlength: [6, 'A senha deve ter pelo menos 6 caracteres']
-    },
-    age: {
-      type: Number,
-      min: [0, 'A idade deve ser um número positivo']
     },
     gender: {
       type: String,
@@ -99,6 +100,20 @@ UserSchema.methods.comparePassword = async function (password: string) {
   if (!this.password) return false
   return bcrypt.compare(password, this.password)
 }
+
+UserSchema.pre('save', async function (this: HydratedDocument<IUser>) {
+  if (this.number) return
+
+  const counterName = `user_${this.role}`
+
+  const counter = await CounterModel.findOneAndUpdate(
+    { name: counterName },
+    { $inc: { value: 1 } },
+    { new: true, upsert: true }
+  )
+
+  this.number = counter.value
+})
 
 type UserModel = mongoose.Model<IUser, {}, IUserMethods>
 export default mongoose.model<IUser, UserModel>('User', UserSchema)

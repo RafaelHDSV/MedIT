@@ -1,23 +1,50 @@
 .header {
   display: flex;
   align-items: flex-end;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
-.backButton {
-  background: none;
-  border: none;
-  padding: 0;
-  transition: 150ms ease;
-  cursor: pointer;
+.textContainer {
+  display: flex;
+  flex-direction: column;
 
-  &:hover {
-    color: var(--primary-color);
+  .titleContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .backButton {
+      background: none;
+      border: none;
+      padding: 0;
+      transition: 150ms ease;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      padding-bottom: 0.25rem;
+    }
   }
-}
 
-.title {
-  font-size: 24px;
-  font-weight: 600;
-  padding-bottom: 0.25rem;
+  .unauthTitle {
+    font-size: 32px;
+    font-weight: 600;
+    padding-bottom: 0.25rem;
+  }
+
+  .description {
+    font-size: 16px;
+    color: var(--gray);
+  }
+
+  .unauthDescription {
+    font-size: 16px;
+    color: var(--light-gray);
+  }
 }

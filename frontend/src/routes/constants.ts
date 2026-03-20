@@ -5,19 +5,66 @@ export const ROUTE_GROUP = {
 }
 
 export const ROUTES = {
-  SIGNIN: { name: 'Login', path: '/' },
-  SIGNUP: { name: 'Cadastro', path: '/sign-up' },
-  DASHBOARD: { name: 'Dashboard', path: '/auth/dashboard' },
-  DOCTORS: { name: 'Médicos', path: '/auth/doctors' },
-  DOCTORS_DETAILS: { name: 'Detalhes do médico', path: '/auth/doctors/:id' },
-  NURSES: { name: 'Enfermeiros', path: '/auth/nurses' },
-  NURSES_DETAILS: { name: 'Detalhes do enfermeiro', path: '/auth/nurses/:id' },
-  PATIENTS: { name: 'Pacientes', path: '/auth/patients' },
+  SIGNIN: {
+    name: 'Bem-vindo de volta',
+    description: 'Acesse sua conta para continuar',
+    path: '/'
+  },
+  SIGNUP: {
+    name: 'Crie sua conta',
+    description: 'Cadastre-se para começar a usar o sistema',
+    path: '/sign-up'
+  },
+  DASHBOARD: {
+    name: 'Dashboard',
+    description:
+      'Visualize um resumo geral das atividades e indicadores do sistema.',
+    path: '/auth/dashboard'
+  },
+  DOCTORS: {
+    name: 'Médicos',
+    description: 'Gerencie o cadastro e as informações dos médicos.',
+    path: '/auth/doctors'
+  },
+  DOCTORS_DETAILS: {
+    name: 'Detalhes do médico',
+    description: 'Visualize e gerencie as informações completas do médico.',
+    path: '/auth/doctors/:id'
+  },
+  NURSES: {
+    name: 'Enfermeiros',
+    description: 'Gerencie o cadastro e as informações dos enfermeiros.',
+    path: '/auth/nurses'
+  },
+  NURSES_DETAILS: {
+    name: 'Detalhes do enfermeiro',
+    description: 'Visualize e gerencie as informações completas do enfermeiro.',
+    path: '/auth/nurses/:id'
+  },
+  PATIENTS: {
+    name: 'Pacientes',
+    description: 'Gerencie o cadastro e os dados dos pacientes.',
+    path: '/auth/patients'
+  },
   PATIENTS_DETAILS: {
     name: 'Detalhes do paciente',
+    description: 'Visualize e gerencie as informações completas do paciente.',
     path: '/auth/patients/:id'
   },
-  MEDICAMENTS: { name: 'Medicamentos', path: '/auth/medications' },
-  ATTENDANCES: { name: 'Histórico de atendimentos', path: '/auth/attendances' },
-  TRIAGES: { name: 'Histórico de triagens', path: '/auth/triages' }
+  MEDICAMENTS: {
+    name: 'Medicamentos',
+    description:
+      'Gerencie o cadastro e o controle de medicamentos disponíveis.',
+    path: '/auth/medications'
+  },
+  ATTENDANCES: {
+    name: 'Histórico de atendimentos',
+    description: 'Consulte o histórico de atendimentos realizados no sistema.',
+    path: '/auth/attendances'
+  },
+  TRIAGES: {
+    name: 'Histórico de triagens',
+    description: 'Consulte o histórico de triagens registradas.',
+    path: '/auth/triages'
+  }
 }

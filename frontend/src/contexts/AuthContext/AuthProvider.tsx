@@ -2,7 +2,7 @@ import { api } from '@/api/api'
 import type { IError } from '@/interfaces/IError'
 import { type IUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
-import { message } from 'antd'
+import { message, Modal } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useState, type ReactNode } from 'react'
@@ -35,8 +35,10 @@ export function AuthProvider({ children }: Props) {
       const formattedUser: IUser = {
         _id: user._id,
         name: user.name,
+        cpf: user.cpf,
         role: user.role,
-        email: user.email
+        email: user.email,
+        number: user.number
       }
 
       setUser(formattedUser)
@@ -61,15 +63,40 @@ export function AuthProvider({ children }: Props) {
   }
 
   async function logout() {
-    const refreshToken = localStorage.getItem('refreshToken')
+    const modal = Modal.confirm({
+      title: 'Sair da conta',
+      content: 'Tem certeza que deseja encerrar sua sessão?',
+      okText: 'Sair',
+      cancelText: 'Cancelar',
+      closable: true,
+      maskClosable: true,
+      destroyOnHidden: false,
+      okButtonProps: { danger: true, autoFocus: true },
 
-    await api.post('/auth/logout', { refreshToken })
+      async onOk() {
+        modal.update({
+          okButtonProps: { loading: true }
+        })
 
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('user')
+        try {
+          const refreshToken = localStorage.getItem('refreshToken')
 
-    setUser(null)
+          await api.post('/auth/logout', { refreshToken })
+
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('refreshToken')
+          localStorage.removeItem('user')
+
+          setUser(null)
+        } catch (err) {
+          console.error('Erro no logout', err)
+          message.error('Ocorreu um erro ao encerrar a sessão')
+          modal.update({
+            okButtonProps: { loading: false }
+          })
+        }
+      }
+    })
   }
 
   return (

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "git pull && yarn && vite",
+    "dev:nopull": "yarn && vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

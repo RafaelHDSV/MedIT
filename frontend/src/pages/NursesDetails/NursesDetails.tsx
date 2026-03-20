@@ -3,14 +3,15 @@ import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
+import { UserGender } from '@/interfaces/IUser'
 import {
   CalendarDotsIcon,
   ChartBarIcon,
   DatabaseIcon
 } from '@phosphor-icons/react'
-
+import dayjs from 'dayjs'
 import styles from './NursesDetails.module.scss'
-import { UserGender } from '@/interfaces/IUser'
+
 const mockedLastAttendance = {
   patientComplaint: 'Febre e dores',
   Temperature: '37.8°C',
@@ -20,10 +21,10 @@ const mockedLastAttendance = {
 }
 
 const mockedAttendanceRecords: IAttendance[] = [
-  { type: 'Consulta', description: 'Gripe', date: new Date('2025-12-01') },
-  { type: 'Emergência', description: 'Entorse', date: new Date('2024-08-11') },
-  { type: 'Rotina', description: 'Check-up', date: new Date('2024-06-15') },
-  { type: 'Consulta', description: 'Alergia', date: new Date('2024-03-22') }
+  { type: 'Consulta', description: 'Gripe', date: '2025-12-01' },
+  { type: 'Emergência', description: 'Entorse', date: '2024-08-11' },
+  { type: 'Rotina', description: 'Check-up', date: '2024-06-15' },
+  { type: 'Consulta', description: 'Alergia', date: '2024-03-22' }
 ]
 function NursesDetails() {
   return (
@@ -82,7 +83,7 @@ function NursesDetails() {
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
           itens={mockedAttendanceRecords.map((item) => ({
-            label: item.date.toLocaleDateString(),
+            label: dayjs(item.date).format('DD/MM/YYYY'),
             value: `${item.type} - ${item.description}`
           }))}
         />
