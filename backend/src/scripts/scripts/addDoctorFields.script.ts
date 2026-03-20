@@ -1,4 +1,4 @@
-import { UserGender } from '../../interfaces/IUser.js'
+import { UserGender, UserLevels } from '../../interfaces/IUser.js'
 import UserModel from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
@@ -9,7 +9,7 @@ const addDoctorFields: Script = {
   async run() {
     console.log('Adicionando campos específicos para médicos...')
 
-    const filter = { level: 'DOCTOR' }
+    const filter = { level: UserLevels.DOCTOR }
 
     const update = {
       $set: {

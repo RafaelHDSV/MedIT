@@ -1,29 +1,29 @@
 import type { IBaseInterface } from './IBaseInterface'
 
 export const UserLevels = {
-  ADMIN: 'ADMIN',
-  DOCTOR: 'DOCTOR',
-  NURSE: 'NURSE',
-  PATIENT: 'PATIENT'
+  ADMIN: 'admin',
+  DOCTOR: 'doctor',
+  NURSE: 'nurse',
+  PATIENT: 'patient'
 } as const
 export type UserLevels = (typeof UserLevels)[keyof typeof UserLevels]
 export const UserLevelsLabels = {
-  ADMIN: 'Administrador(a)',
-  DOCTOR: 'Médico(a)',
-  NURSE: 'Enfermeiro(a)',
-  PATIENT: 'Paciente'
+  [UserLevels.ADMIN]: 'Administrador(a)',
+  [UserLevels.DOCTOR]: 'Médico(a)',
+  [UserLevels.NURSE]: 'Enfermeiro(a)',
+  [UserLevels.PATIENT]: 'Paciente'
 } as const
 
 export const UserGender = {
-  MALE: 'MALE',
-  FEMALE: 'FEMALE',
-  OTHER: 'OTHER'
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other'
 } as const
 export type UserGender = (typeof UserGender)[keyof typeof UserGender]
 export const UserGendersLabels = {
-  MALE: 'Masculino',
-  FEMALE: 'Feminino',
-  OTHER: 'Outro'
+  [UserGender.MALE]: 'Masculino',
+  [UserGender.FEMALE]: 'Feminino',
+  [UserGender.OTHER]: 'Outro'
 } as const
 
 const BloodType = {

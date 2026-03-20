@@ -1,3 +1,4 @@
+import { UserLevels } from '../../interfaces/IUser.js'
 import UserModel from '../../models/UserModel.js'
 
 const updateUserNumbers = {
@@ -5,7 +6,12 @@ const updateUserNumbers = {
   description:
     'Atualiza o campo number dos usuários com base na ordem de criação',
   async run() {
-    const levels = ['DOCTOR', 'NURSE', 'PATIENT', 'ADMIN']
+    const levels = [
+      UserLevels.DOCTOR,
+      UserLevels.NURSE,
+      UserLevels.PATIENT,
+      UserLevels.ADMIN
+    ]
 
     for (const level of levels) {
       const users = await UserModel.find({ level }).sort({ createdAt: 1 })

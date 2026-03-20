@@ -43,7 +43,8 @@ const UserSchema = new mongoose.Schema<
     level: {
       type: String,
       required: [true, 'O nível é obrigatório'],
-      enum: Object.values(UserLevels)
+      enum: Object.values(UserLevels),
+      lowercase: true
     },
     email: {
       type: String,

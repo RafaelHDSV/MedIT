@@ -1,17 +1,17 @@
 import { IBaseInterface } from './IBaseInterface.js'
 
 export const UserLevels = {
-  ADMIN: 'ADMIN',
-  DOCTOR: 'DOCTOR',
-  NURSE: 'NURSE',
-  PATIENT: 'PATIENT'
+  ADMIN: 'admin',
+  DOCTOR: 'doctor',
+  NURSE: 'nurse',
+  PATIENT: 'patient'
 } as const
 export type UserLevels = (typeof UserLevels)[keyof typeof UserLevels]
 
 export const UserGender = {
-  MALE: 'MALE',
-  FEMALE: 'FEMALE',
-  OTHER: 'OTHER'
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other'
 } as const
 export type UserGender = (typeof UserGender)[keyof typeof UserGender]
 

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { IBaseUser, IDoctor } from '../interfaces/IUser.js'
+import { IBaseUser, IDoctor, UserLevels } from '../interfaces/IUser.js'
 
 const DoctorSchema = new mongoose.Schema<IDoctor>({
   crm: { type: String, required: true },
@@ -8,4 +8,4 @@ const DoctorSchema = new mongoose.Schema<IDoctor>({
 
 export const Doctor = mongoose
   .model<IBaseUser>('User')
-  .discriminator('DOCTOR', DoctorSchema)
+  .discriminator(UserLevels.DOCTOR, DoctorSchema)

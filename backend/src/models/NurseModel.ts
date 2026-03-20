@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { IBaseUser, INurse } from '../interfaces/IUser.js'
+import { IBaseUser, INurse, UserLevels } from '../interfaces/IUser.js'
 
 const NurseSchema = new mongoose.Schema<INurse>({
   coren: { type: String, required: true },
@@ -8,4 +8,4 @@ const NurseSchema = new mongoose.Schema<INurse>({
 
 export const Nurse = mongoose
   .model<IBaseUser>('User')
-  .discriminator('NURSE', NurseSchema)
+  .discriminator(UserLevels.NURSE, NurseSchema)
