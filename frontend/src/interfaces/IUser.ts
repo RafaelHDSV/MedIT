@@ -26,7 +26,7 @@ export const UserGendersLabels = {
   OTHER: 'Outro'
 } as const
 
-export interface IUser extends IBaseInterface, IDoctor {
+export interface IUser extends IBaseInterface, IDoctor, INurse, IPatient {
   name: string
   cpf: string
   role: UserRoles
@@ -42,4 +42,20 @@ export interface IUser extends IBaseInterface, IDoctor {
 interface IDoctor {
   crm?: string
   specialization?: string
+}
+
+interface INurse {
+  coren?: string
+  shift?: string
+}
+
+const BloodType = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'] as const
+type BloodType = (typeof BloodType)[number]
+
+interface IPatient {
+  weight: number
+  height: number
+  bloodType: BloodType
+  conditions: string[]
+  allergies: string[]
 }

@@ -3,14 +3,14 @@ import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
+import { UserGender } from '@/interfaces/IUser'
 import {
   CalendarDotsIcon,
   ChartBarIcon,
   DatabaseIcon
 } from '@phosphor-icons/react'
-
 import styles from './NursesDetails.module.scss'
-import { UserGender } from '@/interfaces/IUser'
+
 const mockedLastAttendance = {
   patientComplaint: 'Febre e dores',
   Temperature: '37.8°C',

@@ -69,9 +69,9 @@ export function usePatientsColumns() {
         render: (cellphone: string) => masks(cellphone, 'cellphone')
       },
       {
-        title: 'TipoSanguineo',
-        dataIndex: 'sangue',
-        key: 'sangue'
+        title: 'Tipo Sanguíneo',
+        dataIndex: 'bloodType',
+        key: 'bloodType'
       },
       {
         title: 'Criado em',
