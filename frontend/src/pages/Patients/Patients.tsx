@@ -4,7 +4,7 @@ import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
-import type { IUser } from '@/interfaces/IUser'
+import type { IPatient } from '@/interfaces/IUser'
 import styles from '@/styles/UserTable.module.scss'
 import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'
@@ -14,7 +14,7 @@ import { usePatientsColumns } from './hooks/usePatientsColumns'
 
 function Patients() {
   const columns = usePatientsColumns()
-  const [patients, setPatients] = useState<IUser[]>([])
+  const [patients, setPatients] = useState<IPatient[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {

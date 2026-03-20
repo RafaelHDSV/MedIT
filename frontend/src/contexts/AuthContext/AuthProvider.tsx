@@ -1,6 +1,6 @@
 import { api } from '@/api/api'
 import type { IError } from '@/interfaces/IError'
-import { type IUser } from '@/interfaces/IUser'
+import { type IBaseUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
 import { message, Modal } from 'antd'
 import type { AxiosError } from 'axios'
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<IUser | null>(() => {
+  const [user, setUser] = useState<IBaseUser | null>(() => {
     const stored = localStorage.getItem('user')
     return stored ? JSON.parse(stored) : null
   })
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: Props) {
 
       const { accessToken, refreshToken, user } = response.data
 
-      const formattedUser: IUser = {
+      const formattedUser: IBaseUser = {
         _id: user._id,
         name: user.name,
         cpf: user.cpf,

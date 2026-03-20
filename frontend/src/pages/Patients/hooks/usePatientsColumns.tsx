@@ -1,4 +1,4 @@
-import type { IUser } from '@/interfaces/IUser'
+import type { IPatient } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
@@ -19,7 +19,7 @@ export function usePatientsColumns() {
     [navigate]
   )
 
-  const columns: ColumnsType<IUser> = useMemo(
+  const columns: ColumnsType<IPatient> = useMemo(
     () => [
       {
         title: 'ID',

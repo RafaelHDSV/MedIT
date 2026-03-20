@@ -5,7 +5,7 @@ import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
 import type { IError } from '@/interfaces/IError'
-import { type IUser } from '@/interfaces/IUser'
+import { type IDoctor } from '@/interfaces/IUser'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
@@ -37,7 +37,7 @@ const mockedAttendanceRecords: IAttendance[] = [
 
 function DoctorDetails() {
   const params = useParams<{ id: string }>()
-  const [doctor, setDoctor] = useState<IUser | null>(null)
+  const [doctor, setDoctor] = useState<IDoctor | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

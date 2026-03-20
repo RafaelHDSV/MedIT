@@ -26,28 +26,6 @@ export const UserGendersLabels = {
   OTHER: 'Outro'
 } as const
 
-export interface IUser extends IBaseInterface, IDoctor, INurse, IPatient {
-  name: string
-  cpf: string
-  level: UserLevels
-  number: number
-  email: string
-  password?: string
-  gender?: UserGender
-  cellphone?: number
-  birthDate?: Date
-}
-
-interface IDoctor {
-  crm?: string
-  specialization?: string
-}
-
-interface INurse {
-  coren?: string
-  shift?: string
-}
-
 const BloodType = {
   A_POSITIVE: 'A+',
   A_NEGATIVE: 'A-',
@@ -60,7 +38,30 @@ const BloodType = {
 } as const
 type BloodType = (typeof BloodType)[keyof typeof BloodType]
 
-interface IPatient {
+export interface IBaseUser extends IBaseInterface {
+  name: string
+  cpf: string
+  level: UserLevels
+  number: number
+  email: string
+  password?: string
+  gender?: UserGender
+  cellphone?: number
+  birthDate?: Date
+  refreshToken?: string
+}
+
+export interface IDoctor extends IBaseUser {
+  crm: string
+  specialization: string
+}
+
+export interface INurse extends IBaseUser {
+  coren: string
+  shift: string
+}
+
+export interface IPatient extends IBaseUser {
   weight?: number
   height?: number
   bloodType?: BloodType
