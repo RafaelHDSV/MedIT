@@ -44,15 +44,15 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Usuário não encontrado' })
   }
 
-  const { accessToken, refreshToken } = generateTokens(user._id)
-  user.refreshToken = refreshToken
-  await user.save()
-
   const validPassword = await user.comparePassword(password)
 
   if (!validPassword) {
     return res.status(400).json({ message: 'Senha inválida' })
   }
+
+  const { accessToken, refreshToken } = generateTokens(user._id)
+  user.refreshToken = refreshToken
+  await user.save()
 
   return res.json({
     accessToken,
