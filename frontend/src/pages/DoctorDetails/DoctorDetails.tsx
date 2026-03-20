@@ -29,10 +29,10 @@ const mockedLastAttendance = {
 }
 
 const mockedAttendanceRecords: IAttendance[] = [
-  { type: 'Consulta', description: 'Gripe', date: new Date('2025-12-01') },
-  { type: 'Emergência', description: 'Entorse', date: new Date('2024-08-11') },
-  { type: 'Rotina', description: 'Check-up', date: new Date('2024-06-15') },
-  { type: 'Consulta', description: 'Alergia', date: new Date('2024-03-22') }
+  { type: 'Consulta', description: 'Gripe', date: '2025-12-01' },
+  { type: 'Emergência', description: 'Entorse', date: '2024-08-11' },
+  { type: 'Rotina', description: 'Check-up', date: '2024-06-15' },
+  { type: 'Consulta', description: 'Alergia', date: '2024-03-22' }
 ]
 
 function DoctorDetails() {
@@ -122,7 +122,7 @@ function DoctorDetails() {
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
           itens={mockedAttendanceRecords.map((item) => ({
-            label: item.date.toLocaleDateString(),
+            label: dayjs(item.date).format('DD/MM/YYYY'),
             value: `${item.type} - ${item.description}`
           }))}
           loading={loading}
