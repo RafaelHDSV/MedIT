@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 import mongoose, { HydratedDocument } from 'mongoose'
 import { IUser, IUserMethods, Levels, UserGender } from '../interfaces/IUser.js'
-import CounterModel from './CounterModel.js'
 
 const UserSchema = new mongoose.Schema<
   IUser,
@@ -104,15 +103,13 @@ UserSchema.methods.comparePassword = async function (password: string) {
 UserSchema.pre('save', async function (this: HydratedDocument<IUser>) {
   if (this.number) return
 
-  const counterName = `user_${this.level}`
+  const lastUser = await mongoose
+    .model<IUser>('User')
+    .findOne({ level: this.level })
+    .sort({ number: -1 })
+    .select('number')
 
-  const counter = await CounterModel.findOneAndUpdate(
-    { name: counterName },
-    { $inc: { value: 1 } },
-    { new: true, upsert: true }
-  )
-
-  this.number = counter.value
+  this.number = lastUser?.number ? lastUser.number + 1 : 1
 })
 
 type UserModel = mongoose.Model<IUser, {}, IUserMethods>
