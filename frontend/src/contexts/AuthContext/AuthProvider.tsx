@@ -37,7 +37,8 @@ export function AuthProvider({ children }: Props) {
         name: user.name,
         cpf: user.cpf,
         role: user.role,
-        email: user.email
+        email: user.email,
+        number: user.number
       }
 
       setUser(formattedUser)
@@ -68,6 +69,7 @@ export function AuthProvider({ children }: Props) {
       okText: 'Sair',
       cancelText: 'Cancelar',
       closable: true,
+      maskClosable: true,
       destroyOnHidden: false,
       okButtonProps: { danger: true, autoFocus: true },
 

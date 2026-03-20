@@ -62,9 +62,9 @@ const BloodType = {
 type BloodType = (typeof BloodType)[keyof typeof BloodType]
 
 interface IPatient {
-  weight: number
-  height: number
-  bloodType: BloodType
-  conditions: string[]
-  allergies: string[]
+  weight?: number
+  height?: number
+  bloodType?: BloodType
+  conditions?: string[]
+  allergies?: string[]
 }
