@@ -17,6 +17,7 @@ function DetailsItem({ label, value }: IDetailsItemProps) {
 }
 
 interface IUserDetailsCardProps {
+  useFullWidth?: boolean
   Icon: Icon
   title: string
   itens: IDetailsItemProps[]
@@ -24,6 +25,7 @@ interface IUserDetailsCardProps {
 }
 
 function UserDetailsCard({
+  useFullWidth = false,
   Icon,
   title,
   itens,
@@ -42,7 +44,7 @@ function UserDetailsCard({
   }
 
   return (
-    <section className={styles.card}>
+    <section className={`${styles.card} ${useFullWidth ? styles.fullWidth : ''}`}>
       <div className={styles.cardHeader}>
         <Icon size={22} />
         {title}

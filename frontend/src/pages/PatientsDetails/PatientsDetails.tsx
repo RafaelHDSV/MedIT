@@ -19,6 +19,7 @@ const mockedLastAttendance = {
   SuggestionAI: 'Dengue (87%)',
   date: '12/01/2025'
 }
+//Alteração incorreta das datas, corrigir depois
 const mockedAttendanceRecords: IAttendance[] = [
   { type: 'Consulta', description: 'Gripe', date: new Date('2025-12-01') },
   { type: 'Emergência', description: 'Entorse', date: new Date('2024-08-11') },
@@ -33,12 +34,13 @@ function PatientsDetails() {
         name={'Renata Aragão'}
         age={37}
         gender={UserGender.FEMALE}
-        statusTag={TagStatuses.WARNING}
-        statusTagText='Em plantão'
+        statusTag={TagStatuses.INFO}
+        statusTagText='Internado'
       />
 
       <div className={styles.cards}>
         <UserDetailsCard
+          useFullWidth={true}
           Icon={DatabaseIcon}
           title='Dados Pessoais'
           itens={[
@@ -76,6 +78,7 @@ function PatientsDetails() {
               label: 'Alergias',
               value: 'Dipirona, Latéx'
             }
+          
           ]}
         />
         <UserDetailsCard
