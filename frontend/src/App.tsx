@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd'
+import { theme as antdTheme, ConfigProvider } from 'antd'
 import { Suspense } from 'react'
 import { LayoutSpinner } from './components/LayoutSpinner/LayoutSpinner'
 import { AuthProvider } from './contexts/AuthContext/AuthProvider'
@@ -12,7 +12,12 @@ function App() {
 
   return (
     <Suspense fallback={<LayoutSpinner />}>
-      <ConfigProvider theme={{ token: { colorPrimary: primaryColor } }}>
+      <ConfigProvider
+        theme={{
+          algorithm: antdTheme.defaultAlgorithm,
+          token: { colorPrimary: primaryColor }
+        }}
+      >
         <AuthProvider>
           <SettingsProvider>
             <AppRoutes />
