@@ -54,10 +54,6 @@ const UserSchema = new mongoose.Schema<
       required: [true, 'A senha é obrigatória'],
       minlength: [6, 'A senha deve ter pelo menos 6 caracteres']
     },
-    age: {
-      type: Number,
-      min: [0, 'A idade deve ser um número positivo']
-    },
     gender: {
       type: String,
       enum: Object.values(UserGender)

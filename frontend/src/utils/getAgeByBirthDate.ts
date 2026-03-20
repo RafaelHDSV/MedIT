@@ -1,8 +1,5 @@
-interface IGetAgeByBirthDateProps {
-  birthDate: Date | string
-}
-
-function getAgeByBirthDate({ birthDate }: IGetAgeByBirthDateProps): number {
+function getAgeByBirthDate(birthDate?: Date | string | undefined): number {
+  if (!birthDate) return 0
   const birth = new Date(birthDate)
   const today = new Date()
   let age = today.getFullYear() - birth.getFullYear()

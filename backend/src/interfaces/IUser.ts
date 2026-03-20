@@ -22,7 +22,6 @@ export interface IUser extends IBaseInterface, IDoctor, INurse, IPatient {
   number: number
   email: string
   password?: string
-  age?: number
   gender?: UserGender
   cellphone?: number
   birthDate?: Date

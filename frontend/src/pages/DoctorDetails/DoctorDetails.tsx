@@ -6,6 +6,7 @@ import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
 import type { IError } from '@/interfaces/IError'
 import { type IUser } from '@/interfaces/IUser'
+import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
   CalendarDotsIcon,
@@ -67,7 +68,7 @@ function DoctorDetails() {
       <AuthLayoutHeader />
       <UserDetailsHeader
         name={doctor?.name}
-        age={doctor?.age}
+        age={getAgeByBirthDate(doctor?.birthDate)}
         gender={doctor?.gender}
         statusTag={TagStatuses.WARNING}
         statusTagText='Em plantão'
