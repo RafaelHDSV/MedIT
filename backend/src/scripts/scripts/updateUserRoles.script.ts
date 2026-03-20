@@ -1,20 +1,23 @@
 import User from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
-const updateUserRoles: Script = {
-  name: 'update-user-roles',
-  description: 'Atualiza os papéis dos usuários no banco',
+const updateUserLevels: Script = {
+  name: 'update-user-levels',
+  description: 'Atualiza os níveis dos usuários no banco',
 
   async run() {
     const from = 'PACIENT'
     const to = 'PATIENT'
 
-    console.log('Atualizando papéis dos usuários...')
+    console.log('Atualizando níveis dos usuários...')
 
-    const result = await User.updateMany({ role: from }, { $set: { role: to } })
+    const result = await User.updateMany(
+      { level: from },
+      { $set: { level: to } }
+    )
 
-    console.log(`${result.modifiedCount} papéis atualizados!`)
+    console.log(`${result.modifiedCount} níveis atualizados!`)
   }
 }
 
-export default updateUserRoles
+export default updateUserLevels

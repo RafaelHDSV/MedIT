@@ -60,7 +60,7 @@ export function useDoctorsColumns() {
         dataIndex: 'birthDate',
         key: 'birthDate',
         render: (date: Date | string) =>
-          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate({ birthDate: date })} anos)`
+          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
       },
       {
         title: 'Telefone',

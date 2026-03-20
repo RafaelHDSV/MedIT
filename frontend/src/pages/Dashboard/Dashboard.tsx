@@ -3,7 +3,7 @@ import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import { useAuth } from '@/hooks/useAuth'
-import { UserRoles } from '@/interfaces/IUser'
+import { UserLevels } from '@/interfaces/IUser'
 import {
   CheckCircleIcon,
   DoorOpenIcon,
@@ -19,8 +19,8 @@ import DashboardCard from './DashboardCard/DashboardCard'
 function Dashboard() {
   const { user } = useAuth()
   const cardsData = useMemo(() => {
-    switch (user?.role) {
-      case UserRoles.ADMIN:
+    switch (user?.level) {
+      case UserLevels.ADMIN:
         return [
           { Icon: DoorOpenIcon, value: '142', label: 'Entradas' },
           { Icon: HourglassIcon, value: '46', label: 'Em atendimento' },
@@ -29,7 +29,7 @@ function Dashboard() {
           { Icon: TimerIcon, value: '23min', label: 'Tempo médio' }
           // { Icon: BombIcon, value: '8', label: 'Risco alto' }
         ]
-      case UserRoles.DOCTOR:
+      case UserLevels.DOCTOR:
         return [
           { Icon: HourglassIcon, value: '14', label: 'Pacientes aguardando' },
           {
@@ -44,7 +44,7 @@ function Dashboard() {
             label: 'Assertividade IA vs Médico'
           }
         ]
-      case UserRoles.NURSE:
+      case UserLevels.NURSE:
         return [
           { Icon: HourglassIcon, value: '25', label: 'Pacientes aguardando' },
           {
@@ -54,12 +54,12 @@ function Dashboard() {
           },
           { Icon: TimerIcon, value: '18min', label: 'Tempo médio' }
         ]
-      case UserRoles.PATIENT:
+      case UserLevels.PATIENT:
         return []
       default:
         return []
     }
-  }, [user?.role])
+  }, [user?.level])
 
   return (
     <section>

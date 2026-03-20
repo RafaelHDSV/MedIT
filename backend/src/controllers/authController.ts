@@ -7,7 +7,7 @@ import generateTokens from '../utils/generateTokens.js'
 // /register
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, cpf, role, email, password } = req.body
+    const { name, cpf, level, email, password } = req.body
 
     const userExists = await User.findOne({ email })
 
@@ -18,7 +18,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await User.create({
       name,
       cpf,
-      role,
+      level,
       email,
       password
     })

@@ -36,7 +36,7 @@ export function AuthProvider({ children }: Props) {
         _id: user._id,
         name: user.name,
         cpf: user.cpf,
-        role: user.role,
+        level: user.level,
         email: user.email,
         number: user.number
       }

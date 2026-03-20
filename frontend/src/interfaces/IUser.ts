@@ -1,13 +1,13 @@
 import type { IBaseInterface } from './IBaseInterface'
 
-export const UserRoles = {
+export const UserLevels = {
   ADMIN: 'ADMIN',
   DOCTOR: 'DOCTOR',
   NURSE: 'NURSE',
   PATIENT: 'PATIENT'
 } as const
-export type UserRoles = (typeof UserRoles)[keyof typeof UserRoles]
-export const UserRolesLabels = {
+export type UserLevels = (typeof UserLevels)[keyof typeof UserLevels]
+export const UserLevelsLabels = {
   ADMIN: 'Administrador(a)',
   DOCTOR: 'Médico(a)',
   NURSE: 'Enfermeiro(a)',
@@ -29,7 +29,7 @@ export const UserGendersLabels = {
 export interface IUser extends IBaseInterface, IDoctor, INurse, IPatient {
   name: string
   cpf: string
-  role: UserRoles
+  level: UserLevels
   number: number
   email: string
   password?: string

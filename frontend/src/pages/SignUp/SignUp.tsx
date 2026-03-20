@@ -3,7 +3,7 @@ import Button from '@/components/Button/Button'
 import InputText from '@/components/InputText/InputText'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
-import { UserRolesLabels } from '@/interfaces/IUser'
+import { UserLevelsLabels } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
@@ -37,7 +37,7 @@ function SignUp() {
 
       await api.post('/auth/register', {
         ...values,
-        role: UserRolesLabels.PATIENT
+        level: UserLevelsLabels.PATIENT
       })
 
       message.success('Usuário criado com sucesso!')

@@ -9,7 +9,7 @@ const addDoctorFields: Script = {
   async run() {
     console.log('Adicionando campos específicos para médicos...')
 
-    const filter = { role: 'DOCTOR' }
+    const filter = { level: 'DOCTOR' }
 
     const update = {
       $set: {

@@ -5,10 +5,10 @@ const updateUserNumbers = {
   description:
     'Atualiza o campo number dos usuários com base na ordem de criação',
   async run() {
-    const roles = ['DOCTOR', 'NURSE', 'PATIENT', 'ADMIN']
+    const levels = ['DOCTOR', 'NURSE', 'PATIENT', 'ADMIN']
 
-    for (const role of roles) {
-      const users = await UserModel.find({ role }).sort({ createdAt: 1 })
+    for (const level of levels) {
+      const users = await UserModel.find({ level }).sort({ createdAt: 1 })
 
       let counter = 1
 
@@ -21,7 +21,7 @@ const updateUserNumbers = {
         counter++
       }
 
-      console.log(`✅ ${role} atualizado`)
+      console.log(`✅ ${level} atualizado`)
     }
 
     process.exit()

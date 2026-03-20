@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import mongoose, { HydratedDocument } from 'mongoose'
-import { IUser, IUserMethods, Roles, UserGender } from '../interfaces/IUser.js'
+import { IUser, IUserMethods, Levels, UserGender } from '../interfaces/IUser.js'
 import CounterModel from './CounterModel.js'
 
 const UserSchema = new mongoose.Schema<
@@ -36,10 +36,10 @@ const UserSchema = new mongoose.Schema<
       type: Number,
       unique: true
     },
-    role: {
+    level: {
       type: String,
-      required: [true, 'O papel é obrigatório'],
-      enum: Object.values(Roles)
+      required: [true, 'O nível é obrigatório'],
+      enum: Object.values(Levels)
     },
     email: {
       type: String,
@@ -104,7 +104,7 @@ UserSchema.methods.comparePassword = async function (password: string) {
 UserSchema.pre('save', async function (this: HydratedDocument<IUser>) {
   if (this.number) return
 
-  const counterName = `user_${this.role}`
+  const counterName = `user_${this.level}`
 
   const counter = await CounterModel.findOneAndUpdate(
     { name: counterName },
