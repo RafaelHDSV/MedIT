@@ -14,17 +14,17 @@ import { useNursesColumns } from './hooks/useNursesColumns'
 
 function Nurses() {
   const columns = useNursesColumns()
-  const [nurses, setNurses] = useState<INurse[]>([])
+  const [nurses, setTriagens] = useState<INurse[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    async function fetchNurses() {
+    async function fetchTriagens() {
       setLoading(true)
 
       try {
         const response = await api.get('/users/level/nurse')
         const data = response.data
-        setNurses(data)
+        setTriagens(data)
       } catch (err) {
         if (!axios.isAxiosError(err)) return
         const error = err as AxiosError<IError>
@@ -38,7 +38,7 @@ function Nurses() {
       }
     }
 
-    fetchNurses()
+    fetchTriagens()
   }, [])
 
   return (

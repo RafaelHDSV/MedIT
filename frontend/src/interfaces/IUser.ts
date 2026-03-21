@@ -68,3 +68,12 @@ export interface IPatient extends IBaseUser {
   conditions?: string[]
   allergies?: string[]
 }
+
+export interface ITriagem extends IBaseInterface {
+  name: string
+  idade: string
+  queixa: string
+  data: string
+  risco: 'Alto' | 'Médio' | 'Baixo'
+}
+
