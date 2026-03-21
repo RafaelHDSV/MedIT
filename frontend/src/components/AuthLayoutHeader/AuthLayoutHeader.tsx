@@ -6,9 +6,14 @@ import styles from './AuthLayoutHeader.module.scss'
 interface IAuthLayoutHeaderProps {
   type?: 'unauth'
   marginBottom?: number
+  actionComponent?: React.ReactNode
 }
 
-function AuthLayoutHeader({ type, marginBottom = 16 }: IAuthLayoutHeaderProps) {
+function AuthLayoutHeader({
+  type,
+  marginBottom = 16,
+  actionComponent
+}: IAuthLayoutHeaderProps) {
   const location = useLocation()
   const currentRoute = routes.find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)
@@ -56,6 +61,8 @@ function AuthLayoutHeader({ type, marginBottom = 16 }: IAuthLayoutHeaderProps) {
 
         <p className={descriptionStyles()}>{routeDescription}</p>
       </div>
+
+      {actionComponent}
     </header>
   )
 }

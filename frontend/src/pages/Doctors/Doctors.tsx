@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import Button from '@/components/Button/Button'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
@@ -44,7 +45,7 @@ function Doctors() {
   return (
     <div>
       <Flex gap={16} align='center'>
-        <AuthLayoutHeader />
+        <AuthLayoutHeader actionComponent={<Button>Adicionar médico</Button>} />
         <ProgressTag status={ProgressStatus.COMPLETED} />
       </Flex>
 
