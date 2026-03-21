@@ -1,6 +1,5 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import Button from '@/components/Button/Button'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
@@ -11,6 +10,7 @@ import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import AddDoctorModal from './components/AddDoctorModal/AddDoctorModal'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
 function Doctors() {
@@ -45,7 +45,7 @@ function Doctors() {
   return (
     <div>
       <Flex gap={16} align='center'>
-        <AuthLayoutHeader actionComponent={<Button>Adicionar médico</Button>} />
+        <AuthLayoutHeader actionComponent={<AddDoctorModal />} />
         <ProgressTag status={ProgressStatus.COMPLETED} />
       </Flex>
 
