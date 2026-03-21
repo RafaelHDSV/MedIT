@@ -1,5 +1,7 @@
-import type { ITriagem } from '@/interfaces/IUser'
+import RiskTag from '@/components/RiskTag/RiskTag'
+import type { ITriages, TriagesRisk } from '@/interfaces/ITriages'
 import { ROUTES } from '@/routes/constants'
+import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
@@ -17,8 +19,7 @@ export function useTriagesColumns() {
     [navigate]
   )
 
-
-  const columns: ColumnsType<ITriagem> = useMemo(
+  const columns: ColumnsType<ITriages> = useMemo(
     () => [
       {
         title: 'ID',
@@ -29,44 +30,43 @@ export function useTriagesColumns() {
         title: 'Nome',
         dataIndex: 'name',
         key: 'name',
-      },
-      {
-        title: 'Idade',
-        dataIndex: 'idade',
-        key: 'idade',
-      },
-      {
-        title: 'Queixa',
-        dataIndex: 'queixa',
-        key: 'queixa'
-      },
-      {
-        title: 'Data',
-        dataIndex: 'data',
-        key: 'data',
-      },
-      {
-        title: 'Risco',
-        dataIndex: 'risco',
-        key: 'risco',
-        render: (risco: string) => {
-        const styles: Record<string, React.CSSProperties> = {
-          Alto: { border: '1px solid #f87171', color: '#ef4444', background: '#fef2f2' },
-          Médio: { border: '1px solid #f1b98b', color: '#f1b98b', background: '#fff7ed' },
-          Baixo: { border: '1px solid #4ade80', color: '#16a34a', background: '#f0fdf4' },
-        }
-        return (
-          <span style={{
-            ...styles[risco],
-            fontSize: '12px',
-            padding: '2px 10px',
-            borderRadius: '999px',
-            fontWeight: 500,
-          }}>
-            {risco}
+        render: (name: string, record) => (
+          <span
+            role='button'
+            tabIndex={0}
+            style={{ cursor: 'pointer' }}
+            onClick={() => handleNavigateToDetails(record._id)}
+            onKeyDown={(e) =>
+              e.key === 'Enter' && handleNavigateToDetails(record._id)
+            }
+          >
+            {name}
           </span>
         )
       },
+      {
+        title: 'Data de Nascimento',
+        dataIndex: 'birthDate',
+        key: 'birthDate',
+        render: (date: Date | string) =>
+          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
+      },
+      {
+        title: 'Queixa',
+        dataIndex: 'complaint',
+        key: 'complaint'
+      },
+      {
+        title: 'Triado em',
+        dataIndex: 'date',
+        key: 'date',
+        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
+      },
+      {
+        title: 'Risco',
+        dataIndex: 'risk',
+        key: 'risk',
+        render: (risk: string) => <RiskTag risk={risk as TriagesRisk} />
       },
       {
         title: 'Criado em',

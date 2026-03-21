@@ -61,6 +61,10 @@ function AppRoutes() {
             element={<pages.Attendances />}
           />
           <Route path={ROUTES.TRIAGES.path} element={<pages.Triages />} />
+          <Route
+            path={ROUTES.TRIAGES_DETAILS.path}
+            element={<pages.TriagesDetails />}
+          />
         </Route>
 
         <Route path='*' element={<pages.NotFound />} />

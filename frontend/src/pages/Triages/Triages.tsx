@@ -1,61 +1,70 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
-import type { IError } from '@/interfaces/IError'
-import type { INurse } from '@/interfaces/IUser'
+import { TriagesRisk, type ITriages } from '@/interfaces/ITriages'
 import styles from '@/styles/UserTable.module.scss'
-import { Flex, message, Table } from 'antd'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { ObjectId } from '@/utils/objectId'
+import { Flex, Table } from 'antd'
 import { useTriagesColumns } from './hooks/useTriagesColumns'
 
-function Triages() {
+function ITriages() {
   const columns = useTriagesColumns()
-  const [loading, setLoading] = useState(false)
 
-  const data = [
+  const data: ITriages[] = [
     {
-      number: '1',
-      name: 'John Brown',
-      idade: '60',
-      queixa: 'Náusea',
-      data: '20/08/2004 as 15:00',
-      risco: 'Alto',
+      _id: ObjectId('69bef9b46b9f5d4381a706a9'),
+      number: 1,
+      name: 'John Doe',
+      birthDate: new Date('1990-01-01'),
+      complaint: 'Náusea',
+      date: new Date(),
+      risk: TriagesRisk.EMERGENCY
     },
     {
-      number: '2',
-      name: 'Jim Green',
-      idade: '19',
-      queixa: 'Náusea',
-      data: '20/08/2004 as 15:00',
-      risco: 'Baixo',
+      _id: ObjectId('69bef9bc7e5523fdd7c7a18b'),
+      number: 2,
+      name: 'Jane Smith',
+      birthDate: new Date('1985-05-15'),
+      complaint: 'Dor de cabeça',
+      date: new Date(),
+      risk: TriagesRisk.URGENT
     },
     {
-      number: '3',
-      name: 'Joe Black',
-      idade: '23',
-      queixa: 'Náusea',
-      data: '20/08/2004 as 15:00',
-      risco: 'Baixo',
+      _id: ObjectId('69bef9bedb1e8c62ac29e060'),
+      number: 3,
+      name: 'Alice Johnson',
+      birthDate: new Date('1978-09-30'),
+      complaint: 'Dor abdominal',
+      date: new Date(),
+      risk: TriagesRisk.NOT_URGENT
     },
     {
-      number: '4',
-      name: 'Jim Red',
-      idade: '65',
-      queixa: 'Náusea',
-      data: '20/08/2004 as 15:00',
-      risco: 'Alto',
+      _id: ObjectId('69bef9c1d09e37a45f690251'),
+      number: 4,
+      name: 'Bob Brown',
+      birthDate: new Date('1992-07-20'),
+      complaint: 'Febre',
+      date: new Date(),
+      risk: TriagesRisk.LESS_URGENT
     },
     {
-      number: '5',
-      name: 'Jake White',
-      idade: '43',
-      queixa: 'Náusea',
-      data: '20/08/2004 as 15:00',
-      risco: 'Médio',
+      _id: ObjectId('69bef9c39f7bcc9313543d2a'),
+      number: 5,
+      name: 'Charlie Davis',
+      birthDate: new Date('1988-11-10'),
+      complaint: 'Tosse',
+      date: new Date(),
+      risk: TriagesRisk.VERY_URGENT
+    },
+    {
+      _id: ObjectId('69bef9c5d686012355a4cf4d'),
+      number: 6,
+      name: 'Emily Wilson',
+      birthDate: new Date('1995-03-25'),
+      complaint: 'Dor de garganta',
+      date: new Date(),
+      risk: TriagesRisk.URGENT
     }
   ]
 
@@ -71,7 +80,6 @@ function Triages() {
         rowKey='_id'
         dataSource={data}
         columns={columns}
-        loading={loading}
         pagination={{ pageSize: 10 }}
         size='middle'
         bordered={false}
@@ -81,4 +89,4 @@ function Triages() {
   )
 }
 
-export default Triages
+export default ITriages

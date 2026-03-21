@@ -68,8 +68,8 @@ export const ROUTES = {
     path: '/auth/triages'
   },
   TRIAGES_DETAILS: {
-  name: 'Detalhes da triagem',
-  description: 'Visualize e gerencie as informações completas da triagem.',
-  path: '/auth/triages/:id'
-  },
+    name: 'Detalhes da triagem',
+    description: 'Visualize e gerencie as informações completas da triagem.',
+    path: '/auth/triages/:id'
+  }
 }
