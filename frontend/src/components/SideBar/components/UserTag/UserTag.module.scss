@@ -21,6 +21,7 @@
     align-items: flex-start;
 
     strong {
+      display: flex;
       font-size: 14px;
       color: var(--black);
       text-overflow: ellipsis;
