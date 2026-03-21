@@ -8,7 +8,7 @@ import {
   StethoscopeIcon,
   type Icon
 } from '@phosphor-icons/react'
-import { UserRoles } from '../interfaces/IUser'
+import { UserLevels } from '../interfaces/IUser'
 import { ROUTE_GROUP, ROUTES } from './constants'
 
 export interface IRouteGroup {
@@ -20,7 +20,7 @@ interface MetaConfiguration {
   group?: IRouteGroup
   hidden?: boolean
   progress?: ProgressStatus
-  levels?: UserRoles[]
+  levels?: UserLevels[]
   canGoBack?: boolean
 }
 
@@ -55,10 +55,10 @@ const dashboard: IRoute = {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
     levels: [
-      UserRoles.ADMIN,
-      UserRoles.DOCTOR,
-      UserRoles.NURSE,
-      UserRoles.PATIENT
+      UserLevels.ADMIN,
+      UserLevels.DOCTOR,
+      UserLevels.NURSE,
+      UserLevels.PATIENT
     ]
   }
 }
@@ -72,7 +72,7 @@ const doctors: IRoute = {
     group: ROUTE_GROUP.USERS,
     hidden: false,
     progress: ProgressStatus.COMPLETED,
-    levels: [UserRoles.ADMIN]
+    levels: [UserLevels.ADMIN]
   }
 }
 
@@ -83,7 +83,7 @@ const doctorDetails: IRoute = {
   meta: {
     hidden: true,
     progress: ProgressStatus.IN_PROGRESS,
-    levels: [UserRoles.ADMIN],
+    levels: [UserLevels.ADMIN],
     canGoBack: true
   }
 }
@@ -97,7 +97,7 @@ const nurses: IRoute = {
     group: ROUTE_GROUP.USERS,
     hidden: false,
     progress: ProgressStatus.IN_PROGRESS,
-    levels: [UserRoles.ADMIN]
+    levels: [UserLevels.ADMIN]
   }
 }
 
@@ -108,7 +108,7 @@ const nurseDetails: IRoute = {
   meta: {
     hidden: true,
     progress: ProgressStatus.COMPLETED,
-    levels: [UserRoles.ADMIN],
+    levels: [UserLevels.ADMIN],
     canGoBack: true
   }
 }
@@ -122,7 +122,7 @@ const patients: IRoute = {
     group: ROUTE_GROUP.USERS,
     hidden: false,
     progress: ProgressStatus.IN_PROGRESS,
-    levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE]
+    levels: [UserLevels.ADMIN, UserLevels.DOCTOR, UserLevels.NURSE]
   }
 }
 
@@ -133,7 +133,7 @@ const patientDetails: IRoute = {
   meta: {
     hidden: true,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [UserRoles.ADMIN, UserRoles.DOCTOR, UserRoles.NURSE],
+    levels: [UserLevels.ADMIN, UserLevels.DOCTOR, UserLevels.NURSE],
     canGoBack: true
   }
 }
@@ -147,10 +147,10 @@ const medications: IRoute = {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
     levels: [
-      UserRoles.ADMIN,
-      UserRoles.DOCTOR,
-      UserRoles.NURSE,
-      UserRoles.PATIENT
+      UserLevels.ADMIN,
+      UserLevels.DOCTOR,
+      UserLevels.NURSE,
+      UserLevels.PATIENT
     ]
   }
 }
@@ -163,7 +163,7 @@ const attendances: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [UserRoles.DOCTOR]
+    levels: [UserLevels.DOCTOR]
   }
 }
 
@@ -175,7 +175,7 @@ const triages: IRoute = {
   meta: {
     hidden: false,
     progress: ProgressStatus.NOT_STARTED,
-    levels: [UserRoles.NURSE]
+    levels: [UserLevels.NURSE]
   }
 }
 

@@ -19,10 +19,18 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/auth/refresh')
+    ) {
       originalRequest._retry = true
 
       const refreshToken = localStorage.getItem('refreshToken')
+      if (!refreshToken) {
+        window.location.href = '/signin'
+        return Promise.reject(error)
+      }
 
       try {
         const { data } = await api.post('/auth/refresh', {
@@ -30,6 +38,7 @@ api.interceptors.response.use(
         })
 
         localStorage.setItem('accessToken', data.accessToken)
+        localStorage.setItem('refreshToken', data.refreshToken)
 
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`
 

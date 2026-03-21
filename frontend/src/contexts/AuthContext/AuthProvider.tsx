@@ -1,6 +1,6 @@
 import { api } from '@/api/api'
 import type { IError } from '@/interfaces/IError'
-import { type IUser } from '@/interfaces/IUser'
+import { type IBaseUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
 import { message, Modal } from 'antd'
 import type { AxiosError } from 'axios'
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<IUser | null>(() => {
+  const [user, setUser] = useState<IBaseUser | null>(() => {
     const stored = localStorage.getItem('user')
     return stored ? JSON.parse(stored) : null
   })
@@ -32,11 +32,11 @@ export function AuthProvider({ children }: Props) {
 
       const { accessToken, refreshToken, user } = response.data
 
-      const formattedUser: IUser = {
+      const formattedUser: IBaseUser = {
         _id: user._id,
         name: user.name,
         cpf: user.cpf,
-        role: user.role,
+        level: user.level,
         email: user.email,
         number: user.number
       }
@@ -64,18 +64,29 @@ export function AuthProvider({ children }: Props) {
 
   async function logout() {
     const modal = Modal.confirm({
-      title: 'Sair da conta',
-      content: 'Tem certeza que deseja encerrar sua sessão?',
+      title: 'Encerrar sessão',
+      content: 'Você está prestes a sair da sua conta.',
       okText: 'Sair',
       cancelText: 'Cancelar',
       closable: true,
-      maskClosable: true,
-      destroyOnHidden: false,
-      okButtonProps: { danger: true, autoFocus: true },
+      mask: {
+        closable: true
+      },
+      okButtonProps: {
+        danger: true,
+        autoFocus: true,
+        size: 'middle'
+      },
+      cancelButtonProps: {
+        size: 'middle'
+      },
 
       async onOk() {
         modal.update({
-          okButtonProps: { loading: true }
+          okButtonProps: {
+            loading: true,
+            danger: true
+          }
         })
 
         try {
@@ -90,9 +101,12 @@ export function AuthProvider({ children }: Props) {
           setUser(null)
         } catch (err) {
           console.error('Erro no logout', err)
-          message.error('Ocorreu um erro ao encerrar a sessão')
+          message.error('Erro ao encerrar sessão')
           modal.update({
-            okButtonProps: { loading: false }
+            okButtonProps: {
+              loading: false,
+              danger: true
+            }
           })
         }
       }

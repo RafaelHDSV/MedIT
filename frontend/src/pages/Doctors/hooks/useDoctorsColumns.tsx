@@ -1,4 +1,4 @@
-import type { IUser } from '@/interfaces/IUser'
+import type { IDoctor } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
@@ -19,7 +19,7 @@ export function useDoctorsColumns() {
     [navigate]
   )
 
-  const columns: ColumnsType<IUser> = useMemo(
+  const columns: ColumnsType<IDoctor> = useMemo(
     () => [
       {
         title: 'ID',
@@ -60,7 +60,7 @@ export function useDoctorsColumns() {
         dataIndex: 'birthDate',
         key: 'birthDate',
         render: (date: Date | string) =>
-          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate({ birthDate: date })} anos)`
+          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
       },
       {
         title: 'Telefone',

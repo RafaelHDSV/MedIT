@@ -10,9 +10,9 @@ export const getUsers = async (_req: Request, res: Response) => {
   res.json(users)
 }
 
-export const getUsersByRole = async (req: Request, res: Response) => {
-  const { role } = req.params
-  const users = await User.find({ role: String(role).toUpperCase() })
+export const getUsersByLevel = async (req: Request, res: Response) => {
+  const { level } = req.params
+  const users = await User.find({ level: String(level).toUpperCase() })
     .sort({ createdAt: -1 })
     .select('-password')
   if (!users || users.length === 0) {

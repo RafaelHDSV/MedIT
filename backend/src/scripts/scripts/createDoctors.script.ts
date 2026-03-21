@@ -1,4 +1,4 @@
-import { Roles, UserGender } from '../../interfaces/IUser.js'
+import { UserGender, UserLevels } from '../../interfaces/IUser.js'
 import UserModel from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
@@ -143,7 +143,7 @@ const createDoctors: Script = {
 
       await UserModel.create({
         ...doctor,
-        role: Roles.DOCTOR
+        level: UserLevels.DOCTOR
       })
 
       console.log(`✅ Criado: ${doctor.email}`)

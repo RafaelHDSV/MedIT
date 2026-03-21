@@ -1,11 +1,15 @@
 import bcrypt from 'bcrypt'
 import mongoose, { HydratedDocument } from 'mongoose'
-import { IUser, IUserMethods, Roles, UserGender } from '../interfaces/IUser.js'
-import CounterModel from './CounterModel.js'
+import {
+  IBaseUser,
+  IUserMethods,
+  UserGender,
+  UserLevels
+} from '../interfaces/IUser.js'
 
 const UserSchema = new mongoose.Schema<
-  IUser,
-  mongoose.Model<IUser>,
+  IBaseUser,
+  mongoose.Model<IBaseUser>,
   IUserMethods
 >(
   {
@@ -36,10 +40,11 @@ const UserSchema = new mongoose.Schema<
       type: Number,
       unique: true
     },
-    role: {
+    level: {
       type: String,
-      required: [true, 'O papel é obrigatório'],
-      enum: Object.values(Roles)
+      required: [true, 'O nível é obrigatório'],
+      enum: Object.values(UserLevels),
+      lowercase: true
     },
     email: {
       type: String,
@@ -64,29 +69,33 @@ const UserSchema = new mongoose.Schema<
     birthDate: {
       type: Date
     },
-    crm: {
-      type: String
-    },
-    specialization: {
-      type: String
-    },
     refreshToken: {
       type: String
     }
   },
   {
+    discriminatorKey: 'level',
     timestamps: true
   }
 )
 
-UserSchema.pre('save', async function (this: HydratedDocument<IUser>) {
+UserSchema.pre('save', async function (this: HydratedDocument<IBaseUser>) {
   if (!this.isModified('password')) return
 
   const salt = await bcrypt.genSalt(10)
+  this.password = await bcrypt.hash(this.password!, salt)
+})
 
-  if (this.password) {
-    this.password = await bcrypt.hash(this.password, salt)
-  }
+UserSchema.pre('save', async function (this: HydratedDocument<IBaseUser>) {
+  if (this.number) return
+
+  const lastUser = await mongoose
+    .model<IBaseUser>('User')
+    .findOne({ level: this.level })
+    .sort({ number: -1 })
+    .select('number')
+
+  this.number = lastUser?.number ? lastUser.number + 1 : 1
 })
 
 UserSchema.set('toJSON', {
@@ -97,23 +106,8 @@ UserSchema.set('toJSON', {
 })
 
 UserSchema.methods.comparePassword = async function (password: string) {
-  if (!this.password) return false
-  return bcrypt.compare(password, this.password)
+  return bcrypt.compare(password, this.password!)
 }
 
-UserSchema.pre('save', async function (this: HydratedDocument<IUser>) {
-  if (this.number) return
-
-  const counterName = `user_${this.role}`
-
-  const counter = await CounterModel.findOneAndUpdate(
-    { name: counterName },
-    { $inc: { value: 1 } },
-    { new: true, upsert: true }
-  )
-
-  this.number = counter.value
-})
-
-type UserModel = mongoose.Model<IUser, {}, IUserMethods>
-export default mongoose.model<IUser, UserModel>('User', UserSchema)
+export type UserModel = mongoose.Model<IBaseUser, {}, IUserMethods>
+export default mongoose.model<IBaseUser, UserModel>('User', UserSchema)

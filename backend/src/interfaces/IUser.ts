@@ -1,42 +1,19 @@
 import { IBaseInterface } from './IBaseInterface.js'
 
-export const Roles = {
-  ADMIN: 'ADMIN',
-  DOCTOR: 'DOCTOR',
-  NURSE: 'NURSE',
-  PATIENT: 'PATIENT'
+export const UserLevels = {
+  ADMIN: 'admin',
+  DOCTOR: 'doctor',
+  NURSE: 'nurse',
+  PATIENT: 'patient'
 } as const
-export type Roles = (typeof Roles)[keyof typeof Roles]
+export type UserLevels = (typeof UserLevels)[keyof typeof UserLevels]
 
 export const UserGender = {
-  MALE: 'MALE',
-  FEMALE: 'FEMALE',
-  OTHER: 'OTHER'
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other'
 } as const
 export type UserGender = (typeof UserGender)[keyof typeof UserGender]
-
-export interface IUser extends IBaseInterface, IDoctor, INurse, IPatient {
-  name: string
-  cpf: string
-  role: Roles
-  number: number
-  email: string
-  password?: string
-  gender?: UserGender
-  cellphone?: number
-  birthDate?: Date
-  refreshToken?: string
-}
-
-interface IDoctor {
-  crm?: string
-  specialization?: string
-}
-
-interface INurse {
-  coren?: string
-  shift?: string
-}
 
 const BloodType = {
   A_POSITIVE: 'A+',
@@ -50,14 +27,36 @@ const BloodType = {
 } as const
 type BloodType = (typeof BloodType)[keyof typeof BloodType]
 
-interface IPatient {
+export interface IBaseUser extends IBaseInterface {
+  name: string
+  cpf: string
+  level: UserLevels
+  number: number
+  email: string
+  password?: string
+  gender?: UserGender
+  cellphone?: number
+  birthDate?: Date
+  refreshToken?: string
+}
+
+export interface IDoctor extends IBaseUser {
+  crm: string
+  specialization: string
+}
+
+export interface INurse extends IBaseUser {
+  coren: string
+  shift: string
+}
+
+export interface IPatient extends IBaseUser {
   weight?: number
   height?: number
   bloodType?: BloodType
   conditions?: string[]
   allergies?: string[]
 }
-
 
 export interface IUserMethods {
   comparePassword(password: string): Promise<boolean>

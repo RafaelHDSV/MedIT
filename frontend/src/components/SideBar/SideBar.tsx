@@ -36,7 +36,7 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
   const renderRoute = (route: IRoute) => {
     const hasAcessByLevel = SidebarModel.hasAcessByLevel(
       route.meta?.levels,
-      user?.role
+      user?.level
     )
     if (route.meta?.hidden || !hasAcessByLevel) return null
 
@@ -49,7 +49,7 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
         (r) =>
           r.meta?.group?.name === groupName &&
           !r.meta?.hidden &&
-          SidebarModel.hasAcessByLevel(r.meta?.levels, user?.role)
+          SidebarModel.hasAcessByLevel(r.meta?.levels, user?.level)
       )
       if (!groupRoutes.length) return null
 

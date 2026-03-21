@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { JWT_REFRESH_SECRET, JWT_SECRET } from '../globals/Config.js'
+import { JWT_REFRESH_SECRET } from '../globals/Config.js'
 import User from '../models/UserModel.js'
 import generateTokens from '../utils/generateTokens.js'
 
 // /register
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, cpf, role, email, password } = req.body
+    const { name, cpf, level, email, password } = req.body
 
     const userExists = await User.findOne({ email })
 
@@ -18,7 +18,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await User.create({
       name,
       cpf,
-      role,
+      level,
       email,
       password
     })
@@ -44,15 +44,15 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Usuário não encontrado' })
   }
 
-  const { accessToken, refreshToken } = generateTokens(user._id)
-  user.refreshToken = refreshToken
-  await user.save()
-
   const validPassword = await user.comparePassword(password)
 
   if (!validPassword) {
     return res.status(400).json({ message: 'Senha inválida' })
   }
+
+  const { accessToken, refreshToken } = generateTokens(user._id)
+  user.refreshToken = refreshToken
+  await user.save()
 
   return res.json({
     accessToken,
@@ -78,11 +78,13 @@ export const refresh = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Token inválido' })
     }
 
-    const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET!, {
-      expiresIn: '15m'
-    })
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+      user._id
+    )
+    user.refreshToken = newRefreshToken
+    await user.save()
 
-    return res.json({ accessToken })
+    return res.json({ accessToken, refreshToken: newRefreshToken })
   } catch {
     return res.status(403).json({ message: 'Token inválido' })
   }

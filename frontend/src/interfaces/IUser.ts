@@ -1,52 +1,30 @@
 import type { IBaseInterface } from './IBaseInterface'
 
-export const UserRoles = {
-  ADMIN: 'ADMIN',
-  DOCTOR: 'DOCTOR',
-  NURSE: 'NURSE',
-  PATIENT: 'PATIENT'
+export const UserLevels = {
+  ADMIN: 'admin',
+  DOCTOR: 'doctor',
+  NURSE: 'nurse',
+  PATIENT: 'patient'
 } as const
-export type UserRoles = (typeof UserRoles)[keyof typeof UserRoles]
-export const UserRolesLabels = {
-  ADMIN: 'Administrador(a)',
-  DOCTOR: 'Médico(a)',
-  NURSE: 'Enfermeiro(a)',
-  PATIENT: 'Paciente'
+export type UserLevels = (typeof UserLevels)[keyof typeof UserLevels]
+export const UserLevelsLabels = {
+  [UserLevels.ADMIN]: 'Administrador(a)',
+  [UserLevels.DOCTOR]: 'Médico(a)',
+  [UserLevels.NURSE]: 'Enfermeiro(a)',
+  [UserLevels.PATIENT]: 'Paciente'
 } as const
 
 export const UserGender = {
-  MALE: 'MALE',
-  FEMALE: 'FEMALE',
-  OTHER: 'OTHER'
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other'
 } as const
 export type UserGender = (typeof UserGender)[keyof typeof UserGender]
 export const UserGendersLabels = {
-  MALE: 'Masculino',
-  FEMALE: 'Feminino',
-  OTHER: 'Outro'
+  [UserGender.MALE]: 'Masculino',
+  [UserGender.FEMALE]: 'Feminino',
+  [UserGender.OTHER]: 'Outro'
 } as const
-
-export interface IUser extends IBaseInterface, IDoctor, INurse, IPatient {
-  name: string
-  cpf: string
-  role: UserRoles
-  number: number
-  email: string
-  password?: string
-  gender?: UserGender
-  cellphone?: number
-  birthDate?: Date
-}
-
-interface IDoctor {
-  crm?: string
-  specialization?: string
-}
-
-interface INurse {
-  coren?: string
-  shift?: string
-}
 
 const BloodType = {
   A_POSITIVE: 'A+',
@@ -60,7 +38,30 @@ const BloodType = {
 } as const
 type BloodType = (typeof BloodType)[keyof typeof BloodType]
 
-interface IPatient {
+export interface IBaseUser extends IBaseInterface {
+  name: string
+  cpf: string
+  level: UserLevels
+  number: number
+  email: string
+  password?: string
+  gender?: UserGender
+  cellphone?: number
+  birthDate?: Date
+  refreshToken?: string
+}
+
+export interface IDoctor extends IBaseUser {
+  crm: string
+  specialization: string
+}
+
+export interface INurse extends IBaseUser {
+  coren: string
+  shift: string
+}
+
+export interface IPatient extends IBaseUser {
   weight?: number
   height?: number
   bloodType?: BloodType

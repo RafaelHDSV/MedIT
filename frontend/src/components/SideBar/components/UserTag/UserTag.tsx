@@ -1,6 +1,6 @@
 import UserBall from '@/components/UserBall/UserBall'
 import { useAuth } from '@/hooks/useAuth'
-import { UserRolesLabels } from '@/interfaces/IUser'
+import { UserLevelsLabels } from '@/interfaces/IUser'
 import getShortName from '@/utils/getShortName'
 import { SignOutIcon } from '@phosphor-icons/react'
 import styles from './UserTag.module.scss'
@@ -24,7 +24,7 @@ function UserTag({ isCompact }: IUserTagProps) {
 
           <div className={styles.userInfo}>
             <strong>{shortName}</strong>
-            {user?.role && <p>{UserRolesLabels[user.role]}</p>}
+            {user?.level && <p>{UserLevelsLabels[user.level]}</p>}
           </div>
         </div>
       ) : (
