@@ -63,6 +63,7 @@ export default function SignIn() {
           { required: true, message: 'Informe seu CPF ou email' },
           {
             validator(_, value) {
+              if (!value) return Promise.resolve()
               const error = validators(value, 'signInIdentifier')
               return error
                 ? Promise.resolve()
