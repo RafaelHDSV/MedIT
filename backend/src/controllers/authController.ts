@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { JWT_REFRESH_SECRET, JWT_SECRET } from '../globals/Config.js'
+import { JWT_REFRESH_SECRET } from '../globals/Config.js'
 import User from '../models/UserModel.js'
 import generateTokens from '../utils/generateTokens.js'
 
@@ -78,11 +78,13 @@ export const refresh = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Token inválido' })
     }
 
-    const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET!, {
-      expiresIn: '15m'
-    })
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+      user._id
+    )
+    user.refreshToken = newRefreshToken
+    await user.save()
 
-    return res.json({ accessToken })
+    return res.json({ accessToken, refreshToken: newRefreshToken })
   } catch {
     return res.status(403).json({ message: 'Token inválido' })
   }
