@@ -1,16 +1,13 @@
-import { Spin, type SpinProps } from 'antd'
 import styles from './LayoutSpinner.module.scss'
 
-export function LayoutSpinner({
-  className,
-  size,
-  ...props
-}: Partial<SpinProps>) {
+interface ILayoutSpinnerProps {
+  className?: string
+}
+
+export function LayoutSpinner({ className }: ILayoutSpinnerProps) {
   return (
-    <Spin
-      className={`${styles['layout-spinner']} ${className || ''}`}
-      size={size || 'large'}
-      {...props}
-    />
+    <div className={`${styles['layout-spinner']} ${className || ''}`}>
+      <div className={styles.progressBar} />
+    </div>
   )
 }
