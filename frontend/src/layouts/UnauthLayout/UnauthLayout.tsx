@@ -31,7 +31,7 @@ export default function UnauthLayout() {
 
   setTimeout(() => {
     setImageIndex((imageIndex + 1) % imageSource.length)
-  }, 3000)
+  }, 7000)
 
   function handleImageClick() {
     setImageIndex((imageIndex + 1) % imageSource.length)
@@ -71,7 +71,10 @@ export default function UnauthLayout() {
                 'Plataforma de Apoio à Triagem e Fluxo Hospitalar',
                 'Agilize a triagem de pacientes e otimize o fluxo hospitalar',
                 'Tome decisões informadas com base em dados clínicos',
-                'Melhore a eficiência e a qualidade do atendimento hospitalar'
+                'Melhore a eficiência e a qualidade do atendimento hospitalar',
+                'Facilite a comunicação entre equipes de saúde',
+                'Acesse informações clínicas em tempo real para uma triagem precisa',
+                'Reduza o tempo de espera e melhore a experiência do paciente'
               ]
             }}
           />
