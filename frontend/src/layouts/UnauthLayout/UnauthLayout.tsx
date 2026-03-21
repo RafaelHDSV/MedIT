@@ -20,9 +20,9 @@ export default function UnauthLayout() {
     '/image1.png',
     '/image2.png',
     '/image3.png',
-    '/image4.png'
+    '/image4.png',
+    '/image5.png'
     // TODO: Gerar as imagens restantes pela IA e adicionar
-    // '/image5.png',
     // '/image6.png',
     // '/image7.png',
     // '/image8.png'

@@ -46,6 +46,7 @@
   img {
     max-height: 30rem;
     height: auto;
+    animation: slide 1.5s ease-in-out infinite alternate;
   }
 
   h3 {
@@ -53,5 +54,17 @@
     font-weight: 500;
     max-width: 22.5rem;
     margin: 0 auto;
+  }
+}
+
+@keyframes slide {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1rem);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
