@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
+import { FormItem } from '@/components/FormComponents/FormComponents'
 import InputText from '@/components/InputText/InputText'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
@@ -79,7 +80,7 @@ function SignUp() {
       layout='vertical'
       onFinish={handleRegister}
     >
-      <Form.Item
+      <FormItem
         label='Nome'
         name='name'
         className={styles.input}
@@ -88,9 +89,9 @@ function SignUp() {
         rules={[{ required: true, message: 'Campo obrigatório' }]}
       >
         <Input placeholder='Digite seu nome' type='text' />
-      </Form.Item>
+      </FormItem>
 
-      <Form.Item
+      <FormItem
         label='CPF'
         name='cpf'
         className={styles.input}
@@ -107,9 +108,9 @@ function SignUp() {
         ]}
       >
         <InputText mask='cpf' placeholder='Digite seu CPF' />
-      </Form.Item>
+      </FormItem>
 
-      <Form.Item
+      <FormItem
         label='Email'
         name='email'
         className={styles.input}
@@ -126,9 +127,9 @@ function SignUp() {
         ]}
       >
         <Input placeholder='Digite seu email' type='email' />
-      </Form.Item>
+      </FormItem>
 
-      <Form.Item
+      <FormItem
         label='Senha'
         name='password'
         className={styles.input}
@@ -140,7 +141,7 @@ function SignUp() {
         ]}
       >
         <Input.Password placeholder='Digite sua senha' />
-      </Form.Item>
+      </FormItem>
 
       <Flex vertical className={styles.actions}>
         <Button htmlType='submit' loading={loading}>

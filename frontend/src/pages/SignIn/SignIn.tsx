@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button'
+import { FormItem } from '@/components/FormComponents/FormComponents'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
@@ -55,10 +56,9 @@ export default function SignIn() {
       layout='vertical'
       onFinish={handleLogin}
     >
-      <Form.Item
+      <FormItem
         label='CPF ou Email'
         name='identifier'
-        className={styles.input}
         rules={[
           { required: true, message: 'Informe seu CPF ou email' },
           {
@@ -80,18 +80,17 @@ export default function SignIn() {
               : 200
           }
         />
-      </Form.Item>
-      <Form.Item
+      </FormItem>
+      <FormItem
         label='Senha'
         name='password'
-        className={styles.input}
         rules={[
           { required: true, message: 'Informe sua senha' },
           { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
         ]}
       >
         <Input.Password placeholder='Digite sua senha' />
-      </Form.Item>
+      </FormItem>
 
       <Flex vertical className={styles.actions}>
         <Button htmlType='submit' loading={loading}>
