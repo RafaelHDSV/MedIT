@@ -64,18 +64,27 @@ export function AuthProvider({ children }: Props) {
 
   async function logout() {
     const modal = Modal.confirm({
-      title: 'Sair da conta',
-      content: 'Tem certeza que deseja encerrar sua sessão?',
+      title: 'Encerrar sessão',
+      content: 'Você está prestes a sair da sua conta.',
       okText: 'Sair',
       cancelText: 'Cancelar',
       closable: true,
       maskClosable: true,
-      destroyOnHidden: false,
-      okButtonProps: { danger: true, autoFocus: true },
+      okButtonProps: {
+        danger: true,
+        autoFocus: true,
+        size: 'middle'
+      },
+      cancelButtonProps: {
+        size: 'middle'
+      },
 
       async onOk() {
         modal.update({
-          okButtonProps: { loading: true }
+          okButtonProps: {
+            loading: true,
+            danger: true
+          }
         })
 
         try {
@@ -90,9 +99,12 @@ export function AuthProvider({ children }: Props) {
           setUser(null)
         } catch (err) {
           console.error('Erro no logout', err)
-          message.error('Ocorreu um erro ao encerrar a sessão')
+          message.error('Erro ao encerrar sessão')
           modal.update({
-            okButtonProps: { loading: false }
+            okButtonProps: {
+              loading: false,
+              danger: true
+            }
           })
         }
       }
