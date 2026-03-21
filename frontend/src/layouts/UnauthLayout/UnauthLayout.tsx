@@ -5,6 +5,7 @@ import Logo from '@/components/Logo/Logo'
 import routes from '@/routes/routes'
 import { useState } from 'react'
 import { matchPath, Outlet, useLocation } from 'react-router-dom'
+import TypewriterComponent from 'typewriter-effect'
 import styles from './UnauthLayout.module.scss'
 
 export default function UnauthLayout() {
@@ -56,7 +57,25 @@ export default function UnauthLayout() {
           alt='Ilustração MedFlow'
           onClick={handleImageClick}
         />
-        <h3>Plataforma de Apoio à Triagem e Fluxo Hospitalar</h3>
+
+        <div className={styles.typewriter}>
+          <TypewriterComponent
+            options={{
+              autoStart: true,
+              loop: true,
+              delay: 60,
+              deleteSpeed: 30,
+              skipAddStyles: true,
+              wrapperClassName: styles.typewriter,
+              strings: [
+                'Plataforma de Apoio à Triagem e Fluxo Hospitalar',
+                'Agilize a triagem de pacientes e otimize o fluxo hospitalar',
+                'Tome decisões informadas com base em dados clínicos',
+                'Melhore a eficiência e a qualidade do atendimento hospitalar'
+              ]
+            }}
+          />
+        </div>
       </aside>
     </div>
   )
