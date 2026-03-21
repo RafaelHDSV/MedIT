@@ -1,8 +1,11 @@
 import UserBall from '@/components/UserBall/UserBall'
 import { useAuth } from '@/hooks/useAuth'
 import { UserLevelsLabels } from '@/interfaces/IUser'
+import { getContrastColor } from '@/utils/getContrastColor'
 import getShortName from '@/utils/getShortName'
+import { stringToColor } from '@/utils/stringToColor'
 import { SignOutIcon } from '@phosphor-icons/react'
+import { Tooltip } from 'antd'
 import styles from './UserTag.module.scss'
 
 interface IUserTagProps {
@@ -12,6 +15,8 @@ interface IUserTagProps {
 function UserTag({ isCompact }: IUserTagProps) {
   const { user, logout } = useAuth()
   const shortName = getShortName(user?.name)
+  const bgColor = stringToColor(shortName)
+  const textColor = getContrastColor(bgColor)
 
   return (
     <button
@@ -23,7 +28,17 @@ function UserTag({ isCompact }: IUserTagProps) {
           <UserBall name={shortName} />
 
           <div className={styles.userInfo}>
-            <strong>{shortName}</strong>
+            <Tooltip
+              title={user?.name}
+              color={bgColor}
+              styles={{
+                container: {
+                  color: textColor
+                }
+              }}
+            >
+              <strong>{shortName}</strong>
+            </Tooltip>
             {user?.level && <p>{UserLevelsLabels[user.level]}</p>}
           </div>
         </div>
