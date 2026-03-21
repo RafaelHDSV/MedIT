@@ -33,9 +33,9 @@ export default function UnauthLayout() {
     setImageIndex((imageIndex + 1) % imageSource.length)
   }, 7000)
 
-  function handleImageClick() {
-    setImageIndex((imageIndex + 1) % imageSource.length)
-  }
+  // function handleImageClick() {
+  //   setImageIndex((imageIndex + 1) % imageSource.length)
+  // }
 
   return (
     <div className={styles.content}>
@@ -55,7 +55,7 @@ export default function UnauthLayout() {
         <img
           src={imageSource[imageIndex]}
           alt='Ilustração MedFlow'
-          onClick={handleImageClick}
+          // onClick={handleImageClick}
         />
 
         <div className={styles.typewriter}>
