@@ -1,12 +1,12 @@
 .tag {
   --color: #000;
   --bgColor: #fff;
-  
+
   color: var(--color);
   background-color: var(--bgColor);
   border: 1px solid var(--color);
   font-size: 12px;
-  padding: .25rem 1rem;
+  padding: 0.25rem 1rem;
   border-radius: 999px;
   font-weight: 500;
 }
