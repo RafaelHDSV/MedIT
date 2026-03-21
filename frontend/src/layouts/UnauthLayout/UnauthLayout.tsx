@@ -3,7 +3,7 @@ import UnauthImage from '@/assets/unauth-image.svg'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Logo from '@/components/Logo/Logo'
 import routes from '@/routes/routes'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { matchPath, Outlet, useLocation } from 'react-router-dom'
 import TypewriterComponent from 'typewriter-effect'
 import styles from './UnauthLayout.module.scss'
@@ -15,27 +15,52 @@ export default function UnauthLayout() {
   )
   const isSignInPage = currentRoute?.path === '/'
   const [imageIndex, setImageIndex] = useState(0)
-  const imageSource = [
-    UnauthImage,
-    UnauthImage3,
-    '/image1.png',
-    '/image2.png',
-    '/image3.png',
-    '/image4.png',
-    '/image5.png'
-    // TODO: Gerar as imagens restantes pela IA e adicionar
-    // '/image6.png',
-    // '/image7.png',
-    // '/image8.png'
+  const [isFading, setIsFading] = useState(false)
+
+  const texts = [
+    'Plataforma de Apoio à Triagem e Fluxo Hospitalar',
+    'Agilize a triagem de pacientes e otimize o fluxo',
+    'Tome decisões informadas com base em dados clínicos',
+    'Melhore a eficiência e a qualidade do atendimento',
+    'Facilite a comunicação entre equipes de saúde',
+    'Acesse todas as informações clínicas em tempo real',
+    'Reduza o tempo de espera e melhore a experiência'
   ]
 
-  setTimeout(() => {
-    setImageIndex((imageIndex + 1) % imageSource.length)
-  }, 7000)
+  const imageSource = useCallback(
+    () => [
+      UnauthImage,
+      UnauthImage3,
+      '/image1.png',
+      '/image2.png',
+      '/image3.png',
+      '/image4.png',
+      '/image5.png'
+      // TODO: Gerar as imagens restantes pela IA e adicionar
+      // '/image6.png',
+      // '/image7.png',
+      // '/image8.png'
+    ],
+    []
+  )()
 
-  // function handleImageClick() {
-  //   setImageIndex((imageIndex + 1) % imageSource.length)
-  // }
+  function handleImageChange(index: number) {
+    if (index === imageIndex) return
+
+    setIsFading(true)
+
+    setTimeout(() => {
+      setImageIndex(index)
+      setIsFading(false)
+    }, 200)
+  }
+
+  useEffect(() => {
+    imageSource.forEach((src) => {
+      const img = new Image()
+      img.src = src
+    })
+  }, [imageSource])
 
   return (
     <div className={styles.content}>
@@ -54,8 +79,7 @@ export default function UnauthLayout() {
       <aside className={styles.image}>
         <img
           src={imageSource[imageIndex]}
-          alt='Ilustração MedFlow'
-          // onClick={handleImageClick}
+          className={`${styles.imageItem} ${isFading ? styles.fade : ''}`}
         />
 
         <div className={styles.typewriter}>
@@ -66,16 +90,20 @@ export default function UnauthLayout() {
               delay: 60,
               deleteSpeed: 30,
               skipAddStyles: true,
-              wrapperClassName: styles.typewriter,
-              strings: [
-                'Plataforma de Apoio à Triagem e Fluxo Hospitalar',
-                'Agilize a triagem de pacientes e otimize o fluxo hospitalar',
-                'Tome decisões informadas com base em dados clínicos',
-                'Melhore a eficiência e a qualidade do atendimento hospitalar',
-                'Facilite a comunicação entre equipes de saúde',
-                'Acesse informações clínicas em tempo real para uma triagem precisa',
-                'Reduza o tempo de espera e melhore a experiência do paciente'
-              ]
+              wrapperClassName: styles.typewriter
+            }}
+            onInit={(typewriter) => {
+              texts.forEach((text, index) => {
+                typewriter
+                  .callFunction(() => {
+                    handleImageChange(index)
+                  })
+                  .typeString(text)
+                  .pauseFor(1800)
+                  .deleteAll()
+              })
+
+              typewriter.start()
             }}
           />
         </div>
