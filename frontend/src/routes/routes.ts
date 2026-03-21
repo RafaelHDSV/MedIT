@@ -179,12 +179,25 @@ const triages: IRoute = {
   }
 }
 
+const triagesDetails: IRoute = {
+  name: ROUTES.TRIAGES_DETAILS.name,
+  description: ROUTES.TRIAGES_DETAILS.description,
+  path: ROUTES.TRIAGES_DETAILS.path,
+  meta: {
+    hidden: true,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [UserLevels.NURSE],
+    canGoBack: true
+  }
+}
+
 const routes: IRoute[] = [
   signIn,
   signUp,
   dashboard,
   attendances,
   triages,
+  triagesDetails,
   doctors,
   doctorDetails,
   nurses,

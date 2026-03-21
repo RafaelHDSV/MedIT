@@ -31,7 +31,6 @@ export interface IBaseUser extends IBaseInterface {
   name: string
   cpf: string
   level: UserLevels
-  number: number
   email: string
   password?: string
   gender?: UserGender
