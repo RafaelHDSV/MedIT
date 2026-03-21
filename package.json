@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "powershell -ExecutionPolicy Bypass -File ./scripts/loadNvmAndNode.ps1 && concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
+    "dev": "concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
     "dev:frontend": "cd frontend && yarn && yarn dev",
     "dev:backend": "cd backend && yarn && yarn dev"
   },
