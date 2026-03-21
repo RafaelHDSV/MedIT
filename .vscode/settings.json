@@ -1,0 +1,17 @@
+{
+  "terminal.integrated.profiles.windows": {
+    "PowerShellWithNvm": {
+      "path": "powershell.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-NoExit",
+        "-Command",
+        "& .\\scripts\\loadNvmAndNode.ps1"
+      ],
+      "icon": "terminal-powershell",
+      "title": "PowerShell with NVM"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShellWithNvm"
+}
