@@ -24,7 +24,8 @@ export default function UnauthLayout() {
     'Melhore a eficiência e a qualidade do atendimento',
     'Facilite a comunicação entre equipes de saúde',
     'Acesse todas as informações clínicas em tempo real',
-    'Reduza o tempo de espera e melhore a experiência'
+    'Reduza o tempo de espera e melhore a experiência',
+    'Aumente a segurança do paciente com alertas inteligentes'
   ]
 
   const imageSource = useCallback(
@@ -35,11 +36,8 @@ export default function UnauthLayout() {
       '/image2.png',
       '/image3.png',
       '/image4.png',
-      '/image5.png'
-      // TODO: Gerar as imagens restantes pela IA e adicionar
-      // '/image6.png',
-      // '/image7.png',
-      // '/image8.png'
+      '/image5.png',
+      '/image6.png'
     ],
     []
   )()
