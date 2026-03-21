@@ -1,6 +1,10 @@
 .form {
   width: 100%;
 
+  :global(.ant-form-item) {
+    margin-bottom: 0.5rem;
+  }
+
   .input {
     label {
       font-weight: 400;
@@ -42,7 +46,11 @@
     }
   }
 
-  .signUpLink {
+  .actions {
+    margin-top: 1rem;
+  }
+
+  .link {
     margin-top: 1rem;
     text-align: center;
     font-size: 14px;

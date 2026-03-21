@@ -12,7 +12,7 @@ import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import styles from './SignUp.module.scss'
+import styles from '../../styles/Form.module.scss'
 
 interface ISignUpFormErrors {
   name?: string
@@ -142,12 +142,12 @@ function SignUp() {
         <Input.Password placeholder='Digite sua senha' />
       </Form.Item>
 
-      <Flex vertical>
+      <Flex vertical className={styles.actions}>
         <Button htmlType='submit' loading={loading}>
           Cadastrar
         </Button>
 
-        <Link className={styles.signUpLink} to={ROUTES.SIGNIN.path}>
+        <Link className={styles.link} to={ROUTES.SIGNIN.path}>
           <p>Já possui uma conta? Entrar</p>
         </Link>
       </Flex>

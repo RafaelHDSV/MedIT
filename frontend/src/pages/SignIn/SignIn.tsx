@@ -6,7 +6,7 @@ import { useForm } from 'antd/es/form/Form'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import styles from './SignIn.module.scss'
+import styles from '../../styles/Form.module.scss'
 
 export interface LoginPayload {
   email?: string
@@ -93,12 +93,12 @@ export default function SignIn() {
         <Input.Password placeholder='Digite sua senha' />
       </Form.Item>
 
-      <Flex vertical>
+      <Flex vertical className={styles.actions}>
         <Button htmlType='submit' loading={loading}>
           Entrar
         </Button>
 
-        <Link className={styles.signUpLink} to={ROUTES.SIGNUP.path}>
+        <Link className={styles.link} to={ROUTES.SIGNUP.path}>
           <p>Ainda não possui uma conta? Cadastrar-se</p>
         </Link>
       </Flex>
