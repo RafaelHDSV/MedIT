@@ -4,6 +4,11 @@
   "type": "module",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node src/server.ts",
+    "scripts": "tsx src/scripts/runner.ts"
+  },
   "dependencies": {
     "@inquirer/prompts": "^8.3.0",
     "bcrypt": "^6.0.0",
@@ -24,10 +29,5 @@
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
-  },
-  "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "start": "node src/server.ts",
-    "scripts": "tsx src/scripts/runner.ts"
   }
 }
