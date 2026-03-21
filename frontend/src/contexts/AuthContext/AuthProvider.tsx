@@ -69,7 +69,9 @@ export function AuthProvider({ children }: Props) {
       okText: 'Sair',
       cancelText: 'Cancelar',
       closable: true,
-      maskClosable: true,
+      mask: {
+        closable: true
+      },
       okButtonProps: {
         danger: true,
         autoFocus: true,
