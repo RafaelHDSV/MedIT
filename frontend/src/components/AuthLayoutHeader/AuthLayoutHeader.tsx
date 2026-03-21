@@ -62,7 +62,7 @@ function AuthLayoutHeader({
         <p className={descriptionStyles()}>{routeDescription}</p>
       </div>
 
-      {actionComponent}
+      {actionComponent && actionComponent}
     </header>
   )
 }
