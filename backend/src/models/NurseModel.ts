@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
-import { IBaseUser, INurse, UserLevels } from '../interfaces/IUser.js'
+import { INurse } from '../interfaces/INurse.js'
+import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
 
 const NurseSchema = new mongoose.Schema<INurse>({
   coren: { type: String, required: true },

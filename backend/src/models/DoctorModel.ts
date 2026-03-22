@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
-import { IBaseUser, IDoctor, UserLevels } from '../interfaces/IUser.js'
+import { IDoctor } from '../interfaces/IDoctor.js'
+import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
 
 const DoctorSchema = new mongoose.Schema<IDoctor>({
   crm: { type: String, required: true },

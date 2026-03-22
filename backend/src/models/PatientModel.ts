@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
-import { IBaseUser, IPatient, UserLevels } from '../interfaces/IUser.js'
+import { IPatient } from '../interfaces/IPatient.js'
+import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
 
 const PatientSchema = new mongoose.Schema<IPatient>({
   weight: Number,
