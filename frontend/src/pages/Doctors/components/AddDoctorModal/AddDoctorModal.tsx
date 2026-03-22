@@ -1,5 +1,9 @@
 import Button from '@/components/Button/Button'
-import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
+import {
+  FormItem,
+  InputDate,
+  InputText
+} from '@/components/FormComponents/FormComponents'
 import {
   DoctorSpecializations,
   DoctorSpecializationsLabels,
@@ -23,6 +27,8 @@ function AddDoctorModal() {
   }
   const inputHeight = '2rem'
   const specialization = Form.useWatch('specialization', form)
+  const isOtherSpecialization =
+    specialization && specialization === DoctorSpecializations.OTHER
 
   function onFinish(values: DoctorFormValues) {
     console.log('Criar médico', values)
@@ -88,8 +94,7 @@ function AddDoctorModal() {
                 }
               ]}
             >
-              <InputText />
-              {/* <InputDate /> */}
+              <InputDate />
             </FormItem>
 
             <FormItem
@@ -174,19 +179,18 @@ function AddDoctorModal() {
               />
             </FormItem>
 
-            {specialization &&
-              specialization === DoctorSpecializations.OTHER && (
-                <FormItem
-                  label='Especialidade não listada'
-                  name='otherSpecialization'
-                  inputHeight={inputHeight}
-                  rules={[
-                    { required: true, message: 'Informe sua especialidade' }
-                  ]}
-                >
-                  <Input />
-                </FormItem>
-              )}
+            {isOtherSpecialization && (
+              <FormItem
+                label='Especialidade não listada'
+                name='otherSpecialization'
+                inputHeight={inputHeight}
+                rules={[
+                  { required: true, message: 'Informe sua especialidade' }
+                ]}
+              >
+                <Input />
+              </FormItem>
+            )}
           </div>
 
           <footer className={styles.footer}>

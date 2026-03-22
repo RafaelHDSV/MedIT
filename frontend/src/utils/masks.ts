@@ -28,7 +28,17 @@ const crmMask = (value: string | undefined) => {
   return uf ? `${num}/${uf}` : num
 }
 
-export type MaskEnum = 'cpf' | 'cellphone' | 'crm'
+const dateMask = (value: string | undefined) => {
+  if (!value) return ''
+
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{4})\d+?$/, '$1')
+}
+
+export type MaskEnum = 'cpf' | 'cellphone' | 'crm' | 'date'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -46,6 +56,8 @@ function masks(
       return cellphoneMask(result)
     case 'crm':
       return crmMask(result)
+    case 'date':
+      return dateMask(result)
     default:
       return result
   }

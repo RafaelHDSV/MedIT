@@ -69,4 +69,21 @@ function InputText({
   )
 }
 
-export { FormItem, InputText }
+function InputDate({ value, ...rest }: Omit<IInputProps, 'mask'>) {
+  const [valueMask, setValueMask] = useState(value)
+
+  return (
+    <AntInput
+      {...rest}
+      value={masks(value, 'date') || valueMask}
+      onChange={(event) => {
+        setValueMask(masks(event.target.value, 'date'))
+        if (rest.onChange) return rest.onChange(event)
+        return event
+      }}
+    />
+  )
+}
+
+export { FormItem, InputDate, InputText }
+
