@@ -1,3 +1,4 @@
+import type { Dayjs } from 'dayjs'
 import type { IBaseUser, UserLevels } from './IUser'
 
 export interface IDoctor extends IBaseUser {
@@ -8,7 +9,7 @@ export interface IDoctor extends IBaseUser {
 export interface DoctorFormValues {
   name: string
   cpf: string
-  birthDate: Date
+  birthDate: Dayjs | null
   gender: UserLevels
   email: string
   password: string
