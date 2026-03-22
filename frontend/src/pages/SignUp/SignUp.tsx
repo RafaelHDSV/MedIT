@@ -99,6 +99,7 @@ function SignUp() {
           { required: true, message: 'Informe seu CPF' },
           {
             validator(_, value) {
+              if (!value) return Promise.resolve()
               const error = validators(value, 'validCpf')
               return error
                 ? Promise.resolve()
@@ -118,6 +119,7 @@ function SignUp() {
           { required: true, message: 'Informe seu email' },
           {
             validator(_, value) {
+              if (!value) return Promise.resolve()
               const error = validators(value, 'email')
               return error
                 ? Promise.resolve()

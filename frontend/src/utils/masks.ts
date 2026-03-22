@@ -18,7 +18,17 @@ const cellphoneMask = (value: string | undefined) => {
     .replace(/(-\d{4})\d+?$/, '$1')
 }
 
-export type MaskEnum = 'cpf' | 'cellphone'
+const crmMask = (value: string | undefined) => {
+  if (!value) return ''
+  const cleaned = value.replace(/[^a-zA-Z0-9]/g, '')
+  const match = cleaned.match(/^(\d+)([a-zA-Z]+)?$/)
+  if (!match) return value
+  const num = match[1]
+  const uf = match[2] ? match[2].toUpperCase() : ''
+  return uf ? `${num}/${uf}` : num
+}
+
+export type MaskEnum = 'cpf' | 'cellphone' | 'crm'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -34,6 +44,8 @@ function masks(
       return cpfMask(result)
     case 'cellphone':
       return cellphoneMask(result)
+    case 'crm':
+      return crmMask(result)
     default:
       return result
   }

@@ -1,7 +1,11 @@
 import Button from '@/components/Button/Button'
 import { FormItem } from '@/components/FormComponents/FormComponents'
 import InputText from '@/components/InputText/InputText'
-import type { DoctorFormValues } from '@/interfaces/IDoctor'
+import {
+  DoctorSpecializations,
+  DoctorSpecializationsLabels,
+  type DoctorFormValues
+} from '@/interfaces/IDoctor'
 import { UserGendersLabels } from '@/interfaces/IUser'
 import formStyles from '@/styles/Form.module.scss'
 import validators, { birthDateValidator } from '@/utils/validators'
@@ -19,6 +23,7 @@ function AddDoctorModal() {
     form.resetFields()
   }
   const inputHeight = '2rem'
+  const specialization = Form.useWatch('specialization', form)
 
   function onFinish(values: DoctorFormValues) {
     console.log('Criar médico', values)
@@ -108,7 +113,18 @@ function AddDoctorModal() {
               label='Email'
               name='email'
               inputHeight={inputHeight}
-              rules={[{ required: true, message: 'Informe seu email' }]}
+              rules={[
+                { required: true, message: 'Informe seu email' },
+                {
+                  validator(_, value) {
+                    if (!value) return Promise.resolve()
+                    const error = validators(value, 'email')
+                    return error
+                      ? Promise.resolve()
+                      : Promise.reject(new Error('Email inválido'))
+                  }
+                }
+              ]}
             >
               <Input />
             </FormItem>
@@ -117,7 +133,10 @@ function AddDoctorModal() {
               label='Senha'
               name='password'
               inputHeight={inputHeight}
-              rules={[{ required: true, message: 'Informe sua senha' }]}
+              rules={[
+                { required: true, message: 'Informe sua senha' },
+                { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+              ]}
             >
               <Input.Password />
             </FormItem>
@@ -137,7 +156,7 @@ function AddDoctorModal() {
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu CRM' }]}
             >
-              <Input />
+              <InputText mask='crm' maxLength={9} />
             </FormItem>
 
             <FormItem
@@ -146,8 +165,29 @@ function AddDoctorModal() {
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe sua especialidade' }]}
             >
-              <Input />
+              <Select
+                options={Object.entries(DoctorSpecializationsLabels).map(
+                  ([key, value]) => ({
+                    label: value,
+                    value: key
+                  })
+                )}
+              />
             </FormItem>
+
+            {specialization &&
+              specialization === DoctorSpecializations.OTHER && (
+                <FormItem
+                  label='Especialidade não listada'
+                  name='otherSpecialization'
+                  inputHeight={inputHeight}
+                  rules={[
+                    { required: true, message: 'Informe sua especialidade' }
+                  ]}
+                >
+                  <Input />
+                </FormItem>
+              )}
           </div>
 
           <footer className={styles.footer}>
