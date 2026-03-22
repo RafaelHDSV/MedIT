@@ -37,7 +37,7 @@ function AddDoctorModal() {
 
         <Form
           form={form}
-          className={formStyles.form}
+          className={`${formStyles.form} mt-1`}
           layout='vertical'
           onFinish={onFinish}
         >
@@ -150,9 +150,11 @@ function AddDoctorModal() {
             </FormItem>
           </div>
 
-          <FormItem>
-            <Button htmlType='submit'>Adicionar médico</Button>
-          </FormItem>
+          <footer className={styles.footer}>
+            <FormItem>
+              <Button htmlType='submit'>Adicionar médico</Button>
+            </FormItem>
+          </footer>
         </Form>
       </Modal>
 
