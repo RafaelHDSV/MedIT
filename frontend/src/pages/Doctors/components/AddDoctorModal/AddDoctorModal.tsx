@@ -1,6 +1,5 @@
 import Button from '@/components/Button/Button'
-import { FormItem } from '@/components/FormComponents/FormComponents'
-import InputText from '@/components/InputText/InputText'
+import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import {
   DoctorSpecializations,
   DoctorSpecializationsLabels,

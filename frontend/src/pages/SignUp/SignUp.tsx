@@ -1,7 +1,6 @@
 import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
-import { FormItem } from '@/components/FormComponents/FormComponents'
-import InputText from '@/components/InputText/InputText'
+import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
