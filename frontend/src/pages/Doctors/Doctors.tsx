@@ -3,8 +3,8 @@ import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
+import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
-import type { IDoctor } from '@/interfaces/IUser'
 import styles from '@/styles/UserTable.module.scss'
 import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'

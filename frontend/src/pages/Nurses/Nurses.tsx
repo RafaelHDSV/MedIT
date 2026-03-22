@@ -5,7 +5,7 @@ import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
-import type { INurse } from '@/interfaces/IUser'
+import type { INurse } from '@/interfaces/INurse'
 import styles from '@/styles/UserTable.module.scss'
 import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'

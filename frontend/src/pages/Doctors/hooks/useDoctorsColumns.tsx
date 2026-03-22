@@ -1,4 +1,4 @@
-import type { IDoctor } from '@/interfaces/IUser'
+import type { IDoctor } from '@/interfaces/IDoctor'
 import { ROUTES } from '@/routes/constants'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
