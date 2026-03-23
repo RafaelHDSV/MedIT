@@ -14,6 +14,7 @@ import {
 } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import capitalize from '@/utils/capitalize'
 import masks from '@/utils/masks'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
@@ -52,8 +53,12 @@ function DoctorModal({
   const inputHeight = '2.5rem'
 
   const specialization = Form.useWatch('specialization', form)
+  const isMappedSpecialization = Object.values(DoctorSpecializations).includes(
+    doctor?.specialization as DoctorSpecializations
+  )
   const isOtherSpecialization =
-    specialization && specialization === DoctorSpecializations.OTHER
+    !isMappedSpecialization ||
+    (specialization && specialization === DoctorSpecializations.OTHER)
 
   async function onFinish(values: DoctorFormValues) {
     try {
@@ -85,10 +90,16 @@ function DoctorModal({
   useEffect(() => {
     if (doctor) {
       form.setFieldsValue({
-        ...doctor
+        ...doctor,
+        specialization: isMappedSpecialization
+          ? (doctor.specialization as DoctorSpecializations)
+          : (DoctorSpecializations.OTHER as DoctorSpecializations),
+        otherSpecialization: !isMappedSpecialization
+          ? capitalize(doctor.specialization)
+          : undefined
       })
     }
-  }, [doctor, form])
+  }, [doctor, form, isMappedSpecialization])
 
   return (
     <>
@@ -151,6 +162,7 @@ function DoctorModal({
               ]}
             >
               <InputDate
+                value={form.getFieldValue('birthDate')}
                 inputHeight={inputHeight}
                 onChange={(date) => form.setFieldsValue({ birthDate: date })}
               />
@@ -195,15 +207,25 @@ function DoctorModal({
             </FormItem>
 
             <FormItem
-              label='Senha'
-              name='password'
+              label='Senha atual'
+              name='currentPassword'
               inputHeight={inputHeight}
               rules={[
-                { required: true, message: 'Informe sua senha' },
                 { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
               ]}
             >
-              <Input.Password placeholder='Digite sua senha' />
+              <Input.Password placeholder='Digite sua senha atual' />
+            </FormItem>
+
+            <FormItem
+              label='Nova senha'
+              name='newPassword'
+              inputHeight={inputHeight}
+              rules={[
+                { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+              ]}
+            >
+              <Input.Password placeholder='Digite sua nova senha (opcional)' />
             </FormItem>
 
             <FormItem

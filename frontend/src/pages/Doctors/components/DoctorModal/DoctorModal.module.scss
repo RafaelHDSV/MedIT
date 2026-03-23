@@ -1,11 +1,11 @@
 .modal {
-  max-width: 35rem;
+  max-width: 50rem;
   width: 100% !important;
 
   .formInputs {
     display: grid;
     gap: 16px;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
   .footer {
