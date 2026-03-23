@@ -33,18 +33,41 @@ const createDoctors: Script = {
     async function createDoctor() {
       const gender = faker.helpers.arrayElement(['male', 'female'])
 
+      const name = faker.person.fullName({ sex: gender })
+      const invalidNameParts = ['Mrs', 'Mr', '.', 'Miss', 'Dr']
+      const nameParts = name
+        .trim()
+        .split(/\s+/)
+        .filter((part) => !invalidNameParts.includes(part))
+      const firstName = nameParts[0].toLowerCase()
+      const lastName = nameParts[nameParts.length - 1].toLowerCase()
+      const email = `doctor.${firstName}.${lastName}@yopmail.com`
+
+      const specializations = Object.values(DoctorSpecializations)
+      const randomSpecialization: string =
+        faker.helpers.arrayElement(specializations)
+      let specialization: string
+      if (randomSpecialization === DoctorSpecializations.OTHER) {
+        const otherSpecialization = [
+          'Acupuntura',
+          'Medicina Esportiva',
+          'Medicina do Trabalho'
+        ]
+        specialization = faker.helpers.arrayElement(otherSpecialization)
+      } else {
+        specialization = randomSpecialization
+      }
+
       const doctor = {
-        name: faker.person.fullName(),
+        name,
         cpf: generateCPF(),
-        email: faker.internet.email().toLowerCase(),
-        password: '123456',
+        email,
+        password: 'fastpass',
         gender,
         cellphone: generatePhone(),
-        birthDate: faker.date.birthdate({ min: 25, max: 65, mode: 'age' }),
-        crm: faker.number.int({ min: 100000, max: 999999 }).toString(),
-        specialization: faker.helpers.arrayElement(
-          Object.values(DoctorSpecializations)
-        )
+        birthDate: faker.date.birthdate({ min: 18, max: 85, mode: 'age' }),
+        crm: faker.number.int({ min: 100000, max: 999999 }).toString() + '/SP',
+        specialization
       }
 
       try {
