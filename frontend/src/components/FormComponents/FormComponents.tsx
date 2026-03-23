@@ -69,18 +69,22 @@ function InputText({
   )
 }
 
-function InputDate({ value, ...rest }: Omit<IInputProps, 'mask'>) {
+function InputDate({ value, onChange, ...rest }: Omit<IInputProps, 'mask'>) {
   const [valueMask, setValueMask] = useState(value)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    const maskedValue = masks(value, 'date')
+    setValueMask(maskedValue)
+    if (onChange) return onChange(event)
+    return event
+  }
 
   return (
     <AntInput
       {...rest}
       value={masks(value, 'date') || valueMask}
-      onChange={(event) => {
-        setValueMask(masks(event.target.value, 'date'))
-        if (rest.onChange) return rest.onChange(event)
-        return event
-      }}
+      onChange={handleChange}
     />
   )
 }
