@@ -31,13 +31,22 @@ const crmMask = (value: string | undefined) => {
 const dateMask = (value: string | undefined) => {
   if (!value) return ''
 
-  return value
-    .replace(/\D/g, '')
-    .replace(/(\d{2})(\d)/, '$1/$2')
-    .replace(/(\d{2})(\d)/, '$1/$2')
-    .replace(/(\d{4})\d+?$/, '$1')
-}
+  let v = value.replace(/\D/g, '').slice(0, 8)
 
+  if (v.length >= 2) {
+    const day = parseInt(v.slice(0, 2))
+    if (day > 31) v = '31' + v.slice(2)
+  }
+
+  if (v.length >= 4) {
+    const month = parseInt(v.slice(2, 4))
+    if (month > 12) v = v.slice(0, 2) + '12' + v.slice(4)
+  }
+
+  if (v.length <= 2) return v
+  if (v.length <= 4) return `${v.slice(0, 2)}/${v.slice(2)}`
+  return `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`
+}
 export type MaskEnum = 'cpf' | 'cellphone' | 'crm' | 'date'
 
 function masks(
