@@ -43,7 +43,7 @@ function Nurses() {
   }, [])
 
   return (
-    <div>
+    <div className='h-100'>
       <Flex gap={16} align='center'>
         <AuthLayoutHeader
           actionComponent={<Button>Adicionar enfermeiro</Button>}
@@ -57,7 +57,7 @@ function Nurses() {
         dataSource={nurses}
         columns={columns}
         loading={loading}
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 9 }}
         size='middle'
         bordered={false}
         scroll={{ x: 'max-content' }}

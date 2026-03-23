@@ -43,7 +43,7 @@ function Doctors() {
   }, [])
 
   return (
-    <div>
+    <div className='h-100'>
       <Flex gap={16} align='center'>
         <AuthLayoutHeader
           actionComponent={<AddDoctorModal fetchDoctors={fetchDoctors} />}
@@ -57,7 +57,7 @@ function Doctors() {
         dataSource={doctors}
         columns={columns}
         loading={loading}
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 9 }}
         size='middle'
         bordered={false}
         scroll={{ x: 'max-content' }}
