@@ -3,15 +3,17 @@ import masks from '@/utils/masks'
 import {
   Input as AntInput,
   Form,
+  Select,
   Skeleton,
   type FormItemProps,
   type InputProps,
-  type InputRef
+  type InputRef,
+  type SelectProps
 } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { useState, type RefObject } from 'react'
-import styles from '../../styles/Form.module.scss'
 import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
+import styles from './FormComponents.module.scss'
 
 interface IFormItemProps extends FormItemProps {
   children: React.ReactNode
@@ -71,11 +73,26 @@ function InputText({
   )
 }
 
+interface IInputSelectProps extends SelectProps {
+  inputHeight?: string
+}
+
+function InputSelect({ inputHeight, ...rest }: IInputSelectProps) {
+  return (
+    <Select
+      className={styles.select}
+      style={{ '--input-height': inputHeight || '3rem' } as React.CSSProperties}
+      {...rest}
+    />
+  )
+}
+
 interface IInputDateProps {
+  inputHeight?: string
   onChange?: (date: Dayjs | [Dayjs | null, Dayjs | null] | null) => void
 }
 
-function InputDate({ onChange }: IInputDateProps) {
+function InputDate({ inputHeight, onChange }: IInputDateProps) {
   const [value, setValue] = useState<
     Dayjs | [Dayjs | null, Dayjs | null] | null
   >(null)
@@ -91,6 +108,8 @@ function InputDate({ onChange }: IInputDateProps) {
 
   return (
     <MultiDatepicker
+      className={styles.multiDatepicker}
+      style={{ '--input-height': inputHeight || '3rem' } as React.CSSProperties}
       type={filterDateType}
       defaultPickerType={filterDateType}
       options={['date']}
@@ -110,5 +129,5 @@ function InputDate({ onChange }: IInputDateProps) {
   )
 }
 
-export { FormItem, InputDate, InputText }
+export { FormItem, InputDate, InputSelect, InputText }
 
