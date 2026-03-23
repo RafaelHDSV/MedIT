@@ -44,7 +44,10 @@ function DoctorModal({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const isEditMode = Boolean(doctor)
 
-  const handleOpen = () => setIsModalOpen(true)
+  const handleOpen = () => {
+    if (fetchDoctorDetails) fetchDoctorDetails()
+    setIsModalOpen(true)
+  }
   const handleClose = () => {
     setIsModalOpen(false)
     form.resetFields()
@@ -57,8 +60,7 @@ function DoctorModal({
     doctor?.specialization as DoctorSpecializations
   )
   const isOtherSpecialization =
-    !isMappedSpecialization ||
-    (specialization && specialization === DoctorSpecializations.OTHER)
+    specialization && specialization === DoctorSpecializations.OTHER
 
   async function onFinish(values: DoctorFormValues) {
     try {
@@ -69,14 +71,16 @@ function DoctorModal({
           ...values,
           crm: masks(values.crm, 'crm')
         })
-        message.success('Médico atualizado com sucesso')
         fetchDoctorDetails?.()
       } else {
         await api.post('/doctors', { ...values, crm: masks(values.crm, 'crm') })
-        message.success('Médico adicionado com sucesso')
-        handleClose()
         fetchDoctors?.()
       }
+
+      message.success(
+        `Médico ${isEditMode ? 'atualizado' : 'adicionado'} com sucesso`
+      )
+      handleClose()
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>
@@ -292,9 +296,7 @@ function DoctorModal({
         </Form>
       </Modal>
 
-      <Button loading={loading} onClick={handleOpen}>
-        {buttonText || 'Continuar'}
-      </Button>
+      <Button onClick={handleOpen}>{buttonText || 'Continuar'}</Button>
     </>
   )
 }
