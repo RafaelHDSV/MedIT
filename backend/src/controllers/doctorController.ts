@@ -83,3 +83,71 @@ export const createDoctor = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const editDoctor = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    const {
+      name,
+      cpf,
+      email,
+      currentPassword,
+      newPassword,
+      gender,
+      cellphone,
+      birthDate,
+      crm,
+      specialization,
+      otherSpecialization
+    } = req.body
+
+    const finalSpecialization =
+      specialization === DoctorSpecializations.OTHER
+        ? otherSpecialization?.toLowerCase()
+        : specialization
+
+    const doctor = await Doctor.findById(id)
+    if (!doctor) {
+      return res.status(404).json({ message: 'Médico não encontrado' })
+    }
+
+    if (currentPassword) {
+      const isMatch = await doctor.comparePassword(currentPassword)
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Senha atual incorreta' })
+      }
+    }
+
+    doctor.name = name || doctor.name
+    doctor.cpf = cpf?.replace(/\D/g, '') || doctor.cpf
+    doctor.email = email?.trim().toLowerCase() || doctor.email
+    if (newPassword) doctor.password = newPassword
+    doctor.gender = gender || doctor.gender
+    doctor.cellphone =
+      Number(String(cellphone)?.replace(/\D/g, '')) || doctor.cellphone
+    doctor.birthDate = birthDate || doctor.birthDate
+    doctor.crm = crm || doctor.crm
+    doctor.specialization = finalSpecialization || doctor.specialization
+
+    await doctor.save()
+
+    return res.status(200).json({
+      message: 'Médico atualizado com sucesso',
+      data: doctor
+    })
+  } catch (error: any) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyValue)[0]
+
+      return res.status(400).json({
+        message: `${field} já está em uso`
+      })
+    }
+
+    return res.status(500).json({
+      message: 'Erro ao atualizar médico',
+      error: error.message
+    })
+  }
+}

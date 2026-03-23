@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { IPatient } from '../interfaces/IPatient.js'
 import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
+import { UserModel } from './UserModel.js'
 
 const PatientSchema = new mongoose.Schema<IPatient>({
   weight: Number,
@@ -11,5 +12,5 @@ const PatientSchema = new mongoose.Schema<IPatient>({
 })
 
 export const Patient = mongoose
-  .model<IBaseUser>('User')
+  .model<IBaseUser, UserModel>('User')
   .discriminator(UserLevels.PATIENT, PatientSchema)
