@@ -100,9 +100,7 @@ function InputDate({
   inputHeight,
   onChange
 }: IInputDateProps) {
-  const [value, setValue] = useState<DayjsType>(
-    initialValue ? dayjs(initialValue) : null
-  )
+  const [value, setValue] = useState<DayjsType>(null)
   const [filterDateType, setFilterDateType] = useState<
     'date' | 'week' | 'month' | 'year' | 'range'
   >('date')
@@ -114,6 +112,8 @@ function InputDate({
   }
 
   const finalValue = () => {
+    if (initialValue) return dayjs(initialValue) as DayjsType
+
     if (filterDateType === 'range') {
       return value as [Dayjs | null, Dayjs | null] | null
     }
