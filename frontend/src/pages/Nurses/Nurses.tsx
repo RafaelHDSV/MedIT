@@ -23,7 +23,7 @@ function Nurses() {
       setLoading(true)
 
       try {
-        const response = await api.get('/users/level/nurse')
+        const response = await api.get('/nurses')
         const data = response.data
         setNurses(data)
       } catch (err) {

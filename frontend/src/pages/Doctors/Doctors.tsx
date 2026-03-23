@@ -23,7 +23,7 @@ function Doctors() {
       setLoading(true)
 
       try {
-        const response = await api.get('/users/level/doctor')
+        const response = await api.get('/doctors')
         const data = response.data
         setDoctors(data)
       } catch (err) {

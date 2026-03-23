@@ -4,6 +4,9 @@ import express, { Request, Response } from 'express'
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
 import authRoutes from './routes/authRoutes.js'
+import doctorsRoutes from './routes/doctorsRoutes.js'
+import nursesRoutes from './routes/nursesRoutes.js'
+import patientsRoutes from './routes/patientsRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 
 const app = express()
@@ -19,6 +22,9 @@ app.get('/', (_req: Request, res: Response) => {
 
 app.use('/auth', authRoutes)
 app.use('/users', userRoutes)
+app.use('/doctors', doctorsRoutes)
+app.use('/nurses', nursesRoutes)
+app.use('/patients', patientsRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando em http://localhost:${PORT}`)

@@ -1,0 +1,13 @@
+import { Request, Response } from 'express'
+import UserModel from '../models/UserModel.js'
+
+export const getUsers = async (_req: Request, res: Response) => {
+  const users = await UserModel.find({ level: 'doctor' })
+    .sort({ createdAt: -1 })
+    .select('-password')
+  if (!users || users.length === 0) {
+    return res.status(404).json({ message: 'Nenhum médico encontrado' })
+  }
+
+  res.json(users)
+}
