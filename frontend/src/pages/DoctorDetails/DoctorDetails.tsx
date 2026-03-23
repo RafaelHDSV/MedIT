@@ -4,7 +4,7 @@ import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
-import type { IDoctor } from '@/interfaces/IDoctor'
+import { DoctorSpecializationsLabels, type IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
@@ -91,7 +91,11 @@ function DoctorDetails() {
             },
             {
               label: 'Especialidade',
-              value: doctor?.specialization
+              value:
+                doctor?.specialization &&
+                DoctorSpecializationsLabels[doctor.specialization]
+                  ? DoctorSpecializationsLabels[doctor.specialization]
+                  : doctor?.specialization
             },
             { label: 'CRM', value: doctor?.crm }
           ]}
