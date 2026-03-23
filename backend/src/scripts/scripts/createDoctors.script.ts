@@ -25,7 +25,6 @@ const createDoctors: Script = {
       return cpf.join('')
     }
 
-    // ✅ Gerar telefone numérico
     function generatePhone() {
       return Number('119' + faker.number.int({ min: 10000000, max: 99999999 }))
     }
@@ -34,11 +33,21 @@ const createDoctors: Script = {
       const gender = faker.helpers.arrayElement(['male', 'female'])
 
       const name = faker.person.fullName({ sex: gender })
-      const invalidNameParts = ['Mrs', 'Mr', '.', 'Miss', 'Dr']
+      const invalidNameParts = [
+        'mr',
+        'mrs',
+        'miss',
+        'dr',
+        'jr',
+        'sr',
+        'ii',
+        'iii'
+      ]
       const nameParts = name
         .trim()
         .split(/\s+/)
-        .filter((part) => !invalidNameParts.includes(part))
+        .map((part) => part.toLowerCase().replace(/\./g, ''))
+        .filter((part) => part && !invalidNameParts.includes(part))
       const firstName = nameParts[0].toLowerCase()
       const lastName = nameParts[nameParts.length - 1].toLowerCase()
       const email = `doctor.${firstName}.${lastName}@yopmail.com`
