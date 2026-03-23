@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { DoctorSpecializations, IDoctor } from '../interfaces/IDoctor.js'
+import { IDoctor } from '../interfaces/IDoctor.js'
 import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
 
 const DoctorSchema = new mongoose.Schema<IDoctor>({
@@ -7,7 +7,6 @@ const DoctorSchema = new mongoose.Schema<IDoctor>({
   specialization: {
     type: String,
     required: true,
-    enum: Object.values(DoctorSpecializations),
     lowercase: true
   }
 })
