@@ -67,6 +67,7 @@ interface IInputDate {
   defaultValue?: DateValue | RangeValue
   options?: MultiDatepickerType[]
   className?: string
+  style?: React.CSSProperties
   allowClear?: boolean
   defaultPickerType?: MultiDatepickerType
   dateSelectorRef?: React.RefObject<HTMLButtonElement>
@@ -81,6 +82,7 @@ export default function MultiDatepicker({
   defaultPickerType = 'month',
   options = DEFAULT_DATE_TYPE_OPTIONS,
   className,
+  style,
   allowClear = false,
   dateSelectorRef
 }: IInputDate) {
@@ -156,6 +158,7 @@ export default function MultiDatepicker({
     <MultiDatepickerContainer
       dateSelectorRef={dateSelectorRef}
       className={className || ''}
+      style={style}
       menu={{
         items: menuItems,
         selectable: true,
