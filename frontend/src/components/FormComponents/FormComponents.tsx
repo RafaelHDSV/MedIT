@@ -87,15 +87,22 @@ function InputSelect({ inputHeight, ...rest }: IInputSelectProps) {
   )
 }
 
+type DayjsType = Dayjs | [Dayjs | null, Dayjs | null] | null
+
 interface IInputDateProps {
+  value?: string
   inputHeight?: string
-  onChange?: (date: Dayjs | [Dayjs | null, Dayjs | null] | null) => void
+  onChange?: (date: DayjsType) => void
 }
 
-function InputDate({ inputHeight, onChange }: IInputDateProps) {
-  const [value, setValue] = useState<
-    Dayjs | [Dayjs | null, Dayjs | null] | null
-  >(null)
+function InputDate({
+  value: initialValue,
+  inputHeight,
+  onChange
+}: IInputDateProps) {
+  const [value, setValue] = useState<DayjsType>(
+    initialValue ? dayjs(initialValue) : null
+  )
   const [filterDateType, setFilterDateType] = useState<
     'date' | 'week' | 'month' | 'year' | 'range'
   >('date')
@@ -106,6 +113,14 @@ function InputDate({ inputHeight, onChange }: IInputDateProps) {
     setFilterDateType(type)
   }
 
+  const finalValue = () => {
+    if (filterDateType === 'range') {
+      return value as [Dayjs | null, Dayjs | null] | null
+    }
+
+    return value as Dayjs | null
+  }
+
   return (
     <MultiDatepicker
       className={styles.multiDatepicker}
@@ -114,13 +129,9 @@ function InputDate({ inputHeight, onChange }: IInputDateProps) {
       defaultPickerType={filterDateType}
       options={['date']}
       onDateTypeChange={handleDateTypeChange}
-      value={
-        filterDateType === 'range'
-          ? (value as [Dayjs | null, Dayjs | null] | null)
-          : (value as Dayjs | null)
-      }
+      value={finalValue()}
       defaultValue={dayjs()}
-      onDateChange={(date: Dayjs | [Dayjs | null, Dayjs | null] | null) => {
+      onDateChange={(date: DayjsType) => {
         if (!date) return
         setValue(date)
         if (onChange) onChange(date)
