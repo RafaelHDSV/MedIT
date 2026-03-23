@@ -10,7 +10,7 @@ import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import AddDoctorModal from './components/AddDoctorModal/AddDoctorModal'
+import DoctorModal from './components/DoctorModal/DoctorModal'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
 function Doctors() {
@@ -46,7 +46,12 @@ function Doctors() {
     <div className='h-100'>
       <Flex gap={16} align='center'>
         <AuthLayoutHeader
-          actionComponent={<AddDoctorModal fetchDoctors={fetchDoctors} />}
+          actionComponent={
+            <DoctorModal
+              buttonText='Adicionar médico'
+              fetchDoctors={fetchDoctors}
+            />
+          }
         />
         <ProgressTag status={ProgressStatus.COMPLETED} />
       </Flex>

@@ -17,8 +17,9 @@ import {
 import { message } from 'antd'
 import axios, { AxiosError } from 'axios'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import DoctorModal from '../Doctors/components/DoctorModal/DoctorModal'
 import styles from './DoctorDetails.module.scss'
 
 const mockedLastAttendance = {
@@ -41,32 +42,41 @@ function DoctorDetails() {
   const [doctor, setDoctor] = useState<IDoctor | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function fetchDoctorDetails() {
-      setLoading(true)
+  const fetchDoctorDetails = useCallback(async () => {
+    setLoading(true)
 
-      try {
-        const response = await api.get(`/users/${params.id}`)
-        const data = response.data
-        setDoctor(data)
-      } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao carregar detalhes do médico'
-        )
-      } finally {
-        setLoading(false)
-      }
+    try {
+      const response = await api.get(`/users/${params.id}`)
+      const data = response.data
+      setDoctor(data)
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(
+        error.response?.data?.message || 'Erro ao carregar detalhes do médico'
+      )
+    } finally {
+      setLoading(false)
     }
-
-    fetchDoctorDetails()
   }, [params.id])
+
+  useEffect(() => {
+    fetchDoctorDetails()
+  }, [fetchDoctorDetails])
 
   return (
     <section>
-      <AuthLayoutHeader />
+      <AuthLayoutHeader
+        actionComponent={
+          <DoctorModal
+            doctor={doctor}
+            buttonText='Editar médico'
+            fetchDoctorDetails={fetchDoctorDetails}
+          />
+        }
+      />
+
       <UserDetailsHeader
         name={doctor?.name}
         age={getAgeByBirthDate(doctor?.birthDate)}

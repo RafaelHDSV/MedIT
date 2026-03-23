@@ -9,7 +9,8 @@ import {
 import {
   DoctorSpecializations,
   DoctorSpecializationsLabels,
-  type DoctorFormValues
+  type DoctorFormValues,
+  type IDoctor
 } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import { UserGendersLabels } from '@/interfaces/IUser'
@@ -18,14 +19,29 @@ import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import axios, { AxiosError } from 'axios'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
-import styles from './AddDoctorModal.module.scss'
+import styles from './DoctorModal.module.scss'
 
-function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
+interface IDoctorModalProps {
+  doctor?: IDoctor | null
+  buttonText?: string
+  fetchDoctors?: () => void
+  fetchDoctorDetails?: () => void
+}
+
+function DoctorModal({
+  doctor,
+  buttonText,
+  fetchDoctors,
+  fetchDoctorDetails
+}: IDoctorModalProps) {
   const [form] = useForm()
+  const params = useParams<{ id: string }>()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const isEditMode = Boolean(doctor)
 
   const handleOpen = () => setIsModalOpen(true)
   const handleClose = () => {
@@ -43,10 +59,19 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
     try {
       setLoading(true)
 
-      await api.post('/doctors', { ...values, crm: masks(values.crm, 'crm') })
-      message.success('Médico adicionado com sucesso')
-      handleClose()
-      fetchDoctors()
+      if (isEditMode) {
+        await api.put(`/doctors/${params.id}`, {
+          ...values,
+          crm: masks(values.crm, 'crm')
+        })
+        message.success('Médico atualizado com sucesso')
+        fetchDoctorDetails?.()
+      } else {
+        await api.post('/doctors', { ...values, crm: masks(values.crm, 'crm') })
+        message.success('Médico adicionado com sucesso')
+        handleClose()
+        fetchDoctors?.()
+      }
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>
@@ -57,6 +82,14 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
     }
   }
 
+  useEffect(() => {
+    if (doctor) {
+      form.setFieldsValue({
+        ...doctor
+      })
+    }
+  }, [doctor, form])
+
   return (
     <>
       <Modal
@@ -66,7 +99,7 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
         footer={null}
         centered
       >
-        <h2>Adicionar médico</h2>
+        <h2>{isEditMode ? 'Editar médico' : 'Adicionar médico'}</h2>
 
         <Form
           form={form}
@@ -230,7 +263,7 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
           <footer className={styles.footer}>
             <FormItem>
               <Button htmlType='submit' loading={loading}>
-                Adicionar médico
+                {buttonText || 'Continuar'}
               </Button>
             </FormItem>
           </footer>
@@ -238,10 +271,10 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
       </Modal>
 
       <Button loading={loading} onClick={handleOpen}>
-        Adicionar médico
+        {buttonText || 'Continuar'}
       </Button>
     </>
   )
 }
 
-export default AddDoctorModal
+export default DoctorModal
