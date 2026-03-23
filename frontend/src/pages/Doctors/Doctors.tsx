@@ -18,34 +18,36 @@ function Doctors() {
   const [doctors, setDoctors] = useState<IDoctor[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    async function fetchDoctors() {
-      setLoading(true)
+  async function fetchDoctors() {
+    setLoading(true)
 
-      try {
-        const response = await api.get('/doctors')
-        const data = response.data
-        setDoctors(data)
-      } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro ao carregar a listagem de médicos'
-        )
-      } finally {
-        setLoading(false)
-      }
+    try {
+      const response = await api.get('/doctors')
+      const data = response.data
+      setDoctors(data)
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(
+        error.response?.data?.message ||
+          'Erro ao carregar a listagem de médicos'
+      )
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchDoctors()
   }, [])
 
   return (
     <div>
       <Flex gap={16} align='center'>
-        <AuthLayoutHeader actionComponent={<AddDoctorModal />} />
+        <AuthLayoutHeader
+          actionComponent={<AddDoctorModal fetchDoctors={fetchDoctors} />}
+        />
         <ProgressTag status={ProgressStatus.COMPLETED} />
       </Flex>
 

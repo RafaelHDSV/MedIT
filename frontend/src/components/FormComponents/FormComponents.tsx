@@ -71,7 +71,11 @@ function InputText({
   )
 }
 
-function InputDate() {
+interface IInputDateProps {
+  onChange?: (date: Dayjs | [Dayjs | null, Dayjs | null] | null) => void
+}
+
+function InputDate({ onChange }: IInputDateProps) {
   const [value, setValue] = useState<
     Dayjs | [Dayjs | null, Dayjs | null] | null
   >(null)
@@ -100,6 +104,7 @@ function InputDate() {
       onDateChange={(date: Dayjs | [Dayjs | null, Dayjs | null] | null) => {
         if (!date) return
         setValue(date)
+        if (onChange) onChange(date)
       }}
     />
   )

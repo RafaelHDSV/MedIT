@@ -1,3 +1,4 @@
+import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import {
   FormItem,
@@ -9,29 +10,50 @@ import {
   DoctorSpecializationsLabels,
   type DoctorFormValues
 } from '@/interfaces/IDoctor'
+import type { IError } from '@/interfaces/IError'
 import { UserGendersLabels } from '@/interfaces/IUser'
 import formStyles from '@/styles/Form.module.scss'
+import masks from '@/utils/masks'
 import validators, { birthDateValidator } from '@/utils/validators'
-import { Form, Input, Modal, Select } from 'antd'
+import { Form, Input, message, Modal, Select } from 'antd'
 import { useForm } from 'antd/es/form/Form'
+import axios, { AxiosError } from 'axios'
 import { useState } from 'react'
 import styles from './AddDoctorModal.module.scss'
 
-function AddDoctorModal() {
+function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
   const [form] = useForm()
+  const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
   const handleOpen = () => setIsModalOpen(true)
   const handleClose = () => {
     setIsModalOpen(false)
     form.resetFields()
   }
+
   const inputHeight = '2rem'
+
   const specialization = Form.useWatch('specialization', form)
   const isOtherSpecialization =
     specialization && specialization === DoctorSpecializations.OTHER
 
-  function onFinish(values: DoctorFormValues) {
-    console.log('Criar médico', values)
+  async function onFinish(values: DoctorFormValues) {
+    try {
+      setLoading(true)
+
+      await api.post('/doctors', { ...values, crm: masks(values.crm, 'crm') })
+      message.success('Médico adicionado com sucesso')
+      handleClose()
+      fetchDoctors()
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(error.response?.data?.message || 'Erro ao adicionar médico')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -94,7 +116,9 @@ function AddDoctorModal() {
                 }
               ]}
             >
-              <InputDate />
+              <InputDate
+                onChange={(date) => form.setFieldsValue({ birthDate: date })}
+              />
             </FormItem>
 
             <FormItem
@@ -201,13 +225,17 @@ function AddDoctorModal() {
 
           <footer className={styles.footer}>
             <FormItem>
-              <Button htmlType='submit'>Adicionar médico</Button>
+              <Button htmlType='submit' loading={loading}>
+                Adicionar médico
+              </Button>
             </FormItem>
           </footer>
         </Form>
       </Modal>
 
-      <Button onClick={handleOpen}>Adicionar médico</Button>
+      <Button loading={loading} onClick={handleOpen}>
+        Adicionar médico
+      </Button>
     </>
   )
 }

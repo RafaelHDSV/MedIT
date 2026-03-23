@@ -3,7 +3,7 @@ import { DoctorSpecializations, IDoctor } from '../interfaces/IDoctor.js'
 import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
 
 const DoctorSchema = new mongoose.Schema<IDoctor>({
-  crm: { type: String, required: true },
+  crm: { type: String, required: true, unique: true },
   specialization: {
     type: String,
     required: true,
