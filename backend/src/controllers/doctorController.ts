@@ -151,3 +151,26 @@ export const editDoctor = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const deleteDoctor = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    const doctor = await Doctor.findById(id)
+    if (!doctor) {
+      return res.status(404).json({ message: 'Médico não encontrado' })
+    }
+
+    await doctor.deleteOne()
+
+    return res.status(200).json({
+      message: 'Médico deletado com sucesso'
+    })
+  } catch (error: any) {
+    return res.status(500).json({
+      message: 'Erro ao deletar médico',
+      error: error.message
+    })
+  }
+}
+

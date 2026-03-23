@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
@@ -14,7 +15,7 @@ import {
   ChartBarIcon,
   DatabaseIcon
 } from '@phosphor-icons/react'
-import { message } from 'antd'
+import { Flex, message } from 'antd'
 import axios, { AxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
@@ -69,11 +70,15 @@ function DoctorDetails() {
     <section>
       <AuthLayoutHeader
         actionComponent={
-          <DoctorModal
-            doctor={doctor}
-            buttonText='Editar médico'
-            fetchDoctorDetails={fetchDoctorDetails}
-          />
+          <Flex gap='1rem'>
+            <DoctorModal
+              doctor={doctor}
+              buttonText='Editar médico'
+              fetchDoctorDetails={fetchDoctorDetails}
+            />
+
+            <DeleteModal buttonText='Deletar médico' />
+          </Flex>
         }
       />
 
