@@ -181,7 +181,6 @@ export default function MultiDatepicker({
           onChange={handleSingleChange}
           format={formatDatePicker}
           showWeek={type === 'week' ? false : undefined}
-          lang='pt-br'
         />
       )}
     </MultiDatepickerContainer>
