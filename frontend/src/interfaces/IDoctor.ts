@@ -61,7 +61,8 @@ export interface DoctorFormValues {
   birthDate: Dayjs | null
   gender: UserLevels
   email: string
-  password: string
+  currentPassword?: string
+  newPassword?: string
   cellphone: string
   crm: string
   specialization: DoctorSpecializations
