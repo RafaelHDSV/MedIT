@@ -6,8 +6,8 @@ import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import styles from '../../components/FormComponents/FormComponents.module.scss'
 import { useAuth } from '../../hooks/useAuth'
-import styles from '../../styles/FormComponent.module.scss'
 
 export interface LoginPayload {
   email?: string
