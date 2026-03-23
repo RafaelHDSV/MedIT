@@ -8,8 +8,10 @@ import {
   type InputProps,
   type InputRef
 } from 'antd'
+import dayjs, { Dayjs } from 'dayjs'
 import { useState, type RefObject } from 'react'
 import styles from '../../styles/Form.module.scss'
+import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
 
 interface IFormItemProps extends FormItemProps {
   children: React.ReactNode
@@ -69,22 +71,36 @@ function InputText({
   )
 }
 
-function InputDate({ value, onChange, ...rest }: Omit<IInputProps, 'mask'>) {
-  const [valueMask, setValueMask] = useState(value)
+function InputDate() {
+  const [value, setValue] = useState<
+    Dayjs | [Dayjs | null, Dayjs | null] | null
+  >(null)
+  const [filterDateType, setFilterDateType] = useState<
+    'date' | 'week' | 'month' | 'year' | 'range'
+  >('date')
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    const maskedValue = masks(value, 'date')
-    setValueMask(maskedValue)
-    if (onChange) return onChange(event)
-    return event
+  const handleDateTypeChange = (
+    type: 'date' | 'week' | 'month' | 'year' | 'range'
+  ) => {
+    setFilterDateType(type)
   }
 
   return (
-    <AntInput
-      {...rest}
-      value={masks(value, 'date') || valueMask}
-      onChange={handleChange}
+    <MultiDatepicker
+      type={filterDateType}
+      defaultPickerType={filterDateType}
+      options={['date']}
+      onDateTypeChange={handleDateTypeChange}
+      value={
+        filterDateType === 'range'
+          ? (value as [Dayjs | null, Dayjs | null] | null)
+          : (value as Dayjs | null)
+      }
+      defaultValue={dayjs()}
+      onDateChange={(date: Dayjs | [Dayjs | null, Dayjs | null] | null) => {
+        if (!date) return
+        setValue(date)
+      }}
     />
   )
 }

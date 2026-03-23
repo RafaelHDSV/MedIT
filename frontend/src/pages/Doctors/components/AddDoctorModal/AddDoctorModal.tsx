@@ -94,7 +94,7 @@ function AddDoctorModal() {
                 }
               ]}
             >
-              <InputDate placeholder='Selecione sua data de nascimento' />
+              <InputDate />
             </FormItem>
 
             <FormItem
