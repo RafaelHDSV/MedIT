@@ -12,7 +12,7 @@ import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import styles from '../../styles/Form.module.scss'
+import styles from '../../styles/FormComponent.module.scss'
 
 interface ISignUpFormErrors {
   name?: string

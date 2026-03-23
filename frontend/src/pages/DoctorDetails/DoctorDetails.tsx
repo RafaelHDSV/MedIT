@@ -6,6 +6,7 @@ import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
 import { DoctorSpecializationsLabels, type IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
+import capitalize from '@/utils/capitalize'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
@@ -95,7 +96,7 @@ function DoctorDetails() {
                 doctor?.specialization &&
                 DoctorSpecializationsLabels[doctor.specialization]
                   ? DoctorSpecializationsLabels[doctor.specialization]
-                  : doctor?.specialization
+                  : capitalize(doctor?.specialization)
             },
             { label: 'CRM', value: doctor?.crm }
           ]}

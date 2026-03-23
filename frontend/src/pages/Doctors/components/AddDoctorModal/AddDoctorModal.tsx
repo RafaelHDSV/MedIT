@@ -3,6 +3,7 @@ import Button from '@/components/Button/Button'
 import {
   FormItem,
   InputDate,
+  InputSelect,
   InputText
 } from '@/components/FormComponents/FormComponents'
 import {
@@ -12,13 +13,13 @@ import {
 } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import { UserGendersLabels } from '@/interfaces/IUser'
-import formStyles from '@/styles/Form.module.scss'
 import masks from '@/utils/masks'
 import validators, { birthDateValidator } from '@/utils/validators'
-import { Form, Input, message, Modal, Select } from 'antd'
+import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import axios, { AxiosError } from 'axios'
 import { useState } from 'react'
+import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
 import styles from './AddDoctorModal.module.scss'
 
 function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
@@ -32,7 +33,7 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
     form.resetFields()
   }
 
-  const inputHeight = '2rem'
+  const inputHeight = '2.5rem'
 
   const specialization = Form.useWatch('specialization', form)
   const isOtherSpecialization =
@@ -117,6 +118,7 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
               ]}
             >
               <InputDate
+                inputHeight={inputHeight}
                 onChange={(date) => form.setFieldsValue({ birthDate: date })}
               />
             </FormItem>
@@ -127,7 +129,8 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu gênero' }]}
             >
-              <Select
+              <InputSelect
+                inputHeight={inputHeight}
                 placeholder='Selecione seu gênero'
                 options={Object.entries(UserGendersLabels).map(
                   ([key, value]) => ({
@@ -198,7 +201,8 @@ function AddDoctorModal({ fetchDoctors }: { fetchDoctors: () => void }) {
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe sua especialidade' }]}
             >
-              <Select
+              <InputSelect
+                inputHeight={inputHeight}
                 placeholder='Selecione sua especialidade'
                 options={Object.entries(DoctorSpecializationsLabels).map(
                   ([key, value]) => ({
