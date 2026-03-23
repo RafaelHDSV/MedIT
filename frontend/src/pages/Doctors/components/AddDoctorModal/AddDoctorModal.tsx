@@ -58,7 +58,7 @@ function AddDoctorModal() {
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu nome completo' }]}
             >
-              <Input />
+              <Input placeholder='Digite seu nome completo' />
             </FormItem>
 
             <FormItem
@@ -78,7 +78,7 @@ function AddDoctorModal() {
                 }
               ]}
             >
-              <InputText mask='cpf' />
+              <InputText mask='cpf' placeholder='Digite seu CPF' />
             </FormItem>
 
             <FormItem
@@ -94,7 +94,7 @@ function AddDoctorModal() {
                 }
               ]}
             >
-              <InputDate />
+              <InputDate placeholder='Selecione sua data de nascimento' />
             </FormItem>
 
             <FormItem
@@ -104,6 +104,7 @@ function AddDoctorModal() {
               rules={[{ required: true, message: 'Informe seu gênero' }]}
             >
               <Select
+                placeholder='Selecione seu gênero'
                 options={Object.entries(UserGendersLabels).map(
                   ([key, value]) => ({
                     label: value,
@@ -130,7 +131,7 @@ function AddDoctorModal() {
                 }
               ]}
             >
-              <Input />
+              <Input placeholder='Digite seu email' />
             </FormItem>
 
             <FormItem
@@ -142,7 +143,7 @@ function AddDoctorModal() {
                 { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
               ]}
             >
-              <Input.Password />
+              <Input.Password placeholder='Digite sua senha' />
             </FormItem>
 
             <FormItem
@@ -151,7 +152,7 @@ function AddDoctorModal() {
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu telefone' }]}
             >
-              <InputText mask='cellphone' />
+              <InputText mask='cellphone' placeholder='Digite seu telefone' />
             </FormItem>
 
             <FormItem
@@ -160,7 +161,11 @@ function AddDoctorModal() {
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu CRM' }]}
             >
-              <InputText mask='crm' maxLength={9} />
+              <InputText
+                mask='crm'
+                maxLength={9}
+                placeholder='Digite seu CRM'
+              />
             </FormItem>
 
             <FormItem
@@ -170,6 +175,7 @@ function AddDoctorModal() {
               rules={[{ required: true, message: 'Informe sua especialidade' }]}
             >
               <Select
+                placeholder='Selecione sua especialidade'
                 options={Object.entries(DoctorSpecializationsLabels).map(
                   ([key, value]) => ({
                     label: value,
@@ -188,7 +194,7 @@ function AddDoctorModal() {
                   { required: true, message: 'Informe sua especialidade' }
                 ]}
               >
-                <Input />
+                <Input placeholder='Digite sua especialidade não mapeada' />
               </FormItem>
             )}
           </div>
