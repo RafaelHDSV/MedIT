@@ -1,5 +1,5 @@
 import RiskTag from '@/components/RiskTag/RiskTag'
-import type { ITriages, TriagesRisk } from '@/interfaces/ITriages'
+import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
 import { ROUTES } from '@/routes/constants'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import type { ColumnsType } from 'antd/es/table'
@@ -19,7 +19,7 @@ export function useTriagesColumns() {
     [navigate]
   )
 
-  const columns: ColumnsType<ITriages> = useMemo(
+  const columns: ColumnsType<IAttendance> = useMemo(
     () => [
       {
         title: 'ID',
@@ -66,7 +66,7 @@ export function useTriagesColumns() {
         title: 'Risco',
         dataIndex: 'risk',
         key: 'risk',
-        render: (risk: string) => <RiskTag risk={risk as TriagesRisk} />
+        render: (risk: string) => <RiskTag risk={risk as AttendanceRisk} />
       },
       {
         title: 'Criado em',
