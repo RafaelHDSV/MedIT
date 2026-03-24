@@ -1,9 +1,8 @@
 import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
-import InputText from '@/components/InputText/InputText'
+import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
-import { UserLevels } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
@@ -12,7 +11,7 @@ import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import styles from './SignUp.module.scss'
+import styles from '../../components/FormComponents/FormComponents.module.scss'
 
 interface ISignUpFormErrors {
   name?: string
@@ -35,10 +34,9 @@ function SignUp() {
     try {
       const values = await formRef.validateFields()
 
-      await api.post('/auth/register', {
+      await api.post('/patients', {
         ...values,
-        cpf: values.cpf.replace(/\D/g, ''),
-        level: UserLevels.PATIENT
+        cpf: values.cpf.replace(/\D/g, '')
       })
 
       message.success('Usuário criado com sucesso!')
@@ -54,13 +52,7 @@ function SignUp() {
       const error = err as AxiosError<IError>
 
       if (error.response?.data?.errors) {
-        const formatted: Record<string, string> = {}
-
-        Object.entries(error.response.data.errors).forEach(([key, val]) => {
-          formatted[key] = val.message
-        })
-
-        setFieldErrors(formatted)
+        setFieldErrors(error.response?.data?.errors)
         message.error('Corrija os campos destacados.')
       } else {
         message.error(
@@ -79,7 +71,7 @@ function SignUp() {
       layout='vertical'
       onFinish={handleRegister}
     >
-      <Form.Item
+      <FormItem
         label='Nome'
         name='name'
         className={styles.input}
@@ -88,16 +80,19 @@ function SignUp() {
         rules={[{ required: true, message: 'Campo obrigatório' }]}
       >
         <Input placeholder='Digite seu nome' type='text' />
-      </Form.Item>
+      </FormItem>
 
-      <Form.Item
+      <FormItem
         label='CPF'
         name='cpf'
         className={styles.input}
+        validateStatus={fieldErrors.cpf ? 'error' : ''}
+        help={fieldErrors.cpf}
         rules={[
           { required: true, message: 'Informe seu CPF' },
           {
             validator(_, value) {
+              if (!value) return Promise.resolve()
               const error = validators(value, 'validCpf')
               return error
                 ? Promise.resolve()
@@ -107,16 +102,19 @@ function SignUp() {
         ]}
       >
         <InputText mask='cpf' placeholder='Digite seu CPF' />
-      </Form.Item>
+      </FormItem>
 
-      <Form.Item
+      <FormItem
         label='Email'
         name='email'
         className={styles.input}
+        validateStatus={fieldErrors.email ? 'error' : ''}
+        help={fieldErrors.email}
         rules={[
           { required: true, message: 'Informe seu email' },
           {
             validator(_, value) {
+              if (!value) return Promise.resolve()
               const error = validators(value, 'email')
               return error
                 ? Promise.resolve()
@@ -126,9 +124,9 @@ function SignUp() {
         ]}
       >
         <Input placeholder='Digite seu email' type='email' />
-      </Form.Item>
+      </FormItem>
 
-      <Form.Item
+      <FormItem
         label='Senha'
         name='password'
         className={styles.input}
@@ -140,14 +138,14 @@ function SignUp() {
         ]}
       >
         <Input.Password placeholder='Digite sua senha' />
-      </Form.Item>
+      </FormItem>
 
-      <Flex vertical>
+      <Flex vertical className={styles.actions}>
         <Button htmlType='submit' loading={loading}>
           Cadastrar
         </Button>
 
-        <Link className={styles.signUpLink} to={ROUTES.SIGNIN.path}>
+        <Link className={styles.link} to={ROUTES.SIGNIN.path}>
           <p>Já possui uma conta? Entrar</p>
         </Link>
       </Flex>

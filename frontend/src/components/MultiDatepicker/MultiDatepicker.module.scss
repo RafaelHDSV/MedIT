@@ -1,0 +1,56 @@
+.multi-datepicker {
+  --input-border-color: #d9d9d9;
+  --input-bg: #fff;
+  --border-radius-base: 4px;
+  --height-base: 32px;
+  --primary-color: #1890ff;
+
+  display: flex;
+
+  &__button {
+    padding: 0 11px !important;
+    border: 1px solid var(--input-border-color);
+
+    border-right: none;
+    background: var(--input-bg) !important;
+    font-size: 1.3em;
+    border-radius: var(--border-radius-base) 0 0 var(--border-radius-base);
+    flex-grow: 1;
+    height: calc(var(--height-base) + 0.15px);
+    color: var(--primary-color);
+    cursor: pointer;
+    box-shadow: none;
+    &:hover,
+    &:focus {
+      border-color: var(--primary-color);
+    }
+    .anticon {
+      display: block;
+      width: 22.09px;
+      height: 22.09px;
+      transition:
+        transform 0.15s ease-in,
+        transform 0.25s ease-in !important;
+      transform: rotate(0);
+    }
+    &.ant-dropdown-open {
+      .anticon {
+        transform: rotate(70deg);
+      }
+    }
+  }
+
+  .ant-picker-input {
+    padding-left: 10px;
+  }
+
+  .ant-picker,
+  .ant-input-affix-wrapper {
+    border-left: none;
+    border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0;
+    padding-left: 0;
+    width: 210px !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+}

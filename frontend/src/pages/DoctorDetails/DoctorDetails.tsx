@@ -1,11 +1,13 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import type { IAttendance } from '@/interfaces/IAttendance'
+import { DoctorSpecializationsLabels, type IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
-import { type IDoctor } from '@/interfaces/IUser'
+import capitalize from '@/utils/capitalize'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
@@ -13,11 +15,12 @@ import {
   ChartBarIcon,
   DatabaseIcon
 } from '@phosphor-icons/react'
-import { message } from 'antd'
+import { Flex, message } from 'antd'
 import axios, { AxiosError } from 'axios'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import DoctorModal from '../Doctors/components/DoctorModal/DoctorModal'
 import styles from './DoctorDetails.module.scss'
 
 const mockedLastAttendance = {
@@ -40,32 +43,45 @@ function DoctorDetails() {
   const [doctor, setDoctor] = useState<IDoctor | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function fetchDoctorDetails() {
-      setLoading(true)
+  const fetchDoctorDetails = useCallback(async () => {
+    setLoading(true)
 
-      try {
-        const response = await api.get(`/users/${params.id}`)
-        const data = response.data
-        setDoctor(data)
-      } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao carregar detalhes do médico'
-        )
-      } finally {
-        setLoading(false)
-      }
+    try {
+      const response = await api.get(`/users/${params.id}`)
+      const data = response.data
+      setDoctor(data)
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(
+        error.response?.data?.message || 'Erro ao carregar detalhes do médico'
+      )
+    } finally {
+      setLoading(false)
     }
-
-    fetchDoctorDetails()
   }, [params.id])
+
+  useEffect(() => {
+    fetchDoctorDetails()
+  }, [fetchDoctorDetails])
 
   return (
     <section>
-      <AuthLayoutHeader />
+      <AuthLayoutHeader
+        actionComponent={
+          <Flex gap='1rem'>
+            <DoctorModal
+              doctor={doctor}
+              buttonText='Editar médico'
+              fetchDoctorDetails={fetchDoctorDetails}
+            />
+
+            <DeleteModal buttonText='Deletar médico' />
+          </Flex>
+        }
+      />
+
       <UserDetailsHeader
         name={doctor?.name}
         age={getAgeByBirthDate(doctor?.birthDate)}
@@ -91,7 +107,11 @@ function DoctorDetails() {
             },
             {
               label: 'Especialidade',
-              value: doctor?.specialization
+              value:
+                doctor?.specialization &&
+                DoctorSpecializationsLabels[doctor.specialization]
+                  ? DoctorSpecializationsLabels[doctor.specialization]
+                  : capitalize(doctor?.specialization)
             },
             { label: 'CRM', value: doctor?.crm }
           ]}

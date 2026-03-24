@@ -42,29 +42,26 @@
   );
   text-align: center;
   color: var(--white);
+  overflow: hidden;
 
-  img {
+  .imageItem {
     max-height: 30rem;
-    height: auto;
-    animation: slide 1.5s ease-in-out infinite alternate;
+    transition:
+      opacity 0.3s ease,
+      transform 0.4s ease;
+    opacity: 1;
+  }
+
+  .fade {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
   }
 
   .typewriter {
     font-size: 26px;
     font-weight: 500;
-    max-width: 22.5rem;
+    max-width: 25rem;
+    height: 3rem;
     margin: 0 auto;
-  }
-}
-
-@keyframes slide {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-1rem);
-  }
-  100% {
-    transform: translateY(0);
   }
 }

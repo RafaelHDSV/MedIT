@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 const isEmail = (value: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
   return emailRegex.test(value)
@@ -72,6 +74,25 @@ function validators(
     default:
       return true
   }
+}
+
+export const birthDateValidator = (value?: string | Date): Promise<void> => {
+  if (!value) return Promise.resolve()
+
+  const today = dayjs()
+  const selectedDate = value instanceof Date ? dayjs(value) : dayjs(value)
+
+  if (selectedDate.isAfter(today)) {
+    return Promise.reject(new Error('A data não pode ser no futuro'))
+  }
+
+  const age = today.year() - selectedDate.year()
+
+  if (age < 0 || age > 120) {
+    return Promise.reject(new Error('Data de nascimento inválida'))
+  }
+
+  return Promise.resolve()
 }
 
 export default validators

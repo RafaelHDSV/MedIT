@@ -3,63 +3,90 @@ import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
+import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
-import type { IDoctor } from '@/interfaces/IUser'
 import styles from '@/styles/UserTable.module.scss'
 import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import DoctorModal from './components/DoctorModal/DoctorModal'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
 function Doctors() {
-  const columns = useDoctorsColumns()
   const [doctors, setDoctors] = useState<IDoctor[]>([])
   const [loading, setLoading] = useState(false)
+  const [editingDoctor, setEditingDoctor] = useState<IDoctor | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const columns = useDoctorsColumns({ setEditingDoctor, setEditModalOpen })
+
+  async function fetchDoctors() {
+    setLoading(true)
+
+    try {
+      const response = await api.get('/doctors')
+      const data = response.data
+      setDoctors(data)
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(
+        error.response?.data?.message ||
+          'Erro ao carregar a listagem de médicos'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    async function fetchDoctors() {
-      setLoading(true)
-
-      try {
-        const response = await api.get('/users/level/doctor')
-        const data = response.data
-        setDoctors(data)
-      } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro ao carregar a listagem de médicos'
-        )
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchDoctors()
   }, [])
 
   return (
-    <div>
-      <Flex gap={16} align='center'>
-        <AuthLayoutHeader />
-        <ProgressTag status={ProgressStatus.COMPLETED} />
-      </Flex>
+    <>
+      {editModalOpen && (
+        <DoctorModal
+          key='edit-doctor-modal'
+          doctor={editingDoctor}
+          buttonText='Salvar alterações'
+          fetchDoctors={() => window.location.reload()}
+          fetchDoctorDetails={undefined}
+        />
+      )}
 
-      <Table
-        className={styles.userTable}
-        rowKey='_id'
-        dataSource={doctors}
-        columns={columns}
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-        size='middle'
-        bordered={false}
-        scroll={{ x: 'max-content' }}
-      />
-    </div>
+      <div className={styles.tableContent}>
+        <Flex vertical className={styles.container}>
+          <Flex gap={16} align='center'>
+            <AuthLayoutHeader
+              actionComponent={
+                <DoctorModal
+                  buttonText='Adicionar médico'
+                  fetchDoctors={fetchDoctors}
+                />
+              }
+            />
+            <ProgressTag status={ProgressStatus.COMPLETED} />
+          </Flex>
+
+          <div className={styles.tableWrapper}>
+            <Table
+              className={styles.userTable}
+              rowKey='_id'
+              dataSource={doctors}
+              columns={columns}
+              tableLayout='fixed'
+              loading={loading}
+              pagination={{ pageSize: 7 }}
+              size='middle'
+              bordered={false}
+              scroll={{ x: 'max-content' }}
+            />
+          </div>
+        </Flex>
+      </div>
+    </>
   )
 }
 

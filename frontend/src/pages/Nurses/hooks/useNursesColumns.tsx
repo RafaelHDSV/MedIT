@@ -1,4 +1,4 @@
-import type { INurse } from '@/interfaces/IUser'
+import type { INurse } from '@/interfaces/INurse'
 import { ROUTES } from '@/routes/constants'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'

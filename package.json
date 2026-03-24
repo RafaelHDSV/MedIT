@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "git pull && concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
+    "dev": "git pull && yarn && concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
     "dev:frontend": "cd frontend && yarn && yarn dev",
     "dev:backend": "cd backend && yarn && yarn dev"
   },

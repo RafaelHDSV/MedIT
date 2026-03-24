@@ -37,6 +37,14 @@ function UserDetailsCard({
     return (
       <section className={styles.card}>
         <Skeleton active title={false} paragraph={{ rows: 1 }} />
+
+        {itens.map((item) => (
+          <Skeleton.Button
+            key={`${item.label}_${item.value}`}
+            className={styles.itemSkeleton}
+            active
+          />
+        ))}
       </section>
     )
   }

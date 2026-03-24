@@ -10,7 +10,9 @@
     "scripts": "tsx src/scripts/runner.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@inquirer/prompts": "^8.3.0",
+    "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",

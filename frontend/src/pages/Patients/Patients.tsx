@@ -4,7 +4,7 @@ import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
-import type { IPatient } from '@/interfaces/IUser'
+import type { IPatient } from '@/interfaces/IPatient'
 import styles from '@/styles/UserTable.module.scss'
 import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'
@@ -22,7 +22,7 @@ function Patients() {
       setLoading(true)
 
       try {
-        const response = await api.get('/users/level/patient')
+        const response = await api.get('/patients')
         const data = response.data
         setPatients(data)
       } catch (err) {
@@ -42,7 +42,7 @@ function Patients() {
   }, [])
 
   return (
-    <div>
+    <div className='h-100'>
       <Flex gap={16} align='center'>
         <AuthLayoutHeader />
         <ProgressTag status={ProgressStatus.COMPLETED} />
@@ -54,7 +54,7 @@ function Patients() {
         dataSource={patients}
         columns={columns}
         loading={loading}
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 9 }}
         size='middle'
         bordered={false}
         scroll={{ x: 'max-content' }}

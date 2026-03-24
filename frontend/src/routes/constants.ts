@@ -66,5 +66,10 @@ export const ROUTES = {
     name: 'Histórico de triagens',
     description: 'Consulte o histórico de triagens registradas.',
     path: '/auth/triages'
+  },
+  TRIAGES_DETAILS: {
+    name: 'Detalhes da triagem',
+    description: 'Visualize e gerencie as informações completas da triagem.',
+    path: '/auth/triages/:id'
   }
 }

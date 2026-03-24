@@ -5,6 +5,8 @@ import ProgressTag, {
 import { useAuth } from '@/hooks/useAuth'
 import { UserLevels } from '@/interfaces/IUser'
 import {
+  BedIcon,
+  BombIcon,
   CheckCircleIcon,
   DoorOpenIcon,
   HourglassIcon,
@@ -25,9 +27,9 @@ function Dashboard() {
           { Icon: DoorOpenIcon, value: '142', label: 'Entradas' },
           { Icon: HourglassIcon, value: '46', label: 'Em atendimento' },
           { Icon: CheckCircleIcon, value: '96', label: 'Atendidos' },
-          // { Icon: BedIcon, value: '52%', label: 'Ocupação' },
-          { Icon: TimerIcon, value: '23min', label: 'Tempo médio' }
-          // { Icon: BombIcon, value: '8', label: 'Risco alto' }
+          { Icon: BedIcon, value: '52%', label: 'Ocupação' },
+          { Icon: TimerIcon, value: '23min', label: 'Tempo médio' },
+          { Icon: BombIcon, value: '8', label: 'Risco alto' }
         ]
       case UserLevels.DOCTOR:
         return [
@@ -72,6 +74,10 @@ function Dashboard() {
         {cardsData.map(({ Icon, value, label }) => (
           <DashboardCard key={label} Icon={Icon} value={value} label={label} />
         ))}
+
+        <div className={styles.attendance}>Atendimentos por hora</div>
+
+        <div className={styles.queue}>Fila de Atendimento</div>
       </div>
     </section>
   )

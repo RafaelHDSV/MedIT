@@ -1,10 +1,11 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import Button from '@/components/Button/Button'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
-import type { INurse } from '@/interfaces/IUser'
+import type { INurse } from '@/interfaces/INurse'
 import styles from '@/styles/UserTable.module.scss'
 import { Flex, message, Table } from 'antd'
 import type { AxiosError } from 'axios'
@@ -22,7 +23,7 @@ function Nurses() {
       setLoading(true)
 
       try {
-        const response = await api.get('/users/level/nurse')
+        const response = await api.get('/nurses')
         const data = response.data
         setNurses(data)
       } catch (err) {
@@ -42,9 +43,11 @@ function Nurses() {
   }, [])
 
   return (
-    <div>
+    <div className='h-100'>
       <Flex gap={16} align='center'>
-        <AuthLayoutHeader />
+        <AuthLayoutHeader
+          actionComponent={<Button>Adicionar enfermeiro</Button>}
+        />
         <ProgressTag status={ProgressStatus.COMPLETED} />
       </Flex>
 
@@ -54,7 +57,7 @@ function Nurses() {
         dataSource={nurses}
         columns={columns}
         loading={loading}
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 9 }}
         size='middle'
         bordered={false}
         scroll={{ x: 'max-content' }}

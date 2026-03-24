@@ -1,0 +1,52 @@
+import { AttendanceRisk, AttendanceRiskLabels } from '@/interfaces/IAttendance'
+import styles from './RiskTag.module.scss'
+
+interface IRiskTagProps {
+  risk: AttendanceRisk
+}
+
+interface IRiskColors {
+  color: string
+  bgColor: string
+}
+
+function RiskTag({ risk }: IRiskTagProps) {
+  const colors: Record<AttendanceRisk, IRiskColors> = {
+    [AttendanceRisk.EMERGENCY]: {
+      color: '#E74C64',
+      bgColor: '#E74C6433'
+    },
+    [AttendanceRisk.VERY_URGENT]: {
+      color: '#E78F4C',
+      bgColor: '#E78F4C33'
+    },
+    [AttendanceRisk.URGENT]: {
+      color: '#F0F326',
+      bgColor: '#F0F32633'
+    },
+    [AttendanceRisk.LESS_URGENT]: {
+      color: '#2ECC71',
+      bgColor: '#2ECC7133'
+    },
+    [AttendanceRisk.NOT_URGENT]: {
+      color: '#2E8FCC',
+      bgColor: '#2E8FCC33'
+    }
+  }
+
+  return (
+    <span
+      className={styles.tag}
+      style={
+        {
+          '--color': colors[risk].color,
+          '--bgColor': colors[risk].bgColor
+        } as React.CSSProperties & Record<string, string>
+      }
+    >
+      {AttendanceRiskLabels[risk]}
+    </span>
+  )
+}
+
+export default RiskTag
