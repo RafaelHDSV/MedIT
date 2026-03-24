@@ -1,8 +1,8 @@
-import { TriagesRisk, TriagesRiskLabels } from '@/interfaces/ITriages'
+import { AttendanceRisk, AttendanceRiskLabels } from '@/interfaces/IAttendance'
 import styles from './RiskTag.module.scss'
 
 interface IRiskTagProps {
-  risk: TriagesRisk
+  risk: AttendanceRisk
 }
 
 interface IRiskColors {
@@ -11,24 +11,24 @@ interface IRiskColors {
 }
 
 function RiskTag({ risk }: IRiskTagProps) {
-  const colors: Record<TriagesRisk, IRiskColors> = {
-    [TriagesRisk.EMERGENCY]: {
+  const colors: Record<AttendanceRisk, IRiskColors> = {
+    [AttendanceRisk.EMERGENCY]: {
       color: '#E74C64',
       bgColor: '#E74C6433'
     },
-    [TriagesRisk.VERY_URGENT]: {
+    [AttendanceRisk.VERY_URGENT]: {
       color: '#E78F4C',
       bgColor: '#E78F4C33'
     },
-    [TriagesRisk.URGENT]: {
+    [AttendanceRisk.URGENT]: {
       color: '#F0F326',
       bgColor: '#F0F32633'
     },
-    [TriagesRisk.LESS_URGENT]: {
+    [AttendanceRisk.LESS_URGENT]: {
       color: '#2ECC71',
       bgColor: '#2ECC7133'
     },
-    [TriagesRisk.NOT_URGENT]: {
+    [AttendanceRisk.NOT_URGENT]: {
       color: '#2E8FCC',
       bgColor: '#2E8FCC33'
     }
@@ -44,7 +44,7 @@ function RiskTag({ risk }: IRiskTagProps) {
         } as React.CSSProperties & Record<string, string>
       }
     >
-      {TriagesRiskLabels[risk]}
+      {AttendanceRiskLabels[risk]}
     </span>
   )
 }

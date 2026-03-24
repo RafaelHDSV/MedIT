@@ -1,22 +1,23 @@
 import RiskTag from '@/components/RiskTag/RiskTag'
 import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
-import { ROUTES } from '@/routes/constants'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 
-export function useTriagesColumns() {
-  const navigate = useNavigate()
+export function useAttendancesColumns() {
+  // const navigate = useNavigate()
 
+  // TODO: Implementar navegação para detalhes do atendimento
   const handleNavigateToDetails = useCallback(
     (id: ObjectId | undefined) => {
       if (!id) return
-      navigate(ROUTES.TRIAGES_DETAILS.path.replace(':id', id.toString()))
+      // navigate(ROUTES.ATTENDANCES_DETAILS.path.replace(':id', id.toString()))
     },
-    [navigate]
+    [
+      // navigate
+    ]
   )
 
   const columns: ColumnsType<IAttendance> = useMemo(
@@ -57,7 +58,7 @@ export function useTriagesColumns() {
         key: 'complaint'
       },
       {
-        title: 'Triado em',
+        title: 'Atendido em',
         dataIndex: 'date',
         key: 'date',
         render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
@@ -67,6 +68,11 @@ export function useTriagesColumns() {
         dataIndex: 'risk',
         key: 'risk',
         render: (risk: string) => <RiskTag risk={risk as AttendanceRisk} />
+      },
+      {
+        title: 'Diagnóstico',
+        dataIndex: 'diagnosis',
+        key: 'diagnosis'
       },
       {
         title: 'Criado em',
