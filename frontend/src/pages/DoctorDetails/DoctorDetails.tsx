@@ -4,7 +4,7 @@ import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
-import type { IAttendance } from '@/interfaces/IAttendance'
+import { AttendanceRisk, type IAttendance } from '@/interfaces/IAttendance'
 import { DoctorSpecializationsLabels, type IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import capitalize from '@/utils/capitalize'
@@ -32,10 +32,38 @@ const mockedLastAttendance = {
 }
 
 const mockedAttendanceRecords: IAttendance[] = [
-  { type: 'Consulta', description: 'Gripe', date: '2025-12-01' },
-  { type: 'Emergência', description: 'Entorse', date: '2024-08-11' },
-  { type: 'Rotina', description: 'Check-up', date: '2024-06-15' },
-  { type: 'Consulta', description: 'Alergia', date: '2024-03-22' }
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Gripe',
+    diagnosis: 'Consulta',
+    date: new Date('2025-12-01'),
+    risk: AttendanceRisk.NOT_URGENT
+  },
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Entorse',
+    diagnosis: 'Emergência',
+    date: new Date('2024-08-11'),
+    risk: AttendanceRisk.EMERGENCY
+  },
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Check-up',
+    diagnosis: 'Rotina',
+    date: new Date('2024-06-15'),
+    risk: AttendanceRisk.LESS_URGENT
+  },
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Alergia',
+    diagnosis: 'Consulta',
+    date: new Date('2024-03-22'),
+    risk: AttendanceRisk.URGENT
+  }
 ]
 
 function DoctorDetails() {
@@ -143,7 +171,7 @@ function DoctorDetails() {
           title='Histórico de Atendimentos'
           itens={mockedAttendanceRecords.map((item) => ({
             label: dayjs(item.date).format('DD/MM/YYYY'),
-            value: `${item.type} - ${item.description}`
+            value: `${item.diagnosis ?? ''} - ${item.complaint}`
           }))}
           loading={loading}
         />

@@ -54,6 +54,7 @@ const mockedAttendanceRecords: IAttendance[] = [
     risk: 'urgent'
   }
 ]
+
 function PatientsDetails() {
   return (
     <section className={styles.container}>
