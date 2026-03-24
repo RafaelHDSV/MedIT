@@ -13,3 +13,9 @@
 .mt-1 {
   margin-top: 1rem !important;
 }
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
