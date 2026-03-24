@@ -32,6 +32,21 @@ interface IDoctorModalProps {
   fetchDoctorDetails?: () => void
 }
 
+interface IDoctorFormErrors {
+  name?: string
+  cpf?: string
+  birthDate?: string
+  gender?: string
+  email?: string
+  currentPassword?: string
+  newPassword?: string
+  password?: string
+  cellphone?: string
+  crm?: string
+  specialization?: string
+  otherSpecialization?: string
+}
+
 function DoctorModal({
   doctor,
   buttonText,
@@ -41,6 +56,7 @@ function DoctorModal({
   const [form] = useForm()
   const params = useParams<{ id: string }>()
   const [loading, setLoading] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<IDoctorFormErrors>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
   const isEditMode = Boolean(doctor)
 
@@ -84,8 +100,20 @@ function DoctorModal({
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>
-      console.error(error)
-      message.error(error.response?.data?.message || 'Erro ao adicionar médico')
+
+      if (error.response?.data?.errors) {
+        setFieldErrors(error.response?.data?.errors)
+        console.error(error)
+        message.error(
+          error.response?.data?.message ||
+            'Erro nas validações ao adicionar médico'
+        )
+      } else {
+        console.error(error)
+        message.error(
+          error.response?.data?.message || 'Erro ao adicionar médico'
+        )
+      }
     } finally {
       setLoading(false)
     }
@@ -128,6 +156,8 @@ function DoctorModal({
               name='name'
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu nome completo' }]}
+              validateStatus={fieldErrors.name ? 'error' : undefined}
+              help={fieldErrors.name}
             >
               <Input placeholder='Digite seu nome completo' />
             </FormItem>
@@ -148,6 +178,8 @@ function DoctorModal({
                   }
                 }
               ]}
+              validateStatus={fieldErrors.cpf ? 'error' : undefined}
+              help={fieldErrors.cpf}
             >
               <InputText mask='cpf' placeholder='Digite seu CPF' />
             </FormItem>
@@ -164,6 +196,8 @@ function DoctorModal({
                   }
                 }
               ]}
+              validateStatus={fieldErrors.birthDate ? 'error' : undefined}
+              help={fieldErrors.birthDate}
             >
               <InputDate
                 value={form.getFieldValue('birthDate')}
@@ -177,6 +211,8 @@ function DoctorModal({
               name='gender'
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu gênero' }]}
+              validateStatus={fieldErrors.gender ? 'error' : undefined}
+              help={fieldErrors.gender}
             >
               <InputSelect
                 inputHeight={inputHeight}
@@ -206,37 +242,65 @@ function DoctorModal({
                   }
                 }
               ]}
+              validateStatus={fieldErrors.email ? 'error' : undefined}
+              help={fieldErrors.email}
             >
               <Input placeholder='Digite seu email' />
             </FormItem>
 
-            <FormItem
-              label='Senha atual'
-              name='currentPassword'
-              inputHeight={inputHeight}
-              rules={[
-                { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
-              ]}
-            >
-              <Input.Password placeholder='Digite sua senha atual' />
-            </FormItem>
+            {isEditMode ? (
+              <>
+                <FormItem
+                  label='Senha atual'
+                  name='currentPassword'
+                  inputHeight={inputHeight}
+                  rules={[
+                    { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+                  ]}
+                  validateStatus={
+                    fieldErrors.currentPassword ? 'error' : undefined
+                  }
+                  help={fieldErrors.currentPassword}
+                >
+                  <Input.Password placeholder='Digite sua senha atual' />
+                </FormItem>
 
-            <FormItem
-              label='Nova senha'
-              name='newPassword'
-              inputHeight={inputHeight}
-              rules={[
-                { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
-              ]}
-            >
-              <Input.Password placeholder='Digite sua nova senha (opcional)' />
-            </FormItem>
+                <FormItem
+                  label='Nova senha'
+                  name='newPassword'
+                  inputHeight={inputHeight}
+                  rules={[
+                    { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+                  ]}
+                  validateStatus={fieldErrors.newPassword ? 'error' : undefined}
+                  help={fieldErrors.newPassword}
+                >
+                  <Input.Password placeholder='Digite sua nova senha (opcional)' />
+                </FormItem>
+              </>
+            ) : (
+              <FormItem
+                label='Senha'
+                name='password'
+                inputHeight={inputHeight}
+                rules={[
+                  { required: true, message: 'Informe sua senha' },
+                  { min: 6, message: 'Senha deve ter no mínimo 6 caracteres' }
+                ]}
+                validateStatus={fieldErrors.password ? 'error' : undefined}
+                help={fieldErrors.password}
+              >
+                <Input.Password placeholder='Digite sua senha' />
+              </FormItem>
+            )}
 
             <FormItem
               label='Telefone'
               name='cellphone'
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu telefone' }]}
+              validateStatus={fieldErrors.cellphone ? 'error' : undefined}
+              help={fieldErrors.cellphone}
             >
               <InputText mask='cellphone' placeholder='Digite seu telefone' />
             </FormItem>
@@ -246,6 +310,8 @@ function DoctorModal({
               name='crm'
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe seu CRM' }]}
+              validateStatus={fieldErrors.crm ? 'error' : undefined}
+              help={fieldErrors.crm}
             >
               <InputText
                 mask='crm'
@@ -259,6 +325,8 @@ function DoctorModal({
               name='specialization'
               inputHeight={inputHeight}
               rules={[{ required: true, message: 'Informe sua especialidade' }]}
+              validateStatus={fieldErrors.specialization ? 'error' : undefined}
+              help={fieldErrors.specialization}
             >
               <InputSelect
                 inputHeight={inputHeight}
@@ -280,6 +348,10 @@ function DoctorModal({
                 rules={[
                   { required: true, message: 'Informe sua especialidade' }
                 ]}
+                validateStatus={
+                  fieldErrors.otherSpecialization ? 'error' : undefined
+                }
+                help={fieldErrors.otherSpecialization}
               >
                 <Input placeholder='Digite sua especialidade não mapeada' />
               </FormItem>

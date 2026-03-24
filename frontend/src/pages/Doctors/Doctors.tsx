@@ -14,9 +14,11 @@ import DoctorModal from './components/DoctorModal/DoctorModal'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
 function Doctors() {
-  const columns = useDoctorsColumns()
   const [doctors, setDoctors] = useState<IDoctor[]>([])
   const [loading, setLoading] = useState(false)
+  const [editingDoctor, setEditingDoctor] = useState<IDoctor | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const columns = useDoctorsColumns({ setEditingDoctor, setEditModalOpen })
 
   async function fetchDoctors() {
     setLoading(true)
@@ -43,31 +45,48 @@ function Doctors() {
   }, [])
 
   return (
-    <div className='h-100'>
-      <Flex gap={16} align='center'>
-        <AuthLayoutHeader
-          actionComponent={
-            <DoctorModal
-              buttonText='Adicionar médico'
-              fetchDoctors={fetchDoctors}
-            />
-          }
+    <>
+      {editModalOpen && (
+        <DoctorModal
+          key='edit-doctor-modal'
+          doctor={editingDoctor}
+          buttonText='Salvar alterações'
+          fetchDoctors={() => window.location.reload()}
+          fetchDoctorDetails={undefined}
         />
-        <ProgressTag status={ProgressStatus.COMPLETED} />
-      </Flex>
+      )}
 
-      <Table
-        className={styles.userTable}
-        rowKey='_id'
-        dataSource={doctors}
-        columns={columns}
-        loading={loading}
-        pagination={{ pageSize: 9 }}
-        size='middle'
-        bordered={false}
-        scroll={{ x: 'max-content' }}
-      />
-    </div>
+      <div className={styles.tableContent}>
+        <Flex vertical className={styles.container}>
+          <Flex gap={16} align='center'>
+            <AuthLayoutHeader
+              actionComponent={
+                <DoctorModal
+                  buttonText='Adicionar médico'
+                  fetchDoctors={fetchDoctors}
+                />
+              }
+            />
+            <ProgressTag status={ProgressStatus.COMPLETED} />
+          </Flex>
+
+          <div className={styles.tableWrapper}>
+            <Table
+              className={styles.userTable}
+              rowKey='_id'
+              dataSource={doctors}
+              columns={columns}
+              tableLayout='fixed'
+              loading={loading}
+              pagination={{ pageSize: 7 }}
+              size='middle'
+              bordered={false}
+              scroll={{ x: 'max-content' }}
+            />
+          </div>
+        </Flex>
+      </div>
+    </>
   )
 }
 

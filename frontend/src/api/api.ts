@@ -28,7 +28,7 @@ api.interceptors.response.use(
 
       const refreshToken = localStorage.getItem('refreshToken')
       if (!refreshToken) {
-        window.location.href = '/signin'
+        window.location.href = '/'
         return Promise.reject(error)
       }
 
@@ -47,7 +47,7 @@ api.interceptors.response.use(
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
         localStorage.removeItem('user')
-        window.location.href = '/signin'
+        window.location.href = '/'
       }
     }
 
