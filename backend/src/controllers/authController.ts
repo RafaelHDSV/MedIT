@@ -4,31 +4,6 @@ import { JWT_REFRESH_SECRET } from '../globals/Config.js'
 import User from '../models/UserModel.js'
 import generateTokens from '../utils/generateTokens.js'
 
-// /register
-export const register = async (req: Request, res: Response) => {
-  try {
-    const { name, cpf, level, email, password } = req.body
-
-    const userExists = await User.findOne({ email })
-
-    if (userExists) {
-      return res.status(400).json({ message: 'Usuário já existe' })
-    }
-
-    const user = await User.create({
-      name,
-      cpf,
-      level,
-      email,
-      password
-    })
-
-    return res.status(201).json(user)
-  } catch (error) {
-    return res.status(500).json(error)
-  }
-}
-
 // /login
 export const login = async (req: Request, res: Response) => {
   const { email, cpf, password } = req.body

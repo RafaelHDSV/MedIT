@@ -3,7 +3,6 @@ import Button from '@/components/Button/Button'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
-import { UserLevels } from '@/interfaces/IUser'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
@@ -35,10 +34,9 @@ function SignUp() {
     try {
       const values = await formRef.validateFields()
 
-      await api.post('/auth/register', {
+      await api.post('/patients', {
         ...values,
-        cpf: values.cpf.replace(/\D/g, ''),
-        level: UserLevels.PATIENT
+        cpf: values.cpf.replace(/\D/g, '')
       })
 
       message.success('Usuário criado com sucesso!')
@@ -54,13 +52,7 @@ function SignUp() {
       const error = err as AxiosError<IError>
 
       if (error.response?.data?.errors) {
-        const formatted: Record<string, string> = {}
-
-        Object.entries(error.response.data.errors).forEach(([key, val]) => {
-          formatted[key] = val.message
-        })
-
-        setFieldErrors(formatted)
+        setFieldErrors(error.response?.data?.errors)
         message.error('Corrija os campos destacados.')
       } else {
         message.error(
@@ -94,6 +86,8 @@ function SignUp() {
         label='CPF'
         name='cpf'
         className={styles.input}
+        validateStatus={fieldErrors.cpf ? 'error' : ''}
+        help={fieldErrors.cpf}
         rules={[
           { required: true, message: 'Informe seu CPF' },
           {
@@ -114,6 +108,8 @@ function SignUp() {
         label='Email'
         name='email'
         className={styles.input}
+        validateStatus={fieldErrors.email ? 'error' : ''}
+        help={fieldErrors.email}
         rules={[
           { required: true, message: 'Informe seu email' },
           {
