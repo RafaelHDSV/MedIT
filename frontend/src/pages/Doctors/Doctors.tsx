@@ -78,7 +78,7 @@ function Doctors() {
               columns={columns}
               tableLayout='fixed'
               loading={loading}
-              pagination={{ pageSize: 9 }}
+              pagination={{ pageSize: 7 }}
               size='middle'
               bordered={false}
               scroll={{ x: 'max-content' }}

@@ -1,11 +1,18 @@
 import { Button as AntdButton, type ButtonProps } from 'antd'
 import styles from './Button.module.scss'
 
-function Button({ htmlType, loading, children, ...props }: ButtonProps) {
+interface IButtonProps extends ButtonProps {
+  mode?: 'primary' | 'secondary' | 'icon'
+  children: React.ReactNode
+}
+
+function Button({ htmlType, loading, children, mode, ...props }: IButtonProps) {
+  const isIcon = mode === 'icon'
+
   return (
     <AntdButton
-      className={styles.button}
-      type='primary'
+      className={mode ? styles[mode] : styles.button}
+      type={isIcon ? 'text' : 'primary'}
       loading={loading}
       htmlType={htmlType}
       {...props}

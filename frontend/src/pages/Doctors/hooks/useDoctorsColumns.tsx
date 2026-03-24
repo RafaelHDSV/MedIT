@@ -1,4 +1,5 @@
 import { api } from '@/api/api'
+import Button from '@/components/Button/Button'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import { ROUTES } from '@/routes/constants'
@@ -83,11 +84,9 @@ export function useDoctorsColumns({
           <span
             role='button'
             tabIndex={0}
+            className='ellipsis'
             style={{ cursor: 'pointer' }}
             onClick={() => handleNavigateToDetails(record._id)}
-            onKeyDown={(e) =>
-              e.key === 'Enter' && handleNavigateToDetails(record._id)
-            }
           >
             <TooltipColumn text={name} />
           </span>
@@ -159,23 +158,23 @@ export function useDoctorsColumns({
         render: (_, record: IDoctor) => (
           <Flex gap={8}>
             <Tooltip title='Editar'>
-              <div
-                style={{ padding: 0 }}
+              <Button
+                mode='icon'
                 onClick={() => handleEdit(record)}
                 aria-label='Editar médico'
               >
                 <EditOutlined />
-              </div>
+              </Button>
             </Tooltip>
 
             <Tooltip title='Deletar'>
-              <div
-                style={{ padding: 0 }}
+              <Button
+                mode='icon'
                 onClick={() => handleDelete(record)}
                 aria-label='Deletar médico'
               >
                 <DeleteOutlined />
-              </div>
+              </Button>
             </Tooltip>
           </Flex>
         )
