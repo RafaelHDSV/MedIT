@@ -32,6 +32,22 @@
     }
   }
 
+  .itemsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .twoColumns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    row-gap: 1rem;
+    column-gap: 5rem;
+    width: 100%;
+  }
+
   .detailsItem {
     display: flex;
     justify-content: space-between;

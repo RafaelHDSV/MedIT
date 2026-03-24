@@ -1,0 +1,22 @@
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  grid-template-areas:
+    'initialDataCard initialDataCard'
+    'lastAttendanceCard attendanceHistoryCard';
+}
+
+.initialDataCard {
+  grid-area: initialDataCard;
+}
+
+.lastAttendanceCard {
+  grid-area: lastAttendanceCard;
+}
+
+.attendanceHistoryCard {
+  grid-area: attendanceHistoryCard;
+}
