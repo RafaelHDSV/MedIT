@@ -19,6 +19,7 @@ function IAttendances() {
       name: 'John Doe',
       birthDate: new Date('1990-01-01'),
       complaint: 'Náusea',
+      diagnosis: 'Gastroenterite',
       date: new Date(),
       risk: AttendanceRisk.EMERGENCY
     },
@@ -28,6 +29,7 @@ function IAttendances() {
       name: 'Jane Smith',
       birthDate: new Date('1985-05-15'),
       complaint: 'Dor de cabeça',
+      diagnosis: 'Enxaqueca',
       date: new Date(),
       risk: AttendanceRisk.URGENT
     },
@@ -37,6 +39,7 @@ function IAttendances() {
       name: 'Alice Johnson',
       birthDate: new Date('1978-09-30'),
       complaint: 'Dor abdominal',
+      diagnosis: 'Apendicite',
       date: new Date(),
       risk: AttendanceRisk.NOT_URGENT
     },
@@ -46,6 +49,7 @@ function IAttendances() {
       name: 'Bob Brown',
       birthDate: new Date('1992-07-20'),
       complaint: 'Febre',
+      diagnosis: 'Infecção viral',
       date: new Date(),
       risk: AttendanceRisk.LESS_URGENT
     },
@@ -55,6 +59,7 @@ function IAttendances() {
       name: 'Charlie Davis',
       birthDate: new Date('1988-11-10'),
       complaint: 'Tosse',
+      diagnosis: 'Bronquite',
       date: new Date(),
       risk: AttendanceRisk.VERY_URGENT
     },
@@ -64,6 +69,7 @@ function IAttendances() {
       name: 'Emily Wilson',
       birthDate: new Date('1995-03-25'),
       complaint: 'Dor de garganta',
+      diagnosis: 'Faringite',
       date: new Date(),
       risk: AttendanceRisk.URGENT
     }

@@ -62,11 +62,6 @@ export const ROUTES = {
     description: 'Consulte o histórico de atendimentos realizados no sistema.',
     path: '/auth/attendances'
   },
-  ATTENDANCES_DETAILS: {
-    name: 'Detalhes da triagem',
-    description: 'Visualize e gerencie as informações completas da triagem.',
-    path: '/auth/attendances/:id'
-  },
   TRIAGES: {
     name: 'Histórico de triagens',
     description: 'Consulte o histórico de triagens registradas.',

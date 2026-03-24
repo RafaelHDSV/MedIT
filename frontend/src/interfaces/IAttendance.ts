@@ -20,6 +20,7 @@ export interface IAttendance extends IBaseInterface {
   name: string
   birthDate: Date
   complaint: string
+  diagnosis?: string
   date: Date
   risk: AttendanceRisk
 }
