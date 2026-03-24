@@ -22,6 +22,7 @@ interface IUserDetailsCardProps {
   title: string
   itens: IDetailsItemProps[]
   loading?: boolean
+  twoColumns?: boolean
 }
 
 function UserDetailsCard({
@@ -29,34 +30,35 @@ function UserDetailsCard({
   Icon,
   title,
   itens,
-  loading = false
+  loading = false,
+  twoColumns = false
 }: IUserDetailsCardProps) {
   if (loading) {
     return (
       <section className={styles.card}>
         <Skeleton active title={false} paragraph={{ rows: 1 }} />
-
-        {itens.map(() => (
-          <Skeleton.Button className={styles.itemSkeleton} active />
-        ))}
       </section>
     )
   }
 
   return (
-    <section className={`${styles.card} ${useFullWidth ? styles.fullWidth : ''}`}>
+    <section
+      className={`${styles.card} ${useFullWidth ? styles.fullWidth : ''}`}
+    >
       <div className={styles.cardHeader}>
         <Icon size={22} />
         {title}
       </div>
 
-      {itens.map((item) => (
-        <DetailsItem
-          key={`${item.label}_${item.value}`}
-          label={item.label}
-          value={item.value}
-        />
-      ))}
+      <div className={twoColumns ? styles.twoColumns : ''}>
+        {itens.map((item) => (
+          <DetailsItem
+            key={`${item.label}_${item.value}`}
+            label={item.label}
+            value={item.value}
+          />
+        ))}
+      </div>
     </section>
   )
 }

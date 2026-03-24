@@ -7,6 +7,7 @@ import {
   CalendarDotsIcon,
   ChartBarIcon,
   DatabaseIcon
+  // DivideIcon
 } from '@phosphor-icons/react'
 
 import styles from './PatientsDetails.module.scss'
@@ -29,7 +30,7 @@ const mockedAttendanceRecords: IAttendance[] = [
 ]
 function PatientsDetails() {
   return (
-    <section>
+    <section className={styles.container}>
       <AuthLayoutHeader />
       <UserDetailsHeader
         name={'Renata Aragão'}
@@ -42,44 +43,44 @@ function PatientsDetails() {
       <div className={styles.cards}>
         <UserDetailsCard
           useFullWidth={true}
+          twoColumns={true}
           Icon={DatabaseIcon}
           title='Dados Pessoais'
           itens={[
             { label: 'CPF', value: '123.456.789-00' },
-            { label: 'Nome', value: 'Maria Santos' },
-            {
-              label: 'E-mail',
-              value: 'mariasantos@gmail.com'
-            },
-            {
-              label: 'Telefone',
-              value: '(15) 99999-1234'
-            },
-            {
-              label: 'Tipo Sanguíneo',
-              value: 'O+'
-            },
             {
               label: 'Data de Nascimento',
               value: '15/10/1986'
             },
+            { label: 'Nome', value: 'Maria Santos' },
             {
               label: 'Peso',
               value: '72 kg'
+            },
+            {
+              label: 'E-mail',
+              value: 'mariasantos@gmail.com'
             },
             {
               label: 'Altura',
               value: '1.63'
             },
             {
+              label: 'Telefone',
+              value: '(15) 99999-1234'
+            },
+            {
               label: 'Condições',
               value: 'Hipertensão'
+            },
+            {
+              label: 'Tipo Sanguíneo',
+              value: 'O+'
             },
             {
               label: 'Alergias',
               value: 'Dipirona, Latéx'
             }
-          
           ]}
         />
         <UserDetailsCard
