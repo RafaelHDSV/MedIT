@@ -17,25 +17,25 @@ function DetailsItem({ label, value }: IDetailsItemProps) {
 }
 
 interface IUserDetailsCardProps {
-  useFullWidth?: boolean
   Icon: Icon
   title: string
+  className?: string
   itens: IDetailsItemProps[]
   loading?: boolean
-  twoColumns?: boolean
+  useFullWidth?: boolean
 }
 
 function UserDetailsCard({
-  useFullWidth = false,
   Icon,
   title,
+  className,
   itens,
   loading = false,
-  twoColumns = false
+  useFullWidth = false
 }: IUserDetailsCardProps) {
   if (loading) {
     return (
-      <section className={styles.card}>
+      <section className={`${styles.card} ${className ?? ''}`}>
         <Skeleton active title={false} paragraph={{ rows: 1 }} />
 
         {itens.map((item) => (
@@ -50,15 +50,15 @@ function UserDetailsCard({
   }
 
   return (
-    <section
-      className={`${styles.card} ${useFullWidth ? styles.fullWidth : ''}`}
-    >
+    <section className={`${styles.card} ${className ?? ''}`}>
       <div className={styles.cardHeader}>
         <Icon size={22} />
         {title}
       </div>
 
-      <div className={twoColumns ? styles.twoColumns : ''}>
+      <div
+        className={`${useFullWidth ? styles.twoColumns : styles.itemsContainer}`}
+      >
         {itens.map((item) => (
           <DetailsItem
             key={`${item.label}_${item.value}`}
