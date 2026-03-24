@@ -145,4 +145,5 @@ function PatientsDetails() {
     </section>
   )
 }
+
 export default PatientsDetails
