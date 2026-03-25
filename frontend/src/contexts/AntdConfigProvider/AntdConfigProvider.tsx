@@ -19,7 +19,12 @@ function AntdConfigProvider({ children }: { children: React.ReactNode }) {
     <ConfigProvider
       theme={{
         algorithm: antdTheme.defaultAlgorithm,
-        token: { colorPrimary: primaryColor }
+        token: { colorPrimary: primaryColor },
+        components: {
+          Button: {
+            paddingInline: '0'
+          }
+        }
       }}
       renderEmpty={renderEmpty}
       locale={{
