@@ -20,6 +20,29 @@
   border: 1px solid var(--border);
 
   :global {
+    .ant-table-content {
+      scrollbar-color: var(--secondary-color) transparent;
+
+      &::-webkit-scrollbar {
+        width: 0.5rem;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--secondary-color);
+        border-radius: 0.5rem;
+        transition: background 0.2s ease;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+        cursor: pointer;
+      }
+    }
+
     .ant-table-thead > tr > th {
       background-color: var(--primary-color);
       color: var(--white);
