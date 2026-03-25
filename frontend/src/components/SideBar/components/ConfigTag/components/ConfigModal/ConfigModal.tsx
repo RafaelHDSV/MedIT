@@ -1,7 +1,7 @@
+import Button from '@/components/Button/Button'
 import { useDevTasks } from '@/hooks/useDevTasks'
 import { useSettings } from '@/hooks/useSettings'
 import {
-  Button,
   Checkbox,
   Divider,
   Input,
@@ -148,6 +148,7 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
               </Checkbox>
 
               <Button
+                mode='secondary'
                 type='text'
                 danger
                 size='small'
