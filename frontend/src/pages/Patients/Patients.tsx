@@ -54,7 +54,7 @@ function Patients() {
         dataSource={patients}
         columns={columns}
         loading={loading}
-        pagination={{ pageSize: 9 }}
+        pagination={{ pageSize: 9, hideOnSinglePage: true }}
         size='middle'
         bordered={false}
         scroll={{ x: 'max-content' }}
