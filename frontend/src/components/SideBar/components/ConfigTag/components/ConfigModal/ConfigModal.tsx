@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button'
+import { useAuth } from '@/hooks/useAuth'
 import { useDevTasks } from '@/hooks/useDevTasks'
 import { useSettings } from '@/hooks/useSettings'
+import { UserLevelsLabels } from '@/interfaces/IUser'
 import {
   Checkbox,
   Divider,
@@ -14,21 +16,12 @@ import TextArea from 'antd/es/input/TextArea'
 import { useState } from 'react'
 import styles from './ConfigModal.module.scss'
 
-interface IConfigModalProps {
-  isModalOpen: boolean
-  setIsModalOpen: (bool: boolean) => void
-}
-
-function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
+function ConfigDevContent() {
   const { canSeeProgressStatus, setCanSeeProgressStatus } = useSettings()
   const { tasks, addTask, toggleTask, removeTask } = useDevTasks()
   const [newTask, setNewTask] = useState('')
   const [tasksJson, setTasksJson] = useState('')
   const [visibleEditInput, setVisibleEditInput] = useState(false)
-
-  function closeModal() {
-    setIsModalOpen(false)
-  }
 
   function handleAddTask() {
     if (!newTask.trim()) return
@@ -49,21 +42,7 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   }
 
   return (
-    <Modal
-      title={
-        <div>
-          <Typography.Title level={3}>Configurações</Typography.Title>
-          <Typography.Paragraph>
-            Aqui você pode ajustar suas preferências e configurações de conta.
-          </Typography.Paragraph>
-        </div>
-      }
-      open={isModalOpen}
-      onCancel={closeModal}
-      footer={null}
-      centered
-      width={520}
-    >
+    <>
       <div className={styles.section}>
         <Typography.Title level={5}>Preferências</Typography.Title>
 
@@ -160,6 +139,58 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
           ))}
         </div>
       </div>
+    </>
+  )
+}
+
+function ConfigBaseContent() {
+  const { user } = useAuth()
+  if (!user?.level) return
+
+  return <h2>Configuração do {UserLevelsLabels[user?.level]}</h2>
+}
+
+function ConfigContent() {
+  const { user } = useAuth()
+  const validDevelopmerEmail = ['vieira']
+
+  if (
+    user &&
+    validDevelopmerEmail.some((email) => user.email.includes(email))
+  ) {
+    return <ConfigDevContent />
+  }
+
+  return <ConfigBaseContent />
+}
+
+interface IConfigModalProps {
+  isModalOpen: boolean
+  setIsModalOpen: (bool: boolean) => void
+}
+
+function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
+  function closeModal() {
+    setIsModalOpen(false)
+  }
+
+  return (
+    <Modal
+      title={
+        <div>
+          <Typography.Title level={3}>Configurações</Typography.Title>
+          <Typography.Paragraph>
+            Aqui você pode ajustar suas preferências e configurações de conta.
+          </Typography.Paragraph>
+        </div>
+      }
+      open={isModalOpen}
+      onCancel={closeModal}
+      footer={null}
+      centered
+      width={520}
+    >
+      <ConfigContent />
     </Modal>
   )
 }
