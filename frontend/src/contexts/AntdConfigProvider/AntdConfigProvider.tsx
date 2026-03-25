@@ -1,4 +1,14 @@
-import { theme as antdTheme, ConfigProvider } from 'antd'
+import { EmptyIcon } from '@phosphor-icons/react'
+import { theme as antdTheme, ConfigProvider, Flex } from 'antd'
+
+function renderEmpty() {
+  return (
+    <Flex vertical align='center' justify='center' gap={8}>
+      <EmptyIcon size={32} />
+      <span>Nenhuma informação encontrada para essa consulta</span>
+    </Flex>
+  )
+}
 
 function AntdConfigProvider({ children }: { children: React.ReactNode }) {
   const primaryColor = getComputedStyle(document.documentElement)
@@ -11,6 +21,7 @@ function AntdConfigProvider({ children }: { children: React.ReactNode }) {
         algorithm: antdTheme.defaultAlgorithm,
         token: { colorPrimary: primaryColor }
       }}
+      renderEmpty={renderEmpty}
       locale={{
         locale: 'pt-br',
         Pagination: {
