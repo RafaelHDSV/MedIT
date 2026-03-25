@@ -19,11 +19,13 @@ import TooltipColumn from '../components/TooltipColumn/TooltipColumn'
 interface IUseDoctorsColumnsProps {
   setEditingDoctor: (doctor: IDoctor | null) => void
   setEditModalOpen: (isOpen: boolean) => void
+  fetchDoctors: () => Promise<void>
 }
 
 export function useDoctorsColumns({
   setEditingDoctor,
-  setEditModalOpen
+  setEditModalOpen,
+  fetchDoctors
 }: IUseDoctorsColumnsProps) {
   const navigate = useNavigate()
 
@@ -43,28 +45,31 @@ export function useDoctorsColumns({
     [setEditingDoctor, setEditModalOpen]
   )
 
-  const handleDelete = useCallback(async (doctor: IDoctor) => {
-    Modal.confirm({
-      title: 'Deseja deletar este médico?',
-      content: `Esta ação não pode ser desfeita.`,
-      okText: 'Sim, deletar',
-      cancelText: 'Cancelar',
-      okButtonProps: { danger: true },
-      async onOk() {
-        try {
-          await api.delete(`/doctors/${doctor._id}`)
-          message.success('Médico deletado com sucesso!')
-          window.location.reload()
-        } catch (err) {
-          if (!axios.isAxiosError(err)) return
-          const error = err as AxiosError<IError>
-          message.error(
-            error.response?.data?.message ?? 'Erro ao deletar médico'
-          )
+  const handleDelete = useCallback(
+    async (doctor: IDoctor) => {
+      Modal.confirm({
+        title: 'Deseja deletar este médico?',
+        content: `Esta ação não pode ser desfeita.`,
+        okText: 'Sim, deletar',
+        cancelText: 'Cancelar',
+        okButtonProps: { danger: true },
+        async onOk() {
+          try {
+            await api.delete(`/doctors/${doctor._id}`)
+            message.success('Médico deletado com sucesso!')
+            fetchDoctors()
+          } catch (err) {
+            if (!axios.isAxiosError(err)) return
+            const error = err as AxiosError<IError>
+            message.error(
+              error.response?.data?.message ?? 'Erro ao deletar médico'
+            )
+          }
         }
-      }
-    })
-  }, [])
+      })
+    },
+    [fetchDoctors]
+  )
 
   const columns: ColumnsType<IDoctor> = useMemo(
     () => [

@@ -67,3 +67,18 @@ export interface DoctorFormValues {
   crm: string
   specialization: DoctorSpecializations
 }
+
+export interface IDoctorFormErrors {
+  name?: string
+  cpf?: string
+  birthDate?: string
+  gender?: string
+  email?: string
+  currentPassword?: string
+  newPassword?: string
+  password?: string
+  cellphone?: string
+  crm?: string
+  specialization?: string
+  otherSpecialization?: string
+}

@@ -18,7 +18,6 @@ function Doctors() {
   const [loading, setLoading] = useState(false)
   const [editingDoctor, setEditingDoctor] = useState<IDoctor | null>(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
-  const columns = useDoctorsColumns({ setEditingDoctor, setEditModalOpen })
 
   async function fetchDoctors() {
     setLoading(true)
@@ -40,21 +39,27 @@ function Doctors() {
     }
   }
 
+  const columns = useDoctorsColumns({
+    setEditingDoctor,
+    setEditModalOpen,
+    fetchDoctors
+  })
+
   useEffect(() => {
     fetchDoctors()
   }, [])
 
   return (
     <>
-      {editModalOpen && (
-        <DoctorModal
-          key='edit-doctor-modal'
-          doctor={editingDoctor}
-          buttonText='Salvar alterações'
-          fetchDoctors={() => window.location.reload()}
-          fetchDoctorDetails={undefined}
-        />
-      )}
+      <DoctorModal
+        key='edit-doctor-modal'
+        doctor={editingDoctor}
+        buttonText='Salvar alterações'
+        fetchDoctors={fetchDoctors}
+        useOnlyModal
+        editModalOpen={editModalOpen}
+        setEditModalOpen={setEditModalOpen}
+      />
 
       <div className={styles.tableContent}>
         <Flex vertical className={styles.container}>
