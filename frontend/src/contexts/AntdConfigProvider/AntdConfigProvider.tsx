@@ -1,10 +1,9 @@
-import { EmptyIcon } from '@phosphor-icons/react'
 import { theme as antdTheme, ConfigProvider, Flex } from 'antd'
 
 function renderEmpty() {
   return (
-    <Flex vertical align='center' justify='center' gap={8}>
-      <EmptyIcon size={32} />
+    <Flex vertical align='center' justify='center' gap={16}>
+      <img src='/no-data.svg' alt='No data' className='noDataImage' />
       <span>Nenhuma informação encontrada para essa consulta</span>
     </Flex>
   )
