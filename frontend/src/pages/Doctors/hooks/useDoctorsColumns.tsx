@@ -72,7 +72,8 @@ export function useDoctorsColumns({
         title: 'ID',
         dataIndex: 'number',
         key: 'number',
-        width: 60
+        width: 60,
+        render: (_id: string) => <TooltipColumn text={_id} />
       },
       {
         title: 'Nome',
