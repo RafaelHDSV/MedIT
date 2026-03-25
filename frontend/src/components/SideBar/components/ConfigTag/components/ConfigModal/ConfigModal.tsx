@@ -13,7 +13,7 @@ import {
   Typography
 } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import styles from './ConfigModal.module.scss'
 
 function ConfigDevContent() {
@@ -152,7 +152,7 @@ function ConfigBaseContent() {
 
 function ConfigContent() {
   const { user } = useAuth()
-  const validDevelopmerEmail = ['vieira']
+  const validDevelopmerEmail = ['vieira', 'rafa', 'take']
 
   if (
     user &&
@@ -170,15 +170,22 @@ interface IConfigModalProps {
 }
 
 function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
+  const { user } = useAuth()
+
   function closeModal() {
     setIsModalOpen(false)
   }
+
+  const title = useMemo(() => {
+    if (user?.level) return `Configuração do ${UserLevelsLabels[user?.level]}`
+    return 'Configurações'
+  }, [user?.level])
 
   return (
     <Modal
       title={
         <div>
-          <Typography.Title level={3}>Configurações</Typography.Title>
+          <Typography.Title level={3}>{title}</Typography.Title>
           <Typography.Paragraph>
             Aqui você pode ajustar suas preferências e configurações de conta.
           </Typography.Paragraph>
