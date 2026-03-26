@@ -1,5 +1,6 @@
 import type { FormatDateModes } from '@/utils/formatDate'
-import type { MultiDatepickerType } from './types'
+import { useEffect } from 'react'
+import { DATE_MASKS, type MultiDatepickerType } from './types'
 
 interface IMultiDatepickerFormatProps {
   type: MultiDatepickerType
@@ -39,4 +40,52 @@ export function getMultiDatepickerFormat({
     })()
   }
   return modes[mode]
+}
+
+function applyDateMask(value: string, mask: string): string {
+  const digits = value.replace(/\D/g, '')
+  let result = ''
+  let digitIndex = 0
+
+  for (let i = 0; i < mask.length && digitIndex < digits.length; i++) {
+    if (mask[i] === '/') {
+      result += '/'
+    } else {
+      result += digits[digitIndex++]
+    }
+  }
+
+  return result
+}
+
+export function useInputMask(
+  pickerRef: React.RefObject<HTMLElement | null>,
+  type: MultiDatepickerType
+) {
+  useEffect(() => {
+    const maskConfig = DATE_MASKS[type]
+    if (!maskConfig) return
+
+    const container = pickerRef.current as HTMLElement
+    if (!container) return
+
+    const input = container.querySelector<HTMLInputElement>('input')
+    if (!input) return
+
+    const handleInput = (e: Event) => {
+      const target = e.target as HTMLInputElement
+      const masked = applyDateMask(target.value, maskConfig.mask)
+
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        'value'
+      )?.set
+
+      nativeInputValueSetter?.call(target, masked)
+      target.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    input.addEventListener('input', handleInput)
+    return () => input.removeEventListener('input', handleInput)
+  }, [pickerRef, type])
 }

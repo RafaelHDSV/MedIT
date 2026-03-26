@@ -6,9 +6,13 @@ import dayjs, { Dayjs } from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { type JSX, type ReactNode, useRef } from 'react'
-import { getMultiDatepickerFormat } from './constants'
+import { getMultiDatepickerFormat, useInputMask } from './constants'
 import styles from './MultiDatepicker.module.scss'
-import { DEFAULT_DATE_TYPE_OPTIONS, type MultiDatepickerType } from './types'
+import {
+  DEFAULT_DATE_TYPE_OPTIONS,
+  INPUT_PARSE_FORMATS,
+  type MultiDatepickerType
+} from './types'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -86,27 +90,26 @@ export default function MultiDatepicker({
   allowClear = false,
   dateSelectorRef
 }: IInputDate) {
-  const pickerRef = useRef(null)
+  const pickerRef = useRef<HTMLDivElement>(null)
+  useInputMask(pickerRef, type)
 
-  const customWeekStartEndFormat = (value: Dayjs) => {
-    return `${formatDate({
-      date: dayjs(value).startOf('week'),
-      mode: getMultiDatepickerFormat({ type, mode: 'display' })
-    })} até ${formatDate({
-      date: dayjs(value).endOf('week'),
-      mode: getMultiDatepickerFormat({ type, mode: 'display' })
-    })}`
-  }
+  const getDisplayFormat = (): DatePickerProps['format'] => {
+    if (type === 'week') {
+      const weekFormat: DatePickerProps['format'] = [
+        (value: Dayjs) =>
+          `${formatDate({
+            date: dayjs(value).startOf('week'),
+            mode: getMultiDatepickerFormat({ type, mode: 'display' })
+          })} até ${formatDate({
+            date: dayjs(value).endOf('week'),
+            mode: getMultiDatepickerFormat({ type, mode: 'display' })
+          })}`,
+        ...INPUT_PARSE_FORMATS.week
+      ]
+      return weekFormat
+    }
 
-  const formatDatePicker: DatePickerProps['format'] = (value) => {
-    if (!value) return ''
-
-    if (type === 'week') return customWeekStartEndFormat(value)
-
-    return formatDate({
-      date: value,
-      mode: getMultiDatepickerFormat({ type, mode: 'display' })
-    })
+    return INPUT_PARSE_FORMATS[type]
   }
 
   const handleSingleChange = (date: Dayjs | null) => {
@@ -175,16 +178,17 @@ export default function MultiDatepicker({
           format={getMultiDatepickerFormat({ type, mode: 'display' })}
         />
       ) : (
-        <DatePicker
-          {...commonProps}
-          picker={type}
-          ref={pickerRef}
-          value={value as DateValue}
-          defaultValue={defaultValue as DateValue}
-          onChange={handleSingleChange}
-          format={formatDatePicker}
-          showWeek={type === 'week' ? false : undefined}
-        />
+        <div ref={pickerRef} className='w-100'>
+          <DatePicker
+            {...commonProps}
+            picker={type}
+            value={value as DateValue}
+            defaultValue={defaultValue as DateValue}
+            onChange={handleSingleChange}
+            format={getDisplayFormat()}
+            showWeek={type === 'week' ? false : undefined}
+          />
+        </div>
       )}
     </MultiDatepickerContainer>
   )
