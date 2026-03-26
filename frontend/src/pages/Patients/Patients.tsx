@@ -1,12 +1,12 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import ListTable from '@/components/ListTable/ListTable'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
 import type { IPatient } from '@/interfaces/IPatient'
-import styles from '@/styles/UserTable.module.scss'
-import { Flex, message, Table } from 'antd'
+import { Flex, message } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
@@ -17,27 +17,27 @@ function Patients() {
   const [patients, setPatients] = useState<IPatient[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    async function fetchPatients() {
-      setLoading(true)
+  async function fetchPatients() {
+    setLoading(true)
 
-      try {
-        const response = await api.get('/patients')
-        const data = response.data
-        setPatients(data)
-      } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro ao carregar a listagem de pacientes'
-        )
-      } finally {
-        setLoading(false)
-      }
+    try {
+      const response = await api.get('/patients')
+      const data = response.data
+      setPatients(data)
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(
+        error.response?.data?.message ||
+          'Erro ao carregar a listagem de pacientes'
+      )
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchPatients()
   }, [])
 
@@ -48,16 +48,11 @@ function Patients() {
         <ProgressTag status={ProgressStatus.COMPLETED} />
       </Flex>
 
-      <Table
-        className={styles.userTable}
-        rowKey='_id'
+      <ListTable<IPatient>
         dataSource={patients}
         columns={columns}
         loading={loading}
-        pagination={{ pageSize: 9, hideOnSinglePage: true }}
-        size='middle'
-        bordered={false}
-        scroll={{ x: 'max-content' }}
+        onReload={fetchPatients}
       />
     </div>
   )

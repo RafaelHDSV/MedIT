@@ -1,34 +1,18 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import Button from '@/components/Button/Button'
+import ListTable from '@/components/ListTable/ListTable'
 import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import styles from '@/styles/UserTable.module.scss'
-import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
-import { Flex, Input, message, Table } from 'antd'
+import { Flex, message } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import DoctorModal from './components/DoctorModal/DoctorModal'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
-
-interface IFiltersProps {
-  fetchDoctors: () => void
-}
-
-function Filters({ fetchDoctors }: IFiltersProps) {
-  return (
-    <Flex gap={16} align='center' className={styles.filters}>
-      <Input placeholder='Pesquisar por nome ou email' allowClear />
-      <Button mode='icon' size='large' onClick={fetchDoctors}>
-        <ArrowCounterClockwiseIcon size={24} />
-      </Button>
-    </Flex>
-  )
-}
 
 function Doctors() {
   const [doctors, setDoctors] = useState<IDoctor[]>([])
@@ -92,22 +76,12 @@ function Doctors() {
             <ProgressTag status={ProgressStatus.COMPLETED} />
           </Flex>
 
-          <Filters fetchDoctors={fetchDoctors} />
-
-          <div className={styles.tableWrapper}>
-            <Table
-              className={styles.userTable}
-              rowKey='_id'
-              dataSource={doctors}
-              columns={columns}
-              tableLayout='fixed'
-              loading={loading}
-              pagination={{ pageSize: 7, hideOnSinglePage: true }}
-              size='middle'
-              bordered={false}
-              scroll={{ x: 'max-content' }}
-            />
-          </div>
+          <ListTable<IDoctor>
+            dataSource={doctors}
+            columns={columns}
+            loading={loading}
+            onReload={fetchDoctors}
+          />
         </Flex>
       </div>
     </>
