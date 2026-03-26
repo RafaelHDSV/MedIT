@@ -84,7 +84,7 @@ function ModalContent({
       }
 
       message.success(
-        `Médico ${isEditMode ? 'atualizado' : 'adicionado'} com sucesso`
+        `Médico(a) ${isEditMode ? 'atualizado' : 'adicionado'} com sucesso`
       )
       handleClose()
     } catch (err) {
@@ -96,12 +96,12 @@ function ModalContent({
         console.error(error)
         message.error(
           error.response?.data?.message ||
-            'Erro nas validações ao adicionar médico'
+            'Erro nas validações ao adicionar médico(a)'
         )
       } else {
         console.error(error)
         message.error(
-          error.response?.data?.message || 'Erro ao adicionar médico'
+          error.response?.data?.message || 'Erro ao adicionar médico(a)'
         )
       }
     } finally {
@@ -131,7 +131,7 @@ function ModalContent({
       footer={null}
       centered
     >
-      <h2>{isEditMode ? 'Editar médico' : 'Adicionar médico'}</h2>
+      <h2>{isEditMode ? 'Editar médico(a)' : 'Adicionar médico(a)'}</h2>
 
       <Form
         form={form}

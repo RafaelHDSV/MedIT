@@ -10,7 +10,7 @@ export const getUsers = async (_req: Request, res: Response) => {
     .sort({ createdAt: -1 })
     .select('-password')
   if (!users || users.length === 0) {
-    return res.status(404).json({ message: 'Nenhum médico encontrado' })
+    return res.status(404).json({ message: 'Nenhum médico(a) encontrado' })
   }
 
   res.json(users)
@@ -81,7 +81,7 @@ export const createDoctor = async (req: Request, res: Response) => {
     if (Object.keys(errors).length > 0) {
       return res
         .status(400)
-        .json({ message: 'Erro de validações na criação do médico', errors })
+        .json({ message: 'Erro de validações na criação do médico(a)', errors })
     }
 
     const cleanCpf = cpf.replace(/\D/g, '')
@@ -104,7 +104,7 @@ export const createDoctor = async (req: Request, res: Response) => {
     await doctor.save()
 
     return res.status(201).json({
-      message: 'Médico criado com sucesso',
+      message: 'Médico(a) criado com sucesso',
       data: doctor
     })
   } catch (error: any) {
@@ -116,7 +116,7 @@ export const createDoctor = async (req: Request, res: Response) => {
     }
 
     return res.status(500).json({
-      message: 'Erro ao criar médico',
+      message: 'Erro ao criar médico(a)',
       error: error.message
     })
   }
@@ -184,7 +184,7 @@ export const editDoctor = async (req: Request, res: Response) => {
 
     const doctor = await Doctor.findById(id)
     if (!doctor) {
-      return res.status(404).json({ message: 'Médico não encontrado' })
+      return res.status(404).json({ message: 'Médico(a) não encontrado' })
     }
 
     if (currentPassword) {
@@ -208,7 +208,7 @@ export const editDoctor = async (req: Request, res: Response) => {
     await doctor.save()
 
     return res.status(200).json({
-      message: 'Médico atualizado com sucesso',
+      message: 'Médico(a) atualizado com sucesso',
       data: doctor
     })
   } catch (error: any) {
@@ -220,7 +220,7 @@ export const editDoctor = async (req: Request, res: Response) => {
     }
 
     return res.status(500).json({
-      message: 'Erro ao atualizar médico',
+      message: 'Erro ao atualizar médico(a)',
       error: error.message
     })
   }
@@ -232,18 +232,18 @@ export const deleteDoctor = async (req: Request, res: Response) => {
 
     const doctor = await Doctor.findById(id)
     if (!doctor) {
-      return res.status(404).json({ message: 'Médico não encontrado' })
+      return res.status(404).json({ message: 'Médico(a) não encontrado' })
     }
 
     await doctor.deleteOne()
 
     return res.status(200).json({
-      message: 'Médico deletado com sucesso'
+      message: 'Médico(a) deletado com sucesso'
     })
   } catch (error: any) {
     console.error(error)
     return res.status(500).json({
-      message: 'Erro ao deletar médico',
+      message: 'Erro ao deletar médico(a)',
       error: error.message
     })
   }

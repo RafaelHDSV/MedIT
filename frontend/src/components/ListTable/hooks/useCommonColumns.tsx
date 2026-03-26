@@ -107,7 +107,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
             <Button
               mode='icon'
               onClick={() => handleEdit(record)}
-              aria-label='Editar médico'
+              aria-label='Editar médico(a)'
             >
               <EditOutlined />
             </Button>
@@ -117,7 +117,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
             <Button
               mode='icon'
               onClick={() => handleDelete(record)}
-              aria-label='Deletar médico'
+              aria-label='Deletar médico(a)'
             >
               <DeleteOutlined />
             </Button>

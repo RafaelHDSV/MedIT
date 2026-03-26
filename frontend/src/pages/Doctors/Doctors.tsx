@@ -33,7 +33,7 @@ function Doctors() {
       console.error(error)
       message.error(
         error.response?.data?.message ||
-          'Erro ao carregar a listagem de médicos'
+          'Erro ao carregar a listagem de médicos(as)'
       )
     } finally {
       setLoading(false)
@@ -68,7 +68,7 @@ function Doctors() {
             <AuthLayoutHeader
               actionComponent={
                 <DoctorModal
-                  buttonText='Adicionar médico'
+                  buttonText='Adicionar médico(a)'
                   fetchDoctors={fetchDoctors}
                 />
               }

@@ -83,7 +83,8 @@ function DoctorDetails() {
       const error = err as AxiosError<IError>
       console.error(error)
       message.error(
-        error.response?.data?.message || 'Erro ao carregar detalhes do médico'
+        error.response?.data?.message ||
+          'Erro ao carregar detalhes do médico(a)'
       )
     } finally {
       setLoading(false)
@@ -101,14 +102,14 @@ function DoctorDetails() {
           <Flex gap='1rem'>
             <DoctorModal
               doctor={doctor}
-              buttonText='Editar médico'
+              buttonText='Editar médico(a)'
               fetchDoctorDetails={fetchDoctorDetails}
             />
 
             <DeleteModal
-              label='médico'
+              label='médico(a)'
               apiName='doctors'
-              buttonText='Deletar médico'
+              buttonText='Deletar médico(a)'
             />
           </Flex>
         }

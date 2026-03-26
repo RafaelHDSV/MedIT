@@ -23,12 +23,12 @@ export const ROUTES = {
   },
   DOCTORS: {
     name: 'Médicos',
-    description: 'Gerencie o cadastro e as informações dos médicos.',
+    description: 'Gerencie o cadastro e as informações dos médicos(as).',
     path: '/auth/doctors'
   },
   DOCTORS_DETAILS: {
     name: 'Detalhes do médico',
-    description: 'Visualize e gerencie as informações completas do médico.',
+    description: 'Visualize e gerencie as informações completas do médico(a).',
     path: '/auth/doctors/:id'
   },
   NURSES: {

@@ -43,7 +43,7 @@ function Dashboard() {
           {
             Icon: UsersThreeIcon,
             value: '52%',
-            label: 'Assertividade IA vs Médico'
+            label: 'Assertividade IA vs Médico(a)'
           }
         ]
       case UserLevels.NURSE:

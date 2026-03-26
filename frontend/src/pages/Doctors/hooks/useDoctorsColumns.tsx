@@ -45,7 +45,7 @@ export function useDoctorsColumns({
   const handleDelete = useCallback(
     async (doctor: IDoctor) => {
       Modal.confirm({
-        title: 'Deseja deletar este médico?',
+        title: 'Deseja deletar este médico(a)?',
         content: `Esta ação não pode ser desfeita.`,
         okText: 'Sim, deletar',
         cancelText: 'Cancelar',
@@ -53,13 +53,13 @@ export function useDoctorsColumns({
         async onOk() {
           try {
             await api.delete(`/doctors/${doctor._id}`)
-            message.success('Médico deletado com sucesso!')
+            message.success('Médico(a) deletado com sucesso!')
             fetchDoctors()
           } catch (err) {
             if (!axios.isAxiosError(err)) return
             const error = err as AxiosError<IError>
             message.error(
-              error.response?.data?.message ?? 'Erro ao deletar médico'
+              error.response?.data?.message ?? 'Erro ao deletar médico(a)'
             )
           }
         }
