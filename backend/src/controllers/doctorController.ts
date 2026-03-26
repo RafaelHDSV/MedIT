@@ -114,6 +114,7 @@ export const createDoctor = async (req: Request, res: Response) => {
         errors: { [field]: `${field} já está em uso` }
       })
     }
+
     return res.status(500).json({
       message: 'Erro ao criar médico',
       error: error.message
@@ -240,6 +241,7 @@ export const deleteDoctor = async (req: Request, res: Response) => {
       message: 'Médico deletado com sucesso'
     })
   } catch (error: any) {
+    console.error(error)
     return res.status(500).json({
       message: 'Erro ao deletar médico',
       error: error.message

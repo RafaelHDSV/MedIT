@@ -1,5 +1,5 @@
 import type { Dayjs } from 'dayjs'
-import type { IBaseUser, UserLevels } from './IUser'
+import type { IBaseUser, UserGender } from './IUser'
 
 export const DoctorSpecializations = {
   CARDIOLOGY: 'cardiology',
@@ -59,10 +59,11 @@ export interface DoctorFormValues {
   name: string
   cpf: string
   birthDate: Dayjs | null
-  gender: UserLevels
+  gender: UserGender
   email: string
   currentPassword?: string
   newPassword?: string
+  password?: string
   cellphone: string
   crm: string
   specialization: DoctorSpecializations

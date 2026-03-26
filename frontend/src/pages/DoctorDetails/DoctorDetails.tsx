@@ -105,7 +105,11 @@ function DoctorDetails() {
               fetchDoctorDetails={fetchDoctorDetails}
             />
 
-            <DeleteModal buttonText='Deletar médico' />
+            <DeleteModal
+              label='médico'
+              apiName='doctors'
+              buttonText='Deletar médico'
+            />
           </Flex>
         }
       />

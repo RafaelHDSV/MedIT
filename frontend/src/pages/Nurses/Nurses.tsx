@@ -1,6 +1,5 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import Button from '@/components/Button/Button'
 import ListTable from '@/components/ListTable/ListTable'
 import ProgressTag, {
   ProgressStatus
@@ -11,10 +10,11 @@ import { Flex, message } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import styles from '../../components/ListTable/ListTable.module.scss'
+import NurseModal from './components/NurseModal/NurseModal'
 import { useNursesColumns } from './hooks/useNursesColumns'
 
 function Nurses() {
-  const columns = useNursesColumns()
   const [nurses, setNurses] = useState<INurse[]>([])
   const [loading, setLoading] = useState(false)
   const [editingNurse, setEditingNurse] = useState<INurse | null>(null)
@@ -44,22 +44,47 @@ function Nurses() {
     fetchNurses()
   }, [])
 
-  return (
-    <div className='h-100'>
-      <Flex gap={16} align='center'>
-        <AuthLayoutHeader
-          actionComponent={<Button>Adicionar enfermeiro</Button>}
-        />
-        <ProgressTag status={ProgressStatus.COMPLETED} />
-      </Flex>
+  const columns = useNursesColumns({
+    setEditingNurse,
+    setEditModalOpen,
+    fetchNurses
+  })
 
-      <ListTable<INurse>
-        dataSource={nurses}
-        columns={columns}
-        loading={loading}
-        onReload={fetchNurses}
+  return (
+    <>
+      <NurseModal
+        key='edit-nurse-modal'
+        nurse={editingNurse}
+        buttonText='Salvar alterações'
+        fetchNurses={fetchNurses}
+        useOnlyModal
+        editModalOpen={editModalOpen}
+        setEditModalOpen={setEditModalOpen}
       />
-    </div>
+
+      <div className={styles.tableContent}>
+        <Flex vertical className={styles.container}>
+          <Flex gap={16} align='center'>
+            <AuthLayoutHeader
+              actionComponent={
+                <NurseModal
+                  buttonText='Adicionar enfermeiro(a)'
+                  fetchNurses={fetchNurses}
+                />
+              }
+            />
+            <ProgressTag status={ProgressStatus.COMPLETED} />
+          </Flex>
+
+          <ListTable<INurse>
+            dataSource={nurses}
+            columns={columns}
+            loading={loading}
+            onReload={fetchNurses}
+          />
+        </Flex>
+      </div>
+    </>
   )
 }
 

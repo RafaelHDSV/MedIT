@@ -33,12 +33,13 @@ export const ROUTES = {
   },
   NURSES: {
     name: 'Enfermeiros',
-    description: 'Gerencie o cadastro e as informações dos enfermeiros.',
+    description: 'Gerencie o cadastro e as informações dos enfermeiros(as).',
     path: '/auth/nurses'
   },
   NURSES_DETAILS: {
     name: 'Detalhes do enfermeiro',
-    description: 'Visualize e gerencie as informações completas do enfermeiro.',
+    description:
+      'Visualize e gerencie as informações completas do enfermeiro(a).',
     path: '/auth/nurses/:id'
   },
   PATIENTS: {

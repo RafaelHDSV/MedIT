@@ -1,92 +1,94 @@
+import { api } from '@/api/api'
+import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
+import type { IError } from '@/interfaces/IError'
 import type { INurse } from '@/interfaces/INurse'
 import { ROUTES } from '@/routes/constants'
-import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
-import masks from '@/utils/masks'
+import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import dayjs from 'dayjs'
+import axios, { AxiosError } from 'axios'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export function useNursesColumns() {
+interface IUseNursesColumnsProps {
+  setEditingNurse: (nurse: INurse | null) => void
+  setEditModalOpen: (isOpen: boolean) => void
+  fetchNurses: () => Promise<void>
+}
+
+export function useNursesColumns({
+  setEditingNurse,
+  setEditModalOpen,
+  fetchNurses
+}: IUseNursesColumnsProps) {
   const navigate = useNavigate()
 
   const handleNavigateToDetails = useCallback(
-    (id: ObjectId | undefined) => {
-      if (!id) return
-      navigate(ROUTES.NURSES_DETAILS.path.replace(':id', id.toString()))
+    (_id: ObjectId | undefined) => {
+      if (!_id) return
+      navigate(ROUTES.NURSES_DETAILS.path.replace(':id', _id.toString()))
     },
     [navigate]
   )
 
+  const handleEdit = useCallback(
+    (nurse: INurse) => {
+      setEditingNurse(nurse)
+      setEditModalOpen(true)
+    },
+    [setEditingNurse, setEditModalOpen]
+  )
+
+  const handleDelete = useCallback(
+    async (nurse: INurse) => {
+      Modal.confirm({
+        title: 'Deseja deletar este enfermeiro(a)?',
+        content: `Esta ação não pode ser desfeita.`,
+        okText: 'Sim, deletar',
+        cancelText: 'Cancelar',
+        okButtonProps: { danger: true },
+        async onOk() {
+          try {
+            await api.delete(`/nurses/${nurse._id}`)
+            message.success('Enfermeiro deletado com sucesso!')
+            fetchNurses()
+          } catch (err) {
+            if (!axios.isAxiosError(err)) return
+            const error = err as AxiosError<IError>
+            message.error(
+              error.response?.data?.message ?? 'Erro ao deletar enfermeiro(a)'
+            )
+          }
+        }
+      })
+    },
+    [fetchNurses]
+  )
+
+  const commonColumns = getCommonColumns<INurse>({
+    handleNavigateToDetails,
+    handleEdit,
+    handleDelete
+  })
+
   const columns: ColumnsType<INurse> = useMemo(
     () => [
-      {
-        title: 'ID',
-        dataIndex: 'number',
-        key: 'number'
-      },
-      {
-        title: 'Nome',
-        dataIndex: 'name',
-        key: 'name',
-        render: (name: string, record) => (
-          <span
-            role='button'
-            tabIndex={0}
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleNavigateToDetails(record._id)}
-            onKeyDown={(e) =>
-              e.key === 'Enter' && handleNavigateToDetails(record._id)
-            }
-          >
-            {name}
-          </span>
-        )
-      },
-      {
-        title: 'CPF',
-        dataIndex: 'cpf',
-        key: 'cpf',
-        render: (cpf: string) => masks(cpf, 'cpf')
-      },
-      {
-        title: 'E-mail',
-        dataIndex: 'email',
-        key: 'email'
-      },
-      {
-        title: 'Data de Nascimento',
-        dataIndex: 'birthDate',
-        key: 'birthDate',
-        render: (date: Date | string) =>
-          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
-      },
-      {
-        title: 'Telefone',
-        dataIndex: 'cellphone',
-        key: 'cellphone',
-        render: (cellphone: string) => masks(cellphone, 'cellphone')
-      },
+      commonColumns.id(),
+      commonColumns.name(),
+      commonColumns.cpf(),
+      commonColumns.email(),
+      commonColumns.birthDate(),
+      commonColumns.cellphone(),
       {
         title: 'COREN',
         dataIndex: 'coren',
         key: 'coren'
       },
-      {
-        title: 'Criado em',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
-      },
-      {
-        title: 'Atualizado em',
-        dataIndex: 'updatedAt',
-        key: 'updatedAt',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
-      }
+      commonColumns.createdAt(),
+      commonColumns.updatedAt(),
+      commonColumns.actions()
     ],
-    [handleNavigateToDetails]
+    [commonColumns]
   )
 
   return columns
