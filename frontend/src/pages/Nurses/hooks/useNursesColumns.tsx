@@ -1,4 +1,5 @@
 import { api } from '@/api/api'
+import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import type { IError } from '@/interfaces/IError'
 import type { INurse } from '@/interfaces/INurse'
@@ -82,7 +83,8 @@ export function useNursesColumns({
       {
         title: 'COREN',
         dataIndex: 'coren',
-        key: 'coren'
+        key: 'coren',
+        render: (coren: string) => <TooltipColumn text={coren} />
       },
       commonColumns.createdAt(),
       commonColumns.updatedAt(),
