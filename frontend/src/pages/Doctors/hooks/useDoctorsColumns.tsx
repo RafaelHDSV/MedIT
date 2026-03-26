@@ -1,20 +1,17 @@
 import { api } from '@/api/api'
-import Button from '@/components/Button/Button'
+import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import { ROUTES } from '@/routes/constants'
-import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { Flex, message, Modal, Tooltip } from 'antd'
+import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
-import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TooltipColumn from '../components/TooltipColumn/TooltipColumn'
+import TooltipColumn from '../../../components/ListTable/components/TooltipColumn/TooltipColumn'
 
 interface IUseDoctorsColumnsProps {
   setEditingDoctor: (doctor: IDoctor | null) => void
@@ -71,67 +68,20 @@ export function useDoctorsColumns({
     [fetchDoctors]
   )
 
+  const commonColumns = getCommonColumns<IDoctor>({
+    handleNavigateToDetails,
+    handleEdit,
+    handleDelete
+  })
+
   const columns: ColumnsType<IDoctor> = useMemo(
     () => [
-      {
-        title: 'ID',
-        dataIndex: 'number',
-        key: 'number',
-        width: 60,
-        render: (_id: string) => <TooltipColumn text={_id} />
-      },
-      {
-        title: 'Nome',
-        dataIndex: 'name',
-        key: 'name',
-        width: 180,
-        ellipsis: true,
-        render: (name: string, record) => (
-          <span
-            role='button'
-            tabIndex={0}
-            className='ellipsis'
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleNavigateToDetails(record._id)}
-          >
-            <TooltipColumn text={name} />
-          </span>
-        )
-      },
-      {
-        title: 'CPF',
-        dataIndex: 'cpf',
-        key: 'cpf',
-        width: 140,
-        render: (cpf: string) => <TooltipColumn text={masks(cpf, 'cpf')} />
-      },
-      {
-        title: 'E-mail',
-        dataIndex: 'email',
-        key: 'email',
-        width: 220,
-        render: (email: string) => <TooltipColumn text={email} />
-      },
-      {
-        title: 'Data de Nascimento',
-        dataIndex: 'birthDate',
-        key: 'birthDate',
-        width: 180,
-        render: (date: Date | string) => (
-          <TooltipColumn
-            text={`${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`}
-          />
-        )
-      },
-      {
-        title: 'Telefone',
-        dataIndex: 'cellphone',
-        key: 'cellphone',
-        width: 140,
-        render: (cellphone: string) => (
-          <TooltipColumn text={masks(cellphone, 'cellphone')} />
-        )
-      },
+      commonColumns.id(),
+      commonColumns.name(),
+      commonColumns.cpf(),
+      commonColumns.email(),
+      commonColumns.birthDate(),
+      commonColumns.cellphone(),
       {
         title: 'CRM',
         dataIndex: 'crm',
@@ -139,54 +89,11 @@ export function useDoctorsColumns({
         width: 120,
         render: (crm: string) => <TooltipColumn text={masks(crm, 'crm')} />
       },
-      {
-        title: 'Criado em',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        width: 160,
-        render: (date: Date | string) => (
-          <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
-        )
-      },
-      {
-        title: 'Atualizado em',
-        dataIndex: 'updatedAt',
-        key: 'updatedAt',
-        width: 160,
-        render: (date: Date | string) => (
-          <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
-        )
-      },
-      {
-        title: 'Ações',
-        key: '',
-        width: 100,
-        render: (_, record: IDoctor) => (
-          <Flex gap={8}>
-            <Tooltip title='Editar'>
-              <Button
-                mode='icon'
-                onClick={() => handleEdit(record)}
-                aria-label='Editar médico'
-              >
-                <EditOutlined />
-              </Button>
-            </Tooltip>
-
-            <Tooltip title='Deletar'>
-              <Button
-                mode='icon'
-                onClick={() => handleDelete(record)}
-                aria-label='Deletar médico'
-              >
-                <DeleteOutlined />
-              </Button>
-            </Tooltip>
-          </Flex>
-        )
-      }
+      commonColumns.createdAt(),
+      commonColumns.updatedAt(),
+      commonColumns.actions()
     ],
-    [handleNavigateToDetails, handleEdit, handleDelete]
+    [commonColumns]
   )
 
   return columns

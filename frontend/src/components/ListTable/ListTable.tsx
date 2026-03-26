@@ -1,8 +1,8 @@
-import styles from '@/styles/UserTable.module.scss'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { Flex, Input, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import Button from '../Button/Button'
+import styles from './ListTable.module.scss'
 
 interface IFiltersProps {
   onReload: () => void

@@ -17,6 +17,8 @@ function Nurses() {
   const columns = useNursesColumns()
   const [nurses, setNurses] = useState<INurse[]>([])
   const [loading, setLoading] = useState(false)
+  const [editingNurse, setEditingNurse] = useState<INurse | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
 
   async function fetchNurses() {
     setLoading(true)

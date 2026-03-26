@@ -3,9 +3,9 @@ import ProgressTag, {
   ProgressStatus
 } from '@/components/ProgressTag/ProgressTag'
 import { AttendanceRisk, type IAttendance } from '@/interfaces/IAttendance'
-import styles from '@/styles/UserTable.module.scss'
 import { ObjectId } from '@/utils/objectId'
 import { Flex, Table } from 'antd'
+import styles from '../../components/ListTable/ListTable.module.scss'
 import { useTriagesColumns } from './hooks/useTriagesColumns'
 
 function ITriages() {

@@ -6,11 +6,11 @@ import ProgressTag, {
 } from '@/components/ProgressTag/ProgressTag'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
-import styles from '@/styles/UserTable.module.scss'
 import { Flex, message } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import styles from '../../components/ListTable/ListTable.module.scss'
 import DoctorModal from './components/DoctorModal/DoctorModal'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
@@ -40,15 +40,15 @@ function Doctors() {
     }
   }
 
+  useEffect(() => {
+    fetchDoctors()
+  }, [])
+
   const columns = useDoctorsColumns({
     setEditingDoctor,
     setEditModalOpen,
     fetchDoctors
   })
-
-  useEffect(() => {
-    fetchDoctors()
-  }, [])
 
   return (
     <>
