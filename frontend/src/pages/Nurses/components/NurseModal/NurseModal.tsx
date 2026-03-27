@@ -105,7 +105,7 @@ function ModalContent({
   }
 
   useEffect(() => {
-    if (nurse) {
+    if (isModalOpen && nurse) {
       form.setFieldsValue({
         ...nurse,
         corenUf: nurse.coren.split(' ')[0].split('-')[1],
@@ -113,7 +113,7 @@ function ModalContent({
         corenType: nurse.coren.split(' ')[1].split('-')[1]
       })
     }
-  }, [nurse, form])
+  }, [nurse, form, isModalOpen])
 
   return (
     <Modal

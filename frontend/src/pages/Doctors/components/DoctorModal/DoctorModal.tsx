@@ -110,7 +110,7 @@ function ModalContent({
   }
 
   useEffect(() => {
-    if (doctor) {
+    if (isModalOpen && doctor) {
       form.setFieldsValue({
         ...doctor,
         specialization: isMappedSpecialization
@@ -121,7 +121,7 @@ function ModalContent({
           : undefined
       })
     }
-  }, [doctor, form, isMappedSpecialization])
+  }, [doctor, form, isMappedSpecialization, isModalOpen])
 
   return (
     <Modal
