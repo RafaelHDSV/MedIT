@@ -11,7 +11,7 @@ function Logo({ className, fontSize = 36, isCompact = false }: ILogoProps) {
     return (
       <div className={`${styles.title} ${className}`} style={{ fontSize }}>
         <strong>M</strong>
-        <span>I</span>
+        <span>IT</span>
       </div>
     )
   }
