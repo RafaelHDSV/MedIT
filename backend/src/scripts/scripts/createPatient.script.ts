@@ -31,6 +31,44 @@ const createPatients: Script = {
       return faker.helpers.arrayElement(Object.values(BloodType))
     }
 
+    function generateConditions() {
+      const conditions = [
+        'Diabetes',
+        'Hipertensão',
+        'Asma',
+        'Doença cardíaca',
+        'Depressão',
+        'Ansiedade',
+        'Artrite',
+        'Doença renal',
+        'Doença hepática',
+        'Câncer'
+      ]
+      return faker.helpers.arrayElements(conditions, {
+        min: 0,
+        max: 3
+      })
+    }
+
+    function generateAllergies() {
+      const allergies = [
+        'Pólen',
+        'Ácaros',
+        'Alimentos',
+        'Medicamentos',
+        'Picadas de insetos',
+        'Látex',
+        'Moldes',
+        'Pelos de animais',
+        'Fragrâncias',
+        'Metais'
+      ]
+      return faker.helpers.arrayElements(allergies, {
+        min: 0,
+        max: 3
+      })
+    }
+
     async function createPatient() {
       const gender = faker.helpers.arrayElement(['male', 'female'])
       const name = faker.person.fullName({ sex: gender })
@@ -61,8 +99,10 @@ const createPatients: Script = {
         cellphone: generatePhone(),
         birthDate: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
         bloodType: generateBloodType(),
-        conditions: [],
-        allergies: []
+        weight: faker.number.float({ min: 50, max: 100, precision: 0.1 }),
+        height: faker.number.float({ min: 1.5, max: 2.0, precision: 0.01 }),
+        conditions: generateConditions(),
+        allergies: generateAllergies()
       }
       try {
         const response = await Patient.create(patient)
