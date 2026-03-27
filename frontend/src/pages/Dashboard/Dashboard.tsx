@@ -63,6 +63,27 @@ function Dashboard() {
     }
   }, [user?.level])
 
+  const content = useMemo(() => {
+    switch (user?.level) {
+      case UserLevels.ADMIN:
+        return (
+          <>
+            <div className={styles.attendance}>Atendimentos por hora</div>
+
+            <div className={styles.queue}>Fila de Atendimento</div>
+          </>
+        )
+      case UserLevels.DOCTOR:
+        return <></>
+      case UserLevels.NURSE:
+        return <></>
+      case UserLevels.PATIENT:
+        return <></>
+      default:
+        return <></>
+    }
+  }, [user?.level])
+
   return (
     <section>
       <Flex gap={16} align='center'>
@@ -70,14 +91,12 @@ function Dashboard() {
         <ProgressTag status={ProgressStatus.NOT_STARTED} />
       </Flex>
 
-      <div className={styles.cardsContainer}>
+      <div className={styles.container}>
         {cardsData.map(({ Icon, value, label }) => (
           <DashboardCard key={label} Icon={Icon} value={value} label={label} />
         ))}
 
-        <div className={styles.attendance}>Atendimentos por hora</div>
-
-        <div className={styles.queue}>Fila de Atendimento</div>
+        {content}
       </div>
     </section>
   )
