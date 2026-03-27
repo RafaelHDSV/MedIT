@@ -63,6 +63,30 @@ function Dashboard() {
     }
   }, [user?.level])
 
+  const queueData = [
+    {
+      nome: 'Rafael Silva',
+      idade: 20,
+      sintoma: 'Náusea',
+      tempo: 'Aguard. há 2 horas',
+      risco: 'Alto'
+    },
+    {
+      nome: 'Matheus Takenaka',
+      idade: 35,
+      sintoma: 'Dor no peito',
+      tempo: 'Aguard. há 2 horas',
+      risco: 'Médio'
+    },
+    {
+      nome: 'Rafael Vieira',
+      idade: 48,
+      sintoma: 'Febre',
+      tempo: 'Aguard. há 2 horas',
+      risco: 'Baixo'
+    }
+  ]
+
   return (
     <section>
       <Flex gap={16} align='center'>
@@ -75,9 +99,48 @@ function Dashboard() {
           <DashboardCard key={label} Icon={Icon} value={value} label={label} />
         ))}
 
-        <div className={styles.attendance}>Atendimentos por hora</div>
+        <div className={styles.queue}>
+          <div className={styles.queueHeader}>
+            <h3>Fila de Atendimento</h3>
+            <span>16 atendimentos</span>
+          </div>
 
-        <div className={styles.queue}>Fila de Atendimento</div>
+          {queueData.map((item, index) => {
+            const iniciais = item.nome
+              .split(' ')
+              .map((n) => n[0])
+              .join('')
+              .slice(0, 2)
+
+            return (
+              <div key={index} className={styles.queueItem}>
+                <div className={styles.avatar}>{iniciais}</div>
+
+                <div className={styles.nome}>{item.nome}</div>
+
+                <div className={styles.idade}>{item.idade} anos</div>
+
+                <div className={styles.sintoma}>{item.sintoma}</div>
+
+                <div className={styles.tempo}>{item.tempo}</div>
+
+                <div
+                  className={`${styles.risco} ${
+                    item.risco === 'Alto'
+                      ? styles.alto
+                      : item.risco === 'Médio'
+                        ? styles.medio
+                        : styles.baixo
+                  }`}
+                >
+                  {item.risco}
+                </div>
+
+                <button className={styles.botao}>Iniciar Atendimento</button>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
