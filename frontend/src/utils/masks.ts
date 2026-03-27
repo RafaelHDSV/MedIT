@@ -55,7 +55,17 @@ const corenMask = (value: string | undefined) => {
   return numbers.replace(/(\d{3})(\d+)/, '$1.$2')
 }
 
-export type MaskEnum = 'cpf' | 'cellphone' | 'crm' | 'date' | 'coren'
+const heightMask = (value: string | undefined) => {
+  if (!value) return ''
+  const numbers = value.replace(/\D/g, '').slice(0, 3)
+  if (numbers.length === 0) return ''
+  if (numbers.length <= 1) return numbers
+  if (numbers.length === 2)
+    return `${numbers[0]}.${numbers[1]}${numbers[2] || ''}`.slice(0, 3)
+  return `${numbers[0]}.${numbers.slice(1, 3)}`
+}
+
+export type MaskEnum = 'cpf' | 'cellphone' | 'crm' | 'date' | 'coren' | 'height'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -77,6 +87,8 @@ function masks(
       return dateMask(result)
     case 'coren':
       return corenMask(result)
+    case 'height':
+      return heightMask(result)
     default:
       return result
   }
