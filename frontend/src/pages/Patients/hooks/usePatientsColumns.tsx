@@ -84,13 +84,17 @@ export function usePatientsColumns({
         title: 'Peso',
         dataIndex: 'weight',
         key: 'weight',
-        render: (weight: number) => <TooltipColumn text={weight?.toString()} />
+        render: (weight: number) => (
+          <TooltipColumn text={`${weight?.toString()} kg`} />
+        )
       },
       {
         title: 'Altura',
         dataIndex: 'height',
         key: 'height',
-        render: (height: number) => <TooltipColumn text={height?.toString()} />
+        render: (height: number) => (
+          <TooltipColumn text={`${height?.toString()} m`} />
+        )
       },
       {
         title: 'Tipo sanguíneo',
