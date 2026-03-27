@@ -51,7 +51,7 @@ export function useNursesColumns({
         async onOk() {
           try {
             await api.delete(`/nurses/${nurse._id}`)
-            message.success('Enfermeiro deletado com sucesso!')
+            message.success('Enfermeiro(a) deletado com sucesso!')
             fetchNurses()
           } catch (err) {
             if (!axios.isAxiosError(err)) return
