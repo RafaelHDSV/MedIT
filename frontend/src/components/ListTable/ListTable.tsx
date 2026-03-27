@@ -2,6 +2,7 @@ import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { Flex, Input, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import Button from '../Button/Button'
+import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
 import styles from './ListTable.module.scss'
 
 interface IFiltersProps {
@@ -32,6 +33,10 @@ function ListTable<K extends object>({
   loading: boolean
   onReload: () => void
 }) {
+  if (loading) {
+    return <LayoutSpinner />
+  }
+
   return (
     <>
       <Filters onReload={onReload} />
