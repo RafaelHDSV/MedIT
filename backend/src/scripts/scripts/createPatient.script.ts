@@ -99,8 +99,12 @@ const createPatients: Script = {
         cellphone: generatePhone(),
         birthDate: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
         bloodType: generateBloodType(),
-        weight: faker.number.float({ min: 50, max: 100, precision: 0.1 }),
-        height: faker.number.float({ min: 1.5, max: 2.0, precision: 0.01 }),
+        weight: parseFloat(
+          faker.number.float({ min: 50, max: 100 }).toFixed(1)
+        ),
+        height: parseFloat(
+          faker.number.float({ min: 1.5, max: 2.0 }).toFixed(2)
+        ),
         conditions: generateConditions(),
         allergies: generateAllergies()
       }
