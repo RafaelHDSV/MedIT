@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next'
 import { Suspense } from 'react'
 import { LayoutSpinner } from './components/LayoutSpinner/LayoutSpinner'
 import AntdConfigProvider from './contexts/AntdConfigProvider/AntdConfigProvider'
@@ -11,6 +12,7 @@ function App() {
       <AntdConfigProvider>
         <AuthProvider>
           <SettingsProvider>
+            <Analytics />
             <AppRoutes />
           </SettingsProvider>
         </AuthProvider>
