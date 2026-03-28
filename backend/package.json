@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch src/server.js",
     "start": "node src/server.js",
-    "scripts": "tsx src/scripts/runner.ts"
+    "scripts": "tsx src/scripts/runner.js"
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",
