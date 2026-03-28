@@ -15,6 +15,11 @@
   overflow: hidden;
 }
 
+.filters {
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+
 .userTable {
   border-radius: 1rem;
   border: 1px solid var(--border);
@@ -49,7 +54,34 @@
       font-weight: 600;
       font-size: 14px;
       padding: 1rem;
-      height: 100;
+      height: auto;
+
+      &:hover {
+        background: var(--primary-opaque) !important;
+        color: var(--primary-color) !important;
+      }
+    }
+
+    .ant-table-column-has-sorters {
+      background: var(--primary-color) !important;
+      color: var(--white) !important;
+
+      &:hover {
+        background: var(--primary-opaque) !important;
+        color: var(--primary-color) !important;
+
+        .ant-table-column-sorter {
+          color: var(--primary-color) !important;
+        }
+      }
+    }
+
+    .ant-table-column-sorter {
+      color: var(--white) !important;
+
+      .active {
+        color: var(--sucess-color) !important;
+      }
     }
 
     .ant-table-tbody {
