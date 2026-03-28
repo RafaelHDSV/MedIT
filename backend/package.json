@@ -5,8 +5,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "start": "node src/server.ts",
+    "dev": "tsx watch src/server.js",
+    "start": "node src/server.js",
     "scripts": "tsx src/scripts/runner.ts"
   },
   "dependencies": {
