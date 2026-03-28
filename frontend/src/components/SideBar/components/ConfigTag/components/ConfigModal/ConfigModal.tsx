@@ -1,23 +1,13 @@
 import Button from '@/components/Button/Button'
 import { useAuth } from '@/hooks/useAuth'
 import { useDevTasks } from '@/hooks/useDevTasks'
-import { useSettings } from '@/hooks/useSettings'
 import { UserLevelsLabels } from '@/interfaces/IUser'
-import {
-  Checkbox,
-  Divider,
-  Input,
-  message,
-  Modal,
-  Switch,
-  Typography
-} from 'antd'
+import { Checkbox, Divider, Input, message, Modal, Typography } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useMemo, useState } from 'react'
 import styles from './ConfigModal.module.scss'
 
 function ConfigDevContent() {
-  const { canSeeProgressStatus, setCanSeeProgressStatus } = useSettings()
   const { tasks, addTask, toggleTask, removeTask } = useDevTasks()
   const [newTask, setNewTask] = useState('')
   const [tasksJson, setTasksJson] = useState('')
@@ -45,15 +35,6 @@ function ConfigDevContent() {
     <>
       <div className={styles.section}>
         <Typography.Title level={5}>Preferências</Typography.Title>
-
-        <div className={styles.settingRow}>
-          <span>Mostrar status de progresso</span>
-
-          <Switch
-            checked={canSeeProgressStatus}
-            onChange={(checked) => setCanSeeProgressStatus(checked)}
-          />
-        </div>
 
         <div className={styles.settingRow}>
           <span>Alterar ordenação</span>

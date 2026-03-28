@@ -1,7 +1,4 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import ProgressTag, {
-  ProgressStatus
-} from '@/components/ProgressTag/ProgressTag'
 import { useAuth } from '@/hooks/useAuth'
 import { UserLevels } from '@/interfaces/IUser'
 import {
@@ -13,7 +10,6 @@ import {
   TimerIcon,
   UsersThreeIcon
 } from '@phosphor-icons/react'
-import { Flex } from 'antd'
 import { useMemo } from 'react'
 import styles from './Dashboard.module.scss'
 import DashboardCard from './DashboardCard/DashboardCard'
@@ -86,10 +82,7 @@ function Dashboard() {
 
   return (
     <section>
-      <Flex gap={16} align='center'>
-        <AuthLayoutHeader />
-        <ProgressTag status={ProgressStatus.NOT_STARTED} />
-      </Flex>
+      <AuthLayoutHeader />
 
       <div className={styles.container}>
         {cardsData.map(({ Icon, value, label }) => (

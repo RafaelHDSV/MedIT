@@ -1,9 +1,6 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
-import ProgressTag, {
-  ProgressStatus
-} from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
 import type { IPatient } from '@/interfaces/IPatient'
 import { Flex, message } from 'antd'
@@ -64,10 +61,7 @@ function Patients() {
 
       <div className={styles.tableContent}>
         <Flex vertical className={styles.container}>
-          <Flex gap={16} align='center'>
-            <AuthLayoutHeader />
-            <ProgressTag status={ProgressStatus.COMPLETED} />
-          </Flex>
+          <AuthLayoutHeader />
 
           <ListTable<IPatient>
             dataSource={patients}
