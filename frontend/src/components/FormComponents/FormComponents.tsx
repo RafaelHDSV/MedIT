@@ -10,9 +10,15 @@ import {
   type InputRef,
   type SelectProps
 } from 'antd'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { useState, type RefObject } from 'react'
 import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
+import {
+  DayjsType,
+  type DateValue,
+  type DayjsValue,
+  type RangeValue
+} from '../MultiDatepicker/types'
 import styles from './FormComponents.module.scss'
 
 interface IFormItemProps extends FormItemProps {
@@ -87,54 +93,53 @@ function InputSelect({ inputHeight, ...rest }: IInputSelectProps) {
   )
 }
 
-type DayjsType = Dayjs | [Dayjs | null, Dayjs | null] | null
-
 interface IInputDateProps {
   value?: string
   inputHeight?: string
-  onChange?: (date: DayjsType) => void
+  dateType?: DayjsType
+  onChange?: (date: DayjsValue) => void
 }
 
 function InputDate({
   value: initialValue,
   inputHeight,
+  dateType,
   onChange
 }: IInputDateProps) {
-  const [value, setValue] = useState<DayjsType>(null)
-  const [filterDateType, setFilterDateType] = useState<
-    'date' | 'week' | 'month' | 'year' | 'range'
-  >('date')
+  const [value, setValue] = useState<DayjsValue>(null)
+  const [type, setType] = useState<DayjsType>(dateType || DayjsType.date)
 
-  const handleDateTypeChange = (
-    type: 'date' | 'week' | 'month' | 'year' | 'range'
-  ) => {
-    setFilterDateType(type)
+  const handleDateTypeChange = (type: DayjsType) => {
+    setType(type)
   }
 
   const finalValue = () => {
-    if (initialValue) return dayjs(initialValue) as DayjsType
+    if (initialValue !== undefined) return dayjs(initialValue) as DayjsValue
 
-    if (filterDateType === 'range') {
-      return value as [Dayjs | null, Dayjs | null] | null
+    switch (type) {
+      case DayjsType.range:
+        return value as RangeValue
+      case DayjsType.date:
+        return value as DateValue
+      default:
+        return value as DayjsValue
     }
-
-    return value as Dayjs | null
   }
 
   return (
     <MultiDatepicker
       className={styles.multiDatepicker}
       style={{ '--input-height': inputHeight || '3rem' } as React.CSSProperties}
-      type={filterDateType}
-      defaultPickerType={filterDateType}
-      options={['date']}
+      type={type}
+      defaultPickerType={type}
+      options={[type]}
       onDateTypeChange={handleDateTypeChange}
       value={finalValue()}
       defaultValue={dayjs()}
-      onDateChange={(date: DayjsType) => {
+      onDateChange={(date: DayjsValue) => {
         if (!date) return
         setValue(date)
-        if (onChange) onChange(date)
+        onChange?.(date)
       }}
     />
   )

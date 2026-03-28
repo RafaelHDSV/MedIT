@@ -49,7 +49,33 @@
       font-weight: 600;
       font-size: 14px;
       padding: 1rem;
-      height: 100;
+
+      &:hover {
+        background: var(--primary-opaque);
+        color: var(--primary-color);
+      }
+    }
+
+    .ant-table-column-has-sorters {
+      background: var(--primary-color);
+      color: var(--white);
+
+      &:hover {
+        background: var(--primary-opaque);
+        color: var(--primary-color);
+
+        .ant-table-column-sorter {
+          color: var(--primary-color);
+        }
+      }
+    }
+
+    .ant-table-column-sorter {
+      color: var(--white);
+
+      .active {
+        color: var(--sucess-color);
+      }
     }
 
     .ant-table-tbody {

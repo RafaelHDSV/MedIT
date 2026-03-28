@@ -20,7 +20,7 @@ function Filters({ onReload }: IFiltersProps) {
   )
 }
 
-function ListTable<K extends object>({
+function ListTable<K>({
   dataSource,
   columns,
   pageSize = 7,
@@ -52,6 +52,7 @@ function ListTable<K extends object>({
           pagination={{ pageSize, hideOnSinglePage: true }}
           size='middle'
           bordered={false}
+          // FIXME: Erro com ellipsis com min OU Erro de header maior pra paciente
           scroll={{ x: 'max-content' }}
         />
       </div>

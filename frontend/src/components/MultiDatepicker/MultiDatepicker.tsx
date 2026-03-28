@@ -5,24 +5,21 @@ import { Button, DatePicker, Dropdown, type DropdownProps } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { type JSX, type ReactNode, useRef } from 'react'
+import { useRef, type JSX, type ReactNode } from 'react'
 import { getMultiDatepickerFormat, useInputMask } from './constants'
 import styles from './MultiDatepicker.module.scss'
 import {
-  DEFAULT_DATE_TYPE_OPTIONS,
+  DayjsType,
   INPUT_PARSE_FORMATS,
-  type MultiDatepickerType
+  type DateValue,
+  type DayjsValue,
+  type RangeValue
 } from './types'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.tz.setDefault('America/Sao_Paulo')
 dayjs.locale('pt-br')
-
-const { RangePicker } = DatePicker
-
-type DateValue = Dayjs | null
-type RangeValue = [Dayjs | null, Dayjs | null] | null
 
 type IMultiDatepickerContainerProps = JSX.IntrinsicElements['div'] & {
   menu: DropdownProps['menu']
@@ -64,27 +61,27 @@ export function MultiDatepickerContainer({
 }
 
 interface IInputDate {
-  type?: MultiDatepickerType
-  onDateTypeChange: (type: MultiDatepickerType) => void
-  onDateChange: (value: DateValue | RangeValue) => void
-  value: DateValue | RangeValue
-  defaultValue?: DateValue | RangeValue
-  options?: MultiDatepickerType[]
+  type?: DayjsType
+  onDateTypeChange: (type: DayjsType) => void
+  onDateChange: (value: DayjsValue) => void
+  value: DayjsValue
+  defaultValue?: DayjsValue
+  options?: DayjsType[]
   className?: string
   style?: React.CSSProperties
   allowClear?: boolean
-  defaultPickerType?: MultiDatepickerType
+  defaultPickerType?: DayjsType
   dateSelectorRef?: React.RefObject<HTMLButtonElement>
 }
 
 export default function MultiDatepicker({
-  type = 'date',
+  type = DayjsType.date,
   onDateTypeChange,
   onDateChange,
   value,
   defaultValue,
-  defaultPickerType = 'month',
-  options = DEFAULT_DATE_TYPE_OPTIONS,
+  defaultPickerType = DayjsType.month,
+  options = Object.values(DayjsType),
   className,
   style,
   allowClear = false,
@@ -94,7 +91,7 @@ export default function MultiDatepicker({
   useInputMask(pickerRef, type)
 
   const getDisplayFormat = (): DatePickerProps['format'] => {
-    if (type === 'week') {
+    if (type === DayjsType.week) {
       const weekFormat: DatePickerProps['format'] = [
         (value: Dayjs) =>
           `${formatDate({
@@ -171,7 +168,7 @@ export default function MultiDatepicker({
       }}
     >
       {type === 'range' ? (
-        <RangePicker
+        <DatePicker.RangePicker
           {...commonProps}
           value={value as RangeValue}
           onChange={handleRangeChange}
