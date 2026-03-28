@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch src/server.js",
+    "build": "tsc",
     "start": "node src/server.js",
     "scripts": "tsx src/scripts/runner.js"
   },
