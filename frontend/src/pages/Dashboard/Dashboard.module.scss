@@ -34,20 +34,98 @@
   & > *:nth-child(6) {
     grid-area: card6;
   }
-
-  .attendance,
   .queue {
+    grid-area: queue;
     background: white;
     border-radius: 0.5rem;
     padding: 1rem;
-    height: 20rem;
+    min-height: 20rem;
   }
-
-  .attendance {
-    grid-area: attendance;
+  .queueHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
   }
-
-  .queue {
-    grid-area: queue;
+  .queueHeader h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .queueHeader span {
+    font-size: 17px;
+    color: #9ca3af;
+  }
+  .queueInfo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #777;
+  }
+  .queueItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .queueItem:last-child {
+    border-bottom: none;
+  }
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+  }
+  .avatarAlto {
+    background-color: #ef4444;
+  }
+  .avatarMedio {
+    background-color: #f59e0b;
+  }
+  .avatarBaixo {
+    background-color: #22c55e;
+  }
+  .info {
+    display: flex;
+    flex-direction: column;
+  }
+  .nome {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .status {
+    font-size: 16px;
+    color: #777;
+  }
+  .risco {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .alto {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  .medio {
+    background: #fef3c7;
+    color: #d97706;
+  }
+  .baixo {
+    background: #dcfce7;
+    color: #16a34a;
   }
 }
