@@ -1,3 +1,4 @@
+import { UserLevels } from '../../interfaces/IUser.js'
 import UserModel from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
@@ -61,7 +62,7 @@ const createTccAdmins: Script = {
           email: member.email,
           password: 'fastpass',
           cellphone: member.cellphone,
-          level: 'admin',
+          level: UserLevels.ADMIN,
           number: index + 4 // já tem 3 admins
         }
 
