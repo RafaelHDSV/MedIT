@@ -65,7 +65,22 @@ const heightMask = (value: string | undefined) => {
   return `${numbers[0]}.${numbers.slice(1, 3)}`
 }
 
-export type MaskEnum = 'cpf' | 'cellphone' | 'crm' | 'date' | 'coren' | 'height'
+const normalizeString = (value: string) => {
+  if (!value) return ''
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+export type MaskEnum =
+  | 'cpf'
+  | 'cellphone'
+  | 'crm'
+  | 'date'
+  | 'coren'
+  | 'height'
+  | 'normalize'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -89,6 +104,8 @@ function masks(
       return corenMask(result)
     case 'height':
       return heightMask(result)
+    case 'normalize':
+      return normalizeString(result)
     default:
       return result
   }
