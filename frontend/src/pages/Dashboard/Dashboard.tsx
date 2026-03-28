@@ -11,15 +11,17 @@ import {
   DoorOpenIcon,
   HourglassIcon,
   TimerIcon,
-  UsersThreeIcon
+  UsersThreeIcon,
+  StethoscopeIcon
 } from '@phosphor-icons/react'
 import { Flex } from 'antd'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import styles from './Dashboard.module.scss'
 import DashboardCard from './DashboardCard/DashboardCard'
 
 function Dashboard() {
   const { user } = useAuth()
+  const [showAll, setShowAll] = useState(false)
   const cardsData = useMemo(() => {
     switch (user?.level) {
       case UserLevels.ADMIN:
@@ -62,30 +64,54 @@ function Dashboard() {
         return []
     }
   }, [user?.level])
-
   const queueData = [
     {
+      nome: 'Rafael Vieira',
+      status: 'Aguardando Médico',
+      risco: 'Baixo'
+    },
+    {
       nome: 'Rafael Silva',
-      idade: 20,
-      sintoma: 'Náusea',
-      tempo: 'Aguard. há 2 horas',
+      status: 'Aguardando Médico',
       risco: 'Alto'
     },
     {
-      nome: 'Matheus Takenaka',
-      idade: 35,
-      sintoma: 'Dor no peito',
-      tempo: 'Aguard. há 2 horas',
-      risco: 'Médio'
+      nome: 'Rafael Vieira',
+      status: 'Aguardando Médico',
+      risco: 'Baixo'
     },
     {
       nome: 'Rafael Vieira',
-      idade: 48,
-      sintoma: 'Febre',
-      tempo: 'Aguard. há 2 horas',
+      status: 'Aguardando Médico',
       risco: 'Baixo'
+    },
+    {
+      nome: 'Matheus Takenaka',
+      status: 'Aguardando Médico',
+      risco: 'Médio'
+    },
+    {
+      nome: 'Matheus Takenaka',
+      status: 'Aguardando Médico',
+      risco: 'Médio'
+    },
+    {
+      nome: 'Rafael Silva',
+      status: 'Aguardando Médico',
+      risco: 'Alto'
+    },
+    {
+      nome: 'Rafael Vieira',
+      status: 'Aguardando Médico',
+      risco: 'Baixo'
+    },
+    {
+      nome: 'Matheus Takenaka',
+      status: 'Aguardando Médico',
+      risco: 'Médio'
     }
   ]
+  const visibleQueue = showAll ? queueData : queueData.slice(0, 5)
 
   return (
     <section>
@@ -102,10 +128,15 @@ function Dashboard() {
         <div className={styles.queue}>
           <div className={styles.queueHeader}>
             <h3>Fila de Atendimento</h3>
-            <span>16 atendimentos</span>
+            <div className={styles.queueinfo}>
+              <span>
+                <StethoscopeIcon />
+              </span>
+              <span> {queueData.length} atendimentos</span>
+            </div>
           </div>
 
-          {queueData.map((item, index) => {
+          {visibleQueue.map((item, index) => {
             const iniciais = item.nome
               .split(' ')
               .map((n) => n[0])
@@ -114,16 +145,24 @@ function Dashboard() {
 
             return (
               <div key={index} className={styles.queueItem}>
-                <div className={styles.avatar}>{iniciais}</div>
+                <div className={styles.left}>
+                  <div
+                    className={`${styles.avatar} ${
+                      item.risco === 'Alto'
+                        ? styles.avatarAlto
+                        : item.risco === 'Médio'
+                          ? styles.avatarMedio
+                          : styles.avatarBaixo
+                    }`}
+                  >
+                    {iniciais}
+                  </div>
 
-                <div className={styles.nome}>{item.nome}</div>
-
-                <div className={styles.idade}>{item.idade} anos</div>
-
-                <div className={styles.sintoma}>{item.sintoma}</div>
-
-                <div className={styles.tempo}>{item.tempo}</div>
-
+                  <div className={styles.info}>
+                    <span className={styles.nome}>{item.nome}</span>
+                    <span className={styles.status}>{item.status}</span>
+                  </div>
+                </div>
                 <div
                   className={`${styles.risco} ${
                     item.risco === 'Alto'
@@ -135,15 +174,19 @@ function Dashboard() {
                 >
                   {item.risco}
                 </div>
-
-                <button className={styles.botao}>Iniciar Atendimento</button>
               </div>
             )
           })}
+          {queueData.length > 5 && (
+            <div className={styles.more} onClick={() => setShowAll(!showAll)}>
+              {showAll
+                ? 'Mostrar menos'
+                : `+ ${queueData.length - 5} atendimentos`}
+            </div>
+          )}
         </div>
       </div>
     </section>
   )
 }
-
 export default Dashboard

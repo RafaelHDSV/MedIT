@@ -128,4 +128,18 @@
     background: #dcfce7;
     color: #16a34a;
   }
+  .more {
+    margin-top: 12px;
+    text-align: center;
+    background: #f3f4f6;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .more:hover {
+    background: #e5e7eb;
+  }
 }
