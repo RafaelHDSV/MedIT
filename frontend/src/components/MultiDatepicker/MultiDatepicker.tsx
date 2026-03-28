@@ -21,9 +21,6 @@ dayjs.locale('pt-br')
 
 const { RangePicker } = DatePicker
 
-type DateValue = Dayjs | null
-type RangeValue = [Dayjs | null, Dayjs | null] | null
-
 type IMultiDatepickerContainerProps = JSX.IntrinsicElements['div'] & {
   menu: DropdownProps['menu']
   children: ReactNode
@@ -63,12 +60,25 @@ export function MultiDatepickerContainer({
   )
 }
 
+export type DateValue = Dayjs | null
+export type RangeValue = [DateValue, DateValue] | null
+export type DayjsType = DateValue | RangeValue
+
+export const DateType = {
+  date: 'date',
+  week: 'week',
+  month: 'month',
+  year: 'year',
+  range: 'range'
+} as const
+export type DateType = (typeof DateType)[keyof typeof DateType]
+
 interface IInputDate {
   type?: MultiDatepickerType
   onDateTypeChange: (type: MultiDatepickerType) => void
-  onDateChange: (value: DateValue | RangeValue) => void
-  value: DateValue | RangeValue
-  defaultValue?: DateValue | RangeValue
+  onDateChange: (value: DayjsType) => void
+  value: DayjsType
+  defaultValue?: DayjsType
   options?: MultiDatepickerType[]
   className?: string
   style?: React.CSSProperties

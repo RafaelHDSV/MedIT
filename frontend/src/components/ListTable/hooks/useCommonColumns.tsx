@@ -59,7 +59,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       title: 'E-mail',
       dataIndex: 'email',
       key: 'email',
-      width: 220,
+      width: 250,
       ellipsis: true,
       render: (email: string) => <TooltipColumn text={email} />
     }),

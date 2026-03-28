@@ -10,9 +10,14 @@ import {
   type InputRef,
   type SelectProps
 } from 'antd'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { useState, type RefObject } from 'react'
-import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
+import MultiDatepicker, {
+  DateType,
+  type DateValue,
+  type DayjsType,
+  type RangeValue
+} from '../MultiDatepicker/MultiDatepicker'
 import styles from './FormComponents.module.scss'
 
 interface IFormItemProps extends FormItemProps {
@@ -87,38 +92,36 @@ function InputSelect({ inputHeight, ...rest }: IInputSelectProps) {
   )
 }
 
-type DayjsType = Dayjs | [Dayjs | null, Dayjs | null] | null
-
 interface IInputDateProps {
-  value?: string
+  value?: DayjsType
   inputHeight?: string
+  filterType?: DateType
   onChange?: (date: DayjsType) => void
 }
 
 function InputDate({
   value: initialValue,
   inputHeight,
+  filterType,
   onChange
 }: IInputDateProps) {
   const [value, setValue] = useState<DayjsType>(null)
-  const [filterDateType, setFilterDateType] = useState<
-    'date' | 'week' | 'month' | 'year' | 'range'
-  >('date')
+  const [filterDateType, setFilterDateType] = useState<DateType>(
+    filterType || DateType.date
+  )
 
-  const handleDateTypeChange = (
-    type: 'date' | 'week' | 'month' | 'year' | 'range'
-  ) => {
+  const handleDateTypeChange = (type: DateType) => {
     setFilterDateType(type)
   }
 
   const finalValue = () => {
-    if (initialValue) return dayjs(initialValue) as DayjsType
+    if (initialValue !== undefined) return initialValue
 
     if (filterDateType === 'range') {
-      return value as [Dayjs | null, Dayjs | null] | null
+      return value as RangeValue
     }
 
-    return value as Dayjs | null
+    return value as DateValue
   }
 
   return (
@@ -134,7 +137,7 @@ function InputDate({
       onDateChange={(date: DayjsType) => {
         if (!date) return
         setValue(date)
-        if (onChange) onChange(date)
+        onChange?.(date)
       }}
     />
   )
