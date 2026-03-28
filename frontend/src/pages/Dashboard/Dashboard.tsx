@@ -12,7 +12,8 @@ import {
 } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import styles from './Dashboard.module.scss'
-import DashboardCard from './DashboardCard/DashboardCard'
+import AttendanceByHourChart from './components/AttendanceByHourChart/AttendanceByHourChart'
+import DashboardCard from './components/DashboardCard/DashboardCard'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -64,7 +65,7 @@ function Dashboard() {
       case UserLevels.ADMIN:
         return (
           <>
-            <div className={styles.attendance}>Atendimentos por hora</div>
+            <AttendanceByHourChart className={styles.attendanceByHourChart} />
 
             <div className={styles.queue}>Fila de Atendimento</div>
           </>
@@ -81,7 +82,7 @@ function Dashboard() {
   }, [user?.level])
 
   return (
-    <section>
+    <>
       <AuthLayoutHeader />
 
       <div className={styles.container}>
@@ -91,7 +92,7 @@ function Dashboard() {
 
         {content}
       </div>
-    </section>
+    </>
   )
 }
 
