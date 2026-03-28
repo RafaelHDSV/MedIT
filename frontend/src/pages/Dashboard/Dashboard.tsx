@@ -21,8 +21,8 @@ function Dashboard() {
       case UserLevels.ADMIN:
         return [
           { Icon: DoorOpenIcon, value: '142', label: 'Entradas' },
-          { Icon: HourglassIcon, value: '46', label: 'Em atendimento' },
           { Icon: CheckCircleIcon, value: '96', label: 'Atendidos' },
+          { Icon: HourglassIcon, value: '46', label: 'Em atendimento' },
           { Icon: BedIcon, value: '52%', label: 'Ocupação' },
           { Icon: TimerIcon, value: '23min', label: 'Tempo médio' },
           { Icon: BombIcon, value: '8', label: 'Risco alto' }
