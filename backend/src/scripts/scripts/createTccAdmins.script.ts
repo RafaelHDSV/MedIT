@@ -1,4 +1,5 @@
 import { UserLevels } from '../../interfaces/IUser.js'
+import { Admin } from '../../models/AdminModel.js'
 import UserModel from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
@@ -66,7 +67,7 @@ const createTccAdmins: Script = {
           number: index + 4 // já tem 3 admins
         }
 
-        const response = await UserModel.create(admin)
+        const response = await Admin.create(admin)
 
         console.log('✅ Admin criado:', response.email)
       } catch (error: any) {
