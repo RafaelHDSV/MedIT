@@ -106,6 +106,7 @@ export function usePatientsColumns({
         title: 'Condições',
         dataIndex: 'conditions',
         key: 'conditions',
+        ellipsis: true,
         render: (conditions: string[]) => (
           <TooltipColumn text={conditions.join(', ')} />
         )
@@ -114,6 +115,7 @@ export function usePatientsColumns({
         title: 'Alergias',
         dataIndex: 'allergies',
         key: 'allergies',
+        ellipsis: true,
         render: (allergies: string[]) => (
           <TooltipColumn text={allergies.join(', ')} />
         )

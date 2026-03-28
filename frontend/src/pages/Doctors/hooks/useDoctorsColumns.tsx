@@ -87,6 +87,7 @@ export function useDoctorsColumns({
         dataIndex: 'crm',
         key: 'crm',
         width: 120,
+        ellipsis: true,
         render: (crm: string) => <TooltipColumn text={masks(crm, 'crm')} />
       },
       commonColumns.createdAt(),

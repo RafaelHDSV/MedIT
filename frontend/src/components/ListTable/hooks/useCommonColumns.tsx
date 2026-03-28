@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
+import { sorterFunction } from '@/utils/sorterFunction'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { Flex, Tooltip } from 'antd'
 import type { ColumnType } from 'antd/es/table'
@@ -25,6 +26,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'number',
       key: 'number',
       width: 60,
+      sorter: sorterFunction,
       render: (_id: string) => <TooltipColumn text={_id} />
     }),
     name: (): ColumnType<K> => ({
@@ -50,6 +52,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'cpf',
       key: 'cpf',
       width: 140,
+      ellipsis: true,
       render: (cpf: string) => <TooltipColumn text={masks(cpf, 'cpf')} />
     }),
     email: (): ColumnType<K> => ({
@@ -57,6 +60,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'email',
       key: 'email',
       width: 220,
+      ellipsis: true,
       render: (email: string) => <TooltipColumn text={email} />
     }),
     birthDate: (): ColumnType<K> => ({
@@ -64,6 +68,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'birthDate',
       key: 'birthDate',
       width: 180,
+      ellipsis: true,
       render: (date: Date | string) => (
         <TooltipColumn
           text={`${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`}
@@ -75,6 +80,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'cellphone',
       key: 'cellphone',
       width: 140,
+      ellipsis: true,
       render: (cellphone: string) => (
         <TooltipColumn text={masks(cellphone, 'cellphone')} />
       )
@@ -84,6 +90,8 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
+      ellipsis: true,
+      sorter: sorterFunction,
       render: (date: Date | string) => (
         <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
       )
@@ -93,6 +101,8 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: 160,
+      ellipsis: true,
+      sorter: sorterFunction,
       render: (date: Date | string) => (
         <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
       )

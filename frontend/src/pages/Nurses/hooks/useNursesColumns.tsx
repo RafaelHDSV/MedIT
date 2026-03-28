@@ -84,6 +84,7 @@ export function useNursesColumns({
         title: 'COREN',
         dataIndex: 'coren',
         key: 'coren',
+        ellipsis: true,
         render: (coren: string) => <TooltipColumn text={coren} />
       },
       commonColumns.createdAt(),
