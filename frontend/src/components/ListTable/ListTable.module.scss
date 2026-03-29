@@ -1,3 +1,5 @@
+@use '../../styles/abstract/breakpoints' as *;
+
 .tableContent {
   display: flex;
   flex-direction: column;
@@ -17,8 +19,14 @@
 .userTable {
   border-radius: 1rem;
   border: 1px solid var(--border);
+  max-width: 100%;
 
   :global {
+    .ant-table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .ant-table-content {
       scrollbar-color: var(--secondary-color) transparent;
 
@@ -48,6 +56,12 @@
       font-weight: 600;
       font-size: 14px;
       padding: 1rem;
+      white-space: nowrap;
+
+      @include max-md {
+        padding: 0.625rem 0.5rem;
+        font-size: 12px;
+      }
 
       &:hover {
         background: var(--primary-opaque);
@@ -88,6 +102,11 @@
           font-size: 14px;
           color: var(--black);
           border-bottom: 1px solid var(--white);
+
+          @include max-md {
+            padding: 0.625rem 0.5rem;
+            font-size: 12px;
+          }
 
           &:nth-child(2) {
             color: var(--primary-color);

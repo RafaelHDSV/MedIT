@@ -1,3 +1,5 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
 .card {
   display: flex;
   align-items: center;
@@ -5,7 +7,14 @@
   padding: 1rem;
   gap: 1rem;
   height: 6rem;
+  min-width: 0;
   background-color: var(--white);
+
+  @include max-md {
+    height: auto;
+    min-height: 5rem;
+    padding: 0.75rem;
+  }
   border: 1px solid var(--border);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
   transition: transform 0.15s ease;
@@ -42,11 +51,16 @@
       font-size: 2rem;
       font-weight: 600;
       color: var(--black);
+
+      @include max-md {
+        font-size: 1.5rem;
+      }
     }
 
     .label {
       font-size: 0.875rem;
       color: var(--gray);
+      line-height: 1.3;
     }
   }
 }

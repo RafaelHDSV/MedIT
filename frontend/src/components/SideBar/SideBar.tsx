@@ -86,7 +86,6 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
                       )}
                       {!isCompact ? r.name : ''}
                     </div>
-
                   </NavLink>
                 </li>
               ))}
@@ -111,7 +110,6 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
             {route.icon && <route.icon size={22} className={styles.linkIcon} />}
             {!isCompact ? route.name : ''}
           </div>
-
         </NavLink>
       </li>
     )
@@ -120,27 +118,51 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
   return <ul className={styles.menuList}>{routes.map(renderRoute)}</ul>
 }
 
-function SideBar() {
+interface ISideBarProps {
+  isMobile?: boolean
+  mobileOpen?: boolean
+  onMobileOpenChange?: (open: boolean) => void
+}
+
+function SideBar({
+  isMobile = false,
+  mobileOpen = false,
+  onMobileOpenChange
+}: ISideBarProps) {
   const [isCompact, setIsCompact] = useState(false)
+  const effectiveCompact = isMobile ? false : isCompact
+
+  const toggleMenu = () => {
+    if (isMobile) {
+      onMobileOpenChange?.(!mobileOpen)
+    } else {
+      setIsCompact((prev) => !prev)
+    }
+  }
+
+  const iconActive = (!isMobile && isCompact) || (isMobile && mobileOpen)
+  const mobileHidden = isMobile && !mobileOpen
 
   return (
-    <nav className={`${styles.nav} ${isCompact ? styles.compact : ''}`}>
+    <nav
+      className={`${styles.nav} ${effectiveCompact ? styles.compact : ''} ${mobileHidden ? styles.mobileHidden : ''}`}
+    >
       <div className={styles.main}>
         <header className={styles.header}>
           <ListIcon
-            className={`${styles.icon} ${isCompact ? styles.iconActive : ''}`}
+            className={`${styles.icon} ${iconActive ? styles.iconActive : ''}`}
             size={32}
-            onClick={() => setIsCompact(!isCompact)}
+            onClick={toggleMenu}
           />
-          <Logo fontSize={32} isCompact={isCompact} />
+          <Logo fontSize={32} isCompact={effectiveCompact} />
         </header>
 
-        <SidebarItems isCompact={isCompact} />
+        <SidebarItems isCompact={effectiveCompact} />
       </div>
 
       <div className={styles.footer}>
-        <ConfigTag isCompact={isCompact} />
-        <UserTag isCompact={isCompact} />
+        <ConfigTag isCompact={effectiveCompact} />
+        <UserTag isCompact={effectiveCompact} />
       </div>
     </nav>
   )

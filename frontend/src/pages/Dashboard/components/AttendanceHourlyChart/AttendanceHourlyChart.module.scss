@@ -1,8 +1,15 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
 .chart {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   width: 100%;
+  gap: 0.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
+  -webkit-overflow-scrolling: touch;
 
   .barContainer {
     display: flex;
@@ -16,7 +23,13 @@
 
     .bar {
       width: 2rem;
+      min-width: 1.25rem;
       background-color: var(--primary-color);
+
+      @include max-md {
+        width: 1.25rem;
+        min-width: 0.75rem;
+      }
       border-radius: 6px;
       transition: height 0.3s;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);

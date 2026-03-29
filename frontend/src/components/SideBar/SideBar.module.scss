@@ -1,3 +1,5 @@
+@use '../../styles/abstract/breakpoints' as *;
+
 .nav {
   display: flex;
   flex-direction: column;
@@ -7,6 +9,28 @@
   padding: 1rem;
   width: 15rem;
   height: 100%;
+  flex-shrink: 0;
+
+  @include max-md {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    box-shadow: .25rem 0 1.5rem rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease;
+    will-change: transform;
+  }
+}
+
+.mobileHidden {
+  @include max-md {
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
 }
 
 .compact {
