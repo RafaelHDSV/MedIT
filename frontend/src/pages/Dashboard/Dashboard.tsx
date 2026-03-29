@@ -11,7 +11,7 @@ import {
   UsersThreeIcon
 } from '@phosphor-icons/react'
 import { useMemo } from 'react'
-import AttendanceHourlyChart from './components/AttendanceHourlyChart/AttendanceHourlyChart'
+import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import styles from './Dashboard.module.scss'
@@ -66,7 +66,7 @@ function Dashboard() {
       case UserLevels.ADMIN:
         return (
           <>
-            <AttendanceHourlyChart />
+            <AttendanceByTimeChart />
             <AttendanceQueueChart />
           </>
         )

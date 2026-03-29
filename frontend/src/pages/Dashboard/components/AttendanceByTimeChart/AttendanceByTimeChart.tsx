@@ -1,7 +1,7 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
 import { Tooltip } from 'antd'
-import styles from './AttendanceHourlyChart.module.scss'
+import styles from './AttendanceByTimeChart.module.scss'
 
 function generateAttendanceData() {
   const data = []
@@ -14,7 +14,7 @@ function generateAttendanceData() {
   return data
 }
 
-function AttendanceHourlyChart() {
+function AttendanceByTimeChart() {
   const attendanceData: { hour: string; value: number }[] =
     generateAttendanceData()
 
@@ -23,7 +23,7 @@ function AttendanceHourlyChart() {
       title='Atendimentos por Hora'
       icon={ClockCountdownIcon}
       asideText='30 p/ hora'
-      gridArea='attendanceHourlyChart'
+      gridArea='attendanceByTimeChart'
     >
       <div className={styles.chart}>
         {attendanceData.map((item, index) => (
@@ -42,4 +42,4 @@ function AttendanceHourlyChart() {
   )
 }
 
-export default AttendanceHourlyChart
+export default AttendanceByTimeChart

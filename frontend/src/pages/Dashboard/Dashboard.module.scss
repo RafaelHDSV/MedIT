@@ -10,9 +10,9 @@
   grid-template-areas:
     'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
     'dashboardCard5 dashboardCard6 attendanceQueueChart attendanceQueueChart'
-    'attendanceHourlyChart attendanceHourlyChart attendanceQueueChart attendanceQueueChart'
-    'attendanceHourlyChart attendanceHourlyChart attendanceQueueChart attendanceQueueChart'
-    'attendanceHourlyChart attendanceHourlyChart attendanceQueueChart attendanceQueueChart';
+    'attendanceByTimeChart attendanceByTimeChart attendanceQueueChart attendanceQueueChart'
+    'attendanceByTimeChart attendanceByTimeChart attendanceQueueChart attendanceQueueChart'
+    'attendanceByTimeChart attendanceByTimeChart attendanceQueueChart attendanceQueueChart';
 
   @include max-lg {
     grid-template-columns: repeat(2, 1fr);
@@ -21,9 +21,9 @@
       'dashboardCard3 dashboardCard4'
       'dashboardCard5 dashboardCard6'
       'attendanceQueueChart attendanceQueueChart'
-      'attendanceHourlyChart attendanceHourlyChart'
-      'attendanceHourlyChart attendanceHourlyChart'
-      'attendanceHourlyChart attendanceHourlyChart';
+      'attendanceByTimeChart attendanceByTimeChart'
+      'attendanceByTimeChart attendanceByTimeChart'
+      'attendanceByTimeChart attendanceByTimeChart';
   }
 
   @include max-md {
@@ -36,6 +36,6 @@
       'dashboardCard5'
       'dashboardCard6'
       'attendanceQueueChart'
-      'attendanceHourlyChart';
+      'attendanceByTimeChart';
   }
 }
