@@ -40,13 +40,14 @@
     align-items: center;
     gap: 1rem;
     min-width: 0;
-    flex: 1 1 auto;
+    flex: 1;
   }
 
   .info {
     display: flex;
     flex-direction: column;
     font-size: 16px;
+    min-width: 0;
 
     .name {
       font-weight: 600;

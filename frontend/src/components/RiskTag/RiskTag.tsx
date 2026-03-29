@@ -36,7 +36,7 @@ function RiskTag({ risk }: IRiskTagProps) {
 
   return (
     <span
-      className={styles.tag}
+      className={`${styles.tag} ellipsis`}
       style={
         {
           '--color': colors[risk].color,

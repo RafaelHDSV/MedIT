@@ -6,9 +6,10 @@ import styles from './TooltipColumn.module.scss'
 interface ITooltipColumnProps {
   text: string
   icon?: FC<IconProps>
+  className?: string
 }
 
-function TooltipColumn({ text, icon: Icon }: ITooltipColumnProps) {
+function TooltipColumn({ text, icon: Icon, className }: ITooltipColumnProps) {
   const display = text || 'n/a'
 
   const spanContent = () => {
@@ -20,7 +21,7 @@ function TooltipColumn({ text, icon: Icon }: ITooltipColumnProps) {
       )
     }
 
-    return <span className='ellipsis w-100'>{display}</span>
+    return <span className={`ellipsis w-100 ${className}`}>{display}</span>
   }
 
   return (

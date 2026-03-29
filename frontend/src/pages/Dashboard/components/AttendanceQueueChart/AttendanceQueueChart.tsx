@@ -1,4 +1,5 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
+import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
@@ -22,8 +23,8 @@ function AttendanceItem({ item }: IAttendanceItemProps) {
         <UserBall name={item.name} />
 
         <div className={styles.info}>
-          <span className={styles.name}>{item.name}</span>
-          <span className={styles.status}>{item.status}</span>
+          <TooltipColumn className={styles.name} text={item.name} />
+          <TooltipColumn className={styles.status} text={item.status} />
         </div>
       </div>
 
