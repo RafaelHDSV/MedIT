@@ -13,11 +13,18 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
   transition: transform 0.15s ease;
 
-  @include max-md {
+  @include max-lg {
     height: auto;
     min-height: 5rem;
     padding: 0.75rem;
     width: 15rem;
+  }
+
+  @include max-md {
+    height: auto;
+    min-height: 5rem;
+    padding: 0.75rem;
+    width: 100%;
   }
 
   &:hover {

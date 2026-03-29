@@ -25,4 +25,17 @@
       'attendanceHourlyChart attendanceHourlyChart'
       'attendanceHourlyChart attendanceHourlyChart';
   }
+
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'dashboardCard1'
+      'dashboardCard2'
+      'dashboardCard3'
+      'dashboardCard4'
+      'dashboardCard5'
+      'dashboardCard6'
+      'attendanceQueueChart'
+      'attendanceHourlyChart';
+  }
 }
