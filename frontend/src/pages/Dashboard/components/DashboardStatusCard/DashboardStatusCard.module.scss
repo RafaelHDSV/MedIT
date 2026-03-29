@@ -9,15 +9,16 @@
   height: 6rem;
   min-width: 0;
   background-color: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease;
 
   @include max-md {
     height: auto;
     min-height: 5rem;
     padding: 0.75rem;
+    width: 15rem;
   }
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-  transition: transform 0.15s ease;
 
   &:hover {
     transform: translateY(-0.5rem);

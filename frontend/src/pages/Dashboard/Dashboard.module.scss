@@ -25,12 +25,4 @@
       'attendanceHourlyChart attendanceHourlyChart'
       'attendanceHourlyChart attendanceHourlyChart';
   }
-
-  @include max-md {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    height: auto;
-    min-height: 0;
-  }
 }

@@ -9,14 +9,19 @@
   padding: 2rem;
   height: 100%;
   min-height: 0;
-
-  @include max-md {
-    padding: 1.25rem;
-  }
   background: var(--white);
   border: 1px solid var(--border);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
   transition: transform 0.15s ease;
+
+  @include max-md {
+    padding: 1.25rem;
+    height: auto;
+    min-height: unset;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 1rem;
+  }
 
   .header {
     display: flex;
