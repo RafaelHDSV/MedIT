@@ -71,5 +71,5 @@ const mockedAttendanceItem: QueueItem[] = faker.helpers.multiple(
       risk: faker.helpers.arrayElement(Object.values(AttendanceRisk))
     }
   },
-  { count: 25 }
+  { count: 46 }
 )
