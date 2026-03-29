@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://medit-tcc.vercel.app/sitemap.xml
