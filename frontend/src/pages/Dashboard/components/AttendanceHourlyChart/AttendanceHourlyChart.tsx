@@ -21,7 +21,7 @@ function AttendanceHourlyChart() {
       <div className={styles.header}>
         <h3>Atendimentos por Hora</h3>
 
-        <div className={styles.timer}>
+        <div className={styles.asideInfo}>
           <ClockCountdownIcon size={22} />
           <span>30 p/ hora</span>
         </div>
