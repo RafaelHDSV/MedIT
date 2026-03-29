@@ -1,0 +1,83 @@
+.section {
+  grid-area: attendanceQueueChart;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 1rem;
+  padding: 2rem;
+  height: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .asideInfo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--light-gray);
+    }
+  }
+
+  .queueItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+
+    .leftAside {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      font-size: 16px;
+
+      .name {
+        font-weight: 600;
+      }
+
+      .status {
+        color: var(--gray);
+      }
+    }
+  }
+
+  .more {
+    margin-top: 1rem;
+    text-align: center;
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--gray-2);
+    color: var(--gray-1);
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: var(--gray-3);
+    }
+  }
+}

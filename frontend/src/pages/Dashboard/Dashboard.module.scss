@@ -6,47 +6,9 @@
   height: 100%;
 
   grid-template-areas:
-    'card1 card2 card3 card4'
-    'card5 card6 queue queue'
-    'attendanceByHourChart attendanceByHourChart queue queue'
-    'attendanceByHourChart attendanceByHourChart queue queue';
-
-  & > *:nth-child(1) {
-    grid-area: card1;
-  }
-
-  & > *:nth-child(2) {
-    grid-area: card2;
-  }
-
-  & > *:nth-child(3) {
-    grid-area: card3;
-  }
-
-  & > *:nth-child(4) {
-    grid-area: card4;
-  }
-
-  & > *:nth-child(5) {
-    grid-area: card5;
-  }
-
-  & > *:nth-child(6) {
-    grid-area: card6;
-  }
-
-  .queue {
-    background: white;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    height: 20rem;
-  }
-
-  .attendanceByHourChart {
-    grid-area: attendanceByHourChart;
-  }
-
-  .queue {
-    grid-area: queue;
-  }
+    'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
+    'dashboardCard5 dashboardCard6 attendanceQueueChart attendanceQueueChart'
+    'attendanceHourlyChart attendanceHourlyChart attendanceQueueChart attendanceQueueChart'
+    'attendanceHourlyChart attendanceHourlyChart attendanceQueueChart attendanceQueueChart'
+    'attendanceHourlyChart attendanceHourlyChart attendanceQueueChart attendanceQueueChart';
 }

@@ -11,9 +11,10 @@ import {
   UsersThreeIcon
 } from '@phosphor-icons/react'
 import { useMemo } from 'react'
-import styles from './Dashboard.module.scss'
-import AttendanceByHourChart from './components/AttendanceByHourChart/AttendanceByHourChart'
+import AttendanceHourlyChart from './components/AttendanceHourlyChart/AttendanceHourlyChart'
+import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardCard from './components/DashboardCard/DashboardCard'
+import styles from './Dashboard.module.scss'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -65,9 +66,8 @@ function Dashboard() {
       case UserLevels.ADMIN:
         return (
           <>
-            <AttendanceByHourChart className={styles.attendanceByHourChart} />
-
-            <div className={styles.queue}>Fila de Atendimento</div>
+            <AttendanceHourlyChart />
+            <AttendanceQueueChart />
           </>
         )
       case UserLevels.DOCTOR:
@@ -95,5 +95,4 @@ function Dashboard() {
     </>
   )
 }
-
 export default Dashboard
