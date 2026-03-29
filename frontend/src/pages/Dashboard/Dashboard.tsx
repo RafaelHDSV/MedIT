@@ -111,6 +111,17 @@ function Dashboard() {
       risco: 'Médio'
     }
   ]
+  const attendanceData = [
+    { hora: '17h', valor: 40 },
+    { hora: '18h', valor: 25 },
+    { hora: '19h', valor: 30 },
+    { hora: '20h', valor: 60 },
+    { hora: '21h', valor: 80 },
+    { hora: '22h', valor: 100 },
+    { hora: '23h', valor: 90 },
+    { hora: '00h', valor: 20 }
+  ]
+
   const visibleQueue = showAll ? queueData : queueData.slice(0, 5)
 
   return (
@@ -125,10 +136,31 @@ function Dashboard() {
           <DashboardCard key={label} Icon={Icon} value={value} label={label} />
         ))}
 
+        <div className={styles.attendance}>
+          <div className={styles.attendanceHeader}>
+            <h3>Atendimentos por Hora</h3>
+            <div>
+              <span>
+                <TimerIcon />
+              </span>
+              <span> 30 p/ hora</span>
+            </div>
+          </div>
+
+          <div className={styles.chart}>
+            {attendanceData.map((item, index) => (
+              <div key={index} className={styles.barContainer}>
+                <div className={styles.bar} style={{ height: item.valor }} />
+                <span className={styles.label}>{item.hora}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className={styles.queue}>
           <div className={styles.queueHeader}>
             <h3>Fila de Atendimento</h3>
-            <div className={styles.queueinfo}>
+            <div className={styles.queueInfo}>
               <span>
                 <StethoscopeIcon />
               </span>

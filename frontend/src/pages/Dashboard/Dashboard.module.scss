@@ -11,35 +11,11 @@
     'attendance attendance queue queue'
     'attendance attendance queue queue';
 
-  & > *:nth-child(1) {
-    grid-area: card1;
-  }
-
-  & > *:nth-child(2) {
-    grid-area: card2;
-  }
-
-  & > *:nth-child(3) {
-    grid-area: card3;
-  }
-
-  & > *:nth-child(4) {
-    grid-area: card4;
-  }
-
-  & > *:nth-child(5) {
-    grid-area: card5;
-  }
-
-  & > *:nth-child(6) {
-    grid-area: card6;
-  }
   .queue {
     grid-area: queue;
     background: white;
     border-radius: 0.5rem;
     padding: 1rem;
-    min-height: 20rem;
   }
   .queueHeader {
     display: flex;
@@ -141,5 +117,51 @@
   }
   .more:hover {
     background: #e5e7eb;
+  }
+  .attendance {
+    grid-area: attendance;
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    min-height: 250px;
+  }
+  .attendanceHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .attendance h3 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .attendance span {
+    font-size: 13px;
+    color: #9ca3af;
+  }
+  .chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 200px;
+  }
+  .barContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .bar {
+    width: 50px;
+    background-color: #e8553d;
+    border-radius: 6px;
+    transition: height 0.3s;
+  }
+  .barContainer:nth-child(even) .bar {
+    background-color: #f3cfc9;
+  }
+  .label {
+    font-size: 12px;
+    color: #777;
   }
 }
