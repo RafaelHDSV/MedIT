@@ -1,0 +1,66 @@
+.section {
+  grid-area: attendanceHourlyChart;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 1rem;
+  padding: 2rem;
+  height: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .timer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--light-gray);
+    }
+  }
+
+  .chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+
+    .barContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+
+      &:nth-child(even) .bar {
+        background-color: var(--primary-opaque);
+      }
+
+      .bar {
+        width: 2rem;
+        background-color: var(--primary-color);
+        border-radius: 6px;
+        transition: height 0.3s;
+      }
+
+      .label {
+        font-size: 12px;
+        color: var(--gray);
+      }
+    }
+  }
+}
