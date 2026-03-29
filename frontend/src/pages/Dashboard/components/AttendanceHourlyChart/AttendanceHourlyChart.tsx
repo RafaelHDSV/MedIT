@@ -1,5 +1,6 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
+import { Tooltip } from 'antd'
 import styles from './AttendanceHourlyChart.module.scss'
 
 function generateAttendanceData() {
@@ -27,7 +28,12 @@ function AttendanceHourlyChart() {
       <div className={styles.chart}>
         {attendanceData.map((item, index) => (
           <div key={index} className={styles.barContainer}>
-            <div className={styles.bar} style={{ height: `${item.value}px` }} />
+            <Tooltip title={`${item.value} atendimentos às ${item.hour}`}>
+              <div
+                className={styles.bar}
+                style={{ height: `${item.value}px` }}
+              />
+            </Tooltip>
             <span className={styles.label}>{item.hour}</span>
           </div>
         ))}
