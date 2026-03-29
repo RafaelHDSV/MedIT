@@ -3,6 +3,7 @@ import TooltipColumn from '@/components/ListTable/components/TooltipColumn/Toolt
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
+import { faker } from '@faker-js/faker'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import styles from './AttendanceQueueChart.module.scss'
 
@@ -52,50 +53,23 @@ function AttendanceQueueChart() {
 
 export default AttendanceQueueChart
 
-const mockedAttendanceItem: QueueItem[] = [
-  {
-    name: 'Rafael Vieira',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.NOT_URGENT
+const mockedAttendanceItem: QueueItem[] = faker.helpers.multiple(
+  () => {
+    return {
+      name: faker.person.fullName(),
+      status: faker.helpers.arrayElement([
+        'Em transporte',
+        'Entrada',
+        'Aguardando Triagem',
+        'Em Triagem',
+        'Aguardando Médico',
+        'Em Atendimento',
+        'Aguardando Exames',
+        'Aguardando Resultados',
+        'Aguardando Alta'
+      ]),
+      risk: faker.helpers.arrayElement(Object.values(AttendanceRisk))
+    }
   },
-  {
-    name: 'Rafael Silva',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.EMERGENCY
-  },
-  {
-    name: 'Rafael Vieira',
-    status: 'Aguardando Triagem',
-    risk: AttendanceRisk.NOT_URGENT
-  },
-  {
-    name: 'Rafael Vieira',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.NOT_URGENT
-  },
-  {
-    name: 'Matheus Takenaka',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.VERY_URGENT
-  },
-  {
-    name: 'Matheus Takenaka',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.LESS_URGENT
-  },
-  {
-    name: 'Rafael Silva',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.EMERGENCY
-  },
-  {
-    name: 'Rafael Vieira',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.URGENT
-  },
-  {
-    name: 'Matheus Takenaka',
-    status: 'Aguardando Médico',
-    risk: AttendanceRisk.VERY_URGENT
-  }
-]
+  { count: 25 }
+)
