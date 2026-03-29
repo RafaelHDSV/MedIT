@@ -7,7 +7,8 @@ export const AttendanceRisk = {
   LESS_URGENT: 'lessUrgent',
   NOT_URGENT: 'notUrgent'
 } as const
-export type AttendanceRisk = (typeof AttendanceRisk)[keyof typeof AttendanceRisk]
+export type AttendanceRisk =
+  (typeof AttendanceRisk)[keyof typeof AttendanceRisk]
 export const AttendanceRiskLabels = {
   [AttendanceRisk.EMERGENCY]: 'Emergência',
   [AttendanceRisk.VERY_URGENT]: 'Muito urgente',

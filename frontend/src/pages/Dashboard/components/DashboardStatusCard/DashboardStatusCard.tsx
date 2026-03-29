@@ -7,7 +7,11 @@ interface IDashboardStatusCardProps {
   label: string
 }
 
-function DashboardStatusCard({ Icon, value, label }: IDashboardStatusCardProps) {
+function DashboardStatusCard({
+  Icon,
+  value,
+  label
+}: IDashboardStatusCardProps) {
   return (
     <div className={styles.card}>
       <Icon className={styles.icon} size={24} />
