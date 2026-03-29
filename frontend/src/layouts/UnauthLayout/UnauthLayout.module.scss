@@ -32,9 +32,9 @@
     width: 100%;
     min-height: auto;
     padding: max(1.5rem, env(safe-area-inset-top))
-      max(1.5rem, env(safe-area-inset-right))
-      1.5rem
+      max(1.5rem, env(safe-area-inset-right)) 1.5rem
       max(1.5rem, env(safe-area-inset-left));
+    height: 100vh;
     gap: 2rem;
   }
 
@@ -67,14 +67,6 @@
   width: 60%;
   height: 100vh;
   min-height: 17.5rem;
-
-  @include max-md {
-    width: 100%;
-    height: auto;
-    min-height: 220px;
-    flex: 1;
-    padding: 2rem 1rem max(2rem, env(safe-area-inset-bottom));
-  }
   background: linear-gradient(
     145deg,
     var(--primary-color) 0%,
@@ -83,6 +75,10 @@
   text-align: center;
   color: var(--white);
   overflow: hidden;
+
+  @include max-md {
+    display: none;
+  }
 
   .imageItem {
     max-height: 30rem;
@@ -103,12 +99,5 @@
     max-width: 25rem;
     height: 3rem;
     margin: 0 auto;
-
-    @include max-md {
-      font-size: 1rem;
-      height: auto;
-      min-height: 2.5rem;
-      padding: 0 0.5rem;
-    }
   }
 }
