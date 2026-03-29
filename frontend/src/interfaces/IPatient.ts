@@ -1,6 +1,7 @@
-import type { IBaseUser } from './IUser'
+import type { Dayjs } from 'dayjs'
+import type { IBaseUser, UserGender } from './IUser'
 
-const BloodType = {
+export const BloodType = {
   A_POSITIVE: 'A+',
   A_NEGATIVE: 'A-',
   B_POSITIVE: 'B+',
@@ -10,7 +11,7 @@ const BloodType = {
   O_POSITIVE: 'O+',
   O_NEGATIVE: 'O-'
 } as const
-type BloodType = (typeof BloodType)[keyof typeof BloodType]
+export type BloodType = (typeof BloodType)[keyof typeof BloodType]
 
 export interface IPatient extends IBaseUser {
   weight?: number
@@ -18,4 +19,36 @@ export interface IPatient extends IBaseUser {
   bloodType?: BloodType
   conditions?: string[]
   allergies?: string[]
+}
+
+export interface PatientFormValues {
+  name: string
+  cpf: string
+  birthDate: Dayjs | null
+  gender: UserGender
+  email: string
+  currentPassword?: string
+  newPassword?: string
+  cellphone: string
+  weight?: number
+  height?: number
+  bloodType?: BloodType
+  conditions?: string[]
+  allergies?: string[]
+}
+
+export interface IPatientFormErrors {
+  name?: string
+  cpf?: string
+  birthDate?: string
+  gender?: string
+  email?: string
+  currentPassword?: string
+  newPassword?: string
+  cellphone?: string
+  weight?: string
+  height?: string
+  bloodType?: string
+  conditions?: string
+  allergies?: string
 }

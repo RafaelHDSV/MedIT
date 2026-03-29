@@ -1,4 +1,13 @@
-import { theme as antdTheme, ConfigProvider } from 'antd'
+import { theme as antdTheme, ConfigProvider, Flex } from 'antd'
+
+function renderEmpty() {
+  return (
+    <Flex vertical align='center' justify='center' gap={16}>
+      <img src='/no-data.svg' alt='No data' className='noDataImage' />
+      <span>Nenhuma informação encontrada para essa consulta</span>
+    </Flex>
+  )
+}
 
 function AntdConfigProvider({ children }: { children: React.ReactNode }) {
   const primaryColor = getComputedStyle(document.documentElement)
@@ -9,8 +18,14 @@ function AntdConfigProvider({ children }: { children: React.ReactNode }) {
     <ConfigProvider
       theme={{
         algorithm: antdTheme.defaultAlgorithm,
-        token: { colorPrimary: primaryColor }
+        token: { colorPrimary: primaryColor },
+        components: {
+          Button: {
+            paddingInline: '0'
+          }
+        }
       }}
+      renderEmpty={renderEmpty}
       locale={{
         locale: 'pt-br',
         Pagination: {

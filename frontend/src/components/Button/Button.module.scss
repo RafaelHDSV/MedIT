@@ -1,7 +1,4 @@
 .button {
-  --ant-color-primary-hover: var(--secondary-color);
-  --ant-color-primary-active: var(--secondary-color);
-
   height: 2.5rem;
   background-color: var(--primary-color);
   color: var(--white);
@@ -18,31 +15,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  background: transparent;
-  border-radius: 0.5rem;
-  color: var(--white);
+  padding: 0 !important;
+  border-radius: 0.5rem !important;
   background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s ease;
 
   svg {
     font-size: 1rem;
+    transition: color 0.2s;
   }
 
-  &:hover {
-    background-color: var(--primary-opaque);
-    color: var(--primary-color);
-    transform: scale(0);
+  &:hover,
+  &:focus-visible {
+    background-color: var(--primary-opaque) !important;
+    color: var(--primary-color) !important;
+    outline: 2px solid var(--primary-color);
   }
 
   &:active {
     transform: scale(0.95);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
   }
 }

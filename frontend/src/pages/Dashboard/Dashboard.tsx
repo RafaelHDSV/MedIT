@@ -41,7 +41,7 @@ function Dashboard() {
           {
             Icon: UsersThreeIcon,
             value: '52%',
-            label: 'Assertividade IA vs Médico'
+            label: 'Assertividade IA vs Médico(a)'
           }
         ]
       case UserLevels.NURSE:
@@ -61,19 +61,38 @@ function Dashboard() {
     }
   }, [user?.level])
 
+  const content = useMemo(() => {
+    switch (user?.level) {
+      case UserLevels.ADMIN:
+        return (
+          <>
+            <AttendanceHourlyChart />
+            <AttendanceQueueChart />
+          </>
+        )
+      case UserLevels.DOCTOR:
+        return <></>
+      case UserLevels.NURSE:
+        return <></>
+      case UserLevels.PATIENT:
+        return <></>
+      default:
+        return <></>
+    }
+  }, [user?.level])
+
   return (
-    <section>
+    <>
       <AuthLayoutHeader />
 
-      <div className={styles.cardsContainer}>
+      <div className={styles.container}>
         {cardsData.map(({ Icon, value, label }) => (
           <DashboardCard key={label} Icon={Icon} value={value} label={label} />
         ))}
 
-        <AttendanceHourlyChart />
-        <AttendanceQueueChart />
+        {content}
       </div>
-    </section>
+    </>
   )
 }
 export default Dashboard

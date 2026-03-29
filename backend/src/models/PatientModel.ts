@@ -1,12 +1,12 @@
 import mongoose from 'mongoose'
-import { IPatient } from '../interfaces/IPatient.js'
+import { BloodType, IPatient } from '../interfaces/IPatient.js'
 import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
 import { UserModel } from './UserModel.js'
 
 const PatientSchema = new mongoose.Schema<IPatient>({
   weight: Number,
   height: Number,
-  bloodType: String,
+  bloodType: { type: String, enum: Object.values(BloodType) },
   conditions: [String],
   allergies: [String]
 })

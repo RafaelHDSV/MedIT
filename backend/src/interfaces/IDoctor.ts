@@ -1,4 +1,4 @@
-import { IBaseUser, UserLevels } from './IUser.js'
+import { IBaseUser, UserGender } from './IUser.js'
 
 export const DoctorSpecializations = {
   CARDIOLOGY: 'cardiology',
@@ -58,7 +58,7 @@ export interface DoctorFormValues {
   name: string
   cpf: string
   birthDate: Date
-  gender: UserLevels
+  gender: UserGender
   email: string
   password: string
   cellphone: string

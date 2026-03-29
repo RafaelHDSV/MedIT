@@ -1,15 +1,25 @@
+import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
-import type { IAttendance } from '@/interfaces/IAttendance'
-import { UserGender } from '@/interfaces/IUser'
+import { AttendanceRisk, type IAttendance } from '@/interfaces/IAttendance'
+import type { IError } from '@/interfaces/IError'
+import { NurseShiftsLabels, type INurse } from '@/interfaces/INurse'
+import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
+import masks from '@/utils/masks'
 import {
   CalendarDotsIcon,
   ChartBarIcon,
   DatabaseIcon
 } from '@phosphor-icons/react'
+import { Flex, message } from 'antd'
+import axios, { AxiosError } from 'axios'
 import dayjs from 'dayjs'
+import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import NurseModal from '../Nurses/components/NurseModal/NurseModal'
 import styles from './NursesDetails.module.scss'
 
 const mockedLastAttendance = {
@@ -21,21 +31,96 @@ const mockedLastAttendance = {
 }
 
 const mockedAttendanceRecords: IAttendance[] = [
-  { type: 'Consulta', description: 'Gripe', date: '2025-12-01' },
-  { type: 'Emergência', description: 'Entorse', date: '2024-08-11' },
-  { type: 'Rotina', description: 'Check-up', date: '2024-06-15' },
-  { type: 'Consulta', description: 'Alergia', date: '2024-03-22' }
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Gripe',
+    diagnosis: 'Consulta',
+    date: new Date('2025-12-01'),
+    risk: AttendanceRisk.NOT_URGENT
+  },
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Entorse',
+    diagnosis: 'Emergência',
+    date: new Date('2024-08-11'),
+    risk: AttendanceRisk.EMERGENCY
+  },
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Check-up',
+    diagnosis: 'Rotina',
+    date: new Date('2024-06-15'),
+    risk: AttendanceRisk.LESS_URGENT
+  },
+  {
+    name: 'Maria Santos',
+    birthDate: new Date('1986-10-15'),
+    complaint: 'Alergia',
+    diagnosis: 'Consulta',
+    date: new Date('2024-03-22'),
+    risk: AttendanceRisk.URGENT
+  }
 ]
+
 function NursesDetails() {
+  const params = useParams<{ id: string }>()
+  const [nurse, setNurse] = useState<INurse | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchNurseDetails = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const response = await api.get(`/users/${params.id}`)
+      const data = response.data
+      setNurse(data)
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(
+        error.response?.data?.message ||
+          'Erro ao carregar detalhes do enfermeiro(a)'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }, [params.id])
+
+  useEffect(() => {
+    fetchNurseDetails()
+  }, [fetchNurseDetails])
+
   return (
     <section>
-      <AuthLayoutHeader />
+      <AuthLayoutHeader
+        actionComponent={
+          <Flex gap='1rem'>
+            <NurseModal
+              nurse={nurse}
+              buttonText='Editar enfermeiro(a)'
+              fetchNurseDetails={fetchNurseDetails}
+            />
+
+            <DeleteModal
+              label='enfermeiro(a)'
+              apiName='nurses'
+              buttonText='Deletar enfermeiro(a)'
+            />
+          </Flex>
+        }
+      />
+
       <UserDetailsHeader
-        name={'Renata Aragão'}
-        age={37}
-        gender={UserGender.FEMALE}
+        name={nurse?.name}
+        age={getAgeByBirthDate(nurse?.birthDate)}
+        gender={nurse?.gender}
         statusTag={TagStatuses.WARNING}
         statusTagText='Em plantão'
+        loading={loading}
       />
 
       <div className={styles.cards}>
@@ -43,19 +128,19 @@ function NursesDetails() {
           Icon={DatabaseIcon}
           title='Dados Pessoais'
           itens={[
-            { label: 'CPF', value: '5508.360.050-15' },
-            { label: 'COREN', value: '123.456-ENF' },
+            { label: 'CPF', value: masks(nurse?.cpf, 'cpf') },
+            { label: 'COREN', value: nurse?.coren },
             {
               label: 'Turno',
-              value: 'Noturno'
+              value: nurse?.shift && NurseShiftsLabels[nurse.shift]
             },
             {
               label: 'Telefone',
-              value: '(15) 99642-7257'
+              value: masks(nurse?.cellphone, 'cellphone')
             },
             {
               label: 'Data de Nascimento',
-              value: '05/03/1989'
+              value: dayjs(nurse?.birthDate).format('DD/MM/YYYY')
             }
           ]}
         />
@@ -84,7 +169,7 @@ function NursesDetails() {
           title='Histórico de Atendimentos'
           itens={mockedAttendanceRecords.map((item) => ({
             label: dayjs(item.date).format('DD/MM/YYYY'),
-            value: `${item.type} - ${item.description}`
+            value: `${item.diagnosis ?? ''} - ${item.complaint}`
           }))}
         />
       </div>

@@ -1,6 +1,6 @@
 import { IBaseUser } from './IUser.js'
 
-const BloodType = {
+export const BloodType = {
   A_POSITIVE: 'A+',
   A_NEGATIVE: 'A-',
   B_POSITIVE: 'B+',
@@ -10,7 +10,7 @@ const BloodType = {
   O_POSITIVE: 'O+',
   O_NEGATIVE: 'O-'
 } as const
-type BloodType = (typeof BloodType)[keyof typeof BloodType]
+export type BloodType = (typeof BloodType)[keyof typeof BloodType]
 
 export interface IPatient extends IBaseUser {
   weight?: number

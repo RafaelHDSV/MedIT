@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express, { Request, Response } from 'express'
+import express from 'express'
 
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
@@ -16,7 +16,7 @@ app.use(express.json())
 
 await connectDatabase()
 
-app.get('/', (_req: Request, res: Response) => {
+app.get('/', (_req, res) => {
   res.send('Back-end funcionando com sucesso!')
 })
 
@@ -27,5 +27,5 @@ app.use('/nurses', nursesRoutes)
 app.use('/patients', patientsRoutes)
 
 app.listen(PORT, () => {
-  console.log(`Servidor está rodando em http://localhost:${PORT}`)
+  console.log(`Servidor está rodando! ${PORT}`)
 })

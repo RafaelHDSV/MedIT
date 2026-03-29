@@ -10,7 +10,7 @@ Este repositório faz parte de um Projeto Final de Curso (TFC), mas contribuiç�
 
 1. Clone o repositório
 
-git clone https://github.com/RafaelHDSV/Medflow.git
+git clone https://github.com/RafaelHDSV/Medit.git
 
 2. Instale as dependências
 

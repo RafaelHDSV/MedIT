@@ -1,4 +1,4 @@
-# 🏥 MedFlow
+# 🏥 MedIT
 
 Plataforma Digital de Apoio à Triagem e Organização do Fluxo Hospitalar com Mecanismo Inteligente Baseado em Regras.
 
@@ -6,7 +6,7 @@ Plataforma Digital de Apoio à Triagem e Organização do Fluxo Hospitalar com M
 
 # 📌 Sobre o Projeto
 
-O **MedFlow** é uma plataforma web desenvolvida como Trabalho de Conclusão de Curso (TCC) com o objetivo de **apoiar a organização do fluxo hospitalar e auxiliar o processo de triagem clínica** em unidades de saúde.
+O **MedIT** é uma plataforma web desenvolvida como Trabalho de Conclusão de Curso (TCC) com o objetivo de **apoiar a organização do fluxo hospitalar e auxiliar o processo de triagem clínica** em unidades de saúde.
 
 A proposta do sistema é oferecer **uma solução digital para melhorar a organização do atendimento**, reduzir gargalos operacionais e fornecer **suporte informacional aos profissionais de saúde**.
 
@@ -127,7 +127,7 @@ Camadas principais:
 # 📂 Estrutura do Projeto
 
 ```
-medflow
+medit
 │
 ├── backend
 │   ├── src
@@ -139,7 +139,7 @@ medflow
 │   │   ├── routes
 │   │   ├── types
 │   │   ├── utils
-│   │   └── server.ts
+│   │   └── server
 │
 ├── frontend
 │   ├── src
@@ -174,11 +174,11 @@ Antes de executar o projeto, é necessário ter instalado:
 ## 1️⃣ Clonar o repositório
 
 ```
-git clone https://github.com/RafaelHDSV/medflow.git
+git clone https://github.com/RafaelHDSV/medit.git
 ```
 
 ```
-cd medflow
+cd medit
 ```
 
 ---

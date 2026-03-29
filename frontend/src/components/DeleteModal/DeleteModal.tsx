@@ -5,16 +5,18 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Button from '../Button/Button'
 
 interface IDeleteModalProps {
+  label: string
+  apiName: string
   buttonText?: string
 }
 
-function DeleteModal({ buttonText }: IDeleteModalProps) {
+function DeleteModal({ label, apiName, buttonText }: IDeleteModalProps) {
   const params = useParams<{ id: string }>()
   const navigate = useNavigate()
 
   async function handleOpen() {
     const modal = Modal.confirm({
-      title: 'Deseja deletar esse médico?',
+      title: `Deseja deletar esse ${label}?`,
       content: 'Esta ação não pode ser desfeita.',
       okText: 'Sim, deletar',
       cancelText: 'Cancelar',
@@ -39,13 +41,15 @@ function DeleteModal({ buttonText }: IDeleteModalProps) {
         })
 
         try {
-          await api.delete(`/doctors/${params.id}`)
+          await api.delete(`/${apiName}/${params.id}`)
 
-          navigate(ROUTES.DOCTORS.path)
-          message.success('Médico deletado com sucesso!')
+          navigate(ROUTES[apiName.toUpperCase() as keyof typeof ROUTES].path)
+          message.success(
+            `${label.charAt(0).toUpperCase() + label.slice(1)} deletado com sucesso!`
+          )
         } catch (err) {
-          console.error('Erro ao deletar médico', err)
-          message.error('Erro ao deletar médico')
+          console.error(`Erro ao deletar ${label}`, err)
+          message.error(`Erro ao deletar ${label}`)
         } finally {
           modal.update({
             okButtonProps: {

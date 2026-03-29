@@ -1,92 +1,139 @@
-import type { IPatient } from '@/interfaces/IPatient'
+import { api } from '@/api/api'
+import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
+import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
+import type { IError } from '@/interfaces/IError'
+import type { BloodType, IPatient } from '@/interfaces/IPatient'
 import { ROUTES } from '@/routes/constants'
-import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
-import masks from '@/utils/masks'
+import { DropIcon } from '@phosphor-icons/react'
+import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import dayjs from 'dayjs'
+import axios, { AxiosError } from 'axios'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export function usePatientsColumns() {
+interface IUsePatientsColumnsProps {
+  setEditingPatient: (patient: IPatient | null) => void
+  setEditModalOpen: (isOpen: boolean) => void
+  fetchPatients: () => Promise<void>
+}
+
+export function usePatientsColumns({
+  setEditingPatient,
+  setEditModalOpen,
+  fetchPatients
+}: IUsePatientsColumnsProps) {
   const navigate = useNavigate()
 
   const handleNavigateToDetails = useCallback(
-    (id: ObjectId | undefined) => {
-      if (!id) return
-      navigate(ROUTES.PATIENTS_DETAILS.path.replace(':id', id.toString()))
+    (_id: ObjectId | undefined) => {
+      if (!_id) return
+      navigate(ROUTES.PATIENTS_DETAILS.path.replace(':id', _id.toString()))
     },
     [navigate]
   )
 
+  const handleEdit = useCallback(
+    (patient: IPatient) => {
+      setEditingPatient(patient)
+      setEditModalOpen(true)
+    },
+    [setEditingPatient, setEditModalOpen]
+  )
+
+  const handleDelete = useCallback(
+    async (patient: IPatient) => {
+      Modal.confirm({
+        title: 'Deseja deletar este paciente?',
+        content: `Esta ação não pode ser desfeita.`,
+        okText: 'Sim, deletar',
+        cancelText: 'Cancelar',
+        okButtonProps: { danger: true },
+        async onOk() {
+          try {
+            await api.delete(`/patients/${patient._id}`)
+            message.success('Paciente deletado com sucesso!')
+            fetchPatients()
+          } catch (err) {
+            if (!axios.isAxiosError(err)) return
+            const error = err as AxiosError<IError>
+            message.error(
+              error.response?.data?.message ?? 'Erro ao deletar paciente'
+            )
+          }
+        }
+      })
+    },
+    [fetchPatients]
+  )
+
+  const commonColumns = getCommonColumns<IPatient>({
+    handleNavigateToDetails,
+    handleEdit,
+    handleDelete
+  })
+
   const columns: ColumnsType<IPatient> = useMemo(
     () => [
+      commonColumns.id(),
+      commonColumns.name(),
+      commonColumns.cpf(),
+      commonColumns.email(),
+      commonColumns.birthDate(),
+      commonColumns.cellphone(),
       {
-        title: 'ID',
-        dataIndex: 'number',
-        key: 'number'
-      },
-      {
-        title: 'Nome',
-        dataIndex: 'name',
-        key: 'name',
-        render: (name: string, record) => (
-          <span
-            role='button'
-            tabIndex={0}
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleNavigateToDetails(record._id)}
-            onKeyDown={(e) =>
-              e.key === 'Enter' && handleNavigateToDetails(record._id)
-            }
-          >
-            {name}
-          </span>
+        title: <TooltipColumn text='Peso' />,
+        dataIndex: 'weight',
+        key: 'weight',
+        width: 80,
+        ellipsis: true,
+        render: (weight: number) => (
+          <TooltipColumn text={`${weight?.toString()} kg`} />
         )
       },
       {
-        title: 'CPF',
-        dataIndex: 'cpf',
-        key: 'cpf',
-        render: (cpf: string) => masks(cpf, 'cpf')
+        title: <TooltipColumn text='Altura' />,
+        dataIndex: 'height',
+        key: 'height',
+        width: 80,
+        ellipsis: true,
+        render: (height: number) => (
+          <TooltipColumn text={`${height?.toString()} m`} />
+        )
       },
       {
-        title: 'E-mail',
-        dataIndex: 'email',
-        key: 'email'
-      },
-      {
-        title: 'Data de Nascimento',
-        dataIndex: 'birthDate',
-        key: 'birthDate',
-        render: (date: Date | string) =>
-          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
-      },
-      {
-        title: 'Telefone',
-        dataIndex: 'cellphone',
-        key: 'cellphone',
-        render: (cellphone: string) => masks(cellphone, 'cellphone')
-      },
-      {
-        title: 'Tipo Sanguíneo',
+        title: <TooltipColumn text='Tipo sanguíneo' icon={DropIcon} />,
         dataIndex: 'bloodType',
-        key: 'bloodType'
+        key: 'bloodType',
+        width: 60,
+        ellipsis: true,
+        render: (bloodType: BloodType) => <TooltipColumn text={bloodType} />
       },
       {
-        title: 'Criado em',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
+        title: <TooltipColumn text='Condições' />,
+        dataIndex: 'conditions',
+        key: 'conditions',
+        width: 250,
+        ellipsis: true,
+        render: (conditions: string[]) => (
+          <TooltipColumn text={conditions.join(', ')} />
+        )
       },
       {
-        title: 'Atualizado em',
-        dataIndex: 'updatedAt',
-        key: 'updatedAt',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
-      }
+        title: <TooltipColumn text='Alergias' />,
+        dataIndex: 'allergies',
+        key: 'allergies',
+        width: 250,
+        ellipsis: true,
+        render: (allergies: string[]) => (
+          <TooltipColumn text={allergies.join(', ')} />
+        )
+      },
+      commonColumns.createdAt(),
+      commonColumns.updatedAt(),
+      commonColumns.actions()
     ],
-    [handleNavigateToDetails]
+    [commonColumns]
   )
 
   return columns

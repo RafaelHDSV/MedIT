@@ -1,15 +1,13 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import ProgressTag, {
-  ProgressStatus
-} from '@/components/ProgressTag/ProgressTag'
+import ListTable from '@/components/ListTable/ListTable'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
-import styles from '@/styles/UserTable.module.scss'
-import { Flex, message, Table } from 'antd'
+import { Flex, message } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import styles from '../../components/ListTable/ListTable.module.scss'
 import DoctorModal from './components/DoctorModal/DoctorModal'
 import { useDoctorsColumns } from './hooks/useDoctorsColumns'
 
@@ -18,7 +16,6 @@ function Doctors() {
   const [loading, setLoading] = useState(false)
   const [editingDoctor, setEditingDoctor] = useState<IDoctor | null>(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
-  const columns = useDoctorsColumns({ setEditingDoctor, setEditModalOpen })
 
   async function fetchDoctors() {
     setLoading(true)
@@ -33,7 +30,7 @@ function Doctors() {
       console.error(error)
       message.error(
         error.response?.data?.message ||
-          'Erro ao carregar a listagem de médicos'
+          'Erro ao carregar a listagem de médicos(as)'
       )
     } finally {
       setLoading(false)
@@ -44,46 +41,41 @@ function Doctors() {
     fetchDoctors()
   }, [])
 
+  const columns = useDoctorsColumns({
+    setEditingDoctor,
+    setEditModalOpen,
+    fetchDoctors
+  })
+
   return (
     <>
-      {editModalOpen && (
-        <DoctorModal
-          key='edit-doctor-modal'
-          doctor={editingDoctor}
-          buttonText='Salvar alterações'
-          fetchDoctors={() => window.location.reload()}
-          fetchDoctorDetails={undefined}
-        />
-      )}
+      <DoctorModal
+        key='edit-doctor-modal'
+        doctor={editingDoctor}
+        buttonText='Salvar alterações'
+        fetchDoctors={fetchDoctors}
+        useOnlyModal
+        editModalOpen={editModalOpen}
+        setEditModalOpen={setEditModalOpen}
+      />
 
       <div className={styles.tableContent}>
         <Flex vertical className={styles.container}>
-          <Flex gap={16} align='center'>
-            <AuthLayoutHeader
-              actionComponent={
-                <DoctorModal
-                  buttonText='Adicionar médico'
-                  fetchDoctors={fetchDoctors}
-                />
-              }
-            />
-            <ProgressTag status={ProgressStatus.COMPLETED} />
-          </Flex>
+          <AuthLayoutHeader
+            actionComponent={
+              <DoctorModal
+                buttonText='Adicionar médico(a)'
+                fetchDoctors={fetchDoctors}
+              />
+            }
+          />
 
-          <div className={styles.tableWrapper}>
-            <Table
-              className={styles.userTable}
-              rowKey='_id'
-              dataSource={doctors}
-              columns={columns}
-              tableLayout='fixed'
-              loading={loading}
-              pagination={{ pageSize: 7 }}
-              size='middle'
-              bordered={false}
-              scroll={{ x: 'max-content' }}
-            />
-          </div>
+          <ListTable<IDoctor>
+            dataSource={doctors}
+            columns={columns}
+            loading={loading}
+            onReload={fetchDoctors}
+          />
         </Flex>
       </div>
     </>

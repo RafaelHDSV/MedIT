@@ -12,7 +12,6 @@
 
 .tableWrapper {
   flex: 1;
-  overflow: hidden;
 }
 
 .userTable {
@@ -20,13 +19,66 @@
   border: 1px solid var(--border);
 
   :global {
+    .ant-table-content {
+      scrollbar-color: var(--secondary-color) transparent;
+
+      &::-webkit-scrollbar {
+        width: 0.5rem;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--secondary-color);
+        border-radius: 0.5rem;
+        transition: background 0.2s ease;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+        cursor: pointer;
+      }
+    }
+
     .ant-table-thead > tr > th {
       background-color: var(--primary-color);
       color: var(--white);
       font-weight: 600;
       font-size: 14px;
       padding: 1rem;
-      height: 100;
+
+      &:hover {
+        background: var(--primary-opaque);
+        color: var(--primary-color);
+      }
+    }
+
+    .ant-table-column-has-sorters {
+      background: var(--primary-color);
+      color: var(--white);
+
+      &:hover {
+        background: var(--primary-opaque);
+        color: var(--primary-color);
+
+        .ant-table-column-sorter {
+          color: var(--primary-color);
+        }
+      }
+    }
+
+    th.ant-table-column-sort {
+      color: var(--primary-color) !important;
+    }
+
+    .ant-table-column-sorter {
+      color: var(--white);
+
+      .active {
+        color: var(--sucess-color);
+      }
     }
 
     .ant-table-tbody {
