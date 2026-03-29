@@ -1,3 +1,4 @@
+import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
 import styles from './AttendanceHourlyChart.module.scss'
 
@@ -17,16 +18,12 @@ function AttendanceHourlyChart() {
     generateAttendanceData()
 
   return (
-    <div className={styles.section}>
-      <div className={styles.header}>
-        <h3>Atendimentos por Hora</h3>
-
-        <div className={styles.asideInfo}>
-          <ClockCountdownIcon size={22} />
-          <span>30 p/ hora</span>
-        </div>
-      </div>
-
+    <DashboardCard
+      title='Atendimentos por Hora'
+      icon={ClockCountdownIcon}
+      asideText='30 p/ hora'
+      gridArea='attendanceHourlyChart'
+    >
       <div className={styles.chart}>
         {attendanceData.map((item, index) => (
           <div key={index} className={styles.barContainer}>
@@ -35,7 +32,7 @@ function AttendanceHourlyChart() {
           </div>
         ))}
       </div>
-    </div>
+    </DashboardCard>
   )
 }
 

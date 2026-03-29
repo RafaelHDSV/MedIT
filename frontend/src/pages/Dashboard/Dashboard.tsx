@@ -13,7 +13,7 @@ import {
 import { useMemo } from 'react'
 import AttendanceHourlyChart from './components/AttendanceHourlyChart/AttendanceHourlyChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
-import DashboardCard from './components/DashboardCard/DashboardCard'
+import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import styles from './Dashboard.module.scss'
 
 function Dashboard() {
@@ -87,7 +87,12 @@ function Dashboard() {
 
       <div className={styles.container}>
         {cardsData.map(({ Icon, value, label }) => (
-          <DashboardCard key={label} Icon={Icon} value={value} label={label} />
+          <DashboardStatusCard
+            key={label}
+            Icon={Icon}
+            value={value}
+            label={label}
+          />
         ))}
 
         {content}

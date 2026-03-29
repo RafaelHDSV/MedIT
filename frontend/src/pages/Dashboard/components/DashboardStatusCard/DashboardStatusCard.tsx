@@ -1,13 +1,13 @@
 import type { Icon } from '@phosphor-icons/react'
-import styles from './DashboardCard.module.scss'
+import styles from './DashboardStatusCard.module.scss'
 
-interface IDashboardCardProps {
+interface IDashboardStatusCardProps {
   Icon: Icon
   value: string
   label: string
 }
 
-function DashboardCard({ Icon, value, label }: IDashboardCardProps) {
+function DashboardStatusCard({ Icon, value, label }: IDashboardStatusCardProps) {
   return (
     <div className={styles.card}>
       <Icon className={styles.icon} size={24} />
@@ -20,4 +20,4 @@ function DashboardCard({ Icon, value, label }: IDashboardCardProps) {
   )
 }
 
-export default DashboardCard
+export default DashboardStatusCard

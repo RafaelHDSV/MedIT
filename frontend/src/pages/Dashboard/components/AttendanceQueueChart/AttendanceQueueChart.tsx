@@ -1,3 +1,4 @@
+import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
@@ -41,16 +42,12 @@ function AttendanceQueueChart() {
     : mockedAttendanceItem.slice(0, QUANTITY_ATTENDANCES)
 
   return (
-    <div className={styles.section}>
-      <div className={styles.header}>
-        <h3>Fila de Atendimento</h3>
-
-        <div className={styles.asideInfo}>
-          <StethoscopeIcon size={22} />
-          <span>{mockedAttendanceItem.length} atendimentos</span>
-        </div>
-      </div>
-
+    <DashboardCard
+      title='Fila de Atendimento'
+      icon={StethoscopeIcon}
+      asideText={`${mockedAttendanceItem.length} atendimentos`}
+      gridArea='attendanceQueueChart'
+    >
       {visibleQueue.map((item) => (
         <AttendanceItem key={`${item.name}_${item.risk}`} item={item} />
       ))}
@@ -60,7 +57,7 @@ function AttendanceQueueChart() {
           ? 'Mostrar menos'
           : `+ ${mockedAttendanceItem.length - QUANTITY_ATTENDANCES} atendimentos`}
       </div>
-    </div>
+    </DashboardCard>
   )
 }
 
