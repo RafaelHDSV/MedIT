@@ -1,11 +1,11 @@
-# 🏥 MedIT
-
-Plataforma Digital de Apoio à Triagem e Organização do Fluxo Hospitalar com Mecanismo Inteligente Baseado em Regras.
-
 ![Typescript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Sass](https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white)
 ![GitHub language count](https://img.shields.io/github/languages/count/RafaelHDSV/MedIT?style=for-the-badge)
 ![GitHub repo size](https://img.shields.io/github/repo-size/RafaelHDSV/MedIT?style=for-the-badge)
+
+# 🏥 MedIT
+
+Plataforma Digital de Apoio à Triagem e Organização do Fluxo Hospitalar com Mecanismo Inteligente Baseado em Regras.
 
 ---
 
