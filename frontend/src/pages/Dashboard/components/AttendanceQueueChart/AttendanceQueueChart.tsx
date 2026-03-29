@@ -3,10 +3,7 @@ import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
 import { StethoscopeIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
-
-const QUANTITY_ATTENDANCES = 4
 
 interface QueueItem {
   name: string
@@ -36,11 +33,6 @@ function AttendanceItem({ item }: IAttendanceItemProps) {
 }
 
 function AttendanceQueueChart() {
-  const [showAll, setShowAll] = useState(false)
-  const visibleQueue = showAll
-    ? mockedAttendanceItem
-    : mockedAttendanceItem.slice(0, QUANTITY_ATTENDANCES)
-
   return (
     <DashboardCard
       title='Fila de Atendimento'
@@ -48,14 +40,10 @@ function AttendanceQueueChart() {
       asideText={`${mockedAttendanceItem.length} atendimentos`}
       gridArea='attendanceQueueChart'
     >
-      {visibleQueue.map((item) => (
-        <AttendanceItem key={`${item.name}_${item.risk}`} item={item} />
-      ))}
-
-      <div className={styles.more} onClick={() => setShowAll(!showAll)}>
-        {showAll
-          ? 'Mostrar menos'
-          : `+ ${mockedAttendanceItem.length - QUANTITY_ATTENDANCES} atendimentos`}
+      <div className={styles.queueList}>
+        {mockedAttendanceItem.map((item) => (
+          <AttendanceItem key={`${item.name}_${item.risk}`} item={item} />
+        ))}
       </div>
     </DashboardCard>
   )
