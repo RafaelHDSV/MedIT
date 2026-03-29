@@ -3,7 +3,7 @@ import SidebarModel from '@/models/SidebarModel'
 import { ROUTES } from '@/routes/constants'
 import routes, { type IRoute } from '@/routes/routes'
 import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
 import ConfigTag from './components/ConfigTag/ConfigTag'
@@ -129,6 +129,7 @@ function SideBar({
   mobileOpen = false,
   onMobileOpenChange
 }: ISideBarProps) {
+  const location = useLocation()
   const [isCompact, setIsCompact] = useState(false)
   const effectiveCompact = isMobile ? false : isCompact
 
@@ -142,6 +143,12 @@ function SideBar({
 
   const iconActive = (!isMobile && isCompact) || (isMobile && mobileOpen)
   const mobileHidden = isMobile && !mobileOpen
+
+  useEffect(() => {
+    if (isMobile && mobileOpen) {
+      onMobileOpenChange?.(false)
+    }
+  }, [location.pathname, isMobile, mobileOpen, onMobileOpenChange])
 
   return (
     <nav
