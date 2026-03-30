@@ -10,13 +10,13 @@ const addUnit = {
       address: 'Rua Principal, 123',
       maxOccupancy: 100,
       openingHours: {
-        Monday: [{ open: '08:00', close: '18:00' }],
-        Tuesday: [{ open: '08:00', close: '18:00' }],
-        Wednesday: [{ open: '08:00', close: '18:00' }],
-        Thursday: [{ open: '08:00', close: '18:00' }],
-        Friday: [{ open: '08:00', close: '18:00' }],
-        Saturday: [{ open: '09:00', close: '14:00' }],
-        Sunday: []
+        mon: { open: '08:00', close: '18:00' },
+        tue: { open: '08:00', close: '18:00' },
+        wed: { open: '08:00', close: '18:00' },
+        thu: { open: '08:00', close: '18:00' },
+        fri: { open: '08:00', close: '18:00' },
+        sat: { open: '09:00', close: '14:00' },
+        sun: { open: '09:00', close: '14:00' }
       },
       phone: '11987654321'
     })
@@ -27,11 +27,10 @@ const addUnit = {
       console.log('❌ Falha ao criar a unidade')
     }
 
-    const users = await UserModel.updateMany(
-      { unitId: { $exists: false } },
-      { $set: { unitId: unit._id } }
+    const users = await UserModel.updateMany({}, { $set: { unitId: unit._id } })
+    console.log(
+      `✅ ${users.modifiedCount} usuários atualizados com a nova unidade`
     )
-    console.log(`✅ ${users.modifiedCount} usuários atualizados com a nova unidade`)
 
     process.exit()
   }

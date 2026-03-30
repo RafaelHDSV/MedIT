@@ -21,12 +21,10 @@ const UnitSchema = new mongoose.Schema<IUnit>(
     },
     openingHours: {
       type: Map,
-      of: [
-        {
-          open: { type: String, required: true },
-          close: { type: String, required: true }
-        }
-      ]
+      of: {
+        open: { type: String, required: true },
+        close: { type: String, required: true }
+      }
     },
     phone: {
       type: String,
