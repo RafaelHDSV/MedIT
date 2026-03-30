@@ -3,7 +3,7 @@ import styles from './DashboardStatusCard.module.scss'
 
 interface IDashboardStatusCardProps {
   Icon: Icon
-  value: string
+  value: string | number | undefined
   label: string
 }
 

@@ -1,15 +1,16 @@
 import { Request, Response } from 'express'
-import UnitModel from '../models/UnitModel'
+import { getUnitService } from '../services/unitServices'
 
 export const getUnit = async (req: Request, res: Response) => {
-  const { id } = req.params
+  const { id } = req.query
 
-  const unit = await UnitModel.findById(id)
-  if (!unit) {
-    return res.status(404).json({ message: 'Unidade de saúde não encontrada' })
+  try {
+    const unit = await getUnitService(id as string)
+    if (unit.status !== 200) {
+      return res.status(unit.status).json({ message: unit.message })
+    }
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao buscar unidade de saúde' })
   }
-
-  return res
-    .status(200)
-    .json({ message: 'Unidade de saúde encontrada', data: unit })
 }

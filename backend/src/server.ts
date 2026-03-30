@@ -3,6 +3,7 @@ import express from 'express'
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
 import authRoutes from './routes/authRoutes.js'
+import dashboardRoutes from './routes/dashboardRoutes.js'
 import doctorsRoutes from './routes/doctorsRoutes.js'
 import nursesRoutes from './routes/nursesRoutes.js'
 import patientsRoutes from './routes/patientsRoutes.js'
@@ -26,6 +27,7 @@ app.use('/doctors', doctorsRoutes)
 app.use('/nurses', nursesRoutes)
 app.use('/patients', patientsRoutes)
 app.use('/units', unitsRoutes)
+app.use('/dashboard', dashboardRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando! ${PORT}`)

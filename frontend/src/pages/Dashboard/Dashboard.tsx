@@ -1,6 +1,11 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import { useAuth } from '@/hooks/useAuth'
+import type {
+  IAdminStatusCard,
+  IDoctorStatusCard,
+  INurseStatusCard
+} from '@/interfaces/IDashboardStatusCards'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
 import {
@@ -22,17 +27,22 @@ import styles from './Dashboard.module.scss'
 
 function Dashboard() {
   const { user } = useAuth()
-  const [occupancyRate, setOccupancyRate] = useState(0)
+  const [adminData, setAdminData] = useState<IAdminStatusCard>()
+  const [doctorData, setDoctorData] = useState<IDoctorStatusCard>()
+  const [nurseData, setNurseData] = useState<INurseStatusCard>()
 
   useEffect(() => {
     async function fetchOccupancyRate() {
       try {
-        const response = await api.get(`/units/${user?.unitId}`)
-        const data = response.data.data.maxOccupancy
-        // TODO: Atualizar para pegar os atendimentos correntes da unidade
-        const occupied = 47
-        const occupancyRate = Math.round((occupied / data) * 100)
-        setOccupancyRate(occupancyRate)
+        const response = await api.get(`/dashboard/dashboard-status-cards`, {
+          params: { unitId: user?.unitId }
+        })
+        const data = response.data.data
+        const { admin, doctor, nurse } = data
+
+        setAdminData(admin)
+        setDoctorData(doctor)
+        setNurseData(nurse)
       } catch (err) {
         if (!axios.isAxiosError(err)) return
         const error = err as AxiosError<IError>
@@ -50,44 +60,76 @@ function Dashboard() {
     switch (user?.level) {
       case UserLevels.ADMIN:
         return [
-          { Icon: DoorOpenIcon, value: '142', label: 'Entradas' },
-          { Icon: HourglassIcon, value: '46', label: 'Em atendimento' },
-          { Icon: CheckCircleIcon, value: '96', label: 'Atendidos' },
-          { Icon: BedIcon, value: `${occupancyRate}%`, label: 'Ocupação' },
-          { Icon: TimerIcon, value: '23min', label: 'Tempo médio' },
-          { Icon: BombIcon, value: '8', label: 'Risco alto' }
+          { Icon: DoorOpenIcon, value: adminData?.entries, label: 'Entradas' },
+          {
+            Icon: HourglassIcon,
+            value: adminData?.inAttendance,
+            label: 'Em atendimento'
+          },
+          {
+            Icon: CheckCircleIcon,
+            value: adminData?.attended,
+            label: 'Atendidos'
+          },
+          {
+            Icon: BedIcon,
+            value: `${adminData?.occupancy}%`,
+            label: 'Ocupação'
+          },
+          {
+            Icon: TimerIcon,
+            value: `${adminData?.averageTime}min`,
+            label: 'Tempo médio'
+          },
+          { Icon: BombIcon, value: adminData?.highRisk, label: 'Risco alto' }
         ]
       case UserLevels.DOCTOR:
         return [
-          { Icon: HourglassIcon, value: '14', label: 'Pacientes aguardando' },
+          {
+            Icon: HourglassIcon,
+            value: doctorData?.waitingPatients,
+            label: 'Pacientes aguardando'
+          },
           {
             Icon: CheckCircleIcon,
-            value: '96',
+            value: doctorData?.attended,
             label: 'Atendimentos realizados'
           },
-          { Icon: TimerIcon, value: '18min', label: 'Tempo médio' },
+          {
+            Icon: TimerIcon,
+            value: `${doctorData?.averageTime}min`,
+            label: 'Tempo médio'
+          },
           {
             Icon: UsersThreeIcon,
-            value: '52%',
+            value: `${doctorData?.assertiveness}%`,
             label: 'Assertividade IA vs Médico(a)'
           }
         ]
       case UserLevels.NURSE:
         return [
-          { Icon: HourglassIcon, value: '25', label: 'Pacientes aguardando' },
+          {
+            Icon: HourglassIcon,
+            value: nurseData?.waitingPatients,
+            label: 'Pacientes aguardando'
+          },
           {
             Icon: CheckCircleIcon,
-            value: '96',
+            value: nurseData?.triagedPatients,
             label: 'Pacientes triados hoje'
           },
-          { Icon: TimerIcon, value: '18min', label: 'Tempo médio' }
+          {
+            Icon: TimerIcon,
+            value: `${nurseData?.averageTime}min`,
+            label: 'Tempo médio'
+          }
         ]
       case UserLevels.PATIENT:
         return []
       default:
         return []
     }
-  }, [user?.level, occupancyRate])
+  }, [user?.level, adminData, doctorData, nurseData])
 
   const content = useMemo(() => {
     switch (user?.level) {
