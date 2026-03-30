@@ -69,6 +69,10 @@ const UserSchema = new mongoose.Schema<
     birthDate: {
       type: Date
     },
+    unitId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Unit'
+    },
     refreshToken: {
       type: String
     }

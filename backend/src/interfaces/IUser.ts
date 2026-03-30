@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose'
 import { IBaseInterface } from './IBaseInterface.js'
 
 export const UserLevels = {
@@ -24,6 +25,7 @@ export interface IBaseUser extends IBaseInterface {
   gender?: UserGender
   cellphone?: number
   birthDate?: Date
+  unitId?: ObjectId
   refreshToken?: string
 }
 
