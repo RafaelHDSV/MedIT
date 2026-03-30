@@ -35,5 +35,6 @@ export interface IBaseUser extends IBaseInterface {
   gender?: UserGender
   cellphone?: number
   birthDate?: Date
+  unitId?: string
   refreshToken?: string
 }
