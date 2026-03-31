@@ -2,7 +2,7 @@ import { AttendanceRisk, AttendanceRiskLabels } from '@/interfaces/IAttendance'
 import styles from './RiskTag.module.scss'
 
 interface IRiskTagProps {
-  risk: AttendanceRisk
+  risk?: AttendanceRisk
 }
 
 interface IRiskColors {
@@ -11,6 +11,8 @@ interface IRiskColors {
 }
 
 function RiskTag({ risk }: IRiskTagProps) {
+  if (!risk) return
+
   const colors: Record<AttendanceRisk, IRiskColors> = {
     [AttendanceRisk.EMERGENCY]: {
       color: '#E74C64',

@@ -1,6 +1,7 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
 import { Tooltip } from 'antd'
+import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
 function generateAttendanceData() {
@@ -15,8 +16,17 @@ function generateAttendanceData() {
 }
 
 function AttendanceByTimeChart() {
-  const attendanceData: { hour: string; value: number }[] =
-    generateAttendanceData()
+  const [data, setData] = useState<{ hour: string; value: number }[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setData(generateAttendanceData())
+      setLoading(false)
+    }, 800) // Vieira: simula API
+
+    return () => clearTimeout(timeout)
+  }, [])
 
   return (
     <DashboardCard
@@ -26,17 +36,27 @@ function AttendanceByTimeChart() {
       gridArea='attendanceByTimeChart'
     >
       <div className={styles.chart}>
-        {attendanceData.map((item, index) => (
-          <div key={index} className={styles.barContainer}>
-            <Tooltip title={`${item.value} atendimentos às ${item.hour}`}>
+        {loading
+          ? Array.from({ length: 12 }).map((_, index) => (
               <div
-                className={styles.bar}
-                style={{ height: `${item.value}px` }}
-              />
-            </Tooltip>
-            <span className={styles.label}>{item.hour}</span>
-          </div>
-        ))}
+                key={index}
+                className={`${styles.barContainer} ${styles.skeleton}`}
+              >
+                <div className={`${styles.bar} ${styles.barSkeleton}`} />
+                <span className={`${styles.label} ${styles.skeleton}`} />
+              </div>
+            ))
+          : data.map((item, index) => (
+              <div key={index} className={styles.barContainer}>
+                <Tooltip title={`${item.value} atendimentos às ${item.hour}`}>
+                  <div
+                    className={styles.bar}
+                    style={{ height: `${item.value}px` }}
+                  />
+                </Tooltip>
+                <span className={styles.label}>{item.hour}</span>
+              </div>
+            ))}
       </div>
     </DashboardCard>
   )

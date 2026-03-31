@@ -4,12 +4,13 @@ import type { FC } from 'react'
 import styles from './TooltipColumn.module.scss'
 
 interface ITooltipColumnProps {
-  text: string
+  text?: string
   icon?: FC<IconProps>
   className?: string
 }
 
 function TooltipColumn({ text, icon: Icon, className }: ITooltipColumnProps) {
+  if (!text) return
   const display = text || 'n/a'
 
   const spanContent = () => {

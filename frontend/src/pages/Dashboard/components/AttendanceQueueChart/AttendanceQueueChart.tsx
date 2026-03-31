@@ -5,6 +5,7 @@ import UserBall from '@/components/UserBall/UserBall'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
 import { faker } from '@faker-js/faker'
 import { StethoscopeIcon } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
 
 interface QueueItem {
@@ -14,38 +15,72 @@ interface QueueItem {
 }
 
 interface IAttendanceItemProps {
-  item: QueueItem
+  item?: QueueItem
+  loading?: boolean
 }
 
-function AttendanceItem({ item }: IAttendanceItemProps) {
+function AttendanceItem({ item, loading }: IAttendanceItemProps) {
+  if (loading) {
+    return (
+      <div className={styles.queueItem}>
+        <div className={styles.leftAside}>
+          <div className={`${styles.avatarSkeleton}`} />
+
+          <div className={styles.info}>
+            <span className={`${styles.name} ${styles.skeleton}`} />
+            <span className={`${styles.status} ${styles.skeleton}`} />
+          </div>
+        </div>
+
+        <div className={`${styles.tagSkeleton}`} />
+      </div>
+    )
+  }
+
   return (
     <div className={styles.queueItem}>
       <div className={styles.leftAside}>
-        <UserBall name={item.name} />
+        <UserBall name={item?.name} />
 
         <div className={styles.info}>
-          <TooltipColumn className={styles.name} text={item.name} />
-          <TooltipColumn className={styles.status} text={item.status} />
+          <TooltipColumn className={styles.name} text={item?.name} />
+          <TooltipColumn className={styles.status} text={item?.status} />
         </div>
       </div>
 
-      <RiskTag risk={item.risk} />
+      <RiskTag risk={item?.risk} />
     </div>
   )
 }
 
 function AttendanceQueueChart() {
+  const [data, setData] = useState<QueueItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setData(mockedAttendanceItem)
+      setLoading(false)
+    }, 1000) //Vieira: Simula api
+
+    return () => clearTimeout(timeout)
+  }, [])
+
   return (
     <DashboardCard
       title='Fila de Atendimento'
       icon={StethoscopeIcon}
-      asideText={`${mockedAttendanceItem.length} atendimentos`}
+      asideText={`${data.length} atendimentos`}
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>
-        {mockedAttendanceItem.map((item) => (
-          <AttendanceItem key={`${item.name}_${item.risk}`} item={item} />
-        ))}
+        {loading
+          ? Array.from({ length: 8 }).map((_, i) => (
+              <AttendanceItem key={i} loading={loading} />
+            ))
+          : data.map((item) => (
+              <AttendanceItem key={`${item.name}_${item.risk}`} item={item} />
+            ))}
       </div>
     </DashboardCard>
   )
