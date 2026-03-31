@@ -53,8 +53,8 @@ function Dashboard() {
         message.error(
           error.response?.data?.message || 'Erro ao pegar taxa de ocupação'
         )
-        // } finally {
-        //   setLoading(false)
+      } finally {
+        setLoading(false)
       }
     }
 
