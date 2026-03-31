@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { IDashboardStatusCards } from '../interfaces/IDashboardStatusCards'
-import { getUnitService } from '../services/unitServices'
+import { IDashboardStatusCards } from '../interfaces/IDashboardStatusCards.js'
+import { getUnitService } from '../services/unitServices.js'
 
 // TODO: Atualizar os dados para serem dinâmicos, utilizando os dados reais da unidade de saúde
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
