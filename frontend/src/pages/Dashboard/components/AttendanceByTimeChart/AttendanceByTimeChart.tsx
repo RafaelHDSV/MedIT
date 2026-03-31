@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
+import type { IDashboardAttendanceByTime } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
 import { message, Tooltip } from 'antd'
@@ -7,13 +8,8 @@ import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
-interface IAttendanceByTime {
-  hour: number
-  total: number
-}
-
 function AttendanceByTimeChart() {
-  const [data, setData] = useState<IAttendanceByTime[]>([])
+  const [data, setData] = useState<IDashboardAttendanceByTime[]>([])
   const [loading, setLoading] = useState(true)
   const max = Math.max(...data.map((d) => d.total), 1)
 

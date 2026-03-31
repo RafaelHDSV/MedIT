@@ -1,11 +1,7 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import { useAuth } from '@/hooks/useAuth'
-import type {
-  IAdminStatusCard,
-  IDoctorStatusCard,
-  INurseStatusCard
-} from '@/interfaces/IDashboardStatusCards'
+import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
 import {
@@ -27,9 +23,8 @@ import styles from './Dashboard.module.scss'
 
 function Dashboard() {
   const { user } = useAuth()
-  const [adminData, setAdminData] = useState<IAdminStatusCard>()
-  const [doctorData, setDoctorData] = useState<IDoctorStatusCard>()
-  const [nurseData, setNurseData] = useState<INurseStatusCard>()
+  const [dashboardStatusData, setDashboardStatusData] =
+    useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -38,14 +33,10 @@ function Dashboard() {
 
       try {
         const response = await api.get(`/dashboard/status-cards`, {
-          params: { unitId: user?.unitId }
+          params: { unitId: user?.unitId, level: user?.level }
         })
         const data = response.data.data
-        const { admin, doctor, nurse } = data
-
-        setAdminData(admin)
-        setDoctorData(doctor)
-        setNurseData(nurse)
+        setDashboardStatusData(data)
       } catch (err) {
         if (!axios.isAxiosError(err)) return
         const error = err as AxiosError<IError>
@@ -59,55 +50,63 @@ function Dashboard() {
     }
 
     fetchDashboardStatus()
-  }, [user?.unitId])
+  }, [user?.unitId, user?.level])
 
   const cardsData = useMemo(() => {
     switch (user?.level) {
       case UserLevels.ADMIN:
         return [
-          { Icon: DoorOpenIcon, value: adminData?.entries, label: 'Entradas' },
+          {
+            Icon: DoorOpenIcon,
+            value: dashboardStatusData?.entries,
+            label: 'Entradas'
+          },
           {
             Icon: HourglassIcon,
-            value: adminData?.inAttendance,
+            value: dashboardStatusData?.inAttendance,
             label: 'Em atendimento'
           },
           {
             Icon: CheckCircleIcon,
-            value: adminData?.attended,
+            value: dashboardStatusData?.attended,
             label: 'Atendidos'
           },
           {
             Icon: BedIcon,
-            value: `${adminData?.occupancy}%`,
+            value: `${dashboardStatusData?.occupancy}%`,
             label: 'Ocupação'
           },
           {
             Icon: TimerIcon,
-            value: `${adminData?.averageTime}min`,
+            value: `${dashboardStatusData?.averageTime}min`,
             label: 'Tempo médio'
           },
-          { Icon: BombIcon, value: adminData?.highRisk, label: 'Risco alto' }
+          {
+            Icon: BombIcon,
+            value: dashboardStatusData?.highRisk,
+            label: 'Risco alto'
+          }
         ]
       case UserLevels.DOCTOR:
         return [
           {
             Icon: HourglassIcon,
-            value: doctorData?.waitingPatients,
+            value: dashboardStatusData?.waitingPatients,
             label: 'Pacientes aguardando'
           },
           {
             Icon: CheckCircleIcon,
-            value: doctorData?.attended,
+            value: dashboardStatusData?.attended,
             label: 'Atendimentos realizados'
           },
           {
             Icon: TimerIcon,
-            value: `${doctorData?.averageTime}min`,
+            value: `${dashboardStatusData?.averageTime}min`,
             label: 'Tempo médio'
           },
           {
             Icon: UsersThreeIcon,
-            value: `${doctorData?.assertiveness}%`,
+            value: `${dashboardStatusData?.assertiveness}%`,
             label: 'Assertividade IA vs Médico(a)'
           }
         ]
@@ -115,17 +114,17 @@ function Dashboard() {
         return [
           {
             Icon: HourglassIcon,
-            value: nurseData?.waitingPatients,
+            value: dashboardStatusData?.waitingPatients,
             label: 'Pacientes aguardando'
           },
           {
             Icon: CheckCircleIcon,
-            value: nurseData?.triagedPatients,
+            value: dashboardStatusData?.triagedPatients,
             label: 'Pacientes triados hoje'
           },
           {
             Icon: TimerIcon,
-            value: `${nurseData?.averageTime}min`,
+            value: `${dashboardStatusData?.averageTime}min`,
             label: 'Tempo médio'
           }
         ]
@@ -134,7 +133,7 @@ function Dashboard() {
       default:
         return []
     }
-  }, [user?.level, adminData, doctorData, nurseData])
+  }, [user?.level, dashboardStatusData])
 
   const content = useMemo(() => {
     switch (user?.level) {

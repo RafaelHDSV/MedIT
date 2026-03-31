@@ -1,19 +1,21 @@
 import type { Icon } from '@phosphor-icons/react'
 import styles from './DashboardCard.module.scss'
 
+interface IDashboardCardProps {
+  icon: Icon
+  title: string
+  asideText: string
+  gridArea?: string
+  children: React.ReactNode
+}
+
 function DashboardCard({
   icon: Icon,
   title,
   asideText,
   gridArea,
   children
-}: {
-  icon: Icon
-  title: string
-  asideText: string
-  gridArea?: string
-  children: React.ReactNode
-}) {
+}: IDashboardCardProps) {
   return (
     <div className={styles.section} style={{ gridArea }}>
       <div className={styles.header}>

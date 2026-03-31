@@ -3,7 +3,7 @@ import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
-import { AttendanceRisk } from '@/interfaces/IAttendance'
+import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import { message } from 'antd'
@@ -11,15 +11,8 @@ import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
 
-interface QueueItem {
-  _id: string
-  patientName: string
-  status: string
-  risk: AttendanceRisk
-}
-
 interface IAttendanceItemProps {
-  item?: QueueItem
+  item?: IDashboardQueueItem
   loading?: boolean
 }
 
@@ -58,7 +51,7 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
 }
 
 function AttendanceQueueChart() {
-  const [data, setData] = useState<QueueItem[]>([])
+  const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

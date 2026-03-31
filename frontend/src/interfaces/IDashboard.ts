@@ -1,3 +1,5 @@
+import type { AttendanceRisk } from './IAttendance'
+
 export interface IAdminStatusCard {
   entries: number
   inAttendance: number
@@ -20,9 +22,20 @@ export interface INurseStatusCard {
   averageTime: number
 }
 
+export interface IDashboardStatusCards
+  extends
+    Partial<IAdminStatusCard>,
+    Partial<IDoctorStatusCard>,
+    Partial<INurseStatusCard> {}
 
-export interface IDashboardStatusCards  {
-  admin: IAdminStatusCard
-  doctor: IDoctorStatusCard
-  nurse: INurseStatusCard
+export interface IDashboardQueueItem {
+  _id: string
+  patientName: string
+  status: string
+  risk: AttendanceRisk
+}
+
+export interface IDashboardAttendanceByTime {
+  hour: number
+  total: number
 }

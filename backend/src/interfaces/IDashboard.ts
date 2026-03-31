@@ -1,4 +1,4 @@
-interface IAdminStatusCard {
+export interface IAdminStatusCard {
   entries: number
   inAttendance: number
   attended: number
@@ -7,22 +7,21 @@ interface IAdminStatusCard {
   highRisk: number
 }
 
-interface IDoctorStatusCard {
+export interface IDoctorStatusCard {
   waitingPatients: number
   attended: number
   averageTime: number
   assertiveness: number
 }
 
-interface INurseStatusCard {
+export interface INurseStatusCard {
   waitingPatients: number
   triagedPatients: number
   averageTime: number
 }
 
-
-export interface IDashboardStatusCards  {
-  admin: IAdminStatusCard
-  doctor: IDoctorStatusCard
-  nurse: INurseStatusCard
-}
+export interface IDashboardStatusCards
+  extends
+    Partial<IAdminStatusCard>,
+    Partial<IDoctorStatusCard>,
+    Partial<INurseStatusCard> {}

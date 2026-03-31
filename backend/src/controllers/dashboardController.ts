@@ -1,12 +1,11 @@
 import { faker } from '@faker-js/faker'
 import { Request, Response } from 'express'
 import { AttendanceRisk } from '../interfaces/IAttendance.js'
-import { IDashboardStatusCards } from '../interfaces/IDashboardStatusCards.js'
 import { getUnitService } from '../services/unitServices.js'
 
 // TODO: Atualizar os dados para serem dinâmicos, utilizando os dados reais da unidade de saúde
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
-  const { unitId } = req.query
+  const { unitId, level } = req.query
 
   const unit = await getUnitService(unitId as string)
   const occupied = 47
@@ -35,15 +34,22 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     averageTime: 18
   }
 
-  const data: IDashboardStatusCards = {
-    admin: adminData,
-    doctor: doctorData,
-    nurse: nurseData
+  const data = () => {
+    switch (level) {
+      case 'admin':
+        return adminData
+      case 'doctor':
+        return doctorData
+      case 'nurse':
+        return nurseData
+      default:
+        return
+    }
   }
 
   res.json({
     message: 'Cards de status do dashboard encontrados com sucesso',
-    data
+    data: data()
   })
 }
 
