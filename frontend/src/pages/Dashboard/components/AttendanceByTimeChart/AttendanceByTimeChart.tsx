@@ -1,31 +1,43 @@
+import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
+import type { IError } from '@/interfaces/IError'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
-import { Tooltip } from 'antd'
+import { message, Tooltip } from 'antd'
+import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
-function generateAttendanceData() {
-  const data = []
-  for (let i = 0; i <= 12; i++) {
-    data.push({
-      hour: `${i}h`,
-      value: Math.floor(Math.random() * 200)
-    })
-  }
-  return data
+interface IAttendanceByTime {
+  hour: number
+  total: number
 }
 
 function AttendanceByTimeChart() {
-  const [data, setData] = useState<{ hour: string; value: number }[]>([])
+  const [data, setData] = useState<IAttendanceByTime[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setData(generateAttendanceData())
-      setLoading(false)
-    }, 800) // Vieira: simula API
+    async function fetchAttendanceByTime() {
+      setLoading(true)
+      try {
+        const response = await api.get(
+          '/dashboard/dashboard-attendance-by-time'
+        )
+        const data = response.data.data
+        setData(data)
+      } catch (err) {
+        if (!axios.isAxiosError(err)) return
+        const error = err as AxiosError<IError>
+        console.error(error)
+        message.error(
+          error.response?.data?.message || 'Erro ao pegar atendimentos por hora'
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timeout)
+    fetchAttendanceByTime()
   }, [])
 
   return (
@@ -48,13 +60,13 @@ function AttendanceByTimeChart() {
             ))
           : data.map((item, index) => (
               <div key={index} className={styles.barContainer}>
-                <Tooltip title={`${item.value} atendimentos às ${item.hour}`}>
+                <Tooltip title={`${item.total} atendimentos às ${item.hour}h`}>
                   <div
                     className={styles.bar}
-                    style={{ height: `${item.value}px` }}
+                    style={{ height: `${item.total}px` }}
                   />
                 </Tooltip>
-                <span className={styles.label}>{item.hour}</span>
+                <span className={styles.label}>{item.hour}h</span>
               </div>
             ))}
       </div>

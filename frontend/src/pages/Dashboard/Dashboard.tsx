@@ -33,7 +33,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchOccupancyRate() {
+    async function fetchDashboardStatus() {
       setLoading(true)
 
       try {
@@ -51,14 +51,14 @@ function Dashboard() {
         const error = err as AxiosError<IError>
         console.error(error)
         message.error(
-          error.response?.data?.message || 'Erro ao pegar taxa de ocupação'
+          error.response?.data?.message || 'Erro ao pegar dados do dashboard'
         )
       } finally {
         setLoading(false)
       }
     }
 
-    fetchOccupancyRate()
+    fetchDashboardStatus()
   }, [user?.unitId])
 
   const cardsData = useMemo(() => {

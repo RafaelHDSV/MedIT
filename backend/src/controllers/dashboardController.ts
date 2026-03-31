@@ -44,3 +44,24 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     data
   })
 }
+
+export const getDashboardAttendanceByTime = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const data = Array.from({ length: 12 }).map((_, hour) => ({
+      hour,
+      total: Math.floor(Math.random() * 200)
+    }))
+
+    res.json({
+      message: 'Atendimentos por hora carregados com sucesso',
+      data
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erro ao buscar atendimentos por hora'
+    })
+  }
+}
