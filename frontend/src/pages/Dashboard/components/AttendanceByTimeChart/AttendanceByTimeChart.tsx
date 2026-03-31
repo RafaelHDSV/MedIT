@@ -15,6 +15,7 @@ interface IAttendanceByTime {
 function AttendanceByTimeChart() {
   const [data, setData] = useState<IAttendanceByTime[]>([])
   const [loading, setLoading] = useState(true)
+  const max = Math.max(...data.map((d) => d.total), 1)
 
   useEffect(() => {
     async function fetchAttendanceByTime() {
@@ -63,7 +64,7 @@ function AttendanceByTimeChart() {
                 <Tooltip title={`${item.total} atendimentos às ${item.hour}h`}>
                   <div
                     className={styles.bar}
-                    style={{ height: `${item.total}px` }}
+                    style={{ height: `${(item.total / max) * 200}px` }}
                   />
                 </Tooltip>
                 <span className={styles.label}>{item.hour}h</span>
