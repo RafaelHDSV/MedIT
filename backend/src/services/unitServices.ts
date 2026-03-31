@@ -1,4 +1,4 @@
-import UnitModel from '../models/UnitModel'
+import UnitModel from '../models/UnitModel.js'
 
 export const getUnitService = async (unitId: string) => {
   const unit = await UnitModel.findById(unitId)
