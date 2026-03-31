@@ -21,9 +21,7 @@ function AttendanceByTimeChart() {
     async function fetchAttendanceByTime() {
       setLoading(true)
       try {
-        const response = await api.get(
-          '/dashboard/dashboard-attendance-by-time'
-        )
+        const response = await api.get('/dashboard/attendance-by-time')
         const data = response.data.data
         setData(data)
       } catch (err) {

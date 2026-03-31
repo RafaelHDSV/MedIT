@@ -6,7 +6,7 @@ import {
 
 const router = express.Router()
 
-router.get('/dashboard-status-cards', getDashboardStatusCards)
-router.get('/dashboard-attendance-by-time', getDashboardAttendanceByTime)
+router.get('/status-cards', getDashboardStatusCards)
+router.get('/attendance-by-time', getDashboardAttendanceByTime)
 
 export default router

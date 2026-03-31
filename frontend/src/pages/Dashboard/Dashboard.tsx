@@ -37,7 +37,7 @@ function Dashboard() {
       setLoading(true)
 
       try {
-        const response = await api.get(`/dashboard/dashboard-status-cards`, {
+        const response = await api.get(`/dashboard/status-cards`, {
           params: { unitId: user?.unitId }
         })
         const data = response.data.data
