@@ -1,15 +1,19 @@
+import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
-import { faker } from '@faker-js/faker'
+import type { IError } from '@/interfaces/IError'
 import { StethoscopeIcon } from '@phosphor-icons/react'
+import { message } from 'antd'
+import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
 
 interface QueueItem {
-  name: string
+  _id: string
+  patientName: string
   status: string
   risk: AttendanceRisk
 }
@@ -40,10 +44,10 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
   return (
     <div className={styles.queueItem}>
       <div className={styles.leftAside}>
-        <UserBall name={item?.name} />
+        <UserBall name={item?.patientName} />
 
         <div className={styles.info}>
-          <TooltipColumn className={styles.name} text={item?.name} />
+          <TooltipColumn className={styles.name} text={item?.patientName} />
           <TooltipColumn className={styles.status} text={item?.status} />
         </div>
       </div>
@@ -58,12 +62,24 @@ function AttendanceQueueChart() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setData(mockedAttendanceItem)
-      setLoading(false)
-    }, 1000) //Vieira: Simula api
+    async function fetchData() {
+      try {
+        const response = await api.get('/dashboard/attendance-queue')
+        const data = response.data.data
+        setData(data)
+      } catch (err) {
+        if (!axios.isAxiosError(err)) return
+        const error = err as AxiosError<IError>
+        console.error(error)
+        message.error(
+          error.response?.data?.message || 'Erro ao pegar fila de atendimento'
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timeout)
+    fetchData()
   }, [])
 
   return (
@@ -79,7 +95,10 @@ function AttendanceQueueChart() {
               <AttendanceItem key={i} loading={loading} />
             ))
           : data.map((item) => (
-              <AttendanceItem key={`${item.name}_${item.risk}`} item={item} />
+              <AttendanceItem
+                key={`${item.patientName}_${item.risk}`}
+                item={item}
+              />
             ))}
       </div>
     </DashboardCard>
@@ -87,24 +106,3 @@ function AttendanceQueueChart() {
 }
 
 export default AttendanceQueueChart
-
-const mockedAttendanceItem: QueueItem[] = faker.helpers.multiple(
-  () => {
-    return {
-      name: faker.person.fullName(),
-      status: faker.helpers.arrayElement([
-        'Em transporte',
-        'Entrada',
-        'Aguardando Triagem',
-        'Em Triagem',
-        'Aguardando Médico',
-        'Em Atendimento',
-        'Aguardando Exames',
-        'Aguardando Resultados',
-        'Aguardando Alta'
-      ]),
-      risk: faker.helpers.arrayElement(Object.values(AttendanceRisk))
-    }
-  },
-  { count: 46 }
-)

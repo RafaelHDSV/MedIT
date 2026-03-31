@@ -1,4 +1,6 @@
+import { faker } from '@faker-js/faker'
 import { Request, Response } from 'express'
+import { AttendanceRisk } from '../interfaces/IAttendance.js'
 import { IDashboardStatusCards } from '../interfaces/IDashboardStatusCards.js'
 import { getUnitService } from '../services/unitServices.js'
 
@@ -62,6 +64,42 @@ export const getDashboardAttendanceByTime = async (
   } catch (error) {
     res.status(500).json({
       message: 'Erro ao buscar atendimentos por hora'
+    })
+  }
+}
+
+export const getDashboardAttendanceQueue = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const data = faker.helpers.multiple(
+      () => ({
+        _id: faker.string.uuid(),
+        patientName: faker.person.fullName(),
+        status: faker.helpers.arrayElement([
+          'Em transporte',
+          'Entrada',
+          'Aguardando Triagem',
+          'Em Triagem',
+          'Aguardando Médico',
+          'Em Atendimento',
+          'Aguardando Exames',
+          'Aguardando Resultados',
+          'Aguardando Alta'
+        ]),
+        risk: faker.helpers.arrayElement(Object.values(AttendanceRisk))
+      }),
+      { count: 66 }
+    )
+
+    res.json({
+      message: 'Fila de atendimento carregada com sucesso',
+      data
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erro ao buscar fila de atendimento'
     })
   }
 }
