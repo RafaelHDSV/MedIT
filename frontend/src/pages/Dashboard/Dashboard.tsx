@@ -30,9 +30,12 @@ function Dashboard() {
   const [adminData, setAdminData] = useState<IAdminStatusCard>()
   const [doctorData, setDoctorData] = useState<IDoctorStatusCard>()
   const [nurseData, setNurseData] = useState<INurseStatusCard>()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchOccupancyRate() {
+      setLoading(true)
+
       try {
         const response = await api.get(`/dashboard/dashboard-status-cards`, {
           params: { unitId: user?.unitId }
@@ -50,6 +53,8 @@ function Dashboard() {
         message.error(
           error.response?.data?.message || 'Erro ao pegar taxa de ocupação'
         )
+        // } finally {
+        //   setLoading(false)
       }
     }
 
@@ -162,6 +167,7 @@ function Dashboard() {
             Icon={Icon}
             value={value}
             label={label}
+            loading={loading}
           />
         ))}
 
