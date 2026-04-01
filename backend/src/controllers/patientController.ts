@@ -3,6 +3,7 @@ import { UserLevels } from '../interfaces/IUser.js'
 import { Patient } from '../models/PatientModel.js'
 import UserModel from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
+import normalizeStringArray from '../utils/normalizeStringArray.js'
 
 export const getUsers = async (_req: Request, res: Response) => {
   const users = await UserModel.find({ level: 'patient' })
@@ -155,8 +156,11 @@ export const editPatient = async (req: Request, res: Response) => {
     patient.weight = weight || patient.weight
     patient.height = height || patient.height
     patient.bloodType = bloodType || patient.bloodType
-    patient.conditions = conditions || patient.conditions
-    patient.allergies = allergies || patient.allergies
+    patient.conditions =
+      normalizeStringArray(conditions) ||
+      normalizeStringArray(patient.conditions)
+    patient.allergies =
+      normalizeStringArray(allergies) || normalizeStringArray(patient.allergies)
 
     await patient.save()
 
