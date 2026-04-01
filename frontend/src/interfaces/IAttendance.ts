@@ -1,4 +1,4 @@
-import { Types } from 'mongoose'
+import type { ObjectId } from 'mongoose'
 import type { IBaseInterface } from './IBaseInterface'
 
 export const AttendanceRisk = {
@@ -56,11 +56,11 @@ export interface IAttendance extends IBaseInterface {
   date: Date
   risk: AttendanceRisk
   status: AttendanceStatus
-  patientId: Types.ObjectId
-  unitId: Types.ObjectId
-  nurseId?: Types.ObjectId
-  doctorId?: Types.ObjectId
-  medicationsIds?: Types.ObjectId[]
+  patientId: ObjectId
+  unitId: ObjectId
+  nurseId?: ObjectId
+  doctorId?: ObjectId
+  medicationsIds?: ObjectId[]
   vitalSigns?: IVitalSigns
-  iaConditionId?: Types.ObjectId
+  iaConditionId?: ObjectId
 }
