@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { IDoctor } from '../interfaces/IDoctor'
+import { IDoctor } from '../interfaces/IDoctor.js'
 
 const DoctorSchema = new mongoose.Schema<IDoctor>({
   crm: { type: String, required: true, unique: true },

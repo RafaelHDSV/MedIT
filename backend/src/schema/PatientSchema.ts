@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { BloodType, IPatient } from '../interfaces/IPatient'
+import { BloodType, IPatient } from '../interfaces/IPatient.js'
 
 const PatientSchema = new mongoose.Schema<IPatient>({
   weight: Number,

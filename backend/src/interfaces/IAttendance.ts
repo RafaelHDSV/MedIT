@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'
-import { IBaseInterface } from './IBaseInterface'
+import { IBaseInterface } from './IBaseInterface.js'
 
 export const AttendanceRisk = {
   EMERGENCY: 'emergency',

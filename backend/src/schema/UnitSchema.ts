@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { IUnit } from '../interfaces/IUnit'
+import { IUnit } from '../interfaces/IUnit.js'
 
 const UnitSchema = new mongoose.Schema<IUnit>(
   {

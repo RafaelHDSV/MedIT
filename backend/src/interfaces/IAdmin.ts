@@ -1,3 +1,3 @@
-import { IBaseUser } from './IUser';
+import { IBaseUser } from './IUser.js'
 
 export interface IAdmin extends IBaseUser {}

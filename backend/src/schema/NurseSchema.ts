@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { INurse, NurseShifts } from '../interfaces/INurse'
+import { INurse, NurseShifts } from '../interfaces/INurse.js'
 
 const NurseSchema = new mongoose.Schema<INurse>({
   coren: { type: String, required: true, unique: true },

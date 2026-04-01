@@ -3,7 +3,7 @@ import {
   AttendanceRisk,
   AttendanceStatus,
   IAttendance
-} from '../interfaces/IAttendance'
+} from '../interfaces/IAttendance.js'
 
 const VitalSignsSchema = new Schema(
   {
