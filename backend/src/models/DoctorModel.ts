@@ -1,16 +1,7 @@
 import mongoose from 'mongoose'
-import { IDoctor } from '../interfaces/IDoctor.js'
 import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
+import DoctorSchema from '../schema/DoctorSchema.js'
 import { UserModel } from './UserModel.js'
-
-const DoctorSchema = new mongoose.Schema<IDoctor>({
-  crm: { type: String, required: true, unique: true },
-  specialization: {
-    type: String,
-    required: true,
-    lowercase: true
-  }
-})
 
 export const Doctor = mongoose
   .model<IBaseUser, UserModel>('User')
