@@ -8,13 +8,19 @@ import {
 import { getUnitService } from '../services/unitService.js'
 
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
-  const { unitId, level } = req.query
+  const { unitId, level, period } = req.query
 
-  const unit = await getUnitService(unitId as string)
-  const occupied = await getAttendanceOcuppation(unitId as string)
+  const unit = await getUnitService({ unitId: String(unitId) })
+  const occupied = await getAttendanceOcuppation({
+    unitId: String(unitId),
+    period: String(period)
+  })
   const maxOccupancy = unit.data?.maxOccupancy || 0
   const occupancy = Math.round((occupied / maxOccupancy) * 100)
-  const highRisk = await getHighRisk(unitId as string)
+  const highRisk = await getHighRisk({
+    unitId: String(unitId),
+    period: String(period)
+  })
 
   const adminData = {
     entries: 142,

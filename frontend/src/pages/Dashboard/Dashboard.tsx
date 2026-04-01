@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import { InputSelect } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
@@ -26,6 +27,7 @@ function Dashboard() {
   const [dashboardStatusData, setDashboardStatusData] =
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
+  const [selectedPeriod, setSelectedPeriod] = useState('day')
 
   useEffect(() => {
     async function fetchDashboardStatus() {
@@ -33,7 +35,11 @@ function Dashboard() {
 
       try {
         const response = await api.get(`/dashboard/status-cards`, {
-          params: { unitId: user?.unitId, level: user?.level }
+          params: {
+            unitId: user?.unitId,
+            level: user?.level,
+            period: selectedPeriod
+          }
         })
         const data = response.data.data
         setDashboardStatusData(data)
@@ -50,7 +56,7 @@ function Dashboard() {
     }
 
     fetchDashboardStatus()
-  }, [user?.unitId, user?.level])
+  }, [user?.unitId, user?.level, selectedPeriod])
 
   const cardsData = useMemo(() => {
     switch (user?.level) {
@@ -157,7 +163,21 @@ function Dashboard() {
 
   return (
     <>
-      <AuthLayoutHeader />
+      <AuthLayoutHeader
+        actionComponent={
+          <InputSelect
+            placeholder='Período'
+            options={[
+              { label: 'Dia', value: 'day' },
+              { label: 'Semana', value: 'week' },
+              { label: 'Mês', value: 'month' },
+              { label: 'Ano', value: 'year' }
+            ]}
+            value={selectedPeriod}
+            onChange={setSelectedPeriod}
+          />
+        }
+      />
 
       <div className={styles.container}>
         {cardsData.map(({ Icon, value, label }) => (
