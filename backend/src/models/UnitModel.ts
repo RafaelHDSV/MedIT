@@ -1,6 +1,5 @@
-import mongoose from 'mongoose'
+import { model } from 'mongoose'
 import { IUnit } from '../interfaces/IUnit.js'
 import UnitSchema from '../schema/UnitSchema.js'
 
-export type UnitModel = mongoose.Model<IUnit>
-export default mongoose.model<IUnit, UnitModel>('Unit', UnitSchema)
+export const Unit = model<IUnit>('Unit', UnitSchema)
