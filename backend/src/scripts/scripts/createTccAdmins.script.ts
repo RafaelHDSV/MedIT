@@ -1,6 +1,6 @@
 import { UserLevels } from '../../interfaces/IUser.js'
 import { Admin } from '../../models/AdminModel.js'
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
 const createTccAdmins: Script = {
@@ -50,7 +50,7 @@ const createTccAdmins: Script = {
 
     async function createAdmin(member: any, index: number) {
       try {
-        const alreadyExists = await UserModel.findOne({ email: member.email })
+        const alreadyExists = await User.findOne({ email: member.email })
 
         if (alreadyExists) {
           console.log('⚠️ Já existe:', member.email)

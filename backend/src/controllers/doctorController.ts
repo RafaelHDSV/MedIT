@@ -2,11 +2,11 @@ import { Request, Response } from 'express'
 import { DoctorSpecializations } from '../interfaces/IDoctor.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Doctor } from '../models/DoctorModel.js'
-import UserModel from '../models/UserModel.js'
+import User from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
 
 export const getUsers = async (_req: Request, res: Response) => {
-  const users = await UserModel.find({ level: 'doctor' })
+  const users = await User.find({ level: 'doctor' })
     .sort({ createdAt: -1 })
     .select('-password')
   if (!users || users.length === 0) {

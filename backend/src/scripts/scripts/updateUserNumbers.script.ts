@@ -1,5 +1,5 @@
 import { UserLevels } from '../../interfaces/IUser.js'
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 
 const updateUserNumbers = {
   name: 'update-user-numbers',
@@ -14,15 +14,12 @@ const updateUserNumbers = {
     ]
 
     for (const level of levels) {
-      const users = await UserModel.find({ level }).sort({ createdAt: 1 })
+      const users = await User.find({ level }).sort({ createdAt: 1 })
 
       let counter = 1
 
       for (const user of users) {
-        await UserModel.updateOne(
-          { _id: user._id },
-          { $set: { number: counter } }
-        )
+        await User.updateOne({ _id: user._id }, { $set: { number: counter } })
 
         counter++
       }

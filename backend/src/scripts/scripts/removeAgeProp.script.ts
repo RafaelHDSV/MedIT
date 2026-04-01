@@ -1,10 +1,10 @@
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 
 const removeAgeProp = {
   name: 'removeAgeProp',
   description: 'Remove a propriedade age dos usuários',
   async run() {
-    const result = await UserModel.updateMany(
+    const result = await User.updateMany(
       { age: { $exists: true } },
       { $unset: { age: 1 } }
     )

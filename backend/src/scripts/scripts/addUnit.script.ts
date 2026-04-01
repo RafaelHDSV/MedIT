@@ -1,11 +1,11 @@
-import UnitModel from '../../models/UnitModel'
-import UserModel from '../../models/UserModel'
+import { Unit } from '../../models/UnitModel'
+import User from '../../models/UserModel'
 
 const addUnit = {
   name: 'addUnit',
   description: 'Adiciona uma nova unidade ao banco de dados',
   async run() {
-    const unit = await UnitModel.create({
+    const unit = await Unit.create({
       name: 'Unidade Central',
       address: 'Rua Principal, 123',
       maxOccupancy: 100,
@@ -27,7 +27,7 @@ const addUnit = {
       console.log('❌ Falha ao criar a unidade')
     }
 
-    const users = await UserModel.updateMany({}, { $set: { unitId: unit._id } })
+    const users = await User.updateMany({}, { $set: { unitId: unit._id } })
     console.log(
       `✅ ${users.modifiedCount} usuários atualizados com a nova unidade`
     )

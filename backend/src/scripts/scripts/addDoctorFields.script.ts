@@ -1,5 +1,5 @@
 import { UserGender, UserLevels } from '../../interfaces/IUser.js'
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
 const addDoctorFields: Script = {
@@ -22,7 +22,7 @@ const addDoctorFields: Script = {
       }
     }
 
-    const result = await UserModel.updateMany(filter, update)
+    const result = await User.updateMany(filter, update)
 
     console.log(`${result.modifiedCount} médicos atualizados!`)
   }
