@@ -39,14 +39,14 @@ const AttendanceSchema = new Schema<IAttendance>(
       enum: Object.values(AttendanceStatus),
       default: AttendanceStatus.ON_THE_WAY
     },
-    patientId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Patient',
-      required: true
-    },
     unitId: {
       type: Schema.Types.ObjectId,
       ref: 'Unit',
+      required: true
+    },
+    patientId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Patient',
       required: true
     },
     nurseId: {

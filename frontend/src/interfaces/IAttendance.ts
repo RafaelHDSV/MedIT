@@ -56,8 +56,8 @@ export interface IAttendance extends IBaseInterface {
   date: Date
   risk: AttendanceRisk
   status: AttendanceStatus
-  patientId: ObjectId
   unitId: ObjectId
+  patientId: ObjectId
   nurseId?: ObjectId
   doctorId?: ObjectId
   medicationsIds?: ObjectId[]
