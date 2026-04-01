@@ -12,10 +12,10 @@ import { Unit } from '../../models/UnitModel.js'
 
 const createAttendances = {
   name: 'create-attendances',
-  description: 'Simulação REALISTA de atendimentos (com base no tempo atual)',
+  description: 'Simulação de 1 ano de atendimentos',
 
   async run() {
-    console.log('🚀 Criando atendimentos realistas...')
+    console.log('🚀 Criando atendimentos do ANO inteiro...')
 
     const patients = await Patient.find()
     const nurses = await Nurse.find()
@@ -30,11 +30,10 @@ const createAttendances = {
     const attendances = []
 
     const now = new Date()
-    const currentMonth = now.getMonth()
     const currentYear = now.getFullYear()
-    const currentDay = now.getDate()
 
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+    const startDate = new Date(currentYear, 0, 1) // 01/01
+    const endDate = new Date(currentYear, 11, 31) // 31/12
 
     const riskDistribution = [
       AttendanceRisk.NOT_URGENT,
@@ -82,32 +81,27 @@ const createAttendances = {
       return AttendanceStatus.WAITING_TRIAGE
     }
 
-    function generateHistory(status: AttendanceStatus, date: Date) {
-      const history = []
-      const baseTime = new Date(date.getTime() - 1000 * 60 * 30)
-      history.push({
-        status: AttendanceStatus.ON_THE_WAY,
-        changedAt: baseTime
-      })
+    function getAttendancesPerDay(date: Date) {
+      const diffDays = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
 
-      if (status !== AttendanceStatus.ON_THE_WAY) {
-        history.push({
-          status,
-          changedAt: date
-        })
-      }
+      if (diffDays > 200) return faker.number.int({ min: 20, max: 50 })
+      if (diffDays > 100) return faker.number.int({ min: 40, max: 80 })
+      if (diffDays > 30) return faker.number.int({ min: 60, max: 120 })
 
-      return history
+      return faker.number.int({ min: 100, max: 180 })
     }
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const attendancesPerDay = faker.number.int({ min: 90, max: 160 })
+    let currentDate = new Date(startDate)
+
+    while (currentDate <= endDate) {
+      const attendancesPerDay = getAttendancesPerDay(currentDate)
 
       for (let i = 0; i < attendancesPerDay; i++) {
         const hour = faker.number.int({ min: 0, max: 23 })
         const minute = faker.number.int({ min: 0, max: 59 })
 
-        const date = new Date(currentYear, currentMonth, day, hour, minute)
+        const date = new Date(currentDate)
+        date.setHours(hour, minute)
 
         const risk = faker.helpers.arrayElement(riskDistribution)
         const status = getStatusByTime(date)
@@ -118,7 +112,7 @@ const createAttendances = {
 
         const isFinished = status === AttendanceStatus.ATTENDANCE_COMPLETED
 
-        const attendance = {
+        attendances.push({
           complaint: faker.helpers.arrayElement(complaints),
           diagnosis: isFinished
             ? faker.helpers.arrayElement(diagnoses)
@@ -131,19 +125,28 @@ const createAttendances = {
           nurseId: nurse._id,
           doctorId: isFinished ? doctor._id : undefined,
           medicationsIds: [],
-          changesHistory: generateHistory(status, date),
+          changesHistory: [
+            {
+              status: AttendanceStatus.ON_THE_WAY,
+              changedAt: new Date(date.getTime() - 1000 * 60 * 30)
+            },
+            {
+              status,
+              changedAt: date
+            }
+          ],
           vitalSigns: randomVitalSigns(),
           iaConditionId: new Types.ObjectId()
-        }
-
-        attendances.push(attendance)
+        })
       }
+
+      currentDate.setDate(currentDate.getDate() + 1)
     }
 
     console.log(`📦 Inserindo ${attendances.length} atendimentos...`)
     await Attendance.insertMany(attendances)
 
-    console.log('✅ Dados realistas criados!')
+    console.log('✅ Ano completo gerado com sucesso!')
     process.exit()
   }
 }
