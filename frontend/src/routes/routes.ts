@@ -155,6 +155,20 @@ const medications: IRoute = {
   }
 }
 
+const PreRegistration: IRoute = {
+  name: ROUTES.PREREGISTRATION.name,
+  description: ROUTES.PREREGISTRATION.description,
+  path: ROUTES.PREREGISTRATION.path,
+  icon: PillIcon,
+  meta: {
+    hidden: false,
+    progress: ProgressStatus.NOT_STARTED,
+    levels: [
+      UserLevels.PATIENT
+    ],
+  },
+}
+
 const attendances: IRoute = {
   name: ROUTES.ATTENDANCES.name,
   description: ROUTES.ATTENDANCES.description,
@@ -204,7 +218,8 @@ const routes: IRoute[] = [
   nurseDetails,
   patients,
   patientDetails,
-  medications
+  medications,
+  PreRegistration,
 ]
 
 export default routes

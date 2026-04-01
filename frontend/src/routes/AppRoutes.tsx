@@ -56,6 +56,10 @@ function AppRoutes() {
             path={ROUTES.MEDICAMENTS.path}
             element={<pages.Medications />}
           />
+           <Route
+            path={ROUTES.PREREGISTRATION.path}
+            element={<pages.PreRegistration />}
+          />
           <Route
             path={ROUTES.ATTENDANCES.path}
             element={<pages.Attendances />}
