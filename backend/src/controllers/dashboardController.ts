@@ -1,24 +1,28 @@
 import { faker } from '@faker-js/faker'
 import { Request, Response } from 'express'
 import { AttendanceRisk } from '../interfaces/IAttendance.js'
-import { getUnitService } from '../services/unitServices.js'
+import {
+  getAttendanceOcuppation,
+  getHighRisk
+} from '../services/attendanceService.js'
+import { getUnitService } from '../services/unitService.js'
 
-// TODO: Atualizar os dados para serem dinâmicos, utilizando os dados reais da unidade de saúde
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
   const { unitId, level } = req.query
 
   const unit = await getUnitService(unitId as string)
-  const occupied = 47
+  const occupied = await getAttendanceOcuppation(unitId as string)
   const maxOccupancy = unit.data?.maxOccupancy || 0
-  const occupancyRate = Math.round((occupied / maxOccupancy) * 100)
+  const occupancy = Math.round((occupied / maxOccupancy) * 100)
+  const highRisk = await getHighRisk(unitId as string)
 
   const adminData = {
     entries: 142,
     inAttendance: 46,
     attended: 96,
-    occupancy: occupancyRate,
+    occupancy,
     averageTime: 23,
-    highRisk: 8
+    highRisk
   }
 
   const doctorData = {
