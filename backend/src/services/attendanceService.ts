@@ -29,6 +29,8 @@ export const getAttendanceOcuppation = async ({
       $lte: end
     }
   }
+  // VIEIRA: Remover console
+  console.log('Match para ocupação:', match)
   const attendances = await Attendance.countDocuments(match)
 
   return attendances
