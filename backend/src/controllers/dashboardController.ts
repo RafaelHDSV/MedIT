@@ -3,6 +3,8 @@ import { Request, Response } from 'express'
 import { AttendanceRisk } from '../interfaces/IAttendance.js'
 import {
   getAttendanceOcuppation,
+  getAttended,
+  getEntries,
   getHighRisk
 } from '../services/attendanceService.js'
 import { getUnitService } from '../services/unitService.js'
@@ -11,21 +13,32 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
   const { unitId, level, period } = req.query
 
   const unit = await getUnitService({ unitId: String(unitId) })
-  const occupied = await getAttendanceOcuppation({
+
+  const entries = await getEntries({
     unitId: String(unitId),
     period: String(period)
   })
-  const maxOccupancy = unit.data?.maxOccupancy || 0
-  const occupancy = Math.round((occupied / maxOccupancy) * 100)
+
+  const attended = await getAttended({
+    unitId: String(unitId),
+    period: String(period)
+  })
+
+  const occupancy = await getAttendanceOcuppation({
+    unitId: String(unitId),
+    maxOccupancy: Number(unit.data?.maxOccupancy),
+    period: String(period)
+  })
+
   const highRisk = await getHighRisk({
     unitId: String(unitId),
     period: String(period)
   })
 
   const adminData = {
-    entries: 142,
+    entries,
     inAttendance: 46,
-    attended: 96,
+    attended,
     occupancy,
     averageTime: 23,
     highRisk
