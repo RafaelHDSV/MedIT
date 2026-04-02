@@ -5,7 +5,7 @@ export const getUnit = async (req: Request, res: Response) => {
   const { id } = req.query
 
   try {
-    const unit = await getUnitService(id as string)
+    const unit = await getUnitService({ unitId: id as string })
     if (unit.status !== 200) {
       return res.status(unit.status).json({ message: unit.message })
     }
