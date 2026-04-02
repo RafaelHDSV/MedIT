@@ -12,7 +12,7 @@ import { Unit } from '../../models/UnitModel.js'
 
 const createAttendances = {
   name: 'create-attendances',
-  description: 'Simulação de 1 ano de atendimentos',
+  description: 'Simulação de 1 ano de atendimentos (realista)',
 
   async run() {
     console.log('🚀 Criando atendimentos do ANO inteiro...')
@@ -32,8 +32,8 @@ const createAttendances = {
     const now = new Date()
     const currentYear = now.getFullYear()
 
-    const startDate = new Date(currentYear, 0, 1) // 01/01
-    const endDate = new Date(currentYear, 11, 31) // 31/12
+    const startDate = new Date(currentYear, 0, 1)
+    const endDate = new Date(currentYear, 11, 31)
 
     const riskDistribution = [
       AttendanceRisk.NOT_URGENT,
@@ -71,14 +71,64 @@ const createAttendances = {
       }
     }
 
-    function getStatusByTime(date: Date): AttendanceStatus {
+    // 🔥 Fluxo realista de status
+    function generateStatusFlow(date: Date, risk: AttendanceRisk) {
+      const now = new Date()
       const diffMinutes = (now.getTime() - date.getTime()) / (1000 * 60)
 
-      if (diffMinutes < 0) return AttendanceStatus.ON_THE_WAY
-      if (diffMinutes > 120) return AttendanceStatus.ATTENDANCE_COMPLETED
-      if (diffMinutes > 30) return AttendanceStatus.IN_ATTENDANCE
+      // 🔥 raríssimo: paciente ainda a caminho (só últimos minutos)
+      if (diffMinutes >= 0 && diffMinutes < 10) {
+        return {
+          status: AttendanceStatus.ON_THE_WAY,
+          history: [
+            {
+              status: AttendanceStatus.ON_THE_WAY,
+              changedAt: date
+            }
+          ]
+        }
+      }
 
-      return AttendanceStatus.WAITING_TRIAGE
+      const flow = [
+        AttendanceStatus.ON_THE_WAY,
+        AttendanceStatus.WAITING_TRIAGE,
+        AttendanceStatus.IN_TRIAGE,
+        AttendanceStatus.TRIAGE_COMPLETED,
+        AttendanceStatus.WAITING_ATTENDANCE,
+        AttendanceStatus.IN_ATTENDANCE,
+        AttendanceStatus.ATTENDANCE_COMPLETED,
+        AttendanceStatus.COMPLETED
+      ]
+
+      // 🔥 tempo varia conforme risco (mais urgente = mais rápido)
+      const timeMultiplier = {
+        [AttendanceRisk.EMERGENCY]: 5,
+        [AttendanceRisk.VERY_URGENT]: 10,
+        [AttendanceRisk.URGENT]: 15,
+        [AttendanceRisk.LESS_URGENT]: 25,
+        [AttendanceRisk.NOT_URGENT]: 40
+      }
+
+      const stepTime = timeMultiplier[risk] || 20
+
+      const currentIndex = Math.min(
+        Math.floor(diffMinutes / stepTime),
+        flow.length - 1
+      )
+
+      const history = []
+
+      for (let i = 0; i <= currentIndex; i++) {
+        history.push({
+          status: flow[i],
+          changedAt: new Date(date.getTime() + i * stepTime * 60 * 1000)
+        })
+      }
+
+      return {
+        status: flow[currentIndex],
+        history
+      }
     }
 
     function getAttendancesPerDay(date: Date) {
@@ -104,13 +154,16 @@ const createAttendances = {
         date.setHours(hour, minute)
 
         const risk = faker.helpers.arrayElement(riskDistribution)
-        const status = getStatusByTime(date)
+
+        const { status, history } = generateStatusFlow(date, risk)
 
         const patient = faker.helpers.arrayElement(patients)
         const nurse = faker.helpers.arrayElement(nurses)
         const doctor = faker.helpers.arrayElement(doctors)
 
-        const isFinished = status === AttendanceStatus.ATTENDANCE_COMPLETED
+        const isFinished =
+          status === AttendanceStatus.ATTENDANCE_COMPLETED ||
+          status === AttendanceStatus.COMPLETED
 
         attendances.push({
           complaint: faker.helpers.arrayElement(complaints),
@@ -123,18 +176,10 @@ const createAttendances = {
           unitId: unit._id,
           patientId: patient._id,
           nurseId: nurse._id,
-          doctorId: isFinished ? doctor._id : undefined,
+          doctorId:
+            status !== AttendanceStatus.WAITING_TRIAGE ? doctor._id : undefined,
           medicationsIds: [],
-          changesHistory: [
-            {
-              status: AttendanceStatus.ON_THE_WAY,
-              changedAt: new Date(date.getTime() - 1000 * 60 * 30)
-            },
-            {
-              status,
-              changedAt: date
-            }
-          ],
+          changesHistory: history,
           vitalSigns: randomVitalSigns(),
           iaConditionId: new Types.ObjectId()
         })
@@ -144,6 +189,7 @@ const createAttendances = {
     }
 
     console.log(`📦 Inserindo ${attendances.length} atendimentos...`)
+
     await Attendance.insertMany(attendances)
 
     console.log('✅ Ano completo gerado com sucesso!')
