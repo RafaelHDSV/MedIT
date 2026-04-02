@@ -129,6 +129,55 @@ export const getAttendanceOcuppation = async ({
   }
 }
 
+export const getAverageTime = async ({
+  unitId,
+  period
+}: {
+  unitId: string
+  period: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period)
+
+    const match = {
+      unitId,
+      status: AttendanceStatus.COMPLETED,
+      date: {
+        $gte: start,
+        $lte: end
+      }
+    }
+
+    const attendances = await Attendance.find(match)
+
+    const validAttendances = attendances.filter((attendance) => {
+      return attendance.changesHistory?.some(
+        (c) => c.status === AttendanceStatus.COMPLETED
+      )
+    })
+
+    const totalTime = validAttendances.reduce((acc, attendance) => {
+      const completed = attendance.changesHistory?.find(
+        (c) => c.status === AttendanceStatus.COMPLETED
+      )
+      if (!completed) return acc
+
+      const startTime = attendance.date.getTime()
+      const endTime = completed.changedAt.getTime()
+      const time = (endTime - startTime) / 60000
+
+      return acc + time
+    }, 0)
+
+    return validAttendances.length > 0
+      ? Math.round(totalTime / validAttendances.length)
+      : 0
+  } catch (err) {
+    console.error(err)
+    return 0
+  }
+}
+
 export const getHighRisk = async ({
   unitId,
   period

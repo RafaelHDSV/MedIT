@@ -58,6 +58,12 @@ function Dashboard() {
     fetchDashboardStatus()
   }, [user?.unitId, user?.level, selectedPeriod])
 
+  function averageTimeFormatter(averageTime: number) {
+    const hours = Math.floor(averageTime / 60)
+    const minutes = averageTime % 60
+    return hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`
+  }
+
   const cardsData = useMemo(() => {
     switch (user?.level) {
       case UserLevels.ADMIN:
@@ -87,7 +93,7 @@ function Dashboard() {
           {
             Icon: TimerIcon,
             value: dashboardStatusData?.averageTime
-              ? `${dashboardStatusData?.averageTime}min`
+              ? averageTimeFormatter(dashboardStatusData.averageTime)
               : undefined,
             label: 'Tempo médio'
           },

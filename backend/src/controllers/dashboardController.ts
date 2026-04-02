@@ -4,6 +4,7 @@ import { AttendanceRisk } from '../interfaces/IAttendance.js'
 import {
   getAttendanceOcuppation,
   getAttended,
+  getAverageTime,
   getEntries,
   getHighRisk,
   getInAttendance
@@ -36,6 +37,11 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     period: String(period)
   })
 
+  const averageTime = await getAverageTime({
+    unitId: String(unitId),
+    period: String(period)
+  })
+
   const highRisk = await getHighRisk({
     unitId: String(unitId),
     period: String(period)
@@ -46,7 +52,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     inAttendance,
     attended,
     occupancy,
-    averageTime: 23,
+    averageTime,
     highRisk
   }
 
