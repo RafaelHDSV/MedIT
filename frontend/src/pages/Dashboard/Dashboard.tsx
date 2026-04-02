@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
+import { timeFormatter } from '@/utils/timeFormatter'
 import {
   BedIcon,
   BombIcon,
@@ -58,12 +59,6 @@ function Dashboard() {
     fetchDashboardStatus()
   }, [user?.unitId, user?.level, selectedPeriod])
 
-  function averageTimeFormatter(averageTime: number) {
-    const hours = Math.floor(averageTime / 60)
-    const minutes = averageTime % 60
-    return hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`
-  }
-
   const cardsData = useMemo(() => {
     switch (user?.level) {
       case UserLevels.ADMIN:
@@ -93,7 +88,7 @@ function Dashboard() {
           {
             Icon: TimerIcon,
             value: dashboardStatusData?.averageTime
-              ? averageTimeFormatter(dashboardStatusData.averageTime)
+              ? timeFormatter(dashboardStatusData.averageTime)
               : undefined,
             label: 'Tempo médio'
           },
