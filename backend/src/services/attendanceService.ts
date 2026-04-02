@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
@@ -117,7 +118,7 @@ export const getAverageTime = async ({
     const result = await Attendance.aggregate([
       {
         $match: {
-          unitId,
+          unitId: new Types.ObjectId(unitId),
           status: AttendanceStatus.COMPLETED,
           date: { $gte: start, $lte: end }
         }
