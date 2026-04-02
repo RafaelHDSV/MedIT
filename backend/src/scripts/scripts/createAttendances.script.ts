@@ -38,6 +38,7 @@ const createAttendances = {
     const riskDistribution = [
       AttendanceRisk.NOT_URGENT,
       AttendanceRisk.NOT_URGENT,
+      AttendanceRisk.NOT_URGENT,
       AttendanceRisk.LESS_URGENT,
       AttendanceRisk.LESS_URGENT,
       AttendanceRisk.URGENT,
@@ -71,13 +72,11 @@ const createAttendances = {
       }
     }
 
-    // 🔥 Fluxo realista de status
     function generateStatusFlow(date: Date, risk: AttendanceRisk) {
       const now = new Date()
       const diffMinutes = (now.getTime() - date.getTime()) / (1000 * 60)
 
-      // 🔥 raríssimo: paciente ainda a caminho (só últimos minutos)
-      if (diffMinutes >= 0 && diffMinutes < 10) {
+      if (diffMinutes >= 0 && diffMinutes < 5) {
         return {
           status: AttendanceStatus.ON_THE_WAY,
           history: [
@@ -100,7 +99,6 @@ const createAttendances = {
         AttendanceStatus.COMPLETED
       ]
 
-      // 🔥 tempo varia conforme risco (mais urgente = mais rápido)
       const timeMultiplier = {
         [AttendanceRisk.EMERGENCY]: 5,
         [AttendanceRisk.VERY_URGENT]: 10,
