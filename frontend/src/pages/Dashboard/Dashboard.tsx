@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
+import masks from '@/utils/masks'
 import { timeFormatter } from '@/utils/timeFormatter'
 import {
   BedIcon,
@@ -65,7 +66,9 @@ function Dashboard() {
         return [
           {
             Icon: DoorOpenIcon,
-            value: dashboardStatusData?.entries,
+            value: dashboardStatusData?.entries
+              ? masks(dashboardStatusData?.entries, 'number')
+              : undefined,
             label: 'Entradas'
           },
           {
@@ -75,7 +78,9 @@ function Dashboard() {
           },
           {
             Icon: CheckCircleIcon,
-            value: dashboardStatusData?.attended,
+            value: dashboardStatusData?.attended
+              ? masks(dashboardStatusData?.attended, 'number')
+              : undefined,
             label: 'Atendidos'
           },
           {
@@ -94,7 +99,9 @@ function Dashboard() {
           },
           {
             Icon: BombIcon,
-            value: dashboardStatusData?.highRisk,
+            value: dashboardStatusData?.highRisk
+              ? masks(dashboardStatusData?.highRisk, 'number')
+              : undefined,
             label: 'Risco alto'
           }
         ]

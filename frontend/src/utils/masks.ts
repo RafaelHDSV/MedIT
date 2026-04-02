@@ -65,7 +65,19 @@ const heightMask = (value: string | undefined) => {
   return `${numbers[0]}.${numbers.slice(1, 3)}`
 }
 
-export type MaskEnum = 'cpf' | 'cellphone' | 'crm' | 'date' | 'coren' | 'height'
+const numberMask = (value?: number | string) => {
+  if (!value) return ''
+  return new Intl.NumberFormat('pt-BR').format(Number(value))
+}
+
+export type MaskEnum =
+  | 'cpf'
+  | 'cellphone'
+  | 'crm'
+  | 'date'
+  | 'coren'
+  | 'height'
+  | 'number'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -89,6 +101,8 @@ function masks(
       return corenMask(result)
     case 'height':
       return heightMask(result)
+    case 'number':
+      return numberMask(result)
     default:
       return result
   }
