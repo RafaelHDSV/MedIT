@@ -5,7 +5,8 @@ import {
   getAttendanceOcuppation,
   getAttended,
   getEntries,
-  getHighRisk
+  getHighRisk,
+  getInAttendance
 } from '../services/attendanceService.js'
 import { getUnitService } from '../services/unitService.js'
 
@@ -15,6 +16,11 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
   const unit = await getUnitService({ unitId: String(unitId) })
 
   const entries = await getEntries({
+    unitId: String(unitId),
+    period: String(period)
+  })
+
+  const inAttendance = await getInAttendance({
     unitId: String(unitId),
     period: String(period)
   })
@@ -37,7 +43,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
 
   const adminData = {
     entries,
-    inAttendance: 46,
+    inAttendance,
     attended,
     occupancy,
     averageTime: 23,

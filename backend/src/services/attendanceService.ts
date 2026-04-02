@@ -14,14 +14,47 @@ export const getEntries = async ({
 
     const match = {
       unitId: unitId,
+      changesHistory: {
+        $elemMatch: {
+          status: { $in: [AttendanceStatus.ON_THE_WAY] },
+          changedAt: { $gte: start, $lte: end }
+        }
+      }
+    }
+    console.log(match)
+    return await Attendance.countDocuments(match)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getInAttendance = async ({
+  unitId,
+  period
+}: {
+  unitId: string
+  period: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period)
+
+    const match = {
+      unitId: unitId,
       status: {
-        $in: [AttendanceStatus.ON_THE_WAY]
+        $in: [
+          AttendanceStatus.WAITING_TRIAGE,
+          AttendanceStatus.IN_TRIAGE,
+          AttendanceStatus.TRIAGE_COMPLETED,
+          AttendanceStatus.WAITING_ATTENDANCE,
+          AttendanceStatus.IN_ATTENDANCE
+        ]
       },
       date: {
         $gte: start,
         $lte: end
       }
     }
+    console.log(match)
     return await Attendance.countDocuments(match)
   } catch (err) {
     console.error(err)
@@ -41,13 +74,18 @@ export const getAttended = async ({
     const match = {
       unitId: unitId,
       status: {
-        $in: [AttendanceStatus.ATTENDANCE_COMPLETED, AttendanceStatus.COMPLETED]
+        $in: [
+          AttendanceStatus.ATTENDANCE_COMPLETED,
+          AttendanceStatus.COMPLETED,
+          AttendanceStatus.CANCELED
+        ]
       },
       date: {
         $gte: start,
         $lte: end
       }
     }
+    console.log(match)
     return await Attendance.countDocuments(match)
   } catch (err) {
     console.error(err)

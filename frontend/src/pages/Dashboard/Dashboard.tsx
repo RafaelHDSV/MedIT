@@ -79,12 +79,16 @@ function Dashboard() {
           },
           {
             Icon: BedIcon,
-            value: `${dashboardStatusData?.occupancy}%`,
+            value: dashboardStatusData?.occupancy
+              ? `${dashboardStatusData?.occupancy}%`
+              : undefined,
             label: 'Ocupação'
           },
           {
             Icon: TimerIcon,
-            value: `${dashboardStatusData?.averageTime}min`,
+            value: dashboardStatusData?.averageTime
+              ? `${dashboardStatusData?.averageTime}min`
+              : undefined,
             label: 'Tempo médio'
           },
           {
