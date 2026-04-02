@@ -16,36 +16,34 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
 
   const unit = await getUnitService({ unitId: String(unitId) })
 
-  const entries = await getEntries({
-    unitId: String(unitId),
-    period: String(period)
-  })
-
-  const inAttendance = await getInAttendance({
-    unitId: String(unitId),
-    period: String(period)
-  })
-
-  const attended = await getAttended({
-    unitId: String(unitId),
-    period: String(period)
-  })
-
-  const occupancy = await getAttendanceOcuppation({
-    unitId: String(unitId),
-    maxOccupancy: Number(unit.data?.maxOccupancy),
-    period: String(period)
-  })
-
-  const averageTime = await getAverageTime({
-    unitId: String(unitId),
-    period: String(period)
-  })
-
-  const highRisk = await getHighRisk({
-    unitId: String(unitId),
-    period: String(period)
-  })
+  const [entries, inAttendance, attended, occupancy, averageTime, highRisk] =
+    await Promise.all([
+      getEntries({
+        unitId: String(unitId),
+        period: String(period)
+      }),
+      getInAttendance({
+        unitId: String(unitId),
+        period: String(period)
+      }),
+      getAttended({
+        unitId: String(unitId),
+        period: String(period)
+      }),
+      getAttendanceOcuppation({
+        unitId: String(unitId),
+        maxOccupancy: Number(unit.data?.maxOccupancy),
+        period: String(period)
+      }),
+      getAverageTime({
+        unitId: String(unitId),
+        period: String(period)
+      }),
+      getHighRisk({
+        unitId: String(unitId),
+        period: String(period)
+      })
+    ])
 
   const adminData = {
     entries,

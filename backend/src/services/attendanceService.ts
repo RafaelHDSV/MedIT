@@ -12,17 +12,10 @@ export const getEntries = async ({
   try {
     const { start, end } = getPeriodDateRange(period)
 
-    const match = {
-      unitId: unitId,
-      changesHistory: {
-        $elemMatch: {
-          status: { $in: [AttendanceStatus.ON_THE_WAY] },
-          changedAt: { $gte: start, $lte: end }
-        }
-      }
-    }
-    console.log(match)
-    return await Attendance.countDocuments(match)
+    return await Attendance.countDocuments({
+      unitId,
+      date: { $gte: start, $lte: end }
+    })
   } catch (err) {
     console.error(err)
   }
@@ -38,24 +31,18 @@ export const getInAttendance = async ({
   try {
     const { start, end } = getPeriodDateRange(period)
 
-    const match = {
-      unitId: unitId,
-      status: {
-        $in: [
-          AttendanceStatus.WAITING_TRIAGE,
-          AttendanceStatus.IN_TRIAGE,
-          AttendanceStatus.TRIAGE_COMPLETED,
-          AttendanceStatus.WAITING_ATTENDANCE,
-          AttendanceStatus.IN_ATTENDANCE
-        ]
-      },
-      date: {
-        $gte: start,
-        $lte: end
-      }
-    }
-    console.log(match)
-    return await Attendance.countDocuments(match)
+    const ACTIVE_STATUSES = [
+      AttendanceStatus.WAITING_TRIAGE,
+      AttendanceStatus.IN_TRIAGE,
+      AttendanceStatus.TRIAGE_COMPLETED,
+      AttendanceStatus.WAITING_ATTENDANCE,
+      AttendanceStatus.IN_ATTENDANCE
+    ]
+    return await Attendance.countDocuments({
+      unitId,
+      status: { $in: ACTIVE_STATUSES },
+      date: { $gte: start, $lte: end }
+    })
   } catch (err) {
     console.error(err)
   }
@@ -71,22 +58,13 @@ export const getAttended = async ({
   try {
     const { start, end } = getPeriodDateRange(period)
 
-    const match = {
-      unitId: unitId,
+    return await Attendance.countDocuments({
+      unitId,
       status: {
-        $in: [
-          AttendanceStatus.ATTENDANCE_COMPLETED,
-          AttendanceStatus.COMPLETED,
-          AttendanceStatus.CANCELED
-        ]
+        $in: [AttendanceStatus.ATTENDANCE_COMPLETED, AttendanceStatus.COMPLETED]
       },
-      date: {
-        $gte: start,
-        $lte: end
-      }
-    }
-    console.log(match)
-    return await Attendance.countDocuments(match)
+      date: { $gte: start, $lte: end }
+    })
   } catch (err) {
     console.error(err)
   }
@@ -102,27 +80,24 @@ export const getAttendanceOcuppation = async ({
   period: string
 }) => {
   try {
-    const unOccupiedStatus: AttendanceStatus[] = [
-      AttendanceStatus.CANCELED,
-      AttendanceStatus.ATTENDANCE_COMPLETED,
-      AttendanceStatus.COMPLETED,
-      AttendanceStatus.ON_THE_WAY
-    ]
-    const occupiedStatus = Object.values(AttendanceStatus).filter(
-      (status) => !unOccupiedStatus.includes(status as AttendanceStatus)
-    )
+    if (!maxOccupancy) return 0
 
     const { start, end } = getPeriodDateRange(period)
 
-    const match = {
-      unitId: unitId,
-      status: { $in: occupiedStatus },
-      date: {
-        $gte: start,
-        $lte: end
-      }
-    }
-    const occupied = await Attendance.countDocuments(match)
+    const occupied = await Attendance.countDocuments({
+      unitId,
+      status: {
+        $in: [
+          AttendanceStatus.WAITING_TRIAGE,
+          AttendanceStatus.IN_TRIAGE,
+          AttendanceStatus.TRIAGE_COMPLETED,
+          AttendanceStatus.WAITING_ATTENDANCE,
+          AttendanceStatus.IN_ATTENDANCE
+        ]
+      },
+      date: { $gte: start, $lte: end }
+    })
+
     return Math.round((occupied / maxOccupancy) * 100)
   } catch (err) {
     console.error(err)
@@ -139,42 +114,50 @@ export const getAverageTime = async ({
   try {
     const { start, end } = getPeriodDateRange(period)
 
-    const match = {
-      unitId,
-      status: AttendanceStatus.COMPLETED,
-      date: {
-        $gte: start,
-        $lte: end
+    const result = await Attendance.aggregate([
+      {
+        $match: {
+          unitId,
+          status: AttendanceStatus.COMPLETED,
+          date: { $gte: start, $lte: end }
+        }
+      },
+      {
+        $addFields: {
+          completedAt: {
+            $first: {
+              $filter: {
+                input: '$changesHistory',
+                as: 'c',
+                cond: { $eq: ['$$c.status', 'completed'] }
+              }
+            }
+          }
+        }
+      },
+      {
+        $match: {
+          completedAt: { $ne: null }
+        }
+      },
+      {
+        $addFields: {
+          duration: {
+            $divide: [{ $subtract: ['$completedAt.changedAt', '$date'] }, 60000]
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          avg: { $avg: '$duration' }
+        }
       }
-    }
+    ])
 
-    const attendances = await Attendance.find(match)
-
-    const validAttendances = attendances.filter((attendance) => {
-      return attendance.changesHistory?.some(
-        (c) => c.status === AttendanceStatus.COMPLETED
-      )
-    })
-
-    const totalTime = validAttendances.reduce((acc, attendance) => {
-      const completed = attendance.changesHistory?.find(
-        (c) => c.status === AttendanceStatus.COMPLETED
-      )
-      if (!completed) return acc
-
-      const startTime = attendance.date.getTime()
-      const endTime = completed.changedAt.getTime()
-      const time = (endTime - startTime) / 60000
-
-      return acc + time
-    }, 0)
-
-    return validAttendances.length > 0
-      ? Math.round(totalTime / validAttendances.length)
-      : 0
+    return result[0]?.avg ? Math.round(result[0].avg) : 0
   } catch (err) {
     console.error(err)
-    return 0
   }
 }
 
@@ -190,7 +173,9 @@ export const getHighRisk = async ({
 
     const highRiskAttendances = await Attendance.countDocuments({
       unitId: unitId,
-      risk: AttendanceRisk.EMERGENCY,
+      risk: {
+        $in: [AttendanceRisk.EMERGENCY, AttendanceRisk.VERY_URGENT]
+      },
       date: {
         $gte: start,
         $lte: end
