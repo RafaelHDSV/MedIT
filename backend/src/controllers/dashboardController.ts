@@ -23,8 +23,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         period: String(period)
       }),
       getInAttendance({
-        unitId: String(unitId),
-        period: String(period)
+        unitId: String(unitId)
       }),
       getAttended({
         unitId: String(unitId),
@@ -32,8 +31,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
       }),
       getAttendanceOcuppation({
         unitId: String(unitId),
-        maxOccupancy: Number(unit.data?.maxOccupancy),
-        period: String(period)
+        maxOccupancy: Number(unit.data?.maxOccupancy)
       }),
       getAverageTime({
         unitId: String(unitId),

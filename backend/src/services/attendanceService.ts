@@ -22,16 +22,8 @@ export const getEntries = async ({
   }
 }
 
-export const getInAttendance = async ({
-  unitId,
-  period
-}: {
-  unitId: string
-  period: string
-}) => {
+export const getInAttendance = async ({ unitId }: { unitId: string }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
-
     const ACTIVE_STATUSES = [
       AttendanceStatus.WAITING_TRIAGE,
       AttendanceStatus.IN_TRIAGE,
@@ -41,8 +33,7 @@ export const getInAttendance = async ({
     ]
     return await Attendance.countDocuments({
       unitId,
-      status: { $in: ACTIVE_STATUSES },
-      date: { $gte: start, $lte: end }
+      status: { $in: ACTIVE_STATUSES }
     })
   } catch (err) {
     console.error(err)
@@ -73,17 +64,13 @@ export const getAttended = async ({
 
 export const getAttendanceOcuppation = async ({
   unitId,
-  maxOccupancy,
-  period
+  maxOccupancy
 }: {
   unitId: string
   maxOccupancy: number
-  period: string
 }) => {
   try {
     if (!maxOccupancy) return 0
-
-    const { start, end } = getPeriodDateRange(period)
 
     const occupied = await Attendance.countDocuments({
       unitId,
@@ -95,8 +82,7 @@ export const getAttendanceOcuppation = async ({
           AttendanceStatus.WAITING_ATTENDANCE,
           AttendanceStatus.IN_ATTENDANCE
         ]
-      },
-      date: { $gte: start, $lte: end }
+      }
     })
 
     return Math.round((occupied / maxOccupancy) * 100)
@@ -126,13 +112,16 @@ export const getAverageTime = async ({
       {
         $addFields: {
           completedAt: {
-            $first: {
-              $filter: {
-                input: '$changesHistory',
-                as: 'c',
-                cond: { $eq: ['$$c.status', 'completed'] }
-              }
-            }
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$changesHistory',
+                  as: 'c',
+                  cond: { $eq: ['$$c.status', AttendanceStatus.COMPLETED] }
+                }
+              },
+              -1
+            ]
           }
         }
       },
@@ -156,7 +145,7 @@ export const getAverageTime = async ({
       }
     ])
 
-    return result[0]?.avg ? Math.round(result[0].avg) : 0
+    return result.length ? Math.round(result[0].avg) : 0
   } catch (err) {
     console.error(err)
   }
