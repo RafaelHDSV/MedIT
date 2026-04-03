@@ -25,7 +25,7 @@ function Button({ htmlType, loading, children, mode, ...props }: IButtonProps) {
 
   return (
     <AntdButton
-      className={mode ? styles[mode] : styles.button}
+      className={`${styles.button} ${mode ? styles[mode] : ''}`}
       type={type}
       loading={loading}
       htmlType={htmlType}
