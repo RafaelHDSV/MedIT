@@ -60,19 +60,6 @@ export function MultiDatepickerContainer({
   )
 }
 
-export type DateValue = Dayjs | null
-export type RangeValue = [DateValue, DateValue] | null
-export type DayjsType = DateValue | RangeValue
-
-export const DateType = {
-  date: 'date',
-  week: 'week',
-  month: 'month',
-  year: 'year',
-  range: 'range'
-} as const
-export type DateType = (typeof DateType)[keyof typeof DateType]
-
 interface IInputDate {
   type?: DayjsType
   onDateTypeChange: (type: DayjsType) => void

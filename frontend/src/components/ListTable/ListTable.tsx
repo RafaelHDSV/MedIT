@@ -1,9 +1,24 @@
-import { Table } from 'antd'
+import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
+import { Flex, Input, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
-import { useState } from 'react'
+import Button from '../Button/Button'
 import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
 import styles from './ListTable.module.scss'
-import FiltersTable from './components/FiltersTable/FiltersTable'
+
+interface IFiltersProps {
+  onReload: () => void
+}
+
+function Filters({ onReload }: IFiltersProps) {
+  return (
+    <Flex gap={16} align='center' className={styles.filters}>
+      <Input placeholder='Pesquisar por nome ou email' allowClear />
+      <Button mode='icon' size='large' onClick={onReload}>
+        <ArrowCounterClockwiseIcon size={24} />
+      </Button>
+    </Flex>
+  )
+}
 
 function ListTable<K>({
   dataSource,
@@ -18,35 +33,23 @@ function ListTable<K>({
   loading: boolean
   onReload: () => void
 }) {
-  const [filtersKey, setFiltersKey] = useState('')
-  const [filteredDataSource, setFilteredDataSource] = useState<K[]>(dataSource)
-
   if (loading) {
     return <LayoutSpinner />
   }
 
   return (
     <>
-      <FiltersTable<K>
-        dataSource={dataSource}
-        onReload={onReload}
-        setFiltersKey={setFiltersKey}
-        setFilteredDataSource={setFilteredDataSource}
-      />
+      <Filters onReload={onReload} />
 
       <div className={styles.tableWrapper}>
-        <Table<K>
-          key={filtersKey}
+        <Table
           className={styles.userTable}
           rowKey='_id'
-          dataSource={filteredDataSource}
+          dataSource={dataSource}
           columns={columns}
           tableLayout='fixed'
           loading={loading}
-          pagination={{
-            pageSize,
-            hideOnSinglePage: true
-          }}
+          pagination={{ pageSize, hideOnSinglePage: true }}
           size='middle'
           bordered={false}
           scroll={{ x: '100%' }}
