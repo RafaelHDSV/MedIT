@@ -65,9 +65,15 @@ function AppRoutes() {
             path={ROUTES.TRIAGES_DETAILS.path}
             element={<pages.TriagesDetails />}
           />
+          <Route
+            path={ROUTES.PRE_REGISTRATION.path}
+            element={<pages.PreRegistration />}
+          />
         </Route>
 
-        <Route path='*' element={<pages.NotFound />} />
+        <Route element={<pages.UnauthLayout />}>
+          <Route path='*' element={<pages.NotFound />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )

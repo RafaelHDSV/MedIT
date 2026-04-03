@@ -178,6 +178,17 @@ const triagesDetails: IRoute = {
   }
 }
 
+const preRegistration: IRoute = {
+  name: ROUTES.PRE_REGISTRATION.name,
+  description: ROUTES.PRE_REGISTRATION.description,
+  path: ROUTES.PRE_REGISTRATION.path,
+  meta: {
+    hidden: true,
+    levels: [UserLevels.PATIENT],
+    canGoBack: true
+  }
+}
+
 const routes: IRoute[] = [
   signIn,
   signUp,
@@ -191,7 +202,8 @@ const routes: IRoute[] = [
   nurseDetails,
   patients,
   patientDetails,
-  medications
+  medications,
+  preRegistration
 ]
 
 export default routes

@@ -1,10 +1,12 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import Button from '@/components/Button/Button'
 import { InputSelect } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
+import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import { timeFormatter } from '@/utils/timeFormatter'
 import {
@@ -19,6 +21,7 @@ import {
 import { message } from 'antd'
 import axios, { AxiosError } from 'axios'
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
@@ -26,6 +29,7 @@ import styles from './Dashboard.module.scss'
 
 function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [dashboardStatusData, setDashboardStatusData] =
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
@@ -167,11 +171,17 @@ function Dashboard() {
       case UserLevels.NURSE:
         return <></>
       case UserLevels.PATIENT:
-        return <></>
+        return (
+          <>
+            <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
+              Pré cadastro
+            </Button>
+          </>
+        )
       default:
         return <></>
     }
-  }, [user?.level])
+  }, [user?.level, navigate])
 
   return (
     <>

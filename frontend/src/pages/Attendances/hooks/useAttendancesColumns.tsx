@@ -9,7 +9,7 @@ import { useCallback, useMemo } from 'react'
 export function useAttendancesColumns() {
   // const navigate = useNavigate()
 
-  // TODO: Implementar navegação para detalhes do atendimento
+  // VIEIRA: Implementar navegação para detalhes do atendimento
   const handleNavigateToDetails = useCallback(
     (id: ObjectId | undefined) => {
       if (!id) return
