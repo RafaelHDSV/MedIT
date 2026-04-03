@@ -17,10 +17,13 @@ function BasicInfo() {
         <DetailsLine label='Nome' value={user?.name} />
         <DetailsLine label='CPF' value={masks(user?.cpf, 'cpf')} />
         <DetailsLine label='Email' value={user?.email} />
-        <DetailsLine
-          label='Data e Hora'
-          value={dayjs().format('DD/MM/YYYY HH:mm')}
-        />
+        {user?.birthDate && (
+          <DetailsLine
+            label='Data de nascimento'
+            value={dayjs(user?.birthDate).format('DD/MM/YYYY')}
+          />
+        )}
+        {user?.gender && <DetailsLine label='Gênero' value={user?.gender} />}
       </Flex>
     </div>
   )
