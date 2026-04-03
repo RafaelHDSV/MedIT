@@ -51,10 +51,23 @@ function PreRegistration() {
     }
   }
 
+  async function handleFinish() {
+    try {
+      await form.validateFields()
+      setIsOpen(true)
+    } catch (error) {
+      console.error('Erro ao validar campos:', error)
+      message.error(
+        'Por favor, corrija os erros nos campos antes de finalizar.'
+      )
+    }
+  }
+
   return (
     <>
       <PreRegistrationModal
         values={form.getFieldsValue()}
+        submitForm={form.submit}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         loading={loading}
@@ -74,9 +87,7 @@ function PreRegistration() {
         />
 
         <Flex justify='flex-end'>
-          <Button onClick={() => setIsOpen(true)}>
-            Finalizar pré-cadastro
-          </Button>
+          <Button onClick={handleFinish}>Finalizar pré-cadastro</Button>
         </Flex>
       </Flex>
     </>

@@ -8,6 +8,7 @@ import styles from './PreRegistrationModal.module.scss'
 
 interface IPreRegistrationModalProps {
   values: PreRegistrationFormValues
+  submitForm: () => void
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   loading: boolean
@@ -15,11 +16,17 @@ interface IPreRegistrationModalProps {
 
 function PreRegistrationModal({
   values,
+  submitForm,
   isOpen,
   setIsOpen,
   loading
 }: IPreRegistrationModalProps) {
   const { mainComplaint, symptomStartDate, selfMedicated, painLevel } = values
+
+  function handleConfirm() {
+    submitForm()
+    setIsOpen(false)
+  }
 
   return (
     <Modal
@@ -46,7 +53,7 @@ function PreRegistrationModal({
         </div>
 
         <Flex justify='flex-end'>
-          <Button onClick={() => setIsOpen(false)} loading={loading}>
+          <Button onClick={handleConfirm} loading={loading}>
             Confirmar consulta
           </Button>
         </Flex>
