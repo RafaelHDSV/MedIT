@@ -145,17 +145,6 @@ const medications: IRoute = {
   }
 }
 
-const PreRegistration: IRoute = {
-  name: ROUTES.PREREGISTRATION.name,
-  description: ROUTES.PREREGISTRATION.description,
-  path: ROUTES.PREREGISTRATION.path,
-  icon: PillIcon,
-  meta: {
-    hidden: false,
-    levels: [UserLevels.PATIENT]
-  }
-}
-
 const attendances: IRoute = {
   name: ROUTES.ATTENDANCES.name,
   description: ROUTES.ATTENDANCES.description,
@@ -189,6 +178,16 @@ const triagesDetails: IRoute = {
   }
 }
 
+const preRegistration: IRoute = {
+  name: ROUTES.PRE_REGISTRATION.name,
+  description: ROUTES.PRE_REGISTRATION.description,
+  path: ROUTES.PRE_REGISTRATION.path,
+  meta: {
+    hidden: true,
+    levels: [UserLevels.PATIENT]
+  }
+}
+
 const routes: IRoute[] = [
   signIn,
   signUp,
@@ -203,7 +202,7 @@ const routes: IRoute[] = [
   patients,
   patientDetails,
   medications,
-  PreRegistration
+  preRegistration
 ]
 
 export default routes
