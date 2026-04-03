@@ -1,4 +1,4 @@
-const cpfMask = (value: string | undefined) => {
+const cpfMask = (value?: string) => {
   if (!value) return ''
 
   return value
@@ -9,7 +9,7 @@ const cpfMask = (value: string | undefined) => {
     .replace(/(-\d{2})\d+?$/, '$1')
 }
 
-const cellphoneMask = (value: string | undefined) => {
+const cellphoneMask = (value?: string) => {
   if (!value) return ''
   return value
     .replace(/\D/g, '')
@@ -18,7 +18,7 @@ const cellphoneMask = (value: string | undefined) => {
     .replace(/(-\d{4})\d+?$/, '$1')
 }
 
-const crmMask = (value: string | undefined) => {
+const crmMask = (value?: string) => {
   if (!value) return ''
   const cleaned = value.replace(/[^a-zA-Z0-9]/g, '')
   const match = cleaned.match(/^(\d+)([a-zA-Z]+)?$/)
@@ -28,7 +28,7 @@ const crmMask = (value: string | undefined) => {
   return uf ? `${num}/${uf}` : num
 }
 
-const dateMask = (value: string | undefined) => {
+const dateMask = (value?: string) => {
   if (!value) return ''
 
   let v = value.replace(/\D/g, '').slice(0, 8)
@@ -48,14 +48,14 @@ const dateMask = (value: string | undefined) => {
   return `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`
 }
 
-const corenMask = (value: string | undefined) => {
+const corenMask = (value?: string) => {
   if (!value) return ''
   const numbers = value.replace(/\D/g, '').slice(0, 6)
   if (numbers.length <= 3) return numbers
   return numbers.replace(/(\d{3})(\d+)/, '$1.$2')
 }
 
-const heightMask = (value: string | undefined) => {
+const heightMask = (value?: string) => {
   if (!value) return ''
   const numbers = value.replace(/\D/g, '').slice(0, 3)
   if (numbers.length === 0) return ''
@@ -70,6 +70,11 @@ const numberMask = (value?: number | string) => {
   return new Intl.NumberFormat('pt-BR').format(Number(value))
 }
 
+const booleanMask = (value?: string) => {
+  if (!value) return ''
+  return value === 'true' || value === '1' ? 'Sim' : 'Não'
+}
+
 export type MaskEnum =
   | 'cpf'
   | 'cellphone'
@@ -78,6 +83,7 @@ export type MaskEnum =
   | 'coren'
   | 'height'
   | 'number'
+  | 'boolean'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -103,6 +109,8 @@ function masks(
       return heightMask(result)
     case 'number':
       return numberMask(result)
+    case 'boolean':
+      return booleanMask(result)
     default:
       return result
   }
