@@ -1,4 +1,3 @@
-import { ProgressStatus } from '@/components/ProgressTag/ProgressTag'
 import {
   AmbulanceIcon,
   CalendarDotsIcon,
@@ -19,7 +18,6 @@ export interface IRouteGroup {
 interface MetaConfiguration {
   group?: IRouteGroup
   hidden?: boolean
-  progress?: ProgressStatus
   levels?: UserLevels[]
   canGoBack?: boolean
 }
@@ -36,14 +34,14 @@ const signIn: IRoute = {
   name: ROUTES.SIGNIN.name,
   description: ROUTES.SIGNIN.description,
   path: ROUTES.SIGNIN.path,
-  meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
+  meta: { hidden: true }
 }
 
 const signUp: IRoute = {
   name: ROUTES.SIGNUP.name,
   description: ROUTES.SIGNUP.description,
   path: ROUTES.SIGNUP.path,
-  meta: { hidden: true, progress: ProgressStatus.IN_PROGRESS }
+  meta: { hidden: true }
 }
 
 const dashboard: IRoute = {
@@ -53,7 +51,6 @@ const dashboard: IRoute = {
   icon: ChartBarIcon,
   meta: {
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED,
     levels: [
       UserLevels.ADMIN,
       UserLevels.DOCTOR,
@@ -71,7 +68,6 @@ const doctors: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.COMPLETED,
     levels: [UserLevels.ADMIN]
   }
 }
@@ -82,7 +78,6 @@ const doctorDetails: IRoute = {
   path: ROUTES.DOCTORS_DETAILS.path,
   meta: {
     hidden: true,
-    progress: ProgressStatus.IN_PROGRESS,
     levels: [UserLevels.ADMIN],
     canGoBack: true
   }
@@ -96,7 +91,6 @@ const nurses: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.IN_PROGRESS,
     levels: [UserLevels.ADMIN]
   }
 }
@@ -107,7 +101,6 @@ const nurseDetails: IRoute = {
   path: ROUTES.NURSES_DETAILS.path,
   meta: {
     hidden: true,
-    progress: ProgressStatus.COMPLETED,
     levels: [UserLevels.ADMIN],
     canGoBack: true
   }
@@ -121,7 +114,6 @@ const patients: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    progress: ProgressStatus.IN_PROGRESS,
     levels: [UserLevels.ADMIN, UserLevels.DOCTOR, UserLevels.NURSE]
   }
 }
@@ -132,7 +124,6 @@ const patientDetails: IRoute = {
   path: ROUTES.PATIENTS_DETAILS.path,
   meta: {
     hidden: true,
-    progress: ProgressStatus.NOT_STARTED,
     levels: [UserLevels.ADMIN, UserLevels.DOCTOR, UserLevels.NURSE],
     canGoBack: true
   }
@@ -145,7 +136,6 @@ const medications: IRoute = {
   icon: PillIcon,
   meta: {
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED,
     levels: [
       UserLevels.ADMIN,
       UserLevels.DOCTOR,
@@ -176,7 +166,6 @@ const attendances: IRoute = {
   icon: CalendarDotsIcon,
   meta: {
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED,
     levels: [UserLevels.DOCTOR]
   }
 }
@@ -188,7 +177,6 @@ const triages: IRoute = {
   icon: CalendarDotsIcon,
   meta: {
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED,
     levels: [UserLevels.NURSE]
   }
 }
@@ -199,7 +187,6 @@ const triagesDetails: IRoute = {
   path: ROUTES.TRIAGES_DETAILS.path,
   meta: {
     hidden: true,
-    progress: ProgressStatus.NOT_STARTED,
     levels: [UserLevels.NURSE],
     canGoBack: true
   }

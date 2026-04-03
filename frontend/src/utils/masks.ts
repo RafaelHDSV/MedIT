@@ -65,12 +65,17 @@ const heightMask = (value: string | undefined) => {
   return `${numbers[0]}.${numbers.slice(1, 3)}`
 }
 
-const normalizeString = (value: string) => {
+const normalizeMask = (value: string) => {
   if (!value) return ''
   return value
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+}
+
+const numberMask = (value?: number | string) => {
+  if (!value) return ''
+  return new Intl.NumberFormat('pt-BR').format(Number(value))
 }
 
 export type MaskEnum =
@@ -81,6 +86,7 @@ export type MaskEnum =
   | 'coren'
   | 'height'
   | 'normalize'
+  | 'number'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -105,7 +111,9 @@ function masks(
     case 'height':
       return heightMask(result)
     case 'normalize':
-      return normalizeString(result)
+      return normalizeMask(result)
+    case 'number':
+      return numberMask(result)
     default:
       return result
   }

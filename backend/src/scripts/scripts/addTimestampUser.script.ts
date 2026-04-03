@@ -1,4 +1,4 @@
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
 const addTimestampUser: Script = {
@@ -19,18 +19,18 @@ const addTimestampUser: Script = {
       $or: [{ updatedAt: { $exists: false } }, { updatedAt: null }]
     }
 
-    const createdAtCount = await UserModel.countDocuments(filterCreated)
+    const createdAtCount = await User.countDocuments(filterCreated)
     console.log(`Usuários sem createdAt: ${createdAtCount}`)
-    const updatedAtCount = await UserModel.countDocuments(filterUpdated)
+    const updatedAtCount = await User.countDocuments(filterUpdated)
     console.log(`Usuários sem updatedAt: ${updatedAtCount}`)
 
     const results = await Promise.all([
-      UserModel.updateMany(
+      User.updateMany(
         filterCreated,
         { $set: { createdAt: now } },
         { timestamps: false }
       ),
-      UserModel.updateMany(
+      User.updateMany(
         filterUpdated,
         { $set: { updatedAt: now } },
         { timestamps: false }

@@ -1,3 +1,5 @@
+@use '../../styles/abstract/breakpoints' as *;
+
 .card {
   display: flex;
   flex-direction: column;
@@ -6,6 +8,10 @@
   padding: 2rem;
   gap: 1rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+
+  @include max-md {
+    padding: 1.25rem;
+  }
   transition: transform 0.15s ease;
 
   &:hover {
@@ -46,6 +52,11 @@
     row-gap: 1rem;
     column-gap: 5rem;
     width: 100%;
+
+    @include max-md {
+      grid-template-columns: 1fr;
+      column-gap: 1rem;
+    }
   }
 
   .detailsItem {

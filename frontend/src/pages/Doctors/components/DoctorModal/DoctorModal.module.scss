@@ -1,3 +1,5 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
 .modal {
   max-width: 50rem;
   width: 100% !important;
@@ -6,6 +8,10 @@
     display: grid;
     gap: 16px;
     grid-template-columns: 1fr 1fr 1fr;
+
+    @include max-md {
+      grid-template-columns: 1fr;
+    }
   }
 
   .footer {

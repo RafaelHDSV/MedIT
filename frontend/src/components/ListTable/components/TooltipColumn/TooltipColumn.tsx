@@ -1,13 +1,33 @@
+import type { IconProps } from '@phosphor-icons/react'
 import { Tooltip } from 'antd'
+import type { FC } from 'react'
+import styles from './TooltipColumn.module.scss'
 
-function TooltipColumn({ text }: { text: string }) {
+interface ITooltipColumnProps {
+  text?: string
+  icon?: FC<IconProps>
+  className?: string
+}
+
+function TooltipColumn({ text, icon: Icon, className }: ITooltipColumnProps) {
+  if (!text) return
   const display = text || 'n/a'
+
+  const spanContent = () => {
+    if (Icon) {
+      return (
+        <div className={styles.iconContainer}>
+          <Icon size={16} />
+        </div>
+      )
+    }
+
+    return <span className={`ellipsis w-100 ${className}`}>{display}</span>
+  }
 
   return (
     <div className='ellipsis'>
-      <Tooltip title={display}>
-        <span className='ellipsis w-100'>{display}</span>
-      </Tooltip>
+      <Tooltip title={display}>{spanContent()}</Tooltip>
     </div>
   )
 }

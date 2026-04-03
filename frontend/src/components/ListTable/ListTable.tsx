@@ -5,7 +5,7 @@ import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
 import styles from './ListTable.module.scss'
 import FiltersTable from './components/FiltersTable/FiltersTable'
 
-function ListTable<K extends { [key: string]: unknown }>({
+function ListTable<K>({
   dataSource,
   columns,
   pageSize = 6,
@@ -49,7 +49,7 @@ function ListTable<K extends { [key: string]: unknown }>({
           }}
           size='middle'
           bordered={false}
-          scroll={{ x: 'min-content' }}
+          scroll={{ x: '100%' }}
         />
       </div>
     </>

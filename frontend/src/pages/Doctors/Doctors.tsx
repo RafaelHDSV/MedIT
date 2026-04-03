@@ -1,9 +1,6 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
-import ProgressTag, {
-  ProgressStatus
-} from '@/components/ProgressTag/ProgressTag'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import { Flex, message } from 'antd'
@@ -64,17 +61,14 @@ function Doctors() {
 
       <div className={styles.tableContent}>
         <Flex vertical className={styles.container}>
-          <Flex gap={16} align='center'>
-            <AuthLayoutHeader
-              actionComponent={
-                <DoctorModal
-                  buttonText='Adicionar médico(a)'
-                  fetchDoctors={fetchDoctors}
-                />
-              }
-            />
-            <ProgressTag status={ProgressStatus.COMPLETED} />
-          </Flex>
+          <AuthLayoutHeader
+            actionComponent={
+              <DoctorModal
+                buttonText='Adicionar médico(a)'
+                fetchDoctors={fetchDoctors}
+              />
+            }
+          />
 
           <ListTable<IDoctor>
             dataSource={doctors}

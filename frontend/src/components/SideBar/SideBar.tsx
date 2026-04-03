@@ -6,7 +6,6 @@ import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
-import ProgressTag, { ProgressStatus } from '../ProgressTag/ProgressTag'
 import ConfigTag from './components/ConfigTag/ConfigTag'
 import UserTag from './components/UserTag/UserTag'
 import styles from './SideBar.module.scss'
@@ -87,8 +86,6 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
                       )}
                       {!isCompact ? r.name : ''}
                     </div>
-
-                    <ProgressTag status={r.meta?.progress} />
                   </NavLink>
                 </li>
               ))}
@@ -113,8 +110,6 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
             {route.icon && <route.icon size={22} className={styles.linkIcon} />}
             {!isCompact ? route.name : ''}
           </div>
-
-          <ProgressTag status={route.meta?.progress} />
         </NavLink>
       </li>
     )
@@ -123,28 +118,51 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
   return <ul className={styles.menuList}>{routes.map(renderRoute)}</ul>
 }
 
-function SideBar() {
+interface ISideBarProps {
+  isMobile?: boolean
+  mobileOpen?: boolean
+  onMobileOpenChange?: (open: boolean) => void
+}
+
+function SideBar({
+  isMobile = false,
+  mobileOpen = false,
+  onMobileOpenChange
+}: ISideBarProps) {
   const [isCompact, setIsCompact] = useState(false)
+  const effectiveCompact = isMobile ? false : isCompact
+
+  const toggleMenu = () => {
+    if (isMobile) {
+      onMobileOpenChange?.(!mobileOpen)
+    } else {
+      setIsCompact((prev) => !prev)
+    }
+  }
+
+  const iconActive = (!isMobile && isCompact) || (isMobile && mobileOpen)
+  const mobileHidden = isMobile && !mobileOpen
 
   return (
-    <nav className={`${styles.nav} ${isCompact ? styles.compact : ''}`}>
+    <nav
+      className={`${styles.nav} ${effectiveCompact ? styles.compact : ''} ${mobileHidden ? styles.mobileHidden : ''}`}
+    >
       <div className={styles.main}>
         <header className={styles.header}>
           <ListIcon
-            className={`${styles.icon} ${isCompact ? styles.iconActive : ''}`}
+            className={`${styles.icon} ${iconActive ? styles.iconActive : ''}`}
             size={32}
-            onClick={() => setIsCompact(!isCompact)}
+            onClick={toggleMenu}
           />
-          <Logo fontSize={32} isCompact={isCompact} />
-          <ProgressTag status={ProgressStatus.COMPLETED} />
+          <Logo fontSize={32} isCompact={effectiveCompact} />
         </header>
 
-        <SidebarItems isCompact={isCompact} />
+        <SidebarItems isCompact={effectiveCompact} />
       </div>
 
       <div className={styles.footer}>
-        <ConfigTag isCompact={isCompact} />
-        <UserTag isCompact={isCompact} />
+        <ConfigTag isCompact={effectiveCompact} />
+        <UserTag isCompact={effectiveCompact} />
       </div>
     </nav>
   )

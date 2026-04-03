@@ -4,6 +4,7 @@ import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import type { IError } from '@/interfaces/IError'
 import type { BloodType, IPatient } from '@/interfaces/IPatient'
 import { ROUTES } from '@/routes/constants'
+import { DropIcon } from '@phosphor-icons/react'
 import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import axios, { AxiosError } from 'axios'
@@ -81,40 +82,48 @@ export function usePatientsColumns({
       commonColumns.birthDate(),
       commonColumns.cellphone(),
       {
-        title: 'Peso',
+        title: <TooltipColumn text='Peso' />,
         dataIndex: 'weight',
         key: 'weight',
+        width: 80,
+        ellipsis: true,
         render: (weight: number) => (
           <TooltipColumn text={`${weight?.toString()} kg`} />
         )
       },
       {
-        title: 'Altura',
+        title: <TooltipColumn text='Altura' />,
         dataIndex: 'height',
         key: 'height',
+        width: 80,
+        ellipsis: true,
         render: (height: number) => (
           <TooltipColumn text={`${height?.toString()} m`} />
         )
       },
       {
-        title: 'Tipo sanguíneo',
+        title: <TooltipColumn text='Tipo sanguíneo' icon={DropIcon} />,
         dataIndex: 'bloodType',
         key: 'bloodType',
+        width: 60,
+        ellipsis: true,
         render: (bloodType: BloodType) => <TooltipColumn text={bloodType} />
       },
       {
-        title: 'Condições',
+        title: <TooltipColumn text='Condições' />,
         dataIndex: 'conditions',
         key: 'conditions',
+        width: 250,
         ellipsis: true,
         render: (conditions: string[]) => (
           <TooltipColumn text={conditions.join(', ')} />
         )
       },
       {
-        title: 'Alergias',
+        title: <TooltipColumn text='Alergias' />,
         dataIndex: 'allergies',
         key: 'allergies',
+        width: 250,
         ellipsis: true,
         render: (allergies: string[]) => (
           <TooltipColumn text={allergies.join(', ')} />

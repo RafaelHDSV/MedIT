@@ -1,53 +1,41 @@
+@use '../../styles/abstract/breakpoints' as *;
+
 .container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: auto;
   gap: 1rem;
+  height: 100%;
 
   grid-template-areas:
-    'card1 card2 card3 card4'
-    'card5 card6 queue queue'
-    'attendance attendance queue queue'
-    'attendance attendance queue queue'
-    'attendance attendance queue queue';
+    'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
+    'dashboardCard5 dashboardCard6 attendanceQueueChart attendanceQueueChart'
+    'attendanceByTimeChart attendanceByTimeChart attendanceQueueChart attendanceQueueChart'
+    'attendanceByTimeChart attendanceByTimeChart attendanceQueueChart attendanceQueueChart'
+    'attendanceByTimeChart attendanceByTimeChart attendanceQueueChart attendanceQueueChart';
 
-  & > *:nth-child(1) {
-    grid-area: card1;
+  @include max-lg {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'dashboardCard1 dashboardCard2'
+      'dashboardCard3 dashboardCard4'
+      'dashboardCard5 dashboardCard6'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceByTimeChart attendanceByTimeChart'
+      'attendanceByTimeChart attendanceByTimeChart'
+      'attendanceByTimeChart attendanceByTimeChart';
   }
 
-  & > *:nth-child(2) {
-    grid-area: card2;
-  }
-
-  & > *:nth-child(3) {
-    grid-area: card3;
-  }
-
-  & > *:nth-child(4) {
-    grid-area: card4;
-  }
-
-  & > *:nth-child(5) {
-    grid-area: card5;
-  }
-
-  & > *:nth-child(6) {
-    grid-area: card6;
-  }
-
-  .attendance,
-  .queue {
-    background: white;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    height: 20rem;
-  }
-
-  .attendance {
-    grid-area: attendance;
-  }
-
-  .queue {
-    grid-area: queue;
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'dashboardCard1'
+      'dashboardCard2'
+      'dashboardCard3'
+      'dashboardCard4'
+      'dashboardCard5'
+      'dashboardCard6'
+      'attendanceQueueChart'
+      'attendanceByTimeChart';
   }
 }

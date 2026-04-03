@@ -1,9 +1,6 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
-import ProgressTag, {
-  ProgressStatus
-} from '@/components/ProgressTag/ProgressTag'
 import type { IError } from '@/interfaces/IError'
 import type { INurse } from '@/interfaces/INurse'
 import { Flex, message } from 'antd'
@@ -64,17 +61,14 @@ function Nurses() {
 
       <div className={styles.tableContent}>
         <Flex vertical className={styles.container}>
-          <Flex gap={16} align='center'>
-            <AuthLayoutHeader
-              actionComponent={
-                <NurseModal
-                  buttonText='Adicionar enfermeiro(a)'
-                  fetchNurses={fetchNurses}
-                />
-              }
-            />
-            <ProgressTag status={ProgressStatus.COMPLETED} />
-          </Flex>
+          <AuthLayoutHeader
+            actionComponent={
+              <NurseModal
+                buttonText='Adicionar enfermeiro(a)'
+                fetchNurses={fetchNurses}
+              />
+            }
+          />
 
           <ListTable<INurse>
             dataSource={nurses}

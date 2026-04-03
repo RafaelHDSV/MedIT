@@ -2,6 +2,7 @@ import UnauthImage3 from '@/assets/unauth-image-3.svg'
 import UnauthImage from '@/assets/unauth-image.svg'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Logo from '@/components/Logo/Logo'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import routes from '@/routes/routes'
 import { useCallback, useEffect, useState } from 'react'
 import { matchPath, Outlet, useLocation } from 'react-router-dom'
@@ -13,6 +14,7 @@ export default function UnauthLayout() {
   const currentRoute = routes.find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)
   )
+  const isMobile = useIsMobile()
   const isSignInPage = currentRoute?.path === '/'
   const [imageIndex, setImageIndex] = useState(0)
   const [isFading, setIsFading] = useState(false)
@@ -64,7 +66,9 @@ export default function UnauthLayout() {
     <div className={styles.content}>
       <aside
         className={styles.form}
-        style={{ justifyContent: isSignInPage ? 'center' : 'flex-end' }}
+        style={{
+          justifyContent: isSignInPage || isMobile ? 'center' : 'flex-end'
+        }}
       >
         <Logo className={styles.logo} />
 

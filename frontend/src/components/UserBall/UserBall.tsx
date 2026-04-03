@@ -5,7 +5,7 @@ import { Skeleton } from 'antd'
 import styles from './UserBall.module.scss'
 
 interface IUserBallProps {
-  name: string
+  name?: string
   size?: number
   fontSize?: number
   loading?: boolean
@@ -17,6 +17,8 @@ function UserBall({
   fontSize = 14,
   loading = false
 }: IUserBallProps) {
+  if (!name) return
+  
   const bgColor = stringToColor(name)
   const textColor = getContrastColor(bgColor)
   const initials = getInitials(name)

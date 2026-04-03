@@ -38,7 +38,8 @@ export function AuthProvider({ children }: Props) {
         cpf: user.cpf,
         level: user.level,
         email: user.email,
-        number: user.number
+        number: user.number,
+        unitId: user.unitId
       }
 
       setUser(formattedUser)

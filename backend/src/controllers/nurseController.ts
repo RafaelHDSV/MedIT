@@ -2,11 +2,11 @@ import { Request, Response } from 'express'
 import { NurseShifts } from '../interfaces/INurse.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Nurse } from '../models/NurseModel.js'
-import UserModel from '../models/UserModel.js'
+import User from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
 
 export const getUsers = async (_req: Request, res: Response) => {
-  const users = await UserModel.find({ level: 'nurse' })
+  const users = await User.find({ level: 'nurse' })
     .sort({ createdAt: -1 })
     .select('-password')
   if (!users || users.length === 0) {

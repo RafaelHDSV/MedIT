@@ -4,7 +4,7 @@ import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
-import { AttendanceRisk, type IAttendance } from '@/interfaces/IAttendance'
+import { AttendanceRisk } from '@/interfaces/IAttendance'
 import type { IError } from '@/interfaces/IError'
 import { NurseShiftsLabels, type INurse } from '@/interfaces/INurse'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
@@ -30,7 +30,8 @@ const mockedLastAttendance = {
   date: '12/01/2025'
 }
 
-const mockedAttendanceRecords: IAttendance[] = [
+  // VIEIRA: Corrigir tipagem any
+const mockedAttendanceRecords: any[] = [
   {
     name: 'Maria Santos',
     birthDate: new Date('1986-10-15'),

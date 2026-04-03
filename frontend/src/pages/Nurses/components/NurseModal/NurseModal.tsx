@@ -6,6 +6,7 @@ import {
   InputSelect,
   InputText
 } from '@/components/FormComponents/FormComponents'
+import { DayjsType } from '@/components/MultiDatepicker/types'
 import { UF } from '@/interfaces/globals'
 import type { IError } from '@/interfaces/IError'
 import {
@@ -183,6 +184,7 @@ function ModalContent({
             <InputDate
               value={form.getFieldValue('birthDate')}
               inputHeight={inputHeight}
+              dateType={DayjsType.date}
               onChange={(date) => form.setFieldsValue({ birthDate: date })}
             />
           </FormItem>

@@ -1,9 +1,9 @@
 import type { FormatDateModes } from '@/utils/formatDate'
 import { useEffect } from 'react'
-import { DATE_MASKS, type MultiDatepickerType } from './types'
+import { DATE_MASKS, DayjsType } from './types'
 
 interface IMultiDatepickerFormatProps {
-  type: MultiDatepickerType
+  type: DayjsType
   mode: 'display' | 'store'
 }
 
@@ -14,27 +14,27 @@ export function getMultiDatepickerFormat({
   const modes: { display: FormatDateModes; store: FormatDateModes } = {
     display: (() => {
       switch (type) {
-        case 'month':
+        case DayjsType.month:
           return 'displayMonth'
-        case 'date':
-        case 'range':
+        case DayjsType.date:
+        case DayjsType.range:
           return 'date'
-        case 'year':
+        case DayjsType.year:
           return 'displayYear'
-        case 'week':
+        case DayjsType.week:
           return 'displayWeek'
       }
     })(),
     store: (() => {
       switch (type) {
-        case 'month':
+        case DayjsType.month:
           return 'serverMonth'
-        case 'date':
-        case 'range':
+        case DayjsType.date:
+        case DayjsType.range:
           return 'serverCompleteDate'
-        case 'year':
+        case DayjsType.year:
           return 'serverYear'
-        case 'week':
+        case DayjsType.week:
           return 'date'
       }
     })()
@@ -60,7 +60,7 @@ function applyDateMask(value: string, mask: string): string {
 
 export function useInputMask(
   pickerRef: React.RefObject<HTMLElement | null>,
-  type: MultiDatepickerType
+  type: DayjsType
 ) {
   useEffect(() => {
     const maskConfig = DATE_MASKS[type]

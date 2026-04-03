@@ -6,8 +6,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "node src/server.ts",
-    "scripts": "tsx src/scripts/runner.ts"
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "scripts": "tsx src/scripts/runner.js"
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",

@@ -1,12 +1,13 @@
 import cors from 'cors'
-import express, { Request, Response } from 'express'
-
+import express from 'express'
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
 import authRoutes from './routes/authRoutes.js'
+import dashboardRoutes from './routes/dashboardRoutes.js'
 import doctorsRoutes from './routes/doctorsRoutes.js'
 import nursesRoutes from './routes/nursesRoutes.js'
 import patientsRoutes from './routes/patientsRoutes.js'
+import unitsRoutes from './routes/unitsRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 
 const app = express()
@@ -16,7 +17,7 @@ app.use(express.json())
 
 await connectDatabase()
 
-app.get('/', (_req: Request, res: Response) => {
+app.get('/', (_req, res) => {
   res.send('Back-end funcionando com sucesso!')
 })
 
@@ -25,7 +26,9 @@ app.use('/users', userRoutes)
 app.use('/doctors', doctorsRoutes)
 app.use('/nurses', nursesRoutes)
 app.use('/patients', patientsRoutes)
+app.use('/units', unitsRoutes)
+app.use('/dashboard', dashboardRoutes)
 
 app.listen(PORT, () => {
-  console.log(`Servidor está rodando em http://localhost:${PORT}`)
+  console.log(`Servidor está rodando! ${PORT}`)
 })

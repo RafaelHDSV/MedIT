@@ -1,3 +1,5 @@
+@use '../../../../../../styles/abstract/breakpoints' as *;
+
 .section {
   display: flex;
   flex-direction: column;
@@ -8,6 +10,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  min-width: 0;
+
+  @include max-md {
+    align-items: flex-start;
+  }
 }
 
 .addTask {

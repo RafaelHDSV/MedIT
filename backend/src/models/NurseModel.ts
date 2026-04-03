@@ -1,13 +1,8 @@
 import mongoose from 'mongoose'
-import { INurse, NurseShifts } from '../interfaces/INurse.js'
 import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
-import { UserModel } from './UserModel.js'
-
-const NurseSchema = new mongoose.Schema<INurse>({
-  coren: { type: String, required: true, unique: true },
-  shift: { type: String, enum: Object.values(NurseShifts), required: true }
-})
+import NurseSchema from '../schema/NurseSchema.js'
+import { User } from './UserModel.js'
 
 export const Nurse = mongoose
-  .model<IBaseUser, UserModel>('User')
+  .model<IBaseUser, User>('User')
   .discriminator(UserLevels.NURSE, NurseSchema)

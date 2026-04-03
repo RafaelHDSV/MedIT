@@ -1,17 +1,15 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import ProgressTag, {
-  ProgressStatus
-} from '@/components/ProgressTag/ProgressTag'
-import { AttendanceRisk, type IAttendance } from '@/interfaces/IAttendance'
+import { AttendanceRisk } from '@/interfaces/IAttendance'
 import { ObjectId } from '@/utils/objectId'
-import { Flex, Table } from 'antd'
+import { Table } from 'antd'
 import styles from '../../components/ListTable/ListTable.module.scss'
 import { useTriagesColumns } from './hooks/useTriagesColumns'
 
 function ITriages() {
   const columns = useTriagesColumns()
 
-  const data: IAttendance[] = [
+  // VIEIRA: Corrigir tipagem any
+  const data: any[] = [
     {
       _id: ObjectId('69bef9b46b9f5d4381a706a9'),
       number: 1,
@@ -70,10 +68,7 @@ function ITriages() {
 
   return (
     <div className='h-100'>
-      <Flex gap={16} align='center'>
-        <AuthLayoutHeader />
-        <ProgressTag status={ProgressStatus.COMPLETED} />
-      </Flex>
+      <AuthLayoutHeader />
 
       <Table
         className={styles.userTable}
