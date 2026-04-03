@@ -94,7 +94,7 @@ function InputSelect({ inputHeight, ...rest }: IInputSelectProps) {
 }
 
 interface IInputDateProps {
-  value?: DayjsType
+  value?: string
   inputHeight?: string
   dateType?: DayjsType
   onChange?: (date: DayjsValue) => void
