@@ -184,7 +184,8 @@ const preRegistration: IRoute = {
   path: ROUTES.PRE_REGISTRATION.path,
   meta: {
     hidden: true,
-    levels: [UserLevels.PATIENT]
+    levels: [UserLevels.PATIENT],
+    canGoBack: true
   }
 }
 
