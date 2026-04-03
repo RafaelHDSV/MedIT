@@ -43,6 +43,7 @@ function Dashboard() {
       try {
         const response = await api.get(`/dashboard/status-cards`, {
           params: {
+            userId: user?._id,
             unitId: user?.unitId,
             level: user?.level,
             period: selectedPeriod
@@ -63,7 +64,7 @@ function Dashboard() {
     }
 
     fetchDashboardStatus()
-  }, [user?.unitId, user?.level, selectedPeriod])
+  }, [user?.unitId, user?.level, user?._id, selectedPeriod])
 
   const cardsData = useMemo(() => {
     switch (user?.level) {

@@ -1,87 +1,127 @@
 import { faker } from '@faker-js/faker'
 import { Request, Response } from 'express'
 import { AttendanceRisk } from '../interfaces/IAttendance.js'
+import { UserLevels } from '../interfaces/IUser.js'
 import {
   getAttendanceOcuppation,
   getAttended,
   getAverageTime,
   getEntries,
   getHighRisk,
-  getInAttendance
+  getInAttendance,
+  getWaitingForDoctor
 } from '../services/attendanceService.js'
 import { getUnitService } from '../services/unitService.js'
 
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
-  const { unitId, level, period } = req.query
+  const { unitId, userId, level, period } = req.query
 
   const unit = await getUnitService({ unitId: String(unitId) })
 
-  const [entries, inAttendance, attended, occupancy, averageTime, highRisk] =
-    await Promise.all([
-      getEntries({
-        unitId: String(unitId),
-        period: String(period)
-      }),
-      getInAttendance({
-        unitId: String(unitId)
-      }),
-      getAttended({
-        unitId: String(unitId),
-        period: String(period)
-      }),
-      getAttendanceOcuppation({
-        unitId: String(unitId),
-        maxOccupancy: Number(unit.data?.maxOccupancy)
-      }),
-      getAverageTime({
-        unitId: String(unitId),
-        period: String(period)
-      }),
-      getHighRisk({
-        unitId: String(unitId),
-        period: String(period)
-      })
-    ])
+  async function getAdminData() {
+    try {
+      const [
+        entries,
+        inAttendance,
+        attended,
+        occupancy,
+        averageTime,
+        highRisk
+      ] = await Promise.all([
+        getEntries({
+          unitId: String(unitId),
+          period: String(period)
+        }),
+        getInAttendance({
+          unitId: String(unitId)
+        }),
+        getAttended({
+          unitId: String(unitId),
+          period: String(period)
+        }),
+        getAttendanceOcuppation({
+          unitId: String(unitId),
+          maxOccupancy: Number(unit.data?.maxOccupancy)
+        }),
+        getAverageTime({
+          unitId: String(unitId),
+          period: String(period)
+        }),
+        getHighRisk({
+          unitId: String(unitId),
+          period: String(period)
+        })
+      ])
 
-  const adminData = {
-    entries,
-    inAttendance,
-    attended,
-    occupancy,
-    averageTime,
-    highRisk
+      return {
+        entries,
+        inAttendance,
+        attended,
+        occupancy,
+        averageTime,
+        highRisk
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  async function getDoctorData() {
+    try {
+      const [waitingPatients, attended] = await Promise.all([
+        getWaitingForDoctor({
+          unitId: String(unitId)
+        }),
+        getAttended({
+          unitId: String(unitId),
+          period: String(period),
+          doctorId: String(userId)
+        })
+      ])
+      return {
+        waitingPatients,
+        attended,
+        averageTime: 18,
+        assertiveness: 0
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  async function getNurseData() {
+    try {
+      return {
+        waitingPatients: 25,
+        triagedPatients: 96,
+        averageTime: 18
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const doctorData = {
-    waitingPatients: 14,
-    attended: 96,
-    averageTime: 18,
-    assertiveness: 52
-  }
-
-  const nurseData = {
-    waitingPatients: 25,
-    triagedPatients: 96,
-    averageTime: 18
-  }
-
-  const data = () => {
+  const data = async () => {
     switch (level) {
-      case 'admin':
-        return adminData
-      case 'doctor':
-        return doctorData
-      case 'nurse':
-        return nurseData
+      case UserLevels.ADMIN:
+        return await getAdminData()
+      case UserLevels.DOCTOR:
+        return await getDoctorData()
+      case UserLevels.NURSE:
+        return await getNurseData()
       default:
         return
     }
   }
 
-  res.json({
-    message: 'Cards de status do dashboard encontrados com sucesso',
-    data: data()
-  })
+  try {
+    res.json({
+      message: 'Dados do dashboard carregados com sucesso',
+      data: await data()
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erro ao buscar dados do dashboard'
+    })
+  }
 }
 
 export const getDashboardAttendanceByTime = async (

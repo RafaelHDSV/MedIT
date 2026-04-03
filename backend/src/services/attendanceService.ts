@@ -42,16 +42,19 @@ export const getInAttendance = async ({ unitId }: { unitId: string }) => {
 
 export const getAttended = async ({
   unitId,
-  period
+  period,
+  doctorId
 }: {
   unitId: string
   period: string
+  doctorId?: string
 }) => {
   try {
     const { start, end } = getPeriodDateRange(period)
 
     return await Attendance.countDocuments({
       unitId,
+      ...(doctorId ? { doctorId: new Types.ObjectId(doctorId) } : {}),
       status: {
         $in: [AttendanceStatus.ATTENDANCE_COMPLETED, AttendanceStatus.COMPLETED]
       },
@@ -172,6 +175,17 @@ export const getHighRisk = async ({
       }
     })
     return highRiskAttendances
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getWaitingForDoctor = async ({ unitId }: { unitId: string }) => {
+  try {
+    return await Attendance.countDocuments({
+      unitId,
+      status: AttendanceStatus.WAITING_ATTENDANCE
+    })
   } catch (err) {
     console.error(err)
   }
