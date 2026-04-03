@@ -3,6 +3,7 @@ import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import { InputSelect } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
+import { Periods, PeriodsLabels } from '@/interfaces/globals'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
@@ -33,7 +34,7 @@ function Dashboard() {
   const [dashboardStatusData, setDashboardStatusData] =
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
-  const [selectedPeriod, setSelectedPeriod] = useState('day')
+  const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.DAY)
 
   useEffect(() => {
     async function fetchDashboardStatus() {
@@ -188,13 +189,12 @@ function Dashboard() {
       <AuthLayoutHeader
         actionComponent={
           <InputSelect
+            className={styles.periodSelect}
             placeholder='Período'
-            options={[
-              { label: 'Dia', value: 'day' },
-              { label: 'Semana', value: 'week' },
-              { label: 'Mês', value: 'month' },
-              { label: 'Ano', value: 'year' }
-            ]}
+            options={Object.entries(PeriodsLabels).map(([key, value]) => ({
+              label: value,
+              value: key
+            }))}
             value={selectedPeriod}
             onChange={setSelectedPeriod}
           />

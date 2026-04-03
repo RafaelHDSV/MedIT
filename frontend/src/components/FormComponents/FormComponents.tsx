@@ -83,10 +83,10 @@ interface IInputSelectProps extends SelectProps {
   inputHeight?: string
 }
 
-function InputSelect({ inputHeight, ...rest }: IInputSelectProps) {
+function InputSelect({ className, inputHeight, ...rest }: IInputSelectProps) {
   return (
     <Select
-      className={styles.select}
+      className={`${styles.select} ${className || ''}`}
       style={{ '--input-height': inputHeight || '3rem' } as React.CSSProperties}
       {...rest}
     />
