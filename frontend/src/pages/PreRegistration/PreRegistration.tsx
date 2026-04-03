@@ -25,6 +25,7 @@ import styles from './PreRegistration.module.scss'
 
 const inputHeight = '2.5rem'
 
+// VIEIRA: Refatorar o modal completo
 function PreRegistrationModal({
   isOpen,
   setIsOpen,
