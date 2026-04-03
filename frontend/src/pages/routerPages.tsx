@@ -25,7 +25,9 @@ export const Patients = lazy(() => import('../pages/Patients/Patients'))
 export const PatientsDetails = lazy(
   () => import('../pages/PatientsDetails/PatientsDetails')
 )
-export const Medications = lazy(() => import('../pages/Medications/Medications'))
+export const Medications = lazy(
+  () => import('../pages/Medications/Medications')
+)
 export const Attendances = lazy(
   () => import('../pages/Attendances/Attendances')
 )

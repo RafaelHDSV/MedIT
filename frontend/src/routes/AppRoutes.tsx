@@ -71,7 +71,9 @@ function AppRoutes() {
           />
         </Route>
 
-        <Route path='*' element={<pages.NotFound />} />
+        <Route element={<pages.UnauthLayout />}>
+          <Route path='*' element={<pages.NotFound />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )
