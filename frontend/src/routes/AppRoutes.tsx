@@ -56,7 +56,7 @@ function AppRoutes() {
             path={ROUTES.MEDICAMENTS.path}
             element={<pages.Medications />}
           />
-           <Route
+          <Route
             path={ROUTES.PREREGISTRATION.path}
             element={<pages.PreRegistration />}
           />

@@ -152,11 +152,8 @@ const PreRegistration: IRoute = {
   icon: PillIcon,
   meta: {
     hidden: false,
-    progress: ProgressStatus.NOT_STARTED,
-    levels: [
-      UserLevels.PATIENT
-    ],
-  },
+    levels: [UserLevels.PATIENT]
+  }
 }
 
 const attendances: IRoute = {
@@ -206,7 +203,7 @@ const routes: IRoute[] = [
   patients,
   patientDetails,
   medications,
-  PreRegistration,
+  PreRegistration
 ]
 
 export default routes

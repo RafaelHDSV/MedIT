@@ -146,4 +146,3 @@ function InputDate({
 }
 
 export { FormItem, InputDate, InputSelect, InputText }
-

@@ -18,7 +18,7 @@ function UserBall({
   loading = false
 }: IUserBallProps) {
   if (!name) return
-  
+
   const bgColor = stringToColor(name)
   const textColor = getContrastColor(bgColor)
   const initials = getInitials(name)

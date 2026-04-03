@@ -31,7 +31,7 @@ const mockedLastAttendance = {
   date: '12/01/2025'
 }
 
-  // VIEIRA: Corrigir tipagem any
+// VIEIRA: Corrigir tipagem any
 const mockedAttendanceRecords: any[] = [
   {
     name: 'Maria Santos',
