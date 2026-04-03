@@ -32,19 +32,9 @@ export function AuthProvider({ children }: Props) {
 
       const { accessToken, refreshToken, user } = response.data
 
-      const formattedUser: IBaseUser = {
-        _id: user._id,
-        name: user.name,
-        cpf: user.cpf,
-        level: user.level,
-        email: user.email,
-        number: user.number,
-        unitId: user.unitId
-      }
+      setUser(user)
 
-      setUser(formattedUser)
-
-      localStorage.setItem('user', JSON.stringify(formattedUser))
+      localStorage.setItem('user', JSON.stringify(user))
       localStorage.setItem('accessToken', accessToken)
       localStorage.setItem('refreshToken', refreshToken)
 

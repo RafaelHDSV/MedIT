@@ -5,6 +5,7 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { DayjsType } from '@/components/MultiDatepicker/types'
+import { useAuth } from '@/hooks/useAuth'
 import { UserGendersLabels } from '@/interfaces/IUser'
 import { birthDateValidator } from '@/utils/validators'
 import { Form, Radio, Slider, type FormInstance } from 'antd'
@@ -14,20 +15,22 @@ import type {
   PreRegistrationFormValues
 } from '../../IPreRegistration'
 import parentStyles from '../../PreRegistration.module.scss'
-import styles from './PatientInfo.module.scss'
+import styles from './AttendanceInfo.module.scss'
 
 const INPUT_HEIGHT = '2.5rem'
 
-interface IPatientInfoProps {
+interface IAttendanceInfoProps {
   form: FormInstance<PreRegistrationFormValues>
   onFinish: (values: PreRegistrationFormValues) => void
   fieldErrors: IPreRegistrationErrors
 }
 
-function PatientInfo({ form, onFinish, fieldErrors }: IPatientInfoProps) {
+function AttendanceInfo({ form, onFinish, fieldErrors }: IAttendanceInfoProps) {
+  const { user } = useAuth()
+
   return (
     <div className={parentStyles.formContainer}>
-      <h3 className={parentStyles.sectionTitle}>Informações do Paciente</h3>
+      <h3 className={parentStyles.sectionTitle}>Informações do atendimento</h3>
 
       <Form
         form={form}
@@ -35,45 +38,62 @@ function PatientInfo({ form, onFinish, fieldErrors }: IPatientInfoProps) {
         layout='vertical'
         onFinish={onFinish}
       >
-        <FormItem
-          label='Data de nascimento'
-          name='birthDate'
-          inputHeight={INPUT_HEIGHT}
-          rules={[
-            { required: true, message: 'Informe sua data de nascimento' },
-            {
-              validator(_, value) {
-                return birthDateValidator(value)
-              }
-            }
-          ]}
-          validateStatus={fieldErrors.birthDate ? 'error' : undefined}
-          help={fieldErrors.birthDate}
-        >
-          <InputDate
-            value={form.getFieldValue('birthDate')}
+        {!user?.birthDate && (
+          <FormItem
+            label='Data de nascimento'
+            name='birthDate'
             inputHeight={INPUT_HEIGHT}
-            dateType={DayjsType.date}
-            onChange={(date) => form.setFieldsValue({ birthDate: date })}
-          />
-        </FormItem>
+            rules={[
+              { required: true, message: 'Informe sua data de nascimento' },
+              {
+                validator(_, value) {
+                  return birthDateValidator(value)
+                }
+              }
+            ]}
+            validateStatus={fieldErrors.birthDate ? 'error' : undefined}
+            help={fieldErrors.birthDate}
+          >
+            <InputDate
+              value={form.getFieldValue('birthDate')}
+              inputHeight={INPUT_HEIGHT}
+              dateType={DayjsType.date}
+              onChange={(date) => form.setFieldsValue({ birthDate: date })}
+            />
+          </FormItem>
+        )}
+
+        {!user?.gender && (
+          <FormItem
+            label='Gênero'
+            name='gender'
+            inputHeight={INPUT_HEIGHT}
+            rules={[{ required: true, message: 'Informe seu gênero' }]}
+            validateStatus={fieldErrors.gender ? 'error' : undefined}
+            help={fieldErrors.gender}
+          >
+            <InputSelect
+              inputHeight={INPUT_HEIGHT}
+              placeholder='Selecione seu gênero'
+              options={Object.entries(UserGendersLabels).map(
+                ([key, value]) => ({
+                  label: value,
+                  value: key
+                })
+              )}
+            />
+          </FormItem>
+        )}
 
         <FormItem
-          label='Gênero'
-          name='gender'
+          label='Queixa principal'
+          name='mainComplaint'
           inputHeight={INPUT_HEIGHT}
-          rules={[{ required: true, message: 'Informe seu gênero' }]}
-          validateStatus={fieldErrors.gender ? 'error' : undefined}
-          help={fieldErrors.gender}
+          rules={[{ required: true, message: 'Informe sua queixa principal' }]}
+          validateStatus={fieldErrors.mainComplaint ? 'error' : undefined}
+          help={fieldErrors.mainComplaint}
         >
-          <InputSelect
-            inputHeight={INPUT_HEIGHT}
-            placeholder='Selecione seu gênero'
-            options={Object.entries(UserGendersLabels).map(([key, value]) => ({
-              label: value,
-              value: key
-            }))}
-          />
+          <InputText placeholder='Digite sua queixa principal' />
         </FormItem>
 
         <FormItem
@@ -85,17 +105,6 @@ function PatientInfo({ form, onFinish, fieldErrors }: IPatientInfoProps) {
           help={fieldErrors.painLevel}
         >
           <Slider min={0} max={10} dots />
-        </FormItem>
-
-        <FormItem
-          label='Queixa principal'
-          name='mainComplaint'
-          inputHeight={INPUT_HEIGHT}
-          rules={[{ required: true, message: 'Informe sua queixa principal' }]}
-          validateStatus={fieldErrors.mainComplaint ? 'error' : undefined}
-          help={fieldErrors.mainComplaint}
-        >
-          <InputText placeholder='Digite sua queixa principal' />
         </FormItem>
 
         <FormItem
@@ -169,4 +178,4 @@ function PatientInfo({ form, onFinish, fieldErrors }: IPatientInfoProps) {
   )
 }
 
-export default PatientInfo
+export default AttendanceInfo

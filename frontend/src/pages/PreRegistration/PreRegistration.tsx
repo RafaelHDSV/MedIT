@@ -9,8 +9,8 @@ import type {
   IPreRegistrationErrors,
   PreRegistrationFormValues
 } from './IPreRegistration'
+import AttendanceInfo from './components/AttendanceInfo/AttendanceInfo'
 import BasicInfo from './components/BasicInfo/BasicInfo'
-import PatientInfo from './components/PatientInfo/PatientInfo'
 import PreRegistrationModal from './components/PreRegistrationModal/PreRegistrationModal'
 import SymptomsInfo from './components/SymptomsInfo/SymptomsInfo'
 
@@ -63,7 +63,7 @@ function PreRegistration() {
       <Flex vertical>
         <AuthLayoutHeader marginBottom={32} />
         <BasicInfo />
-        <PatientInfo
+        <AttendanceInfo
           form={form}
           onFinish={onFinish}
           fieldErrors={fieldErrors}

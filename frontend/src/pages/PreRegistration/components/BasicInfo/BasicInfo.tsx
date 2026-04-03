@@ -1,5 +1,6 @@
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import { useAuth } from '@/hooks/useAuth'
+import { UserGendersLabels } from '@/interfaces/IUser'
 import masks from '@/utils/masks'
 import { Flex } from 'antd'
 import dayjs from 'dayjs'
@@ -23,7 +24,9 @@ function BasicInfo() {
             value={dayjs(user?.birthDate).format('DD/MM/YYYY')}
           />
         )}
-        {user?.gender && <DetailsLine label='Gênero' value={user?.gender} />}
+        {user?.gender && (
+          <DetailsLine label='Gênero' value={UserGendersLabels[user?.gender]} />
+        )}
       </Flex>
     </div>
   )
