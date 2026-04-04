@@ -122,7 +122,7 @@ function AttendanceByTimeChart({
                     style={{
                       height:
                         item.total > 0
-                          ? `${(item.total / max) * 200}px`
+                          ? `${(item.total / max) * 180}px`
                           : '16px'
                     }}
                   />
