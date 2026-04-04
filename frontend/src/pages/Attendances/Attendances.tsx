@@ -19,11 +19,7 @@ function Attendances() {
     setLoading(true)
 
     try {
-      const response = await api.get('/attendances', {
-        params: {
-          doctorId: user?._id
-        }
-      })
+      const response = await api.get(`/doctors/${user?._id}/attendances`)
       const data = response.data
       setAttendances(data)
     } catch (err) {

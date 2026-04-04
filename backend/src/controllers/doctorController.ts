@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
+import { Types } from 'mongoose'
 import { DoctorSpecializations } from '../interfaces/IDoctor.js'
 import { UserLevels } from '../interfaces/IUser.js'
+import { Attendance } from '../models/AttendanceModel.js'
 import { Doctor } from '../models/DoctorModel.js'
 import User from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
@@ -246,5 +248,51 @@ export const deleteDoctor = async (req: Request, res: Response) => {
       message: 'Erro ao deletar médico(a)',
       error: error.message
     })
+  }
+}
+
+export const getAttendances = async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  try {
+    const attendances = await Attendance.aggregate([
+      { $match: { doctorId: new Types.ObjectId(String(id)) } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'patientId',
+          foreignField: '_id',
+          as: 'patient'
+        }
+      },
+      { $unwind: { path: '$patient', preserveNullAndEmptyArrays: true } },
+      {
+        $sort: {
+          createdAt: -1
+        }
+      },
+      {
+        $project: {
+          number: 1,
+          name: { $ifNull: ['$patient.name', null] },
+          birthDate: { $ifNull: ['$patient.birthDate', null] },
+          complaint: 1,
+          date: 1,
+          risk: 1,
+          diagnosis: 1,
+          createdAt: 1,
+          updatedAt: 1
+        }
+      }
+    ])
+
+    if (!attendances || attendances.length === 0) {
+      return res.status(404).json({ message: 'Nenhum atendimento encontrado' })
+    }
+
+    res.json(attendances)
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao buscar os atendimentos' })
   }
 }
