@@ -223,7 +223,9 @@ const createAttendances = {
           medicationsIds: [],
           changesHistory: history,
           vitalSigns: randomVitalSigns(),
-          iaConditionId: new Types.ObjectId()
+          iaConditionId: new Types.ObjectId(),
+          createdAt: date,
+          updatedAt: date
         })
       }
 
@@ -232,7 +234,7 @@ const createAttendances = {
 
     console.log(`📦 Inserindo ${attendances.length} atendimentos...`)
 
-    await Attendance.insertMany(attendances)
+    await Attendance.insertMany(attendances, { timestamps: false })
 
     console.log('✅ Ano completo gerado com sucesso!')
     process.exit()
