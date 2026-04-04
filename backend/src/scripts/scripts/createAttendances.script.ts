@@ -33,7 +33,9 @@ const createAttendances = {
     const currentYear = now.getFullYear()
 
     const startDate = new Date(currentYear, 0, 1)
-    const endDate = new Date(currentYear, 11, 31)
+    const endDate = new Date(
+      Math.min(new Date(currentYear, 11, 31).getTime(), now.getTime())
+    )
 
     const riskDistribution = [
       AttendanceRisk.NOT_URGENT,

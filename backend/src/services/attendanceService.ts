@@ -509,25 +509,41 @@ export const getAttendanceByTime = async ({
 
 export const getAttendanceQueue = async ({ unitId }: { unitId: string }) => {
   try {
-    const data = await Attendance.find({
-      unitId,
-      status: { $in: ACTIVE_STATUSES }
-    })
-      .populate('patientId', 'name')
-      .sort({
-        risk: 1,
-        date: 1
-      })
-      .lean()
-
-    return data.map((item) => {
-      return {
-        _id: item._id,
-        patientName: item.patientId?.name || 'Paciente',
-        status: item.status,
-        risk: item.risk
+    const data = await Attendance.aggregate([
+      {
+        $match: {
+          unitId: new Types.ObjectId(unitId),
+          status: { $in: ACTIVE_STATUSES }
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'patientId',
+          foreignField: '_id',
+          as: 'patient'
+        }
+      },
+      {
+        $unwind: {
+          path: '$patient',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $sort: { risk: 1, date: 1 }
+      },
+      {
+        $project: {
+          _id: 1,
+          patientName: { $ifNull: ['$patient.name', 'Paciente'] },
+          status: 1,
+          risk: 1
+        }
       }
-    })
+    ])
+
+    return data
   } catch (err) {
     console.error(err)
     return []

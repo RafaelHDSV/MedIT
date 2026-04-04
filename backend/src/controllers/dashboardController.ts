@@ -64,12 +64,12 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
       ])
 
       if (
-        !entries ||
-        !inAttendance ||
-        !attended ||
-        !occupancy ||
-        !averageTime ||
-        !highRisk
+        entries === undefined ||
+        inAttendance === undefined ||
+        attended === undefined ||
+        occupancy === undefined ||
+        averageTime === undefined ||
+        highRisk === undefined
       ) {
         throw new Error('Erro ao buscar dados do dashboard')
       }
@@ -105,7 +105,11 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         })
       ])
 
-      if (!waitingPatients || !attended || !averageTime) {
+      if (
+        waitingPatients === undefined ||
+        attended === undefined ||
+        averageTime === undefined
+      ) {
         throw new Error('Erro ao buscar dados do dashboard')
       }
 
@@ -141,7 +145,11 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         ]
       )
 
-      if (!waitingPatients || !triagedPatients || !averageTime) {
+      if (
+        waitingPatients === undefined ||
+        triagedPatients === undefined ||
+        averageTime === undefined
+      ) {
         throw new Error('Erro ao buscar dados do dashboard')
       }
 
@@ -208,7 +216,7 @@ export const getDashboardAttendanceQueue = async (
   res: Response
 ) => {
   try {
-    const { unitId, period } = req.query
+    const { unitId } = req.query
 
     const data = await getAttendanceQueue({
       unitId: String(unitId)
