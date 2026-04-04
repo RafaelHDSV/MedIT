@@ -18,15 +18,21 @@ export const getAttendances = async (req: Request, res: Response) => {
       },
       { $unwind: { path: '$patient', preserveNullAndEmptyArrays: true } },
       {
+        $sort: {
+          createdAt: -1
+        }
+      },
+      {
         $project: {
+          number: 1,
           name: { $ifNull: ['$patient.name', null] },
           birthDate: { $ifNull: ['$patient.birthDate', null] },
-          number: 1,
           complaint: 1,
-          diagnosis: 1,
           date: 1,
           risk: 1,
-          status: 1
+          diagnosis: 1,
+          createdAt: 1,
+          updatedAt: 1
         }
       }
     ])
