@@ -59,8 +59,8 @@ const createAttendances = {
 
     function randomVitalSigns() {
       return {
-        bloodPressure: `${faker.number.int({ min: 10, max: 18 })}/${faker.number.int(
-          { min: 6, max: 12 }
+        bloodPressure: `${faker.number.int({ min: 90, max: 180 })}/${faker.number.int(
+          { min: 60, max: 110 }
         )}`,
         heartRate: faker.number.int({ min: 60, max: 130 }),
         temperature: faker.number.float({

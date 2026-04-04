@@ -100,23 +100,25 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
   }
 
   async function getNurseData() {
-    const [waitingPatients, triagedPatients, averageTime] = await Promise.all([
-      getWaitingForTriage({
-        unitId: String(unitId)
-      }),
-      getTriaged({
-        unitId: String(unitId),
-        period: String(period),
-        nurseId: String(userId)
-      }),
-      getTriageAverageTime({
-        unitId: String(unitId),
-        period: String(period),
-        nurseId: String(userId)
-      })
-    ])
-
     try {
+      const [waitingPatients, triagedPatients, averageTime] = await Promise.all(
+        [
+          getWaitingForTriage({
+            unitId: String(unitId)
+          }),
+          getTriaged({
+            unitId: String(unitId),
+            period: String(period),
+            nurseId: String(userId)
+          }),
+          getTriageAverageTime({
+            unitId: String(unitId),
+            period: String(period),
+            nurseId: String(userId)
+          })
+        ]
+      )
+
       return {
         waitingPatients,
         triagedPatients,

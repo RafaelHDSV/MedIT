@@ -467,11 +467,37 @@ export const getAttendanceByTime = async ({
               ? 12
               : 24
 
+    const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+    const monthNames = [
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez'
+    ]
+
     const hours = Array.from({ length: range }).map((_, index) => {
       const value = period === 'day' ? index : index + 1
       const found = result.find((r) => r.hour === value)
+
+      let label: string
+      if (period === 'week') {
+        label = weekDays[index]
+      } else if (period === 'year') {
+        label = monthNames[index]
+      } else {
+        label = String(value)
+      }
+
       return {
-        label: value,
+        label,
         total: found ? found.total : 0
       }
     })

@@ -116,7 +116,7 @@ function Dashboard() {
           {
             Icon: HourglassIcon,
             value: dashboardStatusData?.waitingPatients,
-            label: 'Pacientes aguardando'
+            label: 'Pacientes aguardando atendimento'
           },
           {
             Icon: CheckCircleIcon,
@@ -128,11 +128,13 @@ function Dashboard() {
             value: dashboardStatusData?.averageTime
               ? timeFormatter(dashboardStatusData.averageTime)
               : undefined,
-            label: 'Tempo médio'
+            label: 'Tempo médio de atendimento'
           },
           {
             Icon: UsersThreeIcon,
-            value: `${dashboardStatusData?.assertiveness}%`,
+            value: dashboardStatusData?.assertiveness
+              ? `${dashboardStatusData?.assertiveness}%`
+              : 'N/A',
             label: 'Assertividade IA vs Médico(a)'
           }
         ]
@@ -141,7 +143,7 @@ function Dashboard() {
           {
             Icon: HourglassIcon,
             value: dashboardStatusData?.waitingPatients,
-            label: 'Pacientes aguardando'
+            label: 'Pacientes aguardando triagem'
           },
           {
             Icon: CheckCircleIcon,
@@ -153,7 +155,7 @@ function Dashboard() {
             value: dashboardStatusData?.averageTime
               ? timeFormatter(dashboardStatusData.averageTime)
               : undefined,
-            label: 'Tempo médio'
+            label: 'Tempo médio de triagem'
           }
         ]
       case UserLevels.PATIENT:

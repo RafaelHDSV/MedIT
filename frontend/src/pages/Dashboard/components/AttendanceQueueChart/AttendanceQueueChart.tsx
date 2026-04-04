@@ -66,6 +66,8 @@ function AttendanceQueueChart({ selectedPeriod }: IAttendanceQueueChartProps) {
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true)
+
       try {
         const response = await api.get('/dashboard/attendance-queue', {
           params: {
@@ -103,10 +105,7 @@ function AttendanceQueueChart({ selectedPeriod }: IAttendanceQueueChartProps) {
               <AttendanceItem key={i} loading={loading} />
             ))
           : data.map((item) => (
-              <AttendanceItem
-                key={`${item.patientName}_${item.risk}`}
-                item={item}
-              />
+              <AttendanceItem key={String(item._id)} item={item} />
             ))}
       </div>
     </DashboardCard>
