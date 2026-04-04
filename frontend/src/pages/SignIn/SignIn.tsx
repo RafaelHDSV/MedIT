@@ -39,8 +39,8 @@ export default function SignIn() {
         payload.cpf = cleanIdentifier
       }
 
-      const success = await login(payload)
-      if (success) navigate(ROUTES.DASHBOARD.path)
+      await login(payload)
+      navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
       console.error(err)
       message.error('Email/CPF ou senha inválidos')
