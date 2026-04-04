@@ -52,6 +52,7 @@ function Attendances() {
 
         <ListTable<IAttendance>
           dataSource={attendances}
+          pageSize={8}
           columns={columns}
           loading={loading}
           onReload={fetchAttendances}

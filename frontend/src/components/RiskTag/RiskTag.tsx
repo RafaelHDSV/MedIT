@@ -1,4 +1,5 @@
 import { AttendanceRisk, AttendanceRiskLabels } from '@/interfaces/IAttendance'
+import { Tooltip } from 'antd'
 import styles from './RiskTag.module.scss'
 
 interface IRiskTagProps {
@@ -36,18 +37,22 @@ function RiskTag({ risk }: IRiskTagProps) {
     }
   }
 
+  const label = AttendanceRiskLabels[risk]
+
   return (
-    <span
-      className={`${styles.tag} ellipsis`}
-      style={
-        {
-          '--color': colors[risk].color,
-          '--bgColor': colors[risk].bgColor
-        } as React.CSSProperties & Record<string, string>
-      }
-    >
-      {AttendanceRiskLabels[risk]}
-    </span>
+    <Tooltip title={label}>
+      <span
+        className={`${styles.tag} ellipsis`}
+        style={
+          {
+            '--color': colors[risk].color,
+            '--bgColor': colors[risk].bgColor
+          } as React.CSSProperties & Record<string, string>
+        }
+      >
+        {label}
+      </span>
+    </Tooltip>
   )
 }
 
