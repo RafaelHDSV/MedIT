@@ -23,6 +23,7 @@ import { useParams } from 'react-router-dom'
 import PatientModal from '../Patients/components/PatientModal/PatientModal'
 import styles from './PatientsDetails.module.scss'
 
+// VIEIRA: Remover mock
 const mockedLastAttendance = {
   patientComplaint: 'Febre e dores',
   Temperature: '37.8°C',
@@ -32,6 +33,7 @@ const mockedLastAttendance = {
 }
 
 // VIEIRA: Corrigir tipagem any
+// VIEIRA: Remover mock
 const mockedAttendanceRecords: any[] = [
   {
     name: 'Maria Santos',
