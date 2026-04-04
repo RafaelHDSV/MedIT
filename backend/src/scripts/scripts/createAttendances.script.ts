@@ -15,6 +15,10 @@ const createAttendances = {
   description: 'Simulação de 1 ano de atendimentos (realista)',
 
   async run() {
+    console.log('❌ Deletando os atendimentos já criados anteriormente')
+    const deleted = await Attendance.deleteMany()
+    console.log(`❌ Deletando ${deleted.deletedCount} atendimentos`)
+
     console.log('🚀 Criando atendimentos do ANO inteiro...')
 
     const patients = await Patient.find()
