@@ -35,6 +35,7 @@ function Dashboard() {
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.DAY)
+  const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
 
   useEffect(() => {
     async function fetchDashboardStatus() {
@@ -196,16 +197,18 @@ function Dashboard() {
     <>
       <AuthLayoutHeader
         actionComponent={
-          <InputSelect
-            className={styles.periodSelect}
-            placeholder='Período'
-            options={Object.entries(PeriodsLabels).map(([key, value]) => ({
-              label: value,
-              value: key
-            }))}
-            value={selectedPeriod}
-            onChange={setSelectedPeriod}
-          />
+          shouldShowPeriodSelect && (
+            <InputSelect
+              className={styles.periodSelect}
+              placeholder='Período'
+              options={Object.entries(PeriodsLabels).map(([key, value]) => ({
+                label: value,
+                value: key
+              }))}
+              value={selectedPeriod}
+              onChange={setSelectedPeriod}
+            />
+          )
         }
       />
 

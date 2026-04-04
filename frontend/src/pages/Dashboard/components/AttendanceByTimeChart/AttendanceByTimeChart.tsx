@@ -121,9 +121,7 @@ function AttendanceByTimeChart({
                     className={`${styles.bar} ${item.total === 0 ? styles.barEmpty : ''}`}
                     style={{
                       height:
-                        item.total > 0
-                          ? `${(item.total / max) * 180}px`
-                          : '16px'
+                        item.total > 0 ? `${(item.total / max) * 180}px` : '8px'
                     }}
                   />
                 </Tooltip>
