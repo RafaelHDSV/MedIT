@@ -24,7 +24,7 @@ export function useAttendancesColumns() {
     handleNavigateToDetails
   })
 
-  // VIEIRA: Desenvolver a funcionalidade da assertividade da IA
+  // VIEIRA: Adicionar assertividade IA
   const assertivenessIA = true
 
   const columns: ColumnsType<IAttendance> = useMemo(
