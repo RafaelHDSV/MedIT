@@ -1,7 +1,7 @@
-import { api } from '@/api/api'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
+import DoctorsRepository from '@/repositories/DoctorsRepository'
 import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import { message, Modal } from 'antd'
@@ -52,7 +52,7 @@ export function useDoctorsColumns({
         okButtonProps: { danger: true },
         async onOk() {
           try {
-            await api.delete(`/doctors/${doctor._id}`)
+            await DoctorsRepository.deleteDoctor({ doctorId: doctor._id })
             message.success('Médico(a) deletado com sucesso!')
             fetchDoctors()
           } catch (err) {

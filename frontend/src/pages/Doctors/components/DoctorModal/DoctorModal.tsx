@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import {
   FormItem,
@@ -16,6 +15,7 @@ import {
 } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import DoctorsRepository from '@/repositories/DoctorsRepository'
 import capitalize from '@/utils/capitalize'
 import masks from '@/utils/masks'
 import validators, { birthDateValidator } from '@/utils/validators'
@@ -69,9 +69,12 @@ function ModalContent({
       setLoading(true)
 
       if (isEditMode) {
-        await api.put(`/doctors/${doctor?._id || params.id}`, {
-          ...values,
-          crm: masks(values.crm, 'crm')
+        await DoctorsRepository.editDoctor({
+          doctorId: doctor?._id || params.id,
+          body: {
+            ...values,
+            crm: masks(values.crm, 'crm')
+          }
         })
 
         if (useOnlyModal) {
@@ -80,7 +83,9 @@ function ModalContent({
           fetchDoctorDetails?.()
         }
       } else {
-        await api.post('/doctors', { ...values, crm: masks(values.crm, 'crm') })
+        await DoctorsRepository.createDoctor({
+          body: { ...values, crm: masks(values.crm, 'crm') }
+        })
         fetchDoctors?.()
       }
 

@@ -1,10 +1,4 @@
-import type { IError } from '@/interfaces/IError'
-import { message } from 'antd'
-import axios, {
-  AxiosError,
-  type AxiosInstance,
-  type AxiosResponse
-} from 'axios'
+import { type AxiosInstance, type AxiosResponse } from 'axios'
 
 export interface IRepository {
   api: AxiosInstance
@@ -23,14 +17,7 @@ export class Repository {
   async handle<T>(
     request: () => Promise<AxiosResponse<T>>
   ): Promise<T | undefined> {
-    try {
-      const response = await request()
-      return response.data
-    } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-      console.error(error)
-      message.error(error.response?.data?.message)
-    }
+    const response = await request()
+    return response.data
   }
 }
