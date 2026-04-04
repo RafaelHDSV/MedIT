@@ -172,7 +172,7 @@ function Dashboard() {
         return (
           <>
             <AttendanceByTimeChart selectedPeriod={selectedPeriod} />
-            <AttendanceQueueChart selectedPeriod={selectedPeriod} />
+            <AttendanceQueueChart />
           </>
         )
       case UserLevels.DOCTOR:

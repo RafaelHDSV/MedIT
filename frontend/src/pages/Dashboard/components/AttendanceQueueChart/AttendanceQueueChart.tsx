@@ -55,11 +55,7 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
   )
 }
 
-interface IAttendanceQueueChartProps {
-  selectedPeriod: string
-}
-
-function AttendanceQueueChart({ selectedPeriod }: IAttendanceQueueChartProps) {
+function AttendanceQueueChart() {
   const { user } = useAuth()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -71,8 +67,7 @@ function AttendanceQueueChart({ selectedPeriod }: IAttendanceQueueChartProps) {
       try {
         const response = await api.get('/dashboard/attendance-queue', {
           params: {
-            unitId: user?.unitId,
-            period: selectedPeriod
+            unitId: user?.unitId
           }
         })
         const data = response.data.data
@@ -90,7 +85,7 @@ function AttendanceQueueChart({ selectedPeriod }: IAttendanceQueueChartProps) {
     }
 
     fetchData()
-  }, [user?.unitId, selectedPeriod])
+  }, [user?.unitId])
 
   return (
     <DashboardCard
