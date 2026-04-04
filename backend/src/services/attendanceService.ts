@@ -461,9 +461,9 @@ export const getAttendanceByTime = async ({
         : period === 'week'
           ? 7
           : period === 'month'
-            ? 31
+            ? end.getDate()
             : period === 'year'
-              ? 12
+              ? end.getMonth() + 1
               : 24
 
     const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']

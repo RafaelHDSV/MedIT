@@ -109,10 +109,19 @@ function AttendanceByTimeChart({
             ))
           : data.map((item, index) => (
               <div key={index} className={styles.barContainer}>
-                <Tooltip title={`${item.total} atendimentos`}>
+                <Tooltip
+                  title={
+                    item.total > 0
+                      ? `${item.total} atendimentos`
+                      : 'Sem atendimentos'
+                  }
+                >
                   <div
-                    className={styles.bar}
-                    style={{ height: `${(item.total / max) * 200}px` }}
+                    className={`${styles.bar} ${item.total === 0 ? styles.barEmpty : ''}`}
+                    style={{
+                      height:
+                        item.total > 0 ? `${(item.total / max) * 200}px` : '6px'
+                    }}
                   />
                 </Tooltip>
                 <span className={styles.label}>

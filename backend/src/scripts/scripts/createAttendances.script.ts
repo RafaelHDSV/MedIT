@@ -162,6 +162,7 @@ const createAttendances = {
 
         const date = new Date(currentDate)
         date.setHours(hour, minute)
+        if (date > now) continue
 
         const risk = faker.helpers.arrayElement(riskDistribution)
 
