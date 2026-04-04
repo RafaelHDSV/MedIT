@@ -1,4 +1,10 @@
 import { Request, Response } from 'express'
+import {
+  IAdminStatusCard,
+  IDashboardStatusCards,
+  IDoctorStatusCard,
+  INurseStatusCard
+} from '../interfaces/IDashboard.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import {
   getAttendanceByTime,
@@ -22,7 +28,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
 
   const unit = await getUnitService({ unitId: String(unitId) })
 
-  async function getAdminData() {
+  async function getAdminData(): Promise<IAdminStatusCard | undefined> {
     try {
       const [
         entries,
@@ -57,6 +63,17 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         })
       ])
 
+      if (
+        !entries ||
+        !inAttendance ||
+        !attended ||
+        !occupancy ||
+        !averageTime ||
+        !highRisk
+      ) {
+        throw new Error('Erro ao buscar dados do dashboard')
+      }
+
       return {
         entries,
         inAttendance,
@@ -70,7 +87,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     }
   }
 
-  async function getDoctorData() {
+  async function getDoctorData(): Promise<IDoctorStatusCard | undefined> {
     try {
       const [waitingPatients, attended, averageTime] = await Promise.all([
         getWaitingForDoctor({
@@ -87,6 +104,11 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
           doctorId: String(userId)
         })
       ])
+
+      if (!waitingPatients || !attended || !averageTime) {
+        throw new Error('Erro ao buscar dados do dashboard')
+      }
+
       return {
         waitingPatients,
         attended,
@@ -99,7 +121,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     }
   }
 
-  async function getNurseData() {
+  async function getNurseData(): Promise<INurseStatusCard | undefined> {
     try {
       const [waitingPatients, triagedPatients, averageTime] = await Promise.all(
         [
@@ -119,6 +141,10 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         ]
       )
 
+      if (!waitingPatients || !triagedPatients || !averageTime) {
+        throw new Error('Erro ao buscar dados do dashboard')
+      }
+
       return {
         waitingPatients,
         triagedPatients,
@@ -129,7 +155,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     }
   }
 
-  const data = async () => {
+  const data: () => Promise<IDashboardStatusCards | undefined> = async () => {
     switch (level) {
       case UserLevels.ADMIN:
         return await getAdminData()

@@ -107,6 +107,8 @@ const createAttendances = {
         [AttendanceRisk.NOT_URGENT]: 40
       }
 
+      const stepTime = timeMultiplier[risk] || 20
+
       if (diffMinutes > 180) {
         return {
           status: AttendanceStatus.COMPLETED,
@@ -116,8 +118,6 @@ const createAttendances = {
           }))
         }
       }
-
-      const stepTime = timeMultiplier[risk] || 20
 
       const currentIndex = Math.min(
         Math.floor(diffMinutes / stepTime),

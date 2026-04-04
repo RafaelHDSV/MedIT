@@ -1,7 +1,6 @@
 import { Types } from 'mongoose'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { Attendance } from '../models/AttendanceModel.js'
-import { Patient } from '../models/PatientModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 
 const ACTIVE_STATUSES = [
@@ -514,26 +513,21 @@ export const getAttendanceQueue = async ({ unitId }: { unitId: string }) => {
       unitId,
       status: { $in: ACTIVE_STATUSES }
     })
+      .populate('patientId', 'name')
       .sort({
         risk: 1,
         date: 1
       })
       .lean()
 
-    const formatted = await Promise.all(
-      data.map(async (item) => {
-        const patient = await Patient.findById(item.patientId).lean()
-
-        return {
-          _id: item._id,
-          patientName: patient?.name || 'Paciente',
-          status: item.status,
-          risk: item.risk
-        }
-      })
-    )
-
-    return formatted
+    return data.map((item) => {
+      return {
+        _id: item._id,
+        patientName: item.patientId?.name || 'Paciente',
+        status: item.status,
+        risk: item.risk
+      }
+    })
   } catch (err) {
     console.error(err)
     return []

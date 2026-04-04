@@ -91,9 +91,10 @@ function Dashboard() {
           },
           {
             Icon: BedIcon,
-            value: dashboardStatusData?.occupancy
-              ? `${dashboardStatusData?.occupancy}%`
-              : undefined,
+            value:
+              dashboardStatusData?.occupancy !== undefined
+                ? `${dashboardStatusData?.occupancy}%`
+                : undefined,
             label: 'Ocupação'
           },
           {
