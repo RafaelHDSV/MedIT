@@ -20,7 +20,10 @@ function AttendanceByTimeChart({
   const [data, setData] = useState<IDashboardAttendanceByTime[]>([])
   const [loading, setLoading] = useState(true)
   const max = Math.max(...data.map((d) => d.total), 1)
-  const avg = data.reduce((sum, d) => sum + d.total, 0) / data.length
+  const avg =
+    data.length > 0
+      ? data.reduce((sum, d) => sum + d.total, 0) / data.length
+      : 0
 
   useEffect(() => {
     async function fetchAttendanceByTime() {
@@ -104,23 +107,20 @@ function AttendanceByTimeChart({
                 <span className={`${styles.label} ${styles.skeleton}`} />
               </div>
             ))
-          : data.map(
-              (item, index) =>
-                item.total > 0 && (
-                  <div key={index} className={styles.barContainer}>
-                    <Tooltip title={`${item.total} atendimentos`}>
-                      <div
-                        className={styles.bar}
-                        style={{ height: `${(item.total / max) * 200}px` }}
-                      />
-                    </Tooltip>
-                    <span className={styles.label}>
-                      {item.label}
-                      {periodLabels.suffix}
-                    </span>
-                  </div>
-                )
-            )}
+          : data.map((item, index) => (
+              <div key={index} className={styles.barContainer}>
+                <Tooltip title={`${item.total} atendimentos`}>
+                  <div
+                    className={styles.bar}
+                    style={{ height: `${(item.total / max) * 200}px` }}
+                  />
+                </Tooltip>
+                <span className={styles.label}>
+                  {item.label}
+                  {periodLabels.suffix}
+                </span>
+              </div>
+            ))}
       </div>
     </DashboardCard>
   )

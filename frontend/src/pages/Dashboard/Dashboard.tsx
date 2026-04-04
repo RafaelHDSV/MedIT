@@ -125,7 +125,9 @@ function Dashboard() {
           },
           {
             Icon: TimerIcon,
-            value: `${dashboardStatusData?.averageTime}min`,
+            value: dashboardStatusData?.averageTime
+              ? timeFormatter(dashboardStatusData.averageTime)
+              : undefined,
             label: 'Tempo médio'
           },
           {
@@ -148,7 +150,9 @@ function Dashboard() {
           },
           {
             Icon: TimerIcon,
-            value: `${dashboardStatusData?.averageTime}min`,
+            value: dashboardStatusData?.averageTime
+              ? timeFormatter(dashboardStatusData.averageTime)
+              : undefined,
             label: 'Tempo médio'
           }
         ]

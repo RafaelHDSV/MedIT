@@ -12,7 +12,8 @@ import {
   getInAttendance,
   getTriageAverageTime,
   getTriaged,
-  getWaitingForDoctor
+  getWaitingForDoctor,
+  getWaitingForTriage
 } from '../services/attendanceService.js'
 import { getUnitService } from '../services/unitService.js'
 
@@ -36,8 +37,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
           period: String(period)
         }),
         getInAttendance({
-          unitId: String(unitId),
-          period: String(period)
+          unitId: String(unitId)
         }),
         getAttended({
           unitId: String(unitId),
@@ -101,7 +101,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
 
   async function getNurseData() {
     const [waitingPatients, triagedPatients, averageTime] = await Promise.all([
-      getWaitingForDoctor({
+      getWaitingForTriage({
         unitId: String(unitId)
       }),
       getTriaged({
@@ -183,8 +183,7 @@ export const getDashboardAttendanceQueue = async (
     const { unitId, period } = req.query
 
     const data = await getAttendanceQueue({
-      unitId: String(unitId),
-      period: String(period)
+      unitId: String(unitId)
     })
 
     res.json({

@@ -32,20 +32,11 @@ export const getEntries = async ({
   }
 }
 
-export const getInAttendance = async ({
-  unitId,
-  period
-}: {
-  unitId: string
-  period: string
-}) => {
+export const getInAttendance = async ({ unitId }: { unitId: string }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
-
     return await Attendance.countDocuments({
       unitId,
-      status: { $in: ACTIVE_STATUSES },
-      date: { $gte: start, $lte: end }
+      status: { $in: ACTIVE_STATUSES }
     })
   } catch (err) {
     console.error(err)
@@ -491,20 +482,11 @@ export const getAttendanceByTime = async ({
   }
 }
 
-export const getAttendanceQueue = async ({
-  unitId,
-  period
-}: {
-  unitId: string
-  period: string
-}) => {
+export const getAttendanceQueue = async ({ unitId }: { unitId: string }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
-
     const data = await Attendance.find({
       unitId,
-      status: { $in: ACTIVE_STATUSES },
-      date: { $gte: start, $lte: end }
+      status: { $in: ACTIVE_STATUSES }
     })
       .sort({
         risk: 1,

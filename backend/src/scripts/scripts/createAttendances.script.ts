@@ -107,6 +107,16 @@ const createAttendances = {
         [AttendanceRisk.NOT_URGENT]: 40
       }
 
+      if (diffMinutes > 180) {
+        return {
+          status: AttendanceStatus.COMPLETED,
+          history: flow.map((status, i) => ({
+            status,
+            changedAt: new Date(date.getTime() + i * stepTime * 60000)
+          }))
+        }
+      }
+
       const stepTime = timeMultiplier[risk] || 20
 
       const currentIndex = Math.min(
@@ -145,7 +155,7 @@ const createAttendances = {
       const attendancesPerDay = getAttendancesPerDay(currentDate)
 
       for (let i = 0; i < attendancesPerDay; i++) {
-        const hour = faker.number.int({ min: 0, max: 23 })
+        const hour = faker.number.int({ min: 6, max: 22 })
         const minute = faker.number.int({ min: 0, max: 59 })
 
         const date = new Date(currentDate)
