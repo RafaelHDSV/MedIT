@@ -80,7 +80,10 @@ function DoctorDetails() {
       const response = await UserRepository.getDetails({ userId: params.id })
       setDoctor(response)
     } catch (err) {
-      handleApiError(err, 'Erro ao carregar detalhes do médico(a)')
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao carregar detalhes do médico(a)'
+      })
     } finally {
       setLoading(false)
     }

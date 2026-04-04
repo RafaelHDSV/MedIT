@@ -36,7 +36,7 @@ export function AuthProvider({ children }: Props) {
 
       return true
     } catch (err) {
-      handleApiError(err, 'Email/CPF ou senha inválidos')
+      handleApiError({ err, defaultMessage: 'Email/CPF ou senha inválidos' })
     }
   }
 
