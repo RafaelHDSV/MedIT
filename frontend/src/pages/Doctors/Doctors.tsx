@@ -1,8 +1,8 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { IError } from '@/interfaces/IError'
+import DoctorsRepository from '@/repositories/DoctorsRepository'
 import { Flex, message } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
@@ -21,9 +21,8 @@ function Doctors() {
     setLoading(true)
 
     try {
-      const response = await api.get('/doctors')
-      const data = response.data
-      setDoctors(data)
+      const response = await DoctorsRepository.getDoctor()
+      setDoctors(response)
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>

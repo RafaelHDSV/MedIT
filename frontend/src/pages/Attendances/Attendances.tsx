@@ -1,9 +1,9 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
 import { useAuth } from '@/hooks/useAuth'
 import { type IAttendance } from '@/interfaces/IAttendance'
 import type { IError } from '@/interfaces/IError'
+import DoctorsRepository from '@/repositories/DoctorsRepository'
 import { Flex, message } from 'antd'
 import axios, { AxiosError } from 'axios'
 import { useCallback, useEffect, useState } from 'react'
@@ -19,9 +19,10 @@ function Attendances() {
     setLoading(true)
 
     try {
-      const response = await api.get(`/doctors/${user?._id}/attendances`)
-      const data = response.data
-      setAttendances(data)
+      const response = await DoctorsRepository.getAttendances({
+        doctorId: user?._id
+      })
+      setAttendances(response)
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>

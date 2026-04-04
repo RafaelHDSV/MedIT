@@ -22,12 +22,12 @@ app.get('/', (_req, res) => {
 })
 
 app.use('/auth', authRoutes)
-app.use('/users', usersRoutes)
-app.use('/doctors', doctorsRoutes)
-app.use('/nurses', nursesRoutes)
-app.use('/patients', patientsRoutes)
-app.use('/units', unitsRoutes)
-app.use('/dashboard', dashboardRoutes)
+app.use('/auth/users', usersRoutes)
+app.use('/auth/doctors', doctorsRoutes)
+app.use('/auth/nurses', nursesRoutes)
+app.use('/auth/patients', patientsRoutes)
+app.use('/auth/units', unitsRoutes)
+app.use('/auth/dashboard', dashboardRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando! ${PORT}`)
