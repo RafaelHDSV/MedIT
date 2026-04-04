@@ -1,26 +1,14 @@
 import type { Icon } from '@phosphor-icons/react'
 import { Skeleton } from 'antd'
+import type { IDetailsLineProps } from '../DetailsLine/DetailsLine'
+import DetailsLine from '../DetailsLine/DetailsLine'
 import styles from './UserDetailsCard.module.scss'
-
-interface IDetailsItemProps {
-  label: string
-  value?: string
-}
-
-function DetailsItem({ label, value }: IDetailsItemProps) {
-  return (
-    <div className={styles.detailsItem}>
-      <span className={styles.label}>{label}</span>
-      {value && <span className={styles.value}>{value}</span>}
-    </div>
-  )
-}
 
 interface IUserDetailsCardProps {
   Icon: Icon
   title: string
   className?: string
-  itens: IDetailsItemProps[]
+  itens?: IDetailsLineProps[]
   loading?: boolean
   useFullWidth?: boolean
 }
@@ -38,12 +26,8 @@ function UserDetailsCard({
       <section className={`${styles.card} ${className ?? ''}`}>
         <Skeleton active title={false} paragraph={{ rows: 1 }} />
 
-        {itens.map((item) => (
-          <Skeleton.Button
-            key={`${item.label}_${item.value}`}
-            className={styles.itemSkeleton}
-            active
-          />
+        {itens?.map((_item, index) => (
+          <Skeleton.Button key={index} className={styles.itemSkeleton} active />
         ))}
       </section>
     )
@@ -59,9 +43,9 @@ function UserDetailsCard({
       <div
         className={`${useFullWidth ? styles.twoColumns : styles.itemsContainer}`}
       >
-        {itens.map((item) => (
-          <DetailsItem
-            key={`${item.label}_${item.value}`}
+        {itens?.map((item, index) => (
+          <DetailsLine
+            key={item.key ? String(item.key) : String(index)}
             label={item.label}
             value={item.value}
           />

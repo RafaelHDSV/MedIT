@@ -4,6 +4,7 @@ import styles from './RiskTag.module.scss'
 
 interface IRiskTagProps {
   risk?: AttendanceRisk
+  className?: string
 }
 
 interface IRiskColors {
@@ -11,7 +12,7 @@ interface IRiskColors {
   bgColor: string
 }
 
-function RiskTag({ risk }: IRiskTagProps) {
+function RiskTag({ risk, className }: IRiskTagProps) {
   if (!risk) return
 
   const colors: Record<AttendanceRisk, IRiskColors> = {
@@ -38,11 +39,10 @@ function RiskTag({ risk }: IRiskTagProps) {
   }
 
   const label = AttendanceRiskLabels[risk]
-
   return (
-    <Tooltip title={label}>
+    <Tooltip title={label} className={className ?? ''}>
       <span
-        className={`${styles.tag} ellipsis`}
+        className={`${styles.tag} ellipsis ${className ?? ''}`}
         style={
           {
             '--color': colors[risk].color,

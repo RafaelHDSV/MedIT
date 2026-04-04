@@ -8,4 +8,11 @@
     text-align: center;
     margin: 0;
   }
+
+  .itemsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
 }

@@ -34,7 +34,11 @@ class DoctorsRepositoy extends Repository {
     })
   }
 
-  async getAttendances({ doctorId }: { doctorId: ObjectId | undefined }) {
+  async getAttendances({
+    doctorId
+  }: {
+    doctorId: ObjectId | string | undefined
+  }) {
     return this.handle(() => {
       return this.api.get(`${this.path}/${doctorId}/attendances`)
     })

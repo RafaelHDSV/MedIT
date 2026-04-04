@@ -39,7 +39,7 @@ function PreRegistrationModal({
       <section className={styles.container}>
         <h2 className={styles.title}>Confirmação de consulta</h2>
 
-        <div>
+        <div className={styles.itemsContainer}>
           <DetailsLine label='Queixa principal' value={mainComplaint} />
           <DetailsLine
             label='Os sintomas começaram'
