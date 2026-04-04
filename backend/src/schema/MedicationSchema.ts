@@ -1,5 +1,5 @@
-import mongoose from "mongoose"
-import { IMedication } from "../interfaces/IMedications.js"
+import mongoose from 'mongoose'
+import { IMedication } from '../interfaces/IMedications.js'
 
 const MedicationSchema = new mongoose.Schema<IMedication>(
   {
@@ -9,17 +9,17 @@ const MedicationSchema = new mongoose.Schema<IMedication>(
       trim: true,
       minlength: [2, 'O nome do medicamento deve ter pelo menos 2 caracteres']
     },
-    dosage: { 
+    dosage: {
       type: String,
       required: [true, 'A dosagem do medicamento é obrigatória'],
       trim: true
     },
-    frequency: { 
+    frequency: {
       type: String,
       required: [true, 'A frequência do medicamento é obrigatória'],
       trim: true
     },
-    route: { 
+    route: {
       type: String,
       required: [true, 'A via de administração do medicamento é obrigatória'],
       trim: true

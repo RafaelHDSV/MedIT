@@ -1,4 +1,4 @@
-import { IBaseInterface } from "./IBaseInterface.js"
+import { IBaseInterface } from './IBaseInterface.js'
 
 export interface IMedication extends IBaseInterface {
   name: string

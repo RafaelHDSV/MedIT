@@ -24,12 +24,12 @@ const normalizeAllergiesAndConditions: Script = {
       // Normalizar allergies
       if (patient.allergies?.length) {
         const newAllergies = patient.allergies
-          .flatMap((item: string) =>
-            item.split(',').map((i) => i.trim())
-          )
+          .flatMap((item: string) => item.split(',').map((i) => i.trim()))
           .filter(Boolean)
 
-        if (JSON.stringify(newAllergies) !== JSON.stringify(patient.allergies)) {
+        if (
+          JSON.stringify(newAllergies) !== JSON.stringify(patient.allergies)
+        ) {
           patient.allergies = newAllergies
           updated = true
         }
@@ -38,12 +38,12 @@ const normalizeAllergiesAndConditions: Script = {
       // Normalizar conditions
       if (patient.conditions?.length) {
         const newConditions = patient.conditions
-          .flatMap((item: string) =>
-            item.split(',').map((i) => i.trim())
-          )
+          .flatMap((item: string) => item.split(',').map((i) => i.trim()))
           .filter(Boolean)
 
-        if (JSON.stringify(newConditions) !== JSON.stringify(patient.conditions)) {
+        if (
+          JSON.stringify(newConditions) !== JSON.stringify(patient.conditions)
+        ) {
           patient.conditions = newConditions
           updated = true
         }
