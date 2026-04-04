@@ -36,6 +36,6 @@ export interface IDashboardQueueItem {
 }
 
 export interface IDashboardAttendanceByTime {
-  hour: number
+  label: number
   total: number
 }

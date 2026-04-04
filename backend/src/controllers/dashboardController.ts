@@ -36,7 +36,8 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
           period: String(period)
         }),
         getInAttendance({
-          unitId: String(unitId)
+          unitId: String(unitId),
+          period: String(period)
         }),
         getAttended({
           unitId: String(unitId),

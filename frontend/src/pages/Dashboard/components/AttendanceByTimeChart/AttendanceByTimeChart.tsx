@@ -68,13 +68,13 @@ function AttendanceByTimeChart({
             ))
           : data.map((item, index) => (
               <div key={index} className={styles.barContainer}>
-                <Tooltip title={`${item.total} atendimentos às ${item.hour}h`}>
+                <Tooltip title={`${item.total} atendimentos às ${item.label}h`}>
                   <div
                     className={styles.bar}
                     style={{ height: `${(item.total / max) * 200}px` }}
                   />
                 </Tooltip>
-                <span className={styles.label}>{item.hour}h</span>
+                <span className={styles.label}>{item.label}h</span>
               </div>
             ))}
       </div>

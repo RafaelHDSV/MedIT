@@ -4,6 +4,14 @@ import { Attendance } from '../models/AttendanceModel.js'
 import { Patient } from '../models/PatientModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 
+const ACTIVE_STATUSES = [
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE
+]
+
 // ADMIN
 export const getEntries = async ({
   unitId,
@@ -24,18 +32,20 @@ export const getEntries = async ({
   }
 }
 
-export const getInAttendance = async ({ unitId }: { unitId: string }) => {
+export const getInAttendance = async ({
+  unitId,
+  period
+}: {
+  unitId: string
+  period: string
+}) => {
   try {
-    const ACTIVE_STATUSES = [
-      AttendanceStatus.WAITING_TRIAGE,
-      AttendanceStatus.IN_TRIAGE,
-      AttendanceStatus.TRIAGE_COMPLETED,
-      AttendanceStatus.WAITING_ATTENDANCE,
-      AttendanceStatus.IN_ATTENDANCE
-    ]
+    const { start, end } = getPeriodDateRange(period)
+
     return await Attendance.countDocuments({
       unitId,
-      status: { $in: ACTIVE_STATUSES }
+      status: { $in: ACTIVE_STATUSES },
+      date: { $gte: start, $lte: end }
     })
   } catch (err) {
     console.error(err)
@@ -80,13 +90,7 @@ export const getAttendanceOcuppation = async ({
     const occupied = await Attendance.countDocuments({
       unitId,
       status: {
-        $in: [
-          AttendanceStatus.WAITING_TRIAGE,
-          AttendanceStatus.IN_TRIAGE,
-          AttendanceStatus.TRIAGE_COMPLETED,
-          AttendanceStatus.WAITING_ATTENDANCE,
-          AttendanceStatus.IN_ATTENDANCE
-        ]
+        $in: ACTIVE_STATUSES
       }
     })
 
@@ -428,6 +432,15 @@ export const getAttendanceByTime = async ({
   try {
     const { start, end } = getPeriodDateRange(period)
 
+    const groupBy =
+      period === 'day'
+        ? { $hour: '$date' }
+        : period === 'month'
+          ? { $dayOfMonth: '$date' }
+          : period === 'year'
+            ? { $month: '$date' }
+            : { $hour: '$date' }
+
     const result = await Attendance.aggregate([
       {
         $match: {
@@ -437,7 +450,7 @@ export const getAttendanceByTime = async ({
       },
       {
         $group: {
-          _id: { $hour: '$date' },
+          _id: groupBy,
           total: { $sum: 1 }
         }
       },
@@ -450,10 +463,20 @@ export const getAttendanceByTime = async ({
       }
     ])
 
-    const hours = Array.from({ length: 24 }).map((_, hour) => {
-      const found = result.find((r) => r.hour === hour)
+    const range =
+      period === 'day'
+        ? 24
+        : period === 'month'
+          ? 31
+          : period === 'year'
+            ? 12
+            : 24
+
+    const hours = Array.from({ length: range }).map((_, index) => {
+      const value = period === 'day' ? index : index + 1
+      const found = result.find((r) => r.hour === value)
       return {
-        hour,
+        label: index,
         total: found ? found.total : 0
       }
     })
@@ -476,13 +499,7 @@ export const getAttendanceQueue = async ({
 
     const data = await Attendance.find({
       unitId,
-      status: {
-        $nin: [
-          AttendanceStatus.CANCELED,
-          AttendanceStatus.COMPLETED,
-          AttendanceStatus.ATTENDANCE_COMPLETED
-        ]
-      },
+      status: { $in: ACTIVE_STATUSES },
       date: { $gte: start, $lte: end }
     })
       .sort({
