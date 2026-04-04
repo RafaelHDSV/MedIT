@@ -21,6 +21,7 @@ export const getAttendances = async (req: Request, res: Response) => {
         $project: {
           name: { $ifNull: ['$patient.name', null] },
           birthDate: { $ifNull: ['$patient.birthDate', null] },
+          number: 1,
           complaint: 1,
           diagnosis: 1,
           date: 1,

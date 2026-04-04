@@ -17,6 +17,10 @@ const VitalSignsSchema = new Schema(
 
 const AttendanceSchema = new Schema<IAttendance>(
   {
+    number: {
+      type: Number,
+      unique: true
+    },
     complaint: {
       type: String,
       required: true

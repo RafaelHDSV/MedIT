@@ -169,6 +169,8 @@ const createAttendances = {
       AttendanceStatus.IN_ATTENDANCE
     ]
 
+    let attendanceNumber = 1
+
     while (currentDate <= endDate) {
       const attendancesPerDay = getAttendancesPerDay(currentDate)
 
@@ -205,6 +207,7 @@ const createAttendances = {
           status === AttendanceStatus.COMPLETED
 
         attendances.push({
+          number: attendanceNumber++,
           complaint: faker.helpers.arrayElement(complaints),
           diagnosis: isFinished
             ? faker.helpers.arrayElement(diagnoses)
