@@ -1,13 +1,11 @@
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
+import { handleApiError } from '@/helpers/handleApiError'
 import type { IDoctor } from '@/interfaces/IDoctor'
-import type { IError } from '@/interfaces/IError'
 import DoctorsRepository from '@/repositories/DoctorsRepository'
 import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -56,11 +54,7 @@ export function useDoctorsColumns({
             message.success('Médico(a) deletado com sucesso!')
             fetchDoctors()
           } catch (err) {
-            if (!axios.isAxiosError(err)) return
-            const error = err as AxiosError<IError>
-            message.error(
-              error.response?.data?.message ?? 'Erro ao deletar médico(a)'
-            )
+            handleApiError({ err, defaultMessage: 'Erro ao deletar médico(a)' })
           }
         }
       })

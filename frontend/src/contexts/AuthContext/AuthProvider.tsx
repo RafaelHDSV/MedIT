@@ -1,10 +1,8 @@
-import type { IError } from '@/interfaces/IError'
+import { handleApiError } from '@/helpers/handleApiError'
 import { type IBaseUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
 import AuthRepository from '@/repositories/AuthRepository'
 import { message, Modal } from 'antd'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
 import { useState, type ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
 
@@ -18,11 +16,7 @@ export function AuthProvider({ children }: Props) {
     return stored ? JSON.parse(stored) : null
   })
 
-  async function login({
-    email,
-    cpf,
-    password
-  }: LoginPayload): Promise<boolean> {
+  async function login({ email, cpf, password }: LoginPayload) {
     try {
       const response = await AuthRepository.login({
         body: {
@@ -42,16 +36,7 @@ export function AuthProvider({ children }: Props) {
 
       return true
     } catch (err) {
-      if (!axios.isAxiosError(err)) return false
-
-      const error = err as AxiosError<IError>
-
-      console.error('Erro no login', error)
-      message.error(
-        error.response?.data?.message || 'Email/CPF ou senha inválidos'
-      )
-
-      return false
+      handleApiError(err, 'Email/CPF ou senha inválidos')
     }
   }
 

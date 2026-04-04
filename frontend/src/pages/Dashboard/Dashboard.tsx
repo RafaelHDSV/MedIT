@@ -1,10 +1,10 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import { InputSelect } from '@/components/FormComponents/FormComponents'
+import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import { Periods, PeriodsLabels } from '@/interfaces/globals'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
-import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { ROUTES } from '@/routes/constants'
@@ -19,8 +19,6 @@ import {
   TimerIcon,
   UsersThreeIcon
 } from '@phosphor-icons/react'
-import { message } from 'antd'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
@@ -53,12 +51,10 @@ function Dashboard() {
         const data = response.data
         setDashboardStatusData(data)
       } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao pegar dados do dashboard'
-        )
+        handleApiError({
+          err,
+          defaultMessage: 'Erro ao pegar dados do dashboard'
+        })
       } finally {
         setLoading(false)
       }

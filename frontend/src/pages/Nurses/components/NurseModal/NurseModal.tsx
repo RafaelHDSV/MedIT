@@ -6,8 +6,8 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { DayjsType } from '@/components/MultiDatepicker/types'
+import { handleApiError } from '@/helpers/handleApiError'
 import { UF } from '@/interfaces/globals'
-import type { IError } from '@/interfaces/IError'
 import {
   NurseCorenType,
   NurseShiftsLabels,
@@ -20,7 +20,6 @@ import NursesRepository from '@/repositories/NursesRepository'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
@@ -89,22 +88,11 @@ function ModalContent({
       )
       handleClose()
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response?.data?.errors)
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro nas validações ao adicionar enfermeiro(a)'
-        )
-      } else {
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao adicionar enfermeiro(a)'
-        )
-      }
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao adicionar enfermeiro(a)',
+        setFieldErrors
+      })
     } finally {
       setLoading(false)
     }

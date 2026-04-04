@@ -2,14 +2,12 @@ import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
+import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
-import type { IError } from '@/interfaces/IError'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
-import { message } from 'antd'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
 
@@ -73,12 +71,10 @@ function AttendanceQueueChart() {
         const data = response.data
         setData(data)
       } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao pegar fila de atendimento'
-        )
+        handleApiError({
+          err,
+          defaultMessage: 'Erro ao pegar fila de atendimento'
+        })
       } finally {
         setLoading(false)
       }

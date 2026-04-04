@@ -1,9 +1,8 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
-import type { IError } from '@/interfaces/IError'
+import { handleApiError } from '@/helpers/handleApiError'
 import { Flex, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import axios, { AxiosError } from 'axios'
 import { useState } from 'react'
 import type {
   IPreRegistrationErrors,
@@ -30,22 +29,11 @@ function PreRegistration() {
 
       message.success(`Pré cadastro finalizado com sucesso!`)
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response?.data?.errors)
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro nas validações ao finalizar pré-cadastro. '
-        )
-      }
-
-      console.error(error)
-      message.error(
-        error.response?.data?.message || 'Erro ao finalizar pré-cadastro. '
-      )
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao finalizar pré-cadastro. ',
+        setFieldErrors
+      })
     } finally {
       setLoading(false)
     }

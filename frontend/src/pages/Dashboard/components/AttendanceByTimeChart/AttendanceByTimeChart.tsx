@@ -1,13 +1,12 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
+import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { Periods } from '@/interfaces/globals'
 import type { IDashboardAttendanceByTime } from '@/interfaces/IDashboard'
-import type { IError } from '@/interfaces/IError'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import masks from '@/utils/masks'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
-import { message, Tooltip } from 'antd'
-import axios, { AxiosError } from 'axios'
+import { Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
@@ -40,12 +39,10 @@ function AttendanceByTimeChart({
         const data = response.data
         setData(data)
       } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao pegar atendimentos por hora'
-        )
+        handleApiError({
+          err,
+          defaultMessage: 'Erro ao pegar atendimentos por hora'
+        })
       } finally {
         setLoading(false)
       }

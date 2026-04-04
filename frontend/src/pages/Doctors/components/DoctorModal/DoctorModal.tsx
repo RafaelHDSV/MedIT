@@ -6,6 +6,7 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { DayjsType } from '@/components/MultiDatepicker/types'
+import { handleApiError } from '@/helpers/handleApiError'
 import {
   DoctorSpecializations,
   DoctorSpecializationsLabels,
@@ -13,7 +14,6 @@ import {
   type IDoctor,
   type IDoctorFormErrors
 } from '@/interfaces/IDoctor'
-import type { IError } from '@/interfaces/IError'
 import { UserGendersLabels } from '@/interfaces/IUser'
 import DoctorsRepository from '@/repositories/DoctorsRepository'
 import capitalize from '@/utils/capitalize'
@@ -21,7 +21,6 @@ import masks from '@/utils/masks'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
@@ -94,22 +93,11 @@ function ModalContent({
       )
       handleClose()
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response?.data?.errors)
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro nas validações ao adicionar médico(a)'
-        )
-      } else {
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao adicionar médico(a)'
-        )
-      }
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao adicionar médico(a)',
+        setFieldErrors
+      })
     } finally {
       setLoading(false)
     }

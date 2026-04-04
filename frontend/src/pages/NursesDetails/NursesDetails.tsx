@@ -3,8 +3,8 @@ import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
+import { handleApiError } from '@/helpers/handleApiError'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
-import type { IError } from '@/interfaces/IError'
 import { NurseShiftsLabels, type INurse } from '@/interfaces/INurse'
 import UserRepository from '@/repositories/UserRepository'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
@@ -14,8 +14,7 @@ import {
   ChartBarIcon,
   DatabaseIcon
 } from '@phosphor-icons/react'
-import { Flex, message } from 'antd'
-import axios, { AxiosError } from 'axios'
+import { Flex } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -80,13 +79,10 @@ function NursesDetails() {
       const response = await UserRepository.getDetails({ userId: params.id })
       setNurse(response)
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-      console.error(error)
-      message.error(
-        error.response?.data?.message ||
-          'Erro ao carregar detalhes do enfermeiro(a)'
-      )
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao carregar detalhes do enfermeiro(a)'
+      })
     } finally {
       setLoading(false)
     }

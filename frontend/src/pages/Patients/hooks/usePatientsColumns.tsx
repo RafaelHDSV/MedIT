@@ -1,13 +1,12 @@
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
-import type { IError } from '@/interfaces/IError'
+import { handleApiError } from '@/helpers/handleApiError'
 import type { BloodType, IPatient } from '@/interfaces/IPatient'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import { DropIcon } from '@phosphor-icons/react'
 import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import axios, { AxiosError } from 'axios'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -55,11 +54,7 @@ export function usePatientsColumns({
             message.success('Paciente deletado com sucesso!')
             fetchPatients()
           } catch (err) {
-            if (!axios.isAxiosError(err)) return
-            const error = err as AxiosError<IError>
-            message.error(
-              error.response?.data?.message ?? 'Erro ao deletar paciente'
-            )
+            handleApiError({ err, defaultMessage: 'Erro ao deletar paciente' })
           }
         }
       })
