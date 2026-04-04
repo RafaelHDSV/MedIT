@@ -11,8 +11,8 @@ import TooltipColumn from '../components/TooltipColumn/TooltipColumn'
 
 interface IGetCommonColumnsProps<K> {
   handleNavigateToDetails: (id: ObjectId | undefined) => void
-  handleEdit: (doctor: K) => void
-  handleDelete: (doctor: K) => void
+  handleEdit?: (entity: K) => void
+  handleDelete?: (entity: K) => void
 }
 
 export function getCommonColumns<K extends { _id?: ObjectId }>({
@@ -116,7 +116,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
           <Tooltip title='Editar'>
             <Button
               mode='icon'
-              onClick={() => handleEdit(record)}
+              onClick={() => handleEdit?.(record)}
               aria-label='Editar médico(a)'
             >
               <EditOutlined />
@@ -126,7 +126,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
           <Tooltip title='Deletar'>
             <Button
               mode='icon'
-              onClick={() => handleDelete(record)}
+              onClick={() => handleDelete?.(record)}
               aria-label='Deletar médico(a)'
             >
               <DeleteOutlined />

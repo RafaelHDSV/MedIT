@@ -71,7 +71,7 @@ function ITriages() {
       <AuthLayoutHeader />
 
       <Table
-        className={styles.userTable}
+        className={styles.listTable}
         rowKey='_id'
         dataSource={data}
         columns={columns}

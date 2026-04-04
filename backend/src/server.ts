@@ -2,13 +2,14 @@ import cors from 'cors'
 import express from 'express'
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
+import attendancesRoutes from './routes/attendancesRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import dashboardRoutes from './routes/dashboardRoutes.js'
 import doctorsRoutes from './routes/doctorsRoutes.js'
 import nursesRoutes from './routes/nursesRoutes.js'
 import patientsRoutes from './routes/patientsRoutes.js'
 import unitsRoutes from './routes/unitsRoutes.js'
-import userRoutes from './routes/userRoutes.js'
+import usersRoutes from './routes/usersRoutes.js'
 
 const app = express()
 
@@ -22,12 +23,13 @@ app.get('/', (_req, res) => {
 })
 
 app.use('/auth', authRoutes)
-app.use('/users', userRoutes)
+app.use('/users', usersRoutes)
 app.use('/doctors', doctorsRoutes)
 app.use('/nurses', nursesRoutes)
 app.use('/patients', patientsRoutes)
 app.use('/units', unitsRoutes)
 app.use('/dashboard', dashboardRoutes)
+app.use('/attendances', attendancesRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando! ${PORT}`)

@@ -19,6 +19,7 @@ export function useTriagesColumns() {
     [navigate]
   )
 
+  // VIEIRA: Usar common columns
   const columns: ColumnsType<IAttendance> = useMemo(
     () => [
       {

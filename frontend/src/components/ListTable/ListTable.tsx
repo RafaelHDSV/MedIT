@@ -43,7 +43,7 @@ function ListTable<K>({
 
       <div className={styles.tableWrapper}>
         <Table
-          className={styles.userTable}
+          className={styles.listTable}
           rowKey='_id'
           dataSource={dataSource}
           columns={columns}

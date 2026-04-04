@@ -1,81 +1,64 @@
+import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import { AttendanceRisk } from '@/interfaces/IAttendance'
-import { ObjectId } from '@/utils/objectId'
-import { Table } from 'antd'
+import ListTable from '@/components/ListTable/ListTable'
+import { useAuth } from '@/hooks/useAuth'
+import { type IAttendance } from '@/interfaces/IAttendance'
+import type { IError } from '@/interfaces/IError'
+import { Flex, message } from 'antd'
+import axios, { AxiosError } from 'axios'
+import { useCallback, useEffect, useState } from 'react'
 import styles from '../../components/ListTable/ListTable.module.scss'
 import { useAttendancesColumns } from './hooks/useAttendancesColumns'
 
-function IAttendances() {
+function Attendances() {
+  const { user } = useAuth()
+  const [attendances, setAttendances] = useState<IAttendance[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchAttendances = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const response = await api.get('/attendances', {
+        params: {
+          doctorId: user?._id
+        }
+      })
+      const data = response.data
+      setAttendances(data)
+    } catch (err) {
+      if (!axios.isAxiosError(err)) return
+      const error = err as AxiosError<IError>
+      console.error(error)
+      message.error(
+        error.response?.data?.message ||
+          'Erro ao carregar a listagem de atendimentos'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }, [user?._id])
+
+  useEffect(() => {
+    fetchAttendances()
+  }, [fetchAttendances])
+
   const columns = useAttendancesColumns()
 
-  // VIEIRA: Corrigir tipagem any
-  const data: any = [
-    {
-      _id: ObjectId('69bef9b46b9f5d4381a706a9'),
-      number: 1,
-      complaint: 'Náusea',
-      diagnosis: 'Gastroenterite',
-      date: new Date(),
-      risk: AttendanceRisk.EMERGENCY
-    },
-    {
-      _id: ObjectId('69bef9bc7e5523fdd7c7a18b'),
-      number: 2,
-      complaint: 'Dor de cabeça',
-      diagnosis: 'Enxaqueca',
-      date: new Date(),
-      risk: AttendanceRisk.URGENT
-    },
-    {
-      _id: ObjectId('69bef9bedb1e8c62ac29e060'),
-      number: 3,
-      complaint: 'Dor abdominal',
-      diagnosis: 'Apendicite',
-      date: new Date(),
-      risk: AttendanceRisk.NOT_URGENT
-    },
-    {
-      _id: ObjectId('69bef9c1d09e37a45f690251'),
-      number: 4,
-      complaint: 'Febre',
-      diagnosis: 'Infecção viral',
-      date: new Date(),
-      risk: AttendanceRisk.LESS_URGENT
-    },
-    {
-      _id: ObjectId('69bef9c39f7bcc9313543d2a'),
-      number: 5,
-      complaint: 'Tosse',
-      diagnosis: 'Bronquite',
-      date: new Date(),
-      risk: AttendanceRisk.VERY_URGENT
-    },
-    {
-      _id: ObjectId('69bef9c5d686012355a4cf4d'),
-      number: 6,
-      complaint: 'Dor de garganta',
-      diagnosis: 'Faringite',
-      date: new Date(),
-      risk: AttendanceRisk.URGENT
-    }
-  ]
-
   return (
-    <div className='h-100'>
-      <AuthLayoutHeader />
+    <div className={styles.tableContent}>
+      <Flex vertical className={styles.container}>
+        <AuthLayoutHeader />
 
-      <Table
-        className={styles.userTable}
-        rowKey='_id'
-        dataSource={data}
-        columns={columns}
-        pagination={{ pageSize: 9 }}
-        size='middle'
-        bordered={false}
-        scroll={{ x: 'max-content' }}
-      />
+        <ListTable<IAttendance>
+          dataSource={attendances}
+          columns={columns}
+          loading={loading}
+          onReload={fetchAttendances}
+        />
+      </Flex>
     </div>
   )
 }
 
-export default IAttendances
+export default Attendances
