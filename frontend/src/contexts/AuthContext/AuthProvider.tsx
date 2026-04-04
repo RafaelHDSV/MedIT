@@ -1,7 +1,7 @@
-import { api } from '@/api/api'
 import type { IError } from '@/interfaces/IError'
 import { type IBaseUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
+import AuthRepository from '@/repositories/AuthRepository'
 import { message, Modal } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
@@ -24,13 +24,15 @@ export function AuthProvider({ children }: Props) {
     password
   }: LoginPayload): Promise<boolean> {
     try {
-      const response = await api.post('/auth/login', {
-        email,
-        cpf,
-        password
+      const response = await AuthRepository.login({
+        body: {
+          email,
+          cpf,
+          password
+        }
       })
 
-      const { accessToken, refreshToken, user } = response.data
+      const { accessToken, refreshToken, user } = response
 
       setUser(user)
 
@@ -83,7 +85,7 @@ export function AuthProvider({ children }: Props) {
         try {
           const refreshToken = localStorage.getItem('refreshToken')
 
-          await api.post('/auth/logout', { refreshToken })
+          await AuthRepository.logout({ refreshToken })
 
           localStorage.removeItem('accessToken')
           localStorage.removeItem('refreshToken')

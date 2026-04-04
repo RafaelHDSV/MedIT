@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { TagStatuses } from '@/components/Tag/Tag'
@@ -7,6 +6,7 @@ import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import { AttendanceRisk } from '@/interfaces/IAttendance'
 import type { IError } from '@/interfaces/IError'
 import { NurseShiftsLabels, type INurse } from '@/interfaces/INurse'
+import UserRepository from '@/repositories/UserRepository'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
@@ -77,9 +77,8 @@ function NursesDetails() {
     setLoading(true)
 
     try {
-      const response = await api.get(`/users/${params.id}`)
-      const data = response.data
-      setNurse(data)
+      const response = await UserRepository.getDetails({ userId: params.id })
+      setNurse(response)
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>

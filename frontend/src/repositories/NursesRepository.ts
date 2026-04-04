@@ -1,0 +1,48 @@
+import { api } from '@/api/api'
+import type { NurseFormValues } from '@/interfaces/INurse'
+import type { ObjectId } from 'mongoose'
+import { Repository } from './Repository'
+
+class NursesRepositoy extends Repository {
+  async getNurse() {
+    return this.handle(() => {
+      return this.api.get(`${this.path}`)
+    })
+  }
+
+  async createNurse({ body }: { body: NurseFormValues }) {
+    return this.handle(() => {
+      return this.api.post(`${this.path}`, body)
+    })
+  }
+
+  async editNurse({
+    nurseId,
+    body
+  }: {
+    nurseId: string | ObjectId | undefined
+    body: NurseFormValues
+  }) {
+    return this.handle(() => {
+      return this.api.put(`${this.path}/${nurseId}`, body)
+    })
+  }
+
+  async deleteNurse({ nurseId }: { nurseId: ObjectId | undefined }) {
+    return this.handle(() => {
+      return this.api.delete(`${this.path}/${nurseId}`)
+    })
+  }
+
+  // VIEIRA: Utilizar rota
+  async getAttendances({ nurseId }: { nurseId: ObjectId | undefined }) {
+    return this.handle(() => {
+      return this.api.get(`${this.path}/${nurseId}/attendances`)
+    })
+  }
+}
+
+export default new NursesRepositoy({
+  path: '/auth/nurses',
+  api
+})

@@ -1,8 +1,8 @@
-import { api } from '@/api/api'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import type { IError } from '@/interfaces/IError'
 import type { BloodType, IPatient } from '@/interfaces/IPatient'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import { DropIcon } from '@phosphor-icons/react'
 import { message, Modal } from 'antd'
@@ -51,7 +51,7 @@ export function usePatientsColumns({
         okButtonProps: { danger: true },
         async onOk() {
           try {
-            await api.delete(`/patients/${patient._id}`)
+            await PatientsRepository.deletePatient({ patientId: patient._id })
             message.success('Paciente deletado com sucesso!')
             fetchPatients()
           } catch (err) {

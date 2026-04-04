@@ -1,8 +1,9 @@
-import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { useAuth } from '@/hooks/useAuth'
+import type { Periods } from '@/interfaces/globals'
 import type { IDashboardAttendanceByTime } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
+import DashboardRepository from '@/repositories/DashboardRepository'
 import masks from '@/utils/masks'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
 import { message, Tooltip } from 'antd'
@@ -11,7 +12,7 @@ import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
 interface IAttendanceByTimeChartProps {
-  selectedPeriod: string
+  selectedPeriod: Periods
 }
 
 function AttendanceByTimeChart({
@@ -30,13 +31,13 @@ function AttendanceByTimeChart({
     async function fetchAttendanceByTime() {
       setLoading(true)
       try {
-        const response = await api.get('/dashboard/attendance-by-time', {
+        const response = await DashboardRepository.getAttendanceByTime({
           params: {
             unitId: user?.unitId,
             period: selectedPeriod
           }
         })
-        const data = response.data.data
+        const data = response.data
         setData(data)
       } catch (err) {
         if (!axios.isAxiosError(err)) return

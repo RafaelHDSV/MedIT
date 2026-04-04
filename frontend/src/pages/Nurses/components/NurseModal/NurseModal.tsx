@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import {
   FormItem,
@@ -17,6 +16,7 @@ import {
   type NurseFormValues
 } from '@/interfaces/INurse'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import NursesRepository from '@/repositories/NursesRepository'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
@@ -61,9 +61,12 @@ function ModalContent({
       setLoading(true)
 
       if (isEditMode) {
-        await api.put(`/nurses/${nurse?._id || params.id}`, {
-          ...values,
-          coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+        await NursesRepository.editNurse({
+          nurseId: nurse?._id || params.id,
+          body: {
+            ...values,
+            coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+          }
         })
 
         if (useOnlyModal) {
@@ -72,9 +75,11 @@ function ModalContent({
           fetchNurseDetails?.()
         }
       } else {
-        await api.post('/nurses', {
-          ...values,
-          coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+        await NursesRepository.createNurse({
+          body: {
+            ...values,
+            coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+          }
         })
         fetchNurses?.()
       }

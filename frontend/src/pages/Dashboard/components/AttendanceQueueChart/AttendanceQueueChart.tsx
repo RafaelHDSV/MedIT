@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/RiskTag/RiskTag'
@@ -7,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
+import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import { message } from 'antd'
 import axios, { AxiosError } from 'axios'
@@ -65,12 +65,12 @@ function AttendanceQueueChart() {
       setLoading(true)
 
       try {
-        const response = await api.get('/dashboard/attendance-queue', {
+        const response = await DashboardRepository.getAttendanceQueue({
           params: {
             unitId: user?.unitId
           }
         })
-        const data = response.data.data
+        const data = response.data
         setData(data)
       } catch (err) {
         if (!axios.isAxiosError(err)) return

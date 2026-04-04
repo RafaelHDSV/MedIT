@@ -1,8 +1,8 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import type { IError } from '@/interfaces/IError'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
@@ -34,9 +34,11 @@ function SignUp() {
     try {
       const values = await formRef.validateFields()
 
-      await api.post('/patients', {
-        ...values,
-        cpf: values.cpf.replace(/\D/g, '')
+      await PatientsRepository.createPatient({
+        body: {
+          ...values,
+          cpf: values.cpf.replace(/\D/g, '')
+        }
       })
 
       message.success('Usuário criado com sucesso!')

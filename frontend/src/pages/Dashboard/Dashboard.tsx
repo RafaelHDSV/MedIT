@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import { InputSelect } from '@/components/FormComponents/FormComponents'
@@ -7,6 +6,7 @@ import { Periods, PeriodsLabels } from '@/interfaces/globals'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
+import DashboardRepository from '@/repositories/DashboardRepository'
 import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import { timeFormatter } from '@/utils/timeFormatter'
@@ -42,7 +42,7 @@ function Dashboard() {
       setLoading(true)
 
       try {
-        const response = await api.get(`/dashboard/status-cards`, {
+        const response = await DashboardRepository.getStatusCards({
           params: {
             userId: user?._id,
             unitId: user?.unitId,
@@ -50,7 +50,7 @@ function Dashboard() {
             period: selectedPeriod
           }
         })
-        const data = response.data.data
+        const data = response.data
         setDashboardStatusData(data)
       } catch (err) {
         if (!axios.isAxiosError(err)) return

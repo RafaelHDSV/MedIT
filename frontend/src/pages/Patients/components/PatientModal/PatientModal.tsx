@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import {
   FormItem,
@@ -15,6 +14,7 @@ import {
   type PatientFormValues
 } from '@/interfaces/IPatient'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
@@ -57,8 +57,11 @@ function ModalContent({
     try {
       setLoading(true)
 
-      await api.put(`/patients/${patient?._id || params.id}`, {
-        ...values
+      await PatientsRepository.editPatient({
+        patientId: patient?._id || params.id,
+        body: {
+          ...values
+        }
       })
 
       if (useOnlyModal) {

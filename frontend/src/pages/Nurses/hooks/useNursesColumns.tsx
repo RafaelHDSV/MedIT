@@ -1,8 +1,8 @@
-import { api } from '@/api/api'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import type { IError } from '@/interfaces/IError'
 import type { INurse } from '@/interfaces/INurse'
+import NursesRepository from '@/repositories/NursesRepository'
 import { ROUTES } from '@/routes/constants'
 import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
@@ -50,7 +50,7 @@ export function useNursesColumns({
         okButtonProps: { danger: true },
         async onOk() {
           try {
-            await api.delete(`/nurses/${nurse._id}`)
+            await NursesRepository.deleteNurse({ nurseId: nurse._id })
             message.success('Enfermeiro(a) deletado com sucesso!')
             fetchNurses()
           } catch (err) {

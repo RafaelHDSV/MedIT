@@ -1,8 +1,8 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
 import type { IError } from '@/interfaces/IError'
 import type { INurse } from '@/interfaces/INurse'
+import NursesRepository from '@/repositories/NursesRepository'
 import { Flex, message } from 'antd'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
@@ -21,9 +21,8 @@ function Nurses() {
     setLoading(true)
 
     try {
-      const response = await api.get('/nurses')
-      const data = response.data
-      setNurses(data)
+      const response = await NursesRepository.getNurse()
+      setNurses(response)
     } catch (err) {
       if (!axios.isAxiosError(err)) return
       const error = err as AxiosError<IError>
