@@ -2,9 +2,9 @@
   "scripts": {
     "base": "git pull && yarn",
     "dev": "yarn base && concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
-    "format": "yarn base && concurrently \"yarn format:frontend\" \"yarn format:backend\"",
     "dev:frontend": "cd frontend && yarn && yarn dev",
     "dev:backend": "cd backend && yarn && yarn dev",
+    "format": "yarn base && concurrently \"yarn format:frontend\" \"yarn format:backend\"",
     "format:frontend": "cd frontend && yarn format",
     "format:backend": "cd backend && yarn format"
   },
