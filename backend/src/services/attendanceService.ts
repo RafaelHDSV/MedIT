@@ -531,7 +531,29 @@ export const getAttendanceQueue = async ({ unitId }: { unitId: string }) => {
         }
       },
       {
-        $sort: { risk: 1, date: 1 }
+        $addFields: {
+          riskPriority: {
+            $switch: {
+              branches: [
+                { case: { $eq: ['$risk', AttendanceRisk.EMERGENCY] }, then: 1 },
+                {
+                  case: { $eq: ['$risk', AttendanceRisk.VERY_URGENT] },
+                  then: 2
+                },
+                { case: { $eq: ['$risk', AttendanceRisk.URGENT] }, then: 3 },
+                {
+                  case: { $eq: ['$risk', AttendanceRisk.LESS_URGENT] },
+                  then: 4
+                },
+                { case: { $eq: ['$risk', AttendanceRisk.NOT_URGENT] }, then: 5 }
+              ],
+              default: 6
+            }
+          }
+        }
+      },
+      {
+        $sort: { riskPriority: 1, date: 1 }
       },
       {
         $project: {

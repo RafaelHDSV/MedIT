@@ -3,6 +3,7 @@ import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardAttendanceByTime } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
+import masks from '@/utils/masks'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
 import { message, Tooltip } from 'antd'
 import axios, { AxiosError } from 'axios'
@@ -112,7 +113,7 @@ function AttendanceByTimeChart({
                 <Tooltip
                   title={
                     item.total > 0
-                      ? `${item.total} atendimentos`
+                      ? `${masks(item.total, 'number')} atendimentos`
                       : 'Sem atendimentos'
                   }
                 >
@@ -120,7 +121,9 @@ function AttendanceByTimeChart({
                     className={`${styles.bar} ${item.total === 0 ? styles.barEmpty : ''}`}
                     style={{
                       height:
-                        item.total > 0 ? `${(item.total / max) * 200}px` : '6px'
+                        item.total > 0
+                          ? `${(item.total / max) * 200}px`
+                          : '16px'
                     }}
                   />
                 </Tooltip>
