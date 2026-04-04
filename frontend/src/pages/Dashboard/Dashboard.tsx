@@ -164,8 +164,8 @@ function Dashboard() {
       case UserLevels.ADMIN:
         return (
           <>
-            <AttendanceByTimeChart />
-            <AttendanceQueueChart />
+            <AttendanceByTimeChart selectedPeriod={selectedPeriod} />
+            <AttendanceQueueChart selectedPeriod={selectedPeriod} />
           </>
         )
       case UserLevels.DOCTOR:
@@ -183,7 +183,7 @@ function Dashboard() {
       default:
         return <></>
     }
-  }, [user?.level, navigate])
+  }, [user?.level, navigate, selectedPeriod])
 
   return (
     <>

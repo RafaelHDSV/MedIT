@@ -3,6 +3,8 @@ import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
+import { useAuth } from '@/hooks/useAuth'
+import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { StethoscopeIcon } from '@phosphor-icons/react'
@@ -41,7 +43,10 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
 
         <div className={styles.info}>
           <TooltipColumn className={styles.name} text={item?.patientName} />
-          <TooltipColumn className={styles.status} text={item?.status} />
+          <TooltipColumn
+            className={styles.status}
+            text={item?.status ? AttendanceStatusLabels[item?.status] : ''}
+          />
         </div>
       </div>
 
@@ -50,14 +55,24 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
   )
 }
 
-function AttendanceQueueChart() {
+interface IAttendanceQueueChartProps {
+  selectedPeriod: string
+}
+
+function AttendanceQueueChart({ selectedPeriod }: IAttendanceQueueChartProps) {
+  const { user } = useAuth()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await api.get('/dashboard/attendance-queue')
+        const response = await api.get('/dashboard/attendance-queue', {
+          params: {
+            unitId: user?.unitId,
+            period: selectedPeriod
+          }
+        })
         const data = response.data.data
         setData(data)
       } catch (err) {
@@ -73,13 +88,13 @@ function AttendanceQueueChart() {
     }
 
     fetchData()
-  }, [])
+  }, [user?.unitId, selectedPeriod])
 
   return (
     <DashboardCard
       title='Fila de Atendimento'
       icon={StethoscopeIcon}
-      asideText={`${data.length} atendimentos`}
+      asideText={`${data?.length} atendimentos`}
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>

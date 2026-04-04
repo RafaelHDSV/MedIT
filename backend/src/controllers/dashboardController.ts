@@ -1,9 +1,9 @@
-import { faker } from '@faker-js/faker'
 import { Request, Response } from 'express'
-import { AttendanceRisk } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import {
+  getAttendanceByTime,
   getAttendanceOcuppation,
+  getAttendanceQueue,
   getAttended,
   getAverageTime,
   getDoctorAverageTime,
@@ -156,10 +156,12 @@ export const getDashboardAttendanceByTime = async (
   res: Response
 ) => {
   try {
-    const data = Array.from({ length: 12 }).map((_, hour) => ({
-      hour,
-      total: Math.floor(Math.random() * 200)
-    }))
+    const { unitId, period } = req.query
+
+    const data = await getAttendanceByTime({
+      unitId: String(unitId),
+      period: String(period)
+    })
 
     res.json({
       message: 'Atendimentos por hora carregados com sucesso',
@@ -177,25 +179,12 @@ export const getDashboardAttendanceQueue = async (
   res: Response
 ) => {
   try {
-    const data = faker.helpers.multiple(
-      () => ({
-        _id: faker.string.uuid(),
-        patientName: faker.person.fullName(),
-        status: faker.helpers.arrayElement([
-          'Em transporte',
-          'Entrada',
-          'Aguardando Triagem',
-          'Em Triagem',
-          'Aguardando Médico',
-          'Em Atendimento',
-          'Aguardando Exames',
-          'Aguardando Resultados',
-          'Aguardando Alta'
-        ]),
-        risk: faker.helpers.arrayElement(Object.values(AttendanceRisk))
-      }),
-      { count: 66 }
-    )
+    const { unitId, period } = req.query
+
+    const data = await getAttendanceQueue({
+      unitId: String(unitId),
+      period: String(period)
+    })
 
     res.json({
       message: 'Fila de atendimento carregada com sucesso',

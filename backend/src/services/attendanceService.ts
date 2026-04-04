@@ -1,6 +1,7 @@
 import { Types } from 'mongoose'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { Attendance } from '../models/AttendanceModel.js'
+import { Patient } from '../models/PatientModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 
 // ADMIN
@@ -413,5 +414,99 @@ export const getTriageAverageTime = async ({
     return result.length ? Math.round(result[0].avg) : 0
   } catch (err) {
     console.error(err)
+  }
+}
+
+// getDashboardAttendanceByTime
+export const getAttendanceByTime = async ({
+  unitId,
+  period
+}: {
+  unitId: string
+  period: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period)
+
+    const result = await Attendance.aggregate([
+      {
+        $match: {
+          unitId: new Types.ObjectId(unitId),
+          date: { $gte: start, $lte: end }
+        }
+      },
+      {
+        $group: {
+          _id: { $hour: '$date' },
+          total: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          hour: '$_id',
+          total: 1,
+          _id: 0
+        }
+      }
+    ])
+
+    const hours = Array.from({ length: 24 }).map((_, hour) => {
+      const found = result.find((r) => r.hour === hour)
+      return {
+        hour,
+        total: found ? found.total : 0
+      }
+    })
+
+    return hours
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getAttendanceQueue = async ({
+  unitId,
+  period
+}: {
+  unitId: string
+  period: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period)
+
+    const data = await Attendance.find({
+      unitId,
+      status: {
+        $nin: [
+          AttendanceStatus.CANCELED,
+          AttendanceStatus.COMPLETED,
+          AttendanceStatus.ATTENDANCE_COMPLETED
+        ]
+      },
+      date: { $gte: start, $lte: end }
+    })
+      .sort({
+        risk: 1,
+        date: 1
+      })
+      .lean()
+
+    const formatted = await Promise.all(
+      data.map(async (item) => {
+        const patient = await Patient.findById(item.patientId).lean()
+
+        return {
+          _id: item._id,
+          patientName: patient?.name || 'Paciente',
+          status: item.status,
+          risk: item.risk
+        }
+      })
+    )
+
+    return formatted
+  } catch (err) {
+    console.error(err)
+    return []
   }
 }

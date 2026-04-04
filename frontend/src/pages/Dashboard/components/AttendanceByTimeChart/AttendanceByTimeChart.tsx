@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
+import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardAttendanceByTime } from '@/interfaces/IDashboard'
 import type { IError } from '@/interfaces/IError'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
@@ -8,7 +9,14 @@ import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
-function AttendanceByTimeChart() {
+interface IAttendanceByTimeChartProps {
+  selectedPeriod: string
+}
+
+function AttendanceByTimeChart({
+  selectedPeriod
+}: IAttendanceByTimeChartProps) {
+  const { user } = useAuth()
   const [data, setData] = useState<IDashboardAttendanceByTime[]>([])
   const [loading, setLoading] = useState(true)
   const max = Math.max(...data.map((d) => d.total), 1)
@@ -17,7 +25,12 @@ function AttendanceByTimeChart() {
     async function fetchAttendanceByTime() {
       setLoading(true)
       try {
-        const response = await api.get('/dashboard/attendance-by-time')
+        const response = await api.get('/dashboard/attendance-by-time', {
+          params: {
+            unitId: user?.unitId,
+            period: selectedPeriod
+          }
+        })
         const data = response.data.data
         setData(data)
       } catch (err) {
@@ -33,7 +46,7 @@ function AttendanceByTimeChart() {
     }
 
     fetchAttendanceByTime()
-  }, [])
+  }, [selectedPeriod, user?.unitId])
 
   return (
     <DashboardCard
