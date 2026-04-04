@@ -3,6 +3,7 @@ import {
   createNurse,
   deleteNurse,
   editNurse,
+  getAttendances,
   getUsers
 } from '../controllers/nurseController.js'
 import { authMiddleware } from '../middlewares/authMiddleware.js'
@@ -13,5 +14,6 @@ router.get('/', authMiddleware, getUsers)
 router.post('/', authMiddleware, createNurse)
 router.put('/:id', authMiddleware, editNurse)
 router.delete('/:id', authMiddleware, deleteNurse)
+router.get('/:id/attendances', authMiddleware, getAttendances)
 
 export default router

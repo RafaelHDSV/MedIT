@@ -137,6 +137,7 @@ function DoctorDetails() {
               label: 'Queixa do Paciente',
               value: attendances?.[0].complaint
             },
+            // VIEIRA: Adicionar assertividade IA
             { label: 'Sugestão IA', value: '0' },
             {
               label: 'Definição Médica',

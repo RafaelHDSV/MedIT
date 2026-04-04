@@ -34,8 +34,11 @@ class PatientsRepositoy extends Repository {
     })
   }
 
-  // VIEIRA: Utilizar rota
-  async getAttendances({ patientId }: { patientId: ObjectId | undefined }) {
+  async getAttendances({
+    patientId
+  }: {
+    patientId: ObjectId | string | undefined
+  }) {
     return this.handle(() => {
       return this.api.get(`${this.path}/${patientId}/attendances`)
     })

@@ -4,8 +4,9 @@ import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import { handleApiError } from '@/helpers/handleApiError'
-import { AttendanceRisk } from '@/interfaces/IAttendance'
+import type { IAttendance } from '@/interfaces/IAttendance'
 import type { IPatient } from '@/interfaces/IPatient'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import UserRepository from '@/repositories/UserRepository'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
@@ -21,59 +22,16 @@ import { useParams } from 'react-router-dom'
 import PatientModal from '../Patients/components/PatientModal/PatientModal'
 import styles from './PatientsDetails.module.scss'
 
-// VIEIRA: Remover mock
-const mockedLastAttendance = {
-  patientComplaint: 'Febre e dores',
-  Temperature: '37.8°C',
-  Pressure: '130/85 mmHg',
-  SuggestionAI: 'Dengue (87%)',
-  date: '12/01/2025'
-}
-
-// VIEIRA: Corrigir tipagem any
-// VIEIRA: Remover mock
-const mockedAttendanceRecords: any[] = [
-  {
-    name: 'Maria Santos',
-    birthDate: new Date('1986-10-15'),
-    complaint: 'Gripe',
-    diagnosis: 'Consulta',
-    date: new Date('2025-12-01'),
-    risk: AttendanceRisk.NOT_URGENT
-  },
-  {
-    name: 'Maria Santos',
-    birthDate: new Date('1986-10-15'),
-    complaint: 'Entorse',
-    diagnosis: 'Emergência',
-    date: new Date('2024-08-11'),
-    risk: AttendanceRisk.EMERGENCY
-  },
-  {
-    name: 'Maria Santos',
-    birthDate: new Date('1986-10-15'),
-    complaint: 'Check-up',
-    diagnosis: 'Rotina',
-    date: new Date('2024-06-15'),
-    risk: AttendanceRisk.LESS_URGENT
-  },
-  {
-    name: 'Maria Santos',
-    birthDate: new Date('1986-10-15'),
-    complaint: 'Alergia',
-    diagnosis: 'Consulta',
-    date: new Date('2024-03-22'),
-    risk: AttendanceRisk.URGENT
-  }
-]
-
 function PatientsDetails() {
   const params = useParams<{ id: string }>()
   const [patient, setPatient] = useState<IPatient | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [attendances, setAttendances] = useState<IAttendance[]>()
+  const [detailsLoading, setDetailsLoading] = useState(true)
+  const [attendancesLoading, setAttendancesLoading] = useState(true)
+  const loading = detailsLoading || attendancesLoading
 
   const fetchPatientDetails = useCallback(async () => {
-    setLoading(true)
+    setDetailsLoading(true)
 
     try {
       const response = await UserRepository.getDetails({ userId: params.id })
@@ -84,13 +42,32 @@ function PatientsDetails() {
         defaultMessage: 'Erro ao carregar detalhes do paciente'
       })
     } finally {
-      setLoading(false)
+      setDetailsLoading(false)
+    }
+  }, [params.id])
+
+  const fetchPatientsAttendances = useCallback(async () => {
+    setAttendancesLoading(true)
+
+    try {
+      const response = await PatientsRepository.getAttendances({
+        patientId: params.id
+      })
+      setAttendances(response)
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao carregar os atendimentos do enfermeiro(a)'
+      })
+    } finally {
+      setAttendancesLoading(false)
     }
   }, [params.id])
 
   useEffect(() => {
     fetchPatientDetails()
-  }, [fetchPatientDetails])
+    fetchPatientsAttendances()
+  }, [fetchPatientDetails, fetchPatientsAttendances])
 
   return (
     <section className={styles.container}>
@@ -171,18 +148,25 @@ function PatientsDetails() {
           itens={[
             {
               label: 'Principal Queixa',
-              value: mockedLastAttendance.patientComplaint
+              value: attendances?.[0].complaint
             },
-            { label: 'Temperatura', value: mockedLastAttendance.Temperature },
+            {
+              label: 'Temperatura',
+              value: `${attendances?.[0].vitalSigns?.temperature} °C`
+            },
             {
               label: 'Pressão',
-              value: mockedLastAttendance.Pressure
+              value: `${attendances?.[0].vitalSigns?.bloodPressure} mmHg`
             },
+            // VIEIRA: Adicionar assertividade IA
             {
               label: 'Sugestão IA',
-              value: mockedLastAttendance.SuggestionAI
+              value: '0'
             },
-            { label: 'Data', value: mockedLastAttendance.date }
+            {
+              label: 'Data',
+              value: dayjs(attendances?.[0].date).format('DD/MM/YYYY')
+            }
           ]}
         />
 
@@ -190,9 +174,11 @@ function PatientsDetails() {
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
           className={styles.attendanceHistoryCard}
-          itens={mockedAttendanceRecords.map((item) => ({
-            label: dayjs(item.date).format('DD/MM/YYYY'),
-            value: `${item.diagnosis ?? ''} - ${item.complaint}`
+          // VIEIRA Tirar slice e quando clicar mostrar todos
+          itens={attendances?.slice(0, 5)?.map((attendance) => ({
+            key: attendance._id,
+            label: dayjs(attendance.date).format('DD/MM/YYYY'),
+            value: `${attendance.diagnosis ?? 'N/A'} - ${attendance.complaint}`
           }))}
         />
       </div>
