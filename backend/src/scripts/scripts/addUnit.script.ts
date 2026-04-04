@@ -1,5 +1,5 @@
-import { Unit } from '../../models/UnitModel'
-import User from '../../models/UserModel'
+import { Unit } from '../../models/UnitModel.js'
+import User from '../../models/UserModel.js'
 
 const addUnit = {
   name: 'addUnit',
