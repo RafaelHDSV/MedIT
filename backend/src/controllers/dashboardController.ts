@@ -6,9 +6,12 @@ import {
   getAttendanceOcuppation,
   getAttended,
   getAverageTime,
+  getDoctorAverageTime,
   getEntries,
   getHighRisk,
   getInAttendance,
+  getTriageAverageTime,
+  getTriaged,
   getWaitingForDoctor
 } from '../services/attendanceService.js'
 import { getUnitService } from '../services/unitService.js'
@@ -65,13 +68,19 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
       console.error(err)
     }
   }
+
   async function getDoctorData() {
     try {
-      const [waitingPatients, attended] = await Promise.all([
+      const [waitingPatients, attended, averageTime] = await Promise.all([
         getWaitingForDoctor({
           unitId: String(unitId)
         }),
         getAttended({
+          unitId: String(unitId),
+          period: String(period),
+          doctorId: String(userId)
+        }),
+        getDoctorAverageTime({
           unitId: String(unitId),
           period: String(period),
           doctorId: String(userId)
@@ -80,19 +89,37 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
       return {
         waitingPatients,
         attended,
-        averageTime: 18,
+        averageTime,
+        // VIEIRA: Adicionar assertividade IA
         assertiveness: 0
       }
     } catch (err) {
       console.error(err)
     }
   }
+
   async function getNurseData() {
+    const [waitingPatients, triagedPatients, averageTime] = await Promise.all([
+      getWaitingForDoctor({
+        unitId: String(unitId)
+      }),
+      getTriaged({
+        unitId: String(unitId),
+        period: String(period),
+        nurseId: String(userId)
+      }),
+      getTriageAverageTime({
+        unitId: String(unitId),
+        period: String(period),
+        nurseId: String(userId)
+      })
+    ])
+
     try {
       return {
-        waitingPatients: 25,
-        triagedPatients: 96,
-        averageTime: 18
+        waitingPatients,
+        triagedPatients,
+        averageTime
       }
     } catch (err) {
       console.error(err)

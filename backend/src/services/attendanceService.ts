@@ -3,6 +3,7 @@ import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 
+// ADMIN
 export const getEntries = async ({
   unitId,
   period
@@ -180,12 +181,236 @@ export const getHighRisk = async ({
   }
 }
 
+// DOCTOR
 export const getWaitingForDoctor = async ({ unitId }: { unitId: string }) => {
   try {
     return await Attendance.countDocuments({
       unitId,
       status: AttendanceStatus.WAITING_ATTENDANCE
     })
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getDoctorAverageTime = async ({
+  unitId,
+  period,
+  doctorId
+}: {
+  unitId: string
+  period: string
+  doctorId: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period)
+
+    const result = await Attendance.aggregate([
+      {
+        $match: {
+          unitId: new Types.ObjectId(unitId),
+          doctorId: new Types.ObjectId(doctorId),
+          status: {
+            $in: [
+              AttendanceStatus.ATTENDANCE_COMPLETED,
+              AttendanceStatus.COMPLETED
+            ]
+          },
+          date: { $gte: start, $lte: end }
+        }
+      },
+      {
+        $addFields: {
+          waitingAttendanceAt: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$changesHistory',
+                  as: 'c',
+                  cond: {
+                    $eq: ['$$c.status', AttendanceStatus.WAITING_ATTENDANCE]
+                  }
+                }
+              },
+              -1
+            ]
+          },
+          attendanceCompletedAt: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$changesHistory',
+                  as: 'c',
+                  cond: {
+                    $eq: ['$$c.status', AttendanceStatus.ATTENDANCE_COMPLETED]
+                  }
+                }
+              },
+              -1
+            ]
+          }
+        }
+      },
+      {
+        $match: {
+          waitingAttendanceAt: { $ne: null },
+          attendanceCompletedAt: { $ne: null }
+        }
+      },
+      {
+        $addFields: {
+          duration: {
+            $divide: [
+              {
+                $subtract: [
+                  '$attendanceCompletedAt.changedAt',
+                  '$waitingAttendanceAt.changedAt'
+                ]
+              },
+              60000
+            ]
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          avg: { $avg: '$duration' }
+        }
+      }
+    ])
+
+    return result.length ? Math.round(result[0].avg) : 0
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+// NURSE
+export const getWaitingForTriage = async ({ unitId }: { unitId: string }) => {
+  try {
+    return await Attendance.countDocuments({
+      unitId,
+      status: AttendanceStatus.WAITING_TRIAGE
+    })
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getTriaged = async ({
+  unitId,
+  period,
+  nurseId
+}: {
+  unitId: string
+  period: string
+  nurseId: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period)
+
+    return await Attendance.countDocuments({
+      unitId,
+      nurseId: new Types.ObjectId(nurseId),
+      status: {
+        $in: [
+          AttendanceStatus.TRIAGE_COMPLETED,
+          AttendanceStatus.WAITING_ATTENDANCE,
+          AttendanceStatus.IN_ATTENDANCE,
+          AttendanceStatus.ATTENDANCE_COMPLETED,
+          AttendanceStatus.COMPLETED
+        ]
+      },
+      date: { $gte: start, $lte: end }
+    })
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+export const getTriageAverageTime = async ({
+  unitId,
+  period,
+  nurseId
+}: {
+  unitId: string
+  period: string
+  nurseId: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period)
+
+    const result = await Attendance.aggregate([
+      {
+        $match: {
+          unitId: new Types.ObjectId(unitId),
+          nurseId: new Types.ObjectId(nurseId),
+          date: { $gte: start, $lte: end }
+        }
+      },
+      {
+        $addFields: {
+          waitingTriageAt: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$changesHistory',
+                  as: 'c',
+                  cond: {
+                    $eq: ['$$c.status', AttendanceStatus.WAITING_TRIAGE]
+                  }
+                }
+              },
+              -1
+            ]
+          },
+          triageCompletedAt: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$changesHistory',
+                  as: 'c',
+                  cond: {
+                    $eq: ['$$c.status', AttendanceStatus.TRIAGE_COMPLETED]
+                  }
+                }
+              },
+              -1
+            ]
+          }
+        }
+      },
+      {
+        $match: {
+          waitingTriageAt: { $ne: null },
+          triageCompletedAt: { $ne: null }
+        }
+      },
+      {
+        $addFields: {
+          duration: {
+            $divide: [
+              {
+                $subtract: [
+                  '$triageCompletedAt.changedAt',
+                  '$waitingTriageAt.changedAt'
+                ]
+              },
+              60000
+            ]
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          avg: { $avg: '$duration' }
+        }
+      }
+    ])
+
+    return result.length ? Math.round(result[0].avg) : 0
   } catch (err) {
     console.error(err)
   }

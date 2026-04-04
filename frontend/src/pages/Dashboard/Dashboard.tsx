@@ -144,7 +144,7 @@ function Dashboard() {
           {
             Icon: CheckCircleIcon,
             value: dashboardStatusData?.triagedPatients,
-            label: 'Pacientes triados hoje'
+            label: 'Pacientes triados'
           },
           {
             Icon: TimerIcon,
