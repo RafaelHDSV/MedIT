@@ -435,11 +435,13 @@ export const getAttendanceByTime = async ({
     const groupBy =
       period === 'day'
         ? { $hour: '$date' }
-        : period === 'month'
-          ? { $dayOfMonth: '$date' }
-          : period === 'year'
-            ? { $month: '$date' }
-            : { $hour: '$date' }
+        : period === 'week'
+          ? { $dayOfWeek: '$date' }
+          : period === 'month'
+            ? { $dayOfMonth: '$date' }
+            : period === 'year'
+              ? { $month: '$date' }
+              : { $hour: '$date' }
 
     const result = await Attendance.aggregate([
       {
@@ -466,17 +468,19 @@ export const getAttendanceByTime = async ({
     const range =
       period === 'day'
         ? 24
-        : period === 'month'
-          ? 31
-          : period === 'year'
-            ? 12
-            : 24
+        : period === 'week'
+          ? 7
+          : period === 'month'
+            ? 31
+            : period === 'year'
+              ? 12
+              : 24
 
     const hours = Array.from({ length: range }).map((_, index) => {
       const value = period === 'day' ? index : index + 1
       const found = result.find((r) => r.hour === value)
       return {
-        label: index,
+        label: value,
         total: found ? found.total : 0
       }
     })

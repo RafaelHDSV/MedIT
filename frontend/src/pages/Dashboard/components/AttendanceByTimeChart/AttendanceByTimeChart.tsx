@@ -20,6 +20,7 @@ function AttendanceByTimeChart({
   const [data, setData] = useState<IDashboardAttendanceByTime[]>([])
   const [loading, setLoading] = useState(true)
   const max = Math.max(...data.map((d) => d.total), 1)
+  const avg = data.reduce((sum, d) => sum + d.total, 0) / data.length
 
   useEffect(() => {
     async function fetchAttendanceByTime() {
@@ -48,11 +49,48 @@ function AttendanceByTimeChart({
     fetchAttendanceByTime()
   }, [selectedPeriod, user?.unitId])
 
+  function getPeriodConfig(period: string) {
+    switch (period) {
+      case 'day':
+        return {
+          title: 'Atendimentos por Hora',
+          suffix: 'h',
+          aside: 'por hora'
+        }
+      case 'week':
+        return {
+          title: 'Atendimentos por Dia',
+          suffix: '',
+          aside: 'por dia'
+        }
+      case 'month':
+        return {
+          title: 'Atendimentos por Dia',
+          suffix: '',
+          aside: 'por dia'
+        }
+      case 'year':
+        return {
+          title: 'Atendimentos por Mês',
+          suffix: '',
+          aside: 'por mês'
+        }
+      default:
+        return {
+          title: '',
+          suffix: '',
+          aside: ''
+        }
+    }
+  }
+
+  const periodLabels = getPeriodConfig(selectedPeriod)
+
   return (
     <DashboardCard
-      title='Atendimentos por Hora'
+      title={periodLabels.title}
       icon={ClockCountdownIcon}
-      asideText='30 p/ hora'
+      asideText={`${Math.round(avg)} ${periodLabels.aside}`}
       gridArea='attendanceByTimeChart'
     >
       <div className={styles.chart}>
@@ -66,17 +104,23 @@ function AttendanceByTimeChart({
                 <span className={`${styles.label} ${styles.skeleton}`} />
               </div>
             ))
-          : data.map((item, index) => (
-              <div key={index} className={styles.barContainer}>
-                <Tooltip title={`${item.total} atendimentos às ${item.label}h`}>
-                  <div
-                    className={styles.bar}
-                    style={{ height: `${(item.total / max) * 200}px` }}
-                  />
-                </Tooltip>
-                <span className={styles.label}>{item.label}h</span>
-              </div>
-            ))}
+          : data.map(
+              (item, index) =>
+                item.total > 0 && (
+                  <div key={index} className={styles.barContainer}>
+                    <Tooltip title={`${item.total} atendimentos`}>
+                      <div
+                        className={styles.bar}
+                        style={{ height: `${(item.total / max) * 200}px` }}
+                      />
+                    </Tooltip>
+                    <span className={styles.label}>
+                      {item.label}
+                      {periodLabels.suffix}
+                    </span>
+                  </div>
+                )
+            )}
       </div>
     </DashboardCard>
   )
