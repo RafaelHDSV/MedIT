@@ -1,9 +1,7 @@
-import UnauthImage3 from '@/assets/unauth-image-3.svg'
-import UnauthImage from '@/assets/unauth-image.svg'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Logo from '@/components/Logo/Logo'
 import routes from '@/routes/routes'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { matchPath, Outlet, useLocation } from 'react-router-dom'
 import TypewriterComponent from 'typewriter-effect'
 import styles from './UnauthLayout.module.scss'
@@ -16,10 +14,10 @@ export default function UnauthLayout() {
   const isSignUpPage = currentRoute?.path === '/sign-up'
   const [imageIndex, setImageIndex] = useState(0)
   const [isFading, setIsFading] = useState(false)
+  const currentIndexRef = useRef(0)
 
   const texts = [
     'Plataforma de Apoio à Triagem e Fluxo Hospitalar',
-    'Agilize a triagem de pacientes e otimize o fluxo',
     'Tome decisões informadas com base em dados clínicos',
     'Melhore a eficiência e a qualidade do atendimento',
     'Facilite a comunicação entre equipes de saúde',
@@ -30,24 +28,24 @@ export default function UnauthLayout() {
 
   const imageSource = useCallback(
     () => [
-      UnauthImage,
-      UnauthImage3,
       '/image1.png',
       '/image2.png',
       '/image3.png',
       '/image4.png',
       '/image5.png',
-      '/image6.png'
+      '/image6.png',
+      '/image7.svg'
     ],
     []
   )()
 
   function handleImageChange(index: number) {
-    if (index === imageIndex) return
+    if (index === currentIndexRef.current) return
 
     setIsFading(true)
 
     setTimeout(() => {
+      currentIndexRef.current = index
       setImageIndex(index)
       setIsFading(false)
     }, 200)
