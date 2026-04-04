@@ -74,7 +74,13 @@ const createAttendances = {
       }
     }
 
-    function generateStatusFlow(date: Date, risk: AttendanceRisk) {
+    function generateStatusFlow(
+      date: Date,
+      risk: AttendanceRisk
+    ): {
+      status: AttendanceStatus
+      history: { status: AttendanceStatus; changedAt: Date }[]
+    } {
       const now = new Date()
       const diffMinutes = (now.getTime() - date.getTime()) / (1000 * 60)
 
@@ -153,6 +159,16 @@ const createAttendances = {
 
     let currentDate = new Date(startDate)
 
+    const activePatientIds = new Set<string>()
+
+    const activeStatuses: AttendanceStatus[] = [
+      AttendanceStatus.WAITING_TRIAGE,
+      AttendanceStatus.IN_TRIAGE,
+      AttendanceStatus.TRIAGE_COMPLETED,
+      AttendanceStatus.WAITING_ATTENDANCE,
+      AttendanceStatus.IN_ATTENDANCE
+    ]
+
     while (currentDate <= endDate) {
       const attendancesPerDay = getAttendancesPerDay(currentDate)
 
@@ -168,7 +184,19 @@ const createAttendances = {
 
         const { status, history } = generateStatusFlow(date, risk)
 
-        const patient = faker.helpers.arrayElement(patients)
+        const isActive = activeStatuses.includes(status)
+
+        let patient
+        if (isActive) {
+          const availablePatients = patients.filter(
+            (p) => !activePatientIds.has(String(p._id))
+          )
+          if (availablePatients.length === 0) continue
+          patient = faker.helpers.arrayElement(availablePatients)
+          activePatientIds.add(String(patient._id))
+        } else {
+          patient = faker.helpers.arrayElement(patients)
+        }
         const nurse = faker.helpers.arrayElement(nurses)
         const doctor = faker.helpers.arrayElement(doctors)
 
