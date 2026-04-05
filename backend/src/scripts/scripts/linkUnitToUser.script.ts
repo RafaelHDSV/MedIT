@@ -1,4 +1,3 @@
-import mongoose from 'mongoose'
 import { UserLevels } from '../../interfaces/IUser.js'
 import { Admin } from '../../models/AdminModel.js'
 import { Unit } from '../../models/UnitModel.js'
@@ -36,7 +35,6 @@ const EXTRA_ADMINS = [
 
 function generateCPF(): string {
   const digits = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10))
-
   const calcDigit = (base: number[]) => {
     const sum = base.reduce(
       (acc, num, i) => acc + num * (base.length + 1 - i),
@@ -45,10 +43,8 @@ function generateCPF(): string {
     const rest = (sum * 10) % 11
     return rest === 10 ? 0 : rest
   }
-
   digits.push(calcDigit(digits))
   digits.push(calcDigit(digits))
-
   return digits.join('')
 }
 
@@ -118,7 +114,6 @@ const linkUnitsToUsers: Script = {
         console.log(`✅ Admin criado: ${member.email}`)
       }
 
-      // Recarrega lista de admins após criação
       admins = await User.find({ level: UserLevels.ADMIN }).sort({ number: 1 })
     }
 
@@ -151,7 +146,7 @@ const linkUnitsToUsers: Script = {
       email: { $regex: /@yopmail\.com$/ }
     })
 
-    const assignedIds = new Set<mongoose.Types.ObjectId>()
+    const assignedIds = new Set<string>()
 
     for (const user of nonAdmins) {
       const nome = extractNomeFromEmail(user.email)
@@ -161,9 +156,8 @@ const linkUnitsToUsers: Script = {
       if (!unitId) continue
 
       await User.findByIdAndUpdate(user._id, { $set: { unitId } })
-      assignedIds.add(new mongoose.Types.ObjectId(user._id.toString()))
+      assignedIds.add(user._id.toString())
 
-      const adminEmail = `admin.${nome}@yopmail.com`
       const unitName =
         units.find((u) => u._id.toString() === unitId)?.name ?? unitId
       console.log(`✅ ${user.email}  →  ${unitName}`)
@@ -171,13 +165,20 @@ const linkUnitsToUsers: Script = {
 
     // ------------------------------------------------------------------ //
     //  5. Distribui os usuários restantes de forma equalizada
+    //     Inclui quem tem unitId apontando para unidade inexistente
     // ------------------------------------------------------------------ //
     console.log('\n🔀 Distribuindo usuários restantes...\n')
 
-    const remaining = await User.find({
-      level: { $ne: UserLevels.ADMIN },
-      _id: { $nin: Array.from(assignedIds) } as any,
-      $or: [{ unitId: { $exists: false } }, { unitId: null }]
+    const validUnitIds = units.map((u) => u._id.toString())
+
+    // Busca todos os não-admins ainda não atribuídos na etapa anterior
+    const allNonAdmins = await User.find({ level: { $ne: UserLevels.ADMIN } })
+
+    const remaining = allNonAdmins.filter((user) => {
+      if (assignedIds.has(user._id.toString())) return false
+      const uid = user.unitId?.toString()
+      // Inclui quem não tem unitId ou tem referência inválida
+      return !uid || !validUnitIds.includes(uid)
     })
 
     if (remaining.length === 0) {
