@@ -20,6 +20,7 @@ export default function SignIn() {
   const navigate = useNavigate()
   const [formRef] = useForm()
   const [loading, setLoading] = useState(false)
+  const identifierValue = Form.useWatch('identifier', formRef)
 
   async function handleLogin() {
     setLoading(true)
@@ -74,11 +75,7 @@ export default function SignIn() {
       >
         <Input
           placeholder='Digite seu CPF ou email'
-          maxLength={
-            validators(formRef.getFieldValue('identifier'), 'validCpf')
-              ? 14
-              : 200
-          }
+          maxLength={validators(identifierValue, 'validCpf') ? 14 : 200}
         />
       </FormItem>
       <FormItem
