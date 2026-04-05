@@ -179,10 +179,10 @@ const createAttendances = {
 
     function getAttendancesPerDay(date: Date, now: Date) {
       const diffDays = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
-      if (diffDays > 200) return faker.number.int({ min: 20, max: 50 })
-      if (diffDays > 100) return faker.number.int({ min: 40, max: 80 })
-      if (diffDays > 30) return faker.number.int({ min: 60, max: 120 })
-      return faker.number.int({ min: 100, max: 180 })
+      if (diffDays > 200) return faker.number.int({ min: 70, max: 100 })
+      if (diffDays > 100) return faker.number.int({ min: 90, max: 130 })
+      if (diffDays > 30) return faker.number.int({ min: 110, max: 170 })
+      return faker.number.int({ min: 150, max: 230 })
     }
 
     // ------------------------------------------------------------------ //
