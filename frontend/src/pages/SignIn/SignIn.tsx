@@ -4,7 +4,7 @@ import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from '../../components/FormComponents/FormComponents.module.scss'
 import { useAuth } from '../../hooks/useAuth'
@@ -48,15 +48,6 @@ export default function SignIn() {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    const msg = localStorage.getItem('sessionExpired')
-
-    if (msg) {
-      message.warning(msg)
-      localStorage.removeItem('sessionExpired')
-    }
-  }, [])
 
   return (
     <Form
