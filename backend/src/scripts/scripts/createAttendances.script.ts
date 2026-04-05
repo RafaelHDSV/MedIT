@@ -21,26 +21,63 @@ const createAttendances = {
 
     console.log('🚀 Criando atendimentos do ANO inteiro...')
 
-    const patients = await Patient.find()
-    const nurses = await Nurse.find()
-    const doctors = await Doctor.find()
-    const unit = await Unit.findOne()
+    const units = await Unit.find()
 
-    if (!patients.length || !nurses.length || !doctors.length || !unit) {
-      console.log('❌ Dados insuficientes')
+    if (!units.length) {
+      console.log('❌ Nenhuma unidade encontrada')
       process.exit()
     }
 
-    const attendances = []
+    // ------------------------------------------------------------------ //
+    //  Pré-carrega usuários agrupados por unidade
+    // ------------------------------------------------------------------ //
+    type UnitPool = {
+      unitId: Types.ObjectId
+      patients: Types.ObjectId[]
+      nurses: Types.ObjectId[]
+      doctors: Types.ObjectId[]
+    }
 
-    const now = new Date()
-    const currentYear = now.getFullYear()
+    const unitPools: UnitPool[] = []
 
-    const startDate = new Date(currentYear, 0, 1)
-    const endDate = new Date(
-      Math.min(new Date(currentYear, 11, 31).getTime(), now.getTime())
-    )
+    for (const unit of units) {
+      const patients = await Patient.find({ unitId: unit._id })
+        .select('_id')
+        .lean<{ _id: Types.ObjectId }[]>()
+      const nurses = await Nurse.find({ unitId: unit._id })
+        .select('_id')
+        .lean<{ _id: Types.ObjectId }[]>()
+      const doctors = await Doctor.find({ unitId: unit._id })
+        .select('_id')
+        .lean<{ _id: Types.ObjectId }[]>()
 
+      if (!patients.length || !nurses.length || !doctors.length) {
+        console.warn(
+          `⚠️  Unidade "${unit.name}" sem pacientes/enfermeiros/médicos suficientes — ignorada`
+        )
+        continue
+      }
+
+      unitPools.push({
+        unitId: new Types.ObjectId(String(unit._id)),
+        patients: patients.map((p) => p._id),
+        nurses: nurses.map((n) => n._id),
+        doctors: doctors.map((d) => d._id)
+      })
+    }
+
+    if (!unitPools.length) {
+      console.log(
+        '❌ Nenhuma unidade com dados suficientes para gerar atendimentos'
+      )
+      process.exit()
+    }
+
+    console.log(`✅ ${unitPools.length} unidade(s) com dados válidos`)
+
+    // ------------------------------------------------------------------ //
+    //  Configurações
+    // ------------------------------------------------------------------ //
     const riskDistribution = [
       AttendanceRisk.NOT_URGENT,
       AttendanceRisk.NOT_URGENT,
@@ -65,9 +102,7 @@ const createAttendances = {
 
     function randomVitalSigns() {
       return {
-        bloodPressure: `${faker.number.int({ min: 90, max: 180 })}/${faker.number.int(
-          { min: 60, max: 110 }
-        )}`,
+        bloodPressure: `${faker.number.int({ min: 90, max: 180 })}/${faker.number.int({ min: 60, max: 110 })}`,
         heartRate: faker.number.int({ min: 60, max: 130 }),
         temperature: faker.number.float({
           min: 36,
@@ -91,16 +126,11 @@ const createAttendances = {
       if (diffMinutes >= 0 && diffMinutes < 5) {
         return {
           status: AttendanceStatus.ON_THE_WAY,
-          history: [
-            {
-              status: AttendanceStatus.ON_THE_WAY,
-              changedAt: date
-            }
-          ]
+          history: [{ status: AttendanceStatus.ON_THE_WAY, changedAt: date }]
         }
       }
 
-      const flow = [
+      const flow: AttendanceStatus[] = [
         AttendanceStatus.ON_THE_WAY,
         AttendanceStatus.WAITING_TRIAGE,
         AttendanceStatus.IN_TRIAGE,
@@ -111,7 +141,7 @@ const createAttendances = {
         AttendanceStatus.COMPLETED
       ]
 
-      const timeMultiplier = {
+      const timeMultiplier: Record<AttendanceRisk, number> = {
         [AttendanceRisk.EMERGENCY]: 5,
         [AttendanceRisk.VERY_URGENT]: 10,
         [AttendanceRisk.URGENT]: 15,
@@ -137,7 +167,6 @@ const createAttendances = {
       )
 
       const history = []
-
       for (let i = 0; i <= currentIndex; i++) {
         history.push({
           status: flow[i],
@@ -145,25 +174,26 @@ const createAttendances = {
         })
       }
 
-      return {
-        status: flow[currentIndex],
-        history
-      }
+      return { status: flow[currentIndex], history }
     }
 
-    function getAttendancesPerDay(date: Date) {
+    function getAttendancesPerDay(date: Date, now: Date) {
       const diffDays = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
-
       if (diffDays > 200) return faker.number.int({ min: 20, max: 50 })
       if (diffDays > 100) return faker.number.int({ min: 40, max: 80 })
       if (diffDays > 30) return faker.number.int({ min: 60, max: 120 })
-
       return faker.number.int({ min: 100, max: 180 })
     }
 
-    let currentDate = new Date(startDate)
-
-    const activePatientIds = new Set<string>()
+    // ------------------------------------------------------------------ //
+    //  Geração dos atendimentos
+    // ------------------------------------------------------------------ //
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const startDate = new Date(currentYear, 0, 1)
+    const endDate = new Date(
+      Math.min(new Date(currentYear, 11, 31).getTime(), now.getTime())
+    )
 
     const activeStatuses: AttendanceStatus[] = [
       AttendanceStatus.WAITING_TRIAGE,
@@ -173,10 +203,21 @@ const createAttendances = {
       AttendanceStatus.IN_ATTENDANCE
     ]
 
+    // Controla pacientes ativos por unidade (evita duplicidade em atendimentos simultâneos)
+    const activePatientIdsByUnit = new Map<string, Set<string>>()
+    for (const pool of unitPools) {
+      activePatientIdsByUnit.set(pool.unitId.toString(), new Set())
+    }
+
+    // Índice round-robin para distribuir atendimentos igualmente entre unidades
+    let unitPoolIndex = 0
+
+    const attendances = []
     let attendanceNumber = 1
+    let currentDate = new Date(startDate)
 
     while (currentDate <= endDate) {
-      const attendancesPerDay = getAttendancesPerDay(currentDate)
+      const attendancesPerDay = getAttendancesPerDay(currentDate, now)
 
       for (let i = 0; i < attendancesPerDay; i++) {
         const hour = faker.number.int({ min: 6, max: 22 })
@@ -187,24 +228,30 @@ const createAttendances = {
         if (date > now) continue
 
         const risk = faker.helpers.arrayElement(riskDistribution)
-
         const { status, history } = generateStatusFlow(date, risk)
-
         const isActive = activeStatuses.includes(status)
 
-        let patient
+        // Seleciona a unidade em round-robin
+        const pool = unitPools[unitPoolIndex % unitPools.length]
+        unitPoolIndex++
+
+        const activeSet = activePatientIdsByUnit.get(pool.unitId.toString())!
+
+        // Seleciona paciente respeitando ativos por unidade
+        let patientId: Types.ObjectId | undefined
         if (isActive) {
-          const availablePatients = patients.filter(
-            (p) => !activePatientIds.has(String(p._id))
+          const available = pool.patients.filter(
+            (id) => !activeSet.has(id.toString())
           )
-          if (availablePatients.length === 0) continue
-          patient = faker.helpers.arrayElement(availablePatients)
-          activePatientIds.add(String(patient._id))
+          if (available.length === 0) continue
+          patientId = faker.helpers.arrayElement(available)
+          activeSet.add(patientId.toString())
         } else {
-          patient = faker.helpers.arrayElement(patients)
+          patientId = faker.helpers.arrayElement(pool.patients)
         }
-        const nurse = faker.helpers.arrayElement(nurses)
-        const doctor = faker.helpers.arrayElement(doctors)
+
+        const nurseId = faker.helpers.arrayElement(pool.nurses)
+        const doctorId = faker.helpers.arrayElement(pool.doctors)
 
         const isFinished =
           status === AttendanceStatus.ATTENDANCE_COMPLETED ||
@@ -219,11 +266,11 @@ const createAttendances = {
           date,
           risk,
           status,
-          unitId: unit._id,
-          patientId: patient._id,
-          nurseId: nurse._id,
+          unitId: pool.unitId,
+          patientId,
+          nurseId,
           doctorId:
-            status !== AttendanceStatus.WAITING_TRIAGE ? doctor._id : undefined,
+            status !== AttendanceStatus.WAITING_TRIAGE ? doctorId : undefined,
           medicationsIds: [],
           changesHistory: history,
           vitalSigns: randomVitalSigns(),
@@ -240,7 +287,18 @@ const createAttendances = {
 
     await Attendance.insertMany(attendances, { timestamps: false })
 
-    console.log('✅ Ano completo gerado com sucesso!')
+    console.log('\n📊 Atendimentos por unidade:')
+    for (const pool of unitPools) {
+      const unit = units.find(
+        (u) => u._id.toString() === pool.unitId.toString()
+      )
+      const count = attendances.filter(
+        (a) => a.unitId.toString() === pool.unitId.toString()
+      ).length
+      console.log(`   ${unit?.name}: ${count} atendimento(s)`)
+    }
+
+    console.log('\n✅ Ano completo gerado com sucesso!')
     process.exit()
   }
 }
