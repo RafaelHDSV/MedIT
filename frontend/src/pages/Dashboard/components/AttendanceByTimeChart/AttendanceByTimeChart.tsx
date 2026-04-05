@@ -92,7 +92,7 @@ function AttendanceByTimeChart({
     <DashboardCard
       title={periodLabels.title}
       icon={ClockCountdownIcon}
-      asideText={`${Math.round(avg)} ${periodLabels.aside}`}
+      asideText={`${avg >= 1 ? Math.round(avg) : avg.toFixed(1)} ${periodLabels.aside}`}
       gridArea='attendanceByTimeChart'
     >
       <div className={styles.chart}>
