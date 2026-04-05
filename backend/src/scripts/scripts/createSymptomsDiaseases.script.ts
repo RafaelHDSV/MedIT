@@ -2,7 +2,7 @@ import { ISymptomsDiseases } from '../../interfaces/ISymptomsDiseases.js'
 import SymptomsDiseasesModel from '../../models/SymptomsDiseasesModel.js'
 
 const createSymptomsDiseases = {
-  disease: 'create-symptoms-diseases',
+  name: 'create-symptoms-diseases',
   description: 'Cria doenças com seus sintomas (IA simulada)',
   async run() {
     console.log('🚀 Criando condições médicas...')
