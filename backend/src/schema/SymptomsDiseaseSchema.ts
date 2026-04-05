@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
-import { ISympyomsDiseases } from '../interfaces/ISympyomsDiseases.js'
+import { ISymptomsDiseases } from '../interfaces/ISymptomsDiseases.js'
 
-const SympyomsDiseaseSchema = new mongoose.Schema<ISympyomsDiseases>(
+const SymptomsDiseaseSchema = new mongoose.Schema<ISymptomsDiseases>(
   {
     disease: {
       type: String,
@@ -13,4 +13,4 @@ const SympyomsDiseaseSchema = new mongoose.Schema<ISympyomsDiseases>(
   { timestamps: true }
 )
 
-export default SympyomsDiseaseSchema
+export default SymptomsDiseaseSchema
