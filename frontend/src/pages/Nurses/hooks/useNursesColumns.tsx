@@ -73,7 +73,7 @@ export function useNursesColumns({
   const columns: ColumnsType<INurse> = useMemo(
     () => [
       commonColumns.id(),
-      commonColumns.name(),
+      commonColumns.name({}),
       commonColumns.cpf(),
       commonColumns.email(),
       commonColumns.birthDate(),

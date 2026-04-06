@@ -8,6 +8,7 @@ import type { ColumnType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import TooltipColumn from '../components/TooltipColumn/TooltipColumn'
+import styles from '../ListTable.module.scss'
 
 interface IGetCommonColumnsProps<K> {
   handleNavigateToDetails: (id: ObjectId | undefined) => void
@@ -29,23 +30,31 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       sorter: sorterFunction,
       render: (_id: string) => <TooltipColumn text={_id} />
     }),
-    name: (): ColumnType<K> => ({
+    name: ({
+      canGoToDetails = true
+    }: {
+      canGoToDetails?: boolean
+    }): ColumnType<K> => ({
       title: 'Nome',
       dataIndex: 'name',
       key: 'name',
       width: 180,
       ellipsis: true,
-      render: (name: string, record: K) => (
-        <span
-          role='button'
-          tabIndex={0}
-          className='ellipsis'
-          style={{ cursor: 'pointer' }}
-          onClick={() => handleNavigateToDetails(record?._id)}
-        >
+      render: (name: string, record: K) => {
+        return canGoToDetails ? (
+          <span
+            role='button'
+            tabIndex={0}
+            className={`${styles.clickableItem ?? ''} ellipsis`}
+            style={{ cursor: 'pointer' }}
+            onClick={() => handleNavigateToDetails(record?._id)}
+          >
+            <TooltipColumn text={name} />
+          </span>
+        ) : (
           <TooltipColumn text={name} />
-        </span>
-      )
+        )
+      }
     }),
     cpf: (): ColumnType<K> => ({
       title: 'CPF',

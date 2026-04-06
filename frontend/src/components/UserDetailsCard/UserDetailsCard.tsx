@@ -1,5 +1,8 @@
+import Attendances from '@/pages/Attendances/Attendances'
+import masks from '@/utils/masks'
 import type { Icon } from '@phosphor-icons/react'
-import { Skeleton } from 'antd'
+import { Modal, Skeleton } from 'antd'
+import { useState } from 'react'
 import Button from '../Button/Button'
 import type { IDetailsLineProps } from '../DetailsLine/DetailsLine'
 import DetailsLine from '../DetailsLine/DetailsLine'
@@ -12,6 +15,7 @@ interface IUserDetailsCardProps {
   itens?: IDetailsLineProps[]
   loading?: boolean
   useFullWidth?: boolean
+  doctorId?: string
   isAttendanceHistory?: boolean
 }
 
@@ -22,14 +26,27 @@ function UserDetailsCard({
   itens,
   loading = false,
   useFullWidth = false,
+  doctorId,
   isAttendanceHistory = false
 }: IUserDetailsCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const finalItens = isAttendanceHistory ? itens?.slice(0, 4) : itens
+  const moreItens = itens && isAttendanceHistory && itens?.length - 4
+
+  function openModal() {
+    setIsModalOpen(true)
+  }
+
+  function closeModal() {
+    setIsModalOpen(false)
+  }
+
   if (loading) {
     return (
       <section className={`${styles.card} ${className ?? ''}`}>
         <Skeleton active title={false} paragraph={{ rows: 1 }} />
 
-        {itens?.map((_item, index) => (
+        {finalItens?.map((_item, index) => (
           <Skeleton.Button key={index} className={styles.itemSkeleton} active />
         ))}
 
@@ -41,26 +58,43 @@ function UserDetailsCard({
   }
 
   return (
-    <section className={`${styles.card} ${className ?? ''}`}>
-      <div className={styles.cardHeader}>
-        <Icon size={22} />
-        {title}
-      </div>
-
-      <div
-        className={`${useFullWidth ? styles.twoColumns : styles.itemsContainer}`}
+    <>
+      <Modal
+        open={isModalOpen}
+        title={<h3>Histórico dos Atendimentos</h3>}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        width={1000}
       >
-        {itens?.map((item, index) => (
-          <DetailsLine
-            key={item.key ? String(item.key) : String(index)}
-            label={item.label}
-            value={item.value}
-          />
-        ))}
+        <Attendances doctorId={doctorId} />
+      </Modal>
 
-        {isAttendanceHistory && <Button mode='secondary'>Ver mais</Button>}
-      </div>
-    </section>
+      <section className={`${styles.card} ${className ?? ''}`}>
+        <div className={styles.cardHeader}>
+          <Icon size={22} />
+          {title}
+        </div>
+
+        <div
+          className={`${useFullWidth ? styles.twoColumns : styles.itemsContainer}`}
+        >
+          {finalItens?.map((item, index) => (
+            <DetailsLine
+              key={item.key ? String(item.key) : String(index)}
+              label={item.label}
+              value={item.value}
+            />
+          ))}
+
+          {isAttendanceHistory && (
+            <Button mode='secondary' onClick={openModal}>
+              {`+ ${masks(moreItens, 'number')} atendimentos`}
+            </Button>
+          )}
+        </div>
+      </section>
+    </>
   )
 }
 
