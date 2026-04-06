@@ -25,6 +25,7 @@ import AttendanceByTimeChart from './components/AttendanceByTimeChart/Attendance
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import styles from './Dashboard.module.scss'
+import AttendanceQueueChartDoctor from './components/AttendanceQueueChart/AttendanceQueueChartDoctor'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -173,7 +174,11 @@ function Dashboard() {
           </>
         )
       case UserLevels.DOCTOR:
-        return <></>
+        return (
+          <>
+            <AttendanceQueueChartDoctor />
+          </>
+        )
       case UserLevels.NURSE:
         return <></>
       case UserLevels.PATIENT:
