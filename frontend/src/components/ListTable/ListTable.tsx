@@ -1,26 +1,12 @@
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { Flex, Input, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
+import { useMemo, useState } from 'react'
 import Button from '../Button/Button'
 import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
 import styles from './ListTable.module.scss'
 
-interface IFiltersProps {
-  onReload: () => void
-}
-
-function Filters({ onReload }: IFiltersProps) {
-  return (
-    <Flex gap={16} align='center' className={styles.filters}>
-      <Input placeholder='Pesquisar por nome ou email' allowClear />
-      <Button mode='icon' onClick={onReload}>
-        <ArrowCounterClockwiseIcon />
-      </Button>
-    </Flex>
-  )
-}
-
-function ListTable<K>({
+function ListTable<K extends Record<string, any>>({
   dataSource,
   columns,
   pageSize = 6,
@@ -33,19 +19,41 @@ function ListTable<K>({
   loading: boolean
   onReload: () => void
 }) {
+  const [search, setSearch] = useState('')
+
+  const filteredData = useMemo(() => {
+    if (!search.trim()) return dataSource
+    const term = search.toLowerCase()
+    return dataSource.filter((item) =>
+      ['name', 'email', 'cpf', 'crm'].some((field) =>
+        String(item[field] ?? '').toLowerCase().includes(term)
+      )
+    )
+  }, [dataSource, search])
+
   if (loading) {
     return <LayoutSpinner />
   }
 
   return (
     <>
-      <Filters onReload={onReload} />
+      <Flex gap={16} align='center' className={styles.filters}>
+        <Input
+          placeholder='Pesquisar por nome, email, CPF ou CRM'
+          allowClear
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button mode='icon' onClick={() => { setSearch(''); onReload() }}>
+          <ArrowCounterClockwiseIcon />
+        </Button>
+      </Flex>
 
       <div className={styles.tableWrapper}>
         <Table
           className={styles.listTable}
           rowKey='_id'
-          dataSource={dataSource}
+          dataSource={filteredData}
           columns={columns}
           tableLayout='fixed'
           loading={loading}

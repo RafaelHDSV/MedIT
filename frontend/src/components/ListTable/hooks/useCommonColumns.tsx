@@ -40,6 +40,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'name',
       width: 180,
       ellipsis: true,
+      sorter: (a: any, b: any) => (a.name ?? '').localeCompare(b.name ?? ''),
       render: (name: string, record: K) => {
         return canGoToDetails ? (
           name ? (
@@ -66,6 +67,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'cpf',
       width: 140,
       ellipsis: true,
+      sorter: (a: any, b: any) => (a.cpf ?? '').localeCompare(b.cpf ?? ''),
       render: (cpf: string) => (
         <TooltipColumn text={cpf ? masks(cpf, 'cpf') : undefined} />
       )
@@ -76,6 +78,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'email',
       width: 250,
       ellipsis: true,
+      sorter: (a: any, b: any) => (a.email ?? '').localeCompare(b.email ?? ''),
       render: (email: string) => <TooltipColumn text={email} />
     }),
     birthDate: (): ColumnType<K> => ({
@@ -84,6 +87,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'birthDate',
       width: 180,
       ellipsis: true,
+      sorter: (a: any, b: any) => new Date(a.birthDate).getTime() - new Date(b.birthDate).getTime(),
       render: (date: Date | string) => (
         <TooltipColumn
           text={
