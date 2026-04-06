@@ -132,7 +132,7 @@ function Dashboard() {
             Icon: UsersThreeIcon,
             value: dashboardStatusData?.assertiveness
               ? `${dashboardStatusData?.assertiveness}%`
-              : 'N/A',
+              : 'n/a',
             label: 'Assertividade IA vs Médico(a)'
           }
         ]

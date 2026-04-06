@@ -42,15 +42,19 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       ellipsis: true,
       render: (name: string, record: K) => {
         return canGoToDetails ? (
-          <span
-            role='button'
-            tabIndex={0}
-            className={`${styles.clickableItem ?? ''} ellipsis`}
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleNavigateToDetails(record?._id)}
-          >
-            <TooltipColumn text={name} />
-          </span>
+          name ? (
+            <span
+              role='button'
+              tabIndex={0}
+              className={`${styles.clickableItem ?? ''} ellipsis`}
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleNavigateToDetails(record?._id)}
+            >
+              <TooltipColumn text={name} />
+            </span>
+          ) : (
+            'n/a'
+          )
         ) : (
           <TooltipColumn text={name} />
         )
@@ -62,7 +66,9 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'cpf',
       width: 140,
       ellipsis: true,
-      render: (cpf: string) => <TooltipColumn text={masks(cpf, 'cpf')} />
+      render: (cpf: string) => (
+        <TooltipColumn text={cpf ? masks(cpf, 'cpf') : undefined} />
+      )
     }),
     email: (): ColumnType<K> => ({
       title: 'E-mail',
@@ -80,7 +86,11 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       ellipsis: true,
       render: (date: Date | string) => (
         <TooltipColumn
-          text={`${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`}
+          text={
+            date
+              ? `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
+              : undefined
+          }
         />
       )
     }),
@@ -91,7 +101,9 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       width: 140,
       ellipsis: true,
       render: (cellphone: string) => (
-        <TooltipColumn text={masks(cellphone, 'cellphone')} />
+        <TooltipColumn
+          text={cellphone ? masks(cellphone, 'cellphone') : undefined}
+        />
       )
     }),
     createdAt: (): ColumnType<K> => ({
@@ -102,7 +114,9 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       ellipsis: true,
       sorter: sorterFunction,
       render: (date: Date | string) => (
-        <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
+        <TooltipColumn
+          text={date ? dayjs(date).format('DD/MM/YYYY HH:mm') : undefined}
+        />
       )
     }),
     updatedAt: (): ColumnType<K> => ({
@@ -113,7 +127,9 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       ellipsis: true,
       sorter: sorterFunction,
       render: (date: Date | string) => (
-        <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
+        <TooltipColumn
+          text={date ? dayjs(date).format('DD/MM/YYYY HH:mm') : undefined}
+        />
       )
     }),
     actions: (): ColumnType<K> => ({

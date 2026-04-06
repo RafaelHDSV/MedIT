@@ -82,7 +82,9 @@ export function useDoctorsColumns({
         key: 'crm',
         width: 120,
         ellipsis: true,
-        render: (crm: string) => <TooltipColumn text={masks(crm, 'crm')} />
+        render: (crm: string) => (
+          <TooltipColumn text={crm ? masks(crm, 'crm') : undefined} />
+        )
       },
       commonColumns.createdAt(),
       commonColumns.updatedAt(),

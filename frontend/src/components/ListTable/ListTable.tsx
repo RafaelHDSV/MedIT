@@ -13,8 +13,8 @@ function Filters({ onReload }: IFiltersProps) {
   return (
     <Flex gap={16} align='center' className={styles.filters}>
       <Input placeholder='Pesquisar por nome ou email' allowClear />
-      <Button mode='icon' size='large' onClick={onReload}>
-        <ArrowCounterClockwiseIcon size={24} />
+      <Button mode='icon' onClick={onReload}>
+        <ArrowCounterClockwiseIcon />
       </Button>
     </Flex>
   )

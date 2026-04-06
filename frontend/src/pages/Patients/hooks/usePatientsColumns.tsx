@@ -83,7 +83,9 @@ export function usePatientsColumns({
         width: 80,
         ellipsis: true,
         render: (weight: number) => (
-          <TooltipColumn text={`${weight?.toString()} kg`} />
+          <TooltipColumn
+            text={weight ? `${weight?.toString()} kg` : undefined}
+          />
         )
       },
       {
@@ -93,7 +95,9 @@ export function usePatientsColumns({
         width: 80,
         ellipsis: true,
         render: (height: number) => (
-          <TooltipColumn text={`${height?.toString()} m`} />
+          <TooltipColumn
+            text={height ? `${height?.toString()} m` : undefined}
+          />
         )
       },
       {
@@ -111,7 +115,9 @@ export function usePatientsColumns({
         width: 250,
         ellipsis: true,
         render: (conditions: string[]) => (
-          <TooltipColumn text={conditions.join(', ')} />
+          <TooltipColumn
+            text={conditions ? conditions.join(', ') : undefined}
+          />
         )
       },
       {
@@ -121,7 +127,7 @@ export function usePatientsColumns({
         width: 250,
         ellipsis: true,
         render: (allergies: string[]) => (
-          <TooltipColumn text={allergies.join(', ')} />
+          <TooltipColumn text={allergies ? allergies.join(', ') : undefined} />
         )
       },
       commonColumns.createdAt(),

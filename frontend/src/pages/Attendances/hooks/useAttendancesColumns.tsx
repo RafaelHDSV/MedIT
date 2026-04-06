@@ -55,7 +55,11 @@ export function useAttendancesColumns({
         ellipsis: true,
         render: (date: Date | string) => (
           <TooltipColumn
-            text={`${dayjs(date).format('DD/MM/YYYY')} às ${dayjs(date).format('HH:mm')}  `}
+            text={
+              date
+                ? `${dayjs(date).format('DD/MM/YYYY')} às ${dayjs(date).format('HH:mm')}`
+                : undefined
+            }
           />
         )
       },
@@ -65,7 +69,8 @@ export function useAttendancesColumns({
         key: 'risk',
         width: 160,
         ellipsis: true,
-        render: (risk: string) => <RiskTag risk={risk as AttendanceRisk} />
+        render: (risk: string) =>
+          risk ? <RiskTag risk={risk as AttendanceRisk} /> : 'n/a'
       },
       {
         title: 'Diagnóstico',
@@ -73,13 +78,11 @@ export function useAttendancesColumns({
         key: 'diagnosis',
         width: 120,
         ellipsis: true,
-        render: (text: string) => {
-          return text ? (
-            <TooltipColumn text={`${text} ${assertivenessIA && '✅'}`} />
-          ) : (
-            <TooltipColumn text={'N/A'} />
-          )
-        }
+        render: (text: string) => (
+          <TooltipColumn
+            text={text ? `${text} ${assertivenessIA && '✅'}` : undefined}
+          />
+        )
       },
       commonColumns.createdAt(),
       commonColumns.updatedAt()
