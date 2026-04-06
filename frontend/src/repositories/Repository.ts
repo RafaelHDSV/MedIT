@@ -14,9 +14,7 @@ export class Repository {
     this.path = path
   }
 
-  async handle<T>(
-    request: () => Promise<AxiosResponse<T>>
-  ): Promise<T | undefined> {
+  async handle<T>(request: () => Promise<AxiosResponse<T>>): Promise<T> {
     const response = await request()
     return response.data
   }

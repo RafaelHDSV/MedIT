@@ -1,8 +1,9 @@
 import Button from '@/components/Button/Button'
 import { FormItem } from '@/components/FormComponents/FormComponents'
+import { handleApiError } from '@/helpers/handleApiError'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
-import { Flex, Form, Input, message } from 'antd'
+import { Flex, Form, Input } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -43,8 +44,7 @@ export default function SignIn() {
       await login(payload)
       navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
-      console.error(err)
-      message.error('Email/CPF ou senha inválidos')
+      handleApiError({ err, defaultMessage: 'Email/CPF ou senha inválidos' })
     } finally {
       setLoading(false)
     }
