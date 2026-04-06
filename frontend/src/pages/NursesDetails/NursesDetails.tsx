@@ -153,7 +153,7 @@ function NursesDetails() {
           itens={attendances?.slice(0, 5)?.map((attendance) => ({
             key: attendance._id,
             label: dayjs(attendance.date).format('DD/MM/YYYY'),
-            value: `${attendance.diagnosis ?? ''} - ${attendance.complaint}`
+            value: attendance.complaint
           }))}
         />
       </div>

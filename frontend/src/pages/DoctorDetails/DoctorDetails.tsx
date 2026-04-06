@@ -159,12 +159,13 @@ function DoctorDetails() {
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
           // VIEIRA Tirar slice e quando clicar mostrar todos
-          itens={attendances?.slice(0, 5)?.map((attendance) => ({
+          itens={attendances?.slice(0, 4)?.map((attendance) => ({
             key: attendance._id,
             label: dayjs(attendance.date).format('DD/MM/YYYY'),
-            value: `${attendance.diagnosis ?? ''} - ${attendance.complaint}`
+            value: attendance.complaint
           }))}
           loading={loading}
+          isAttendanceHistory
         />
       </div>
     </section>
