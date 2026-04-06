@@ -1,5 +1,7 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
-import RiskTag from '@/components/RiskTag/RiskTag' // 🔧 ADICIONAR AQUIimport { handleApiError } from '@/helpers/handleApiError'
+import UserBall from '@/components/UserBall/UserBall'
+import { handleApiError } from '@/helpers/handleApiError' 
+import RiskTag from '@/components/RiskTag/RiskTag' 
 import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import DashboardRepository from '@/repositories/DashboardRepository'
