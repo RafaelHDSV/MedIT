@@ -83,6 +83,7 @@ function DoctorDetails() {
             />
 
             <DeleteModal
+              user={doctor}
               label='médico(a)'
               apiName='doctors'
               buttonText='Deletar médico(a)'

@@ -100,7 +100,7 @@ function ModalContent({
       footer={null}
       centered
     >
-      <h2>Editar paciente</h2>
+      <h2>Editar {patient?.name ?? 'paciente'}</h2>
 
       <Form
         form={form}

@@ -43,7 +43,7 @@ export function useDoctorsColumns({
   const handleDelete = useCallback(
     async (doctor: IDoctor) => {
       Modal.confirm({
-        title: 'Deseja deletar este médico(a)?',
+        title: `Deseja deletar o ${doctor.name ?? 'médico(a)'}?`,
         content: `Esta ação não pode ser desfeita.`,
         okText: 'Sim, deletar',
         cancelText: 'Cancelar',

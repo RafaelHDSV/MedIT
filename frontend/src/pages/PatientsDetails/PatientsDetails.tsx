@@ -81,6 +81,7 @@ function PatientsDetails() {
             />
 
             <DeleteModal
+              user={patient}
               label='paciente'
               apiName='patients'
               buttonText='Deletar paciente'
