@@ -25,7 +25,7 @@ import AttendanceByTimeChart from './components/AttendanceByTimeChart/Attendance
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import styles from './Dashboard.module.scss'
-import AttendanceQueueChartDoctor from './components/AttendanceQueueChart/AttendanceQueueChartDoctor'
+import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -213,7 +213,13 @@ function Dashboard() {
         }
       />
 
-      <div className={styles.container}>
+      <div
+        className={
+          user?.level === UserLevels.DOCTOR
+            ? styles.containerDoctor
+            : styles.container
+        }
+      >
         {cardsData.map(({ Icon, value, label }) => (
           <DashboardStatusCard
             key={label}

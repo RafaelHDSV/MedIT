@@ -1,13 +1,13 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import UserBall from '@/components/UserBall/UserBall'
-import { handleApiError } from '@/helpers/handleApiError' 
-import RiskTag from '@/components/RiskTag/RiskTag' 
+import { handleApiError } from '@/helpers/handleApiError'
+import RiskTag from '@/components/RiskTag/RiskTag'
 import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import styles from './AttendanceQueueChart.module.scss'
+import styles from './AttendanceQueueChartDoctor.module.scss'
 
 function AttendanceQueueChartDoctor() {
   const { user } = useAuth()
@@ -43,15 +43,24 @@ function AttendanceQueueChartDoctor() {
 
   return (
     <DashboardCard
-      title='Meus Atendimentos'
+      title='Fila de Atendimento'
       icon={StethoscopeIcon}
-      asideText={`${data.length} pacientes`}
+      asideText={`${data.length} atendimentos`}
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>
         {loading
           ? Array.from({ length: 5 }).map((_, i) => (
-              <div key={i}>Carregando...</div>
+              <div key={i} className={styles.queueItem}>
+                <div className={styles.leftAside}>
+                  <div className={styles.avatarSkeleton} />
+                  <div className={styles.info}>
+                    <span className={styles.skeleton} />
+                    <span className={styles.skeleton} />
+                  </div>
+                </div>
+                <div className={styles.tagSkeleton} />
+              </div>
             ))
           : data.map((item) => (
               <div key={String(item._id)} className={styles.queueItem}>
@@ -62,8 +71,8 @@ function AttendanceQueueChartDoctor() {
                     <strong className={styles.name}>{item.patientName}</strong>
 
                     <div className={styles.details}>
-                      <span>Idade não informada</span>
-                      <span>Sintoma não informado</span>
+                      <span>-- anos</span>
+                      <span>--</span>
                       <span>Aguardando...</span>
                     </div>
                   </div>
@@ -72,8 +81,11 @@ function AttendanceQueueChartDoctor() {
                 <div className={styles.rightAside}>
                   <RiskTag risk={item.risk} />
 
-                  <button className={styles.startButton}>
-                    Iniciar Atendimento
+                  <button
+                    className={styles.startButton}
+                    onClick={() => console.log('Iniciar atendimento', item._id)}
+                  >
+                    Iniciar Atendimnto
                   </button>
                 </div>
               </div>
