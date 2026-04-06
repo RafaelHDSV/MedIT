@@ -83,7 +83,7 @@ function UserDetailsCard({
             <DetailsLine
               key={item.key ? String(item.key) : String(index)}
               label={item.label}
-              value={item.value}
+              value={item.value ? item.value : 'n/a'}
             />
           ))}
 
