@@ -42,7 +42,7 @@ export function useNursesColumns({
   const handleDelete = useCallback(
     async (nurse: INurse) => {
       Modal.confirm({
-        title: `Deseja deletar o ${nurse?.name ?? 'enfermeiro(a)'}?`,
+        title: `Deseja deletar ${nurse?.name ?? 'o enfermeiro(a)'}?`,
         content: `Esta ação não pode ser desfeita.`,
         okText: 'Sim, deletar',
         cancelText: 'Cancelar',

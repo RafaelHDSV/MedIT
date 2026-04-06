@@ -119,7 +119,7 @@ function ModalContent({
     >
       <h2>
         {isEditMode
-          ? `Editar ${nurse?.name ?? 'enfermeiro(a)'}`
+          ? `Editar ${nurse?.name ?? 'o enfermeiro(a)'}`
           : 'Adicionar enfermeiro(a)'}
       </h2>
 
