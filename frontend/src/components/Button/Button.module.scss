@@ -35,13 +35,13 @@
 }
 
 .secondary {
-  color: var(--gray);
+  color: var(--gray-1);
   background-color: var(--gray-3);
 
   &:hover,
   &:focus-visible {
-    background-color: var(--primary-opaque);
-    color: var(--gray-1);
+    background-color: var(--gray-2);
+    color: var(--gray-2);
     outline: 2px solid var(--gray-1);
   }
 
