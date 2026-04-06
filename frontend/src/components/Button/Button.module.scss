@@ -35,6 +35,22 @@
 }
 
 .secondary {
+  color: var(--gray);
+  background-color: var(--gray-3);
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--primary-opaque);
+    color: var(--gray-1);
+    outline: 2px solid var(--gray-1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.outline {
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
   background-color: transparent;

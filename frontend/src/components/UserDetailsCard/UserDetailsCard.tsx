@@ -1,5 +1,6 @@
 import type { Icon } from '@phosphor-icons/react'
 import { Skeleton } from 'antd'
+import Button from '../Button/Button'
 import type { IDetailsLineProps } from '../DetailsLine/DetailsLine'
 import DetailsLine from '../DetailsLine/DetailsLine'
 import styles from './UserDetailsCard.module.scss'
@@ -11,6 +12,7 @@ interface IUserDetailsCardProps {
   itens?: IDetailsLineProps[]
   loading?: boolean
   useFullWidth?: boolean
+  isAttendanceHistory?: boolean
 }
 
 function UserDetailsCard({
@@ -19,7 +21,8 @@ function UserDetailsCard({
   className,
   itens,
   loading = false,
-  useFullWidth = false
+  useFullWidth = false,
+  isAttendanceHistory = false
 }: IUserDetailsCardProps) {
   if (loading) {
     return (
@@ -29,6 +32,10 @@ function UserDetailsCard({
         {itens?.map((_item, index) => (
           <Skeleton.Button key={index} className={styles.itemSkeleton} active />
         ))}
+
+        {isAttendanceHistory && (
+          <Skeleton.Button className={styles.itemSkeleton} active />
+        )}
       </section>
     )
   }
@@ -50,6 +57,8 @@ function UserDetailsCard({
             value={item.value}
           />
         ))}
+
+        {isAttendanceHistory && <Button mode='secondary'>Ver mais</Button>}
       </div>
     </section>
   )
