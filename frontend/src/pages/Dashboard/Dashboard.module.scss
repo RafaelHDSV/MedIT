@@ -43,9 +43,9 @@
 .containerDoctor {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto 1fr;
   gap: 1rem;
   height: 100%;
-
   grid-template-areas:
     'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
     'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart'

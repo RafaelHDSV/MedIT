@@ -48,48 +48,54 @@ function AttendanceQueueChartDoctor() {
       asideText={`${data.length} atendimentos`}
       gridArea='attendanceQueueChart'
     >
-      <div className={styles.queueList}>
-        {loading
-          ? Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className={styles.queueItem}>
-                <div className={styles.leftAside}>
-                  <div className={styles.avatarSkeleton} />
-                  <div className={styles.info}>
-                    <span className={styles.skeleton} />
-                    <span className={styles.skeleton} />
-                  </div>
-                </div>
-                <div className={styles.tagSkeleton} />
-              </div>
-            ))
-          : data.map((item) => (
-              <div key={String(item._id)} className={styles.queueItem}>
-                <div className={styles.leftAside}>
-                  <UserBall name={item.patientName} />
-
-                  <div className={styles.info}>
-                    <strong className={styles.name}>{item.patientName}</strong>
-
-                    <div className={styles.details}>
-                      <span>-- anos</span>
-                      <span>--</span>
-                      <span>Aguardando...</span>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div className={styles.queueList}>
+          {loading
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className={styles.queueItem}>
+                  <div className={styles.leftAside}>
+                    <div className={styles.avatarSkeleton} />
+                    <div className={styles.info}>
+                      <span className={styles.skeleton} />
+                      <span className={styles.skeleton} />
                     </div>
                   </div>
+                  <div className={styles.tagSkeleton} />
                 </div>
+              ))
+            : data.map((item) => (
+                <div key={String(item._id)} className={styles.queueItem}>
+                  <div className={styles.leftAside}>
+                    <UserBall name={item.patientName} />
 
-                <div className={styles.rightAside}>
-                  <RiskTag risk={item.risk} />
+                    <div className={styles.info}>
+                      <strong className={styles.name}>
+                        {item.patientName}
+                      </strong>
 
-                  <button
-                    className={styles.startButton}
-                    onClick={() => console.log('Iniciar atendimento', item._id)}
-                  >
-                    Iniciar Atendimnto
-                  </button>
+                      <div className={styles.details}>
+                        <span>-- anos</span>
+                        <span>--</span>
+                        <span>Aguardando...</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.rightAside}>
+                    <RiskTag risk={item.risk} />
+
+                    <button
+                      className={styles.startButton}
+                      onClick={() =>
+                        console.log('Iniciar atendimento', item._id)
+                      }
+                    >
+                      Iniciar Atendimnto
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+        </div>
       </div>
     </DashboardCard>
   )
