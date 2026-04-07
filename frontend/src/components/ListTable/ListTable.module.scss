@@ -54,54 +54,27 @@
   }
 }
 
+.searchInput,
+.filterDateRange {
+  flex: 1;
+  min-width: 0;
+}
+
 .searchInput {
-  flex: 1;
-  min-width: 0;
-}
+  :global(.ant-input) {
+    border-radius: 0.75rem;
+    border-color: var(--border);
+  }
 
-.searchInput :global(.ant-input) {
-  border-radius: 0.75rem;
-  border-color: var(--border);
-}
+  :global(.ant-input:focus),
+  :global(.ant-input-focused) {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-opaque);
+  }
 
-.searchInput :global(.ant-input:focus),
-.searchInput :global(.ant-input-focused) {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-opaque);
-}
-
-.searchInput :global(.ant-input-prefix) {
-  color: var(--gray);
-}
-
-.dateRange {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.dateSeparator {
-  color: var(--gray);
-  font-weight: 500;
-  user-select: none;
-}
-
-.dateInput {
-  flex: 1;
-  min-width: 0;
-}
-
-.dateInput :global(.ant-picker) {
-  border-radius: 0.75rem;
-  border-color: var(--border);
-  width: 100%;
-}
-
-.dateInput :global(.ant-picker-focused) {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-opaque);
+  :global(.ant-input-prefix) {
+    color: var(--gray);
+  }
 }
 
 .filterDatepicker :global {

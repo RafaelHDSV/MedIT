@@ -1,22 +1,34 @@
 import masks, { type MaskEnum } from '@/utils/masks'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
-import { DatePicker, Input, Select, Table } from 'antd'
+import { Input, Select, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import Button from '../Button/Button'
 import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
-import type { DateValue } from '../MultiDatepicker/types'
+import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
+import {
+  DayjsType,
+  type DateValue,
+  type DayjsValue
+} from '../MultiDatepicker/types'
 import styles from './ListTable.module.scss'
 
-type SearchField = 'number' | 'cpf' | 'name' | 'email' | 'birthDate'
+type SearchField =
+  | 'number'
+  | 'cpf'
+  | 'name'
+  | 'email'
+  | 'createdAt'
+  | 'updatedAt'
 
 interface SearchableItem {
   number?: string
   cpf?: string
   name?: string | string[]
   email?: string | string[]
-  birthDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 type MaskMap = Record<SearchField, MaskEnum | null>
@@ -26,12 +38,14 @@ const FIELD_OPTIONS: { label: string; value: SearchField }[] = [
   { label: 'CPF', value: 'cpf' },
   { label: 'Nome', value: 'name' },
   { label: 'Email', value: 'email' },
-  { label: 'Data de Nascimento', value: 'birthDate' }
+  { label: 'Criado em', value: 'createdAt' },
+  { label: 'Atualizado em', value: 'updatedAt' }
 ]
 
 const FIELD_MASKS: MaskMap = {
   cpf: 'cpf',
-  birthDate: 'date',
+  createdAt: 'date',
+  updatedAt: 'date',
   number: null,
   name: null,
   email: null
@@ -57,7 +71,7 @@ function ListTable<T extends SearchableItem>({
     null
   ])
 
-  const isDateField = searchField === 'birthDate'
+  const isDateField = searchField === 'createdAt' || searchField === 'updatedAt'
 
   function handleFieldChange(field: SearchField) {
     setSearchField(field)
@@ -70,11 +84,10 @@ function ListTable<T extends SearchableItem>({
       const [start, end] = dateRange
       if (!start || !end) return dataSource
       return dataSource.filter((item) => {
-        const date = dayjs(item.birthDate)
-        const itemTimestamp = date.startOf('day').valueOf()
-        const startTimestamp = start.startOf('day').valueOf()
-        const endTimestamp = end.endOf('day').valueOf()
-        return itemTimestamp >= startTimestamp && itemTimestamp <= endTimestamp
+        const itemDate = dayjs(item[searchField]).startOf('day').valueOf()
+        const startTs = start.startOf('day').valueOf()
+        const endTs = end.endOf('day').valueOf()
+        return itemDate >= startTs && itemDate <= endTs
       })
     }
 
@@ -90,13 +103,7 @@ function ListTable<T extends SearchableItem>({
         : raw.toLowerCase()
       return itemValue.includes(searchTerm)
     })
-  }, [dataSource, search, searchField, dateRange, isDateField])
-
-  function handleReset() {
-    setSearch('')
-    setDateRange([null, null])
-    onReload()
-  }
+  }, [dataSource, search, searchField, isDateField, dateRange])
 
   const currentFieldLabel =
     FIELD_OPTIONS.find((f) => f.value === searchField)?.label ?? ''
@@ -118,25 +125,20 @@ function ListTable<T extends SearchableItem>({
           />
 
           {isDateField ? (
-            <div className={styles.dateRange}>
-              <DatePicker
-                className={styles.dateInput}
-                rootClassName={styles.filterDatepicker}
-                value={dateRange[0]}
-                onChange={(date) => setDateRange([date, dateRange[1]])}
-                format='DD/MM/YYYY'
-                placeholder='Data inicial'
-              />
-              <span className={styles.dateSeparator}>—</span>
-              <DatePicker
-                className={styles.dateInput}
-                rootClassName={styles.filterDatepicker}
-                value={dateRange[1]}
-                onChange={(date) => setDateRange([dateRange[0], date])}
-                format='DD/MM/YYYY'
-                placeholder='Data final'
-              />
-            </div>
+            <MultiDatepicker
+              className={styles.filterDateRange}
+              value={dateRange}
+              type={DayjsType.range}
+              options={[DayjsType.range]}
+              onDateChange={(dates: DayjsValue) => {
+                if (dates && Array.isArray(dates)) {
+                  setDateRange([dates[0], dates[1]])
+                } else {
+                  setDateRange([null, null])
+                }
+              }}
+              allowClear
+            />
           ) : (
             <Input
               className={styles.searchInput}
@@ -151,7 +153,7 @@ function ListTable<T extends SearchableItem>({
           )}
         </div>
 
-        <Button mode='icon' onClick={handleReset}>
+        <Button mode='icon' onClick={onReload}>
           <ArrowCounterClockwiseIcon />
         </Button>
       </div>
