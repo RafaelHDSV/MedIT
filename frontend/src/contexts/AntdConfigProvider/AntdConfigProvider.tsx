@@ -91,6 +91,53 @@ function AntdConfigProvider({ children }: { children: React.ReactNode }) {
             placeholder: 'Selecione a hora',
             rangePlaceholder: ['Hora inicial', 'Hora final']
           }
+        },
+        Calendar: {
+          lang: {
+            locale: 'pt-br',
+            today: 'Hoje',
+            now: 'Agora',
+            backToToday: 'Voltar para hoje',
+            ok: 'OK',
+            clear: 'Limpar',
+            month: 'Mês',
+            year: 'Ano',
+            timeSelect: 'Selecionar horário',
+            dateSelect: 'Selecionar data',
+            weekSelect: 'Selecionar semana',
+            monthSelect: 'Selecionar mês',
+            yearSelect: 'Selecionar ano',
+            decadeSelect: 'Selecionar década',
+            yearFormat: 'YYYY',
+            dateFormat: 'DD/MM/YYYY',
+            dayFormat: 'D',
+            dateTimeFormat: 'DD/MM/YYYY HH:mm:ss',
+            week: 'Semana',
+            previousMonth: 'Mês anterior',
+            nextMonth: 'Próximo mês',
+            previousYear: 'Ano anterior',
+            nextYear: 'Próximo ano',
+            monthBeforeYear: true,
+            shortWeekDays: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+            shortMonths: [
+              'Jan',
+              'Fev',
+              'Mar',
+              'Abr',
+              'Mai',
+              'Jun',
+              'Jul',
+              'Ago',
+              'Set',
+              'Out',
+              'Nov',
+              'Dez'
+            ],
+            previousDecade: 'Década anterior',
+            nextDecade: 'Próxima década',
+            previousCentury: 'Século anterior',
+            nextCentury: 'Próximo século'
+          }
         }
       }}
     >

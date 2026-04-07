@@ -4,6 +4,7 @@ import { handleApiError } from '@/helpers/handleApiError'
 import type { BloodType, IPatient } from '@/interfaces/IPatient'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
+import { sorterFunctionByNumber } from '@/utils/sorterFunction'
 import { DropIcon } from '@phosphor-icons/react'
 import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
@@ -82,6 +83,7 @@ export function usePatientsColumns({
         key: 'weight',
         width: 80,
         ellipsis: true,
+        sorter: sorterFunctionByNumber('weight'),
         render: (weight: number) => (
           <TooltipColumn
             text={weight ? `${weight?.toString()} kg` : undefined}
@@ -94,6 +96,7 @@ export function usePatientsColumns({
         key: 'height',
         width: 80,
         ellipsis: true,
+        sorter: sorterFunctionByNumber('height'),
         render: (height: number) => (
           <TooltipColumn
             text={height ? `${height?.toString()} m` : undefined}
