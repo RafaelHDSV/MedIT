@@ -1,5 +1,6 @@
+import masks, { type MaskEnum } from '@/utils/masks'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
-import { DatePicker, Flex, Input, Select, Table } from 'antd'
+import { DatePicker, Input, Select, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
@@ -18,6 +19,8 @@ interface SearchableItem {
   birthDate?: Date | string
 }
 
+type MaskMap = Record<SearchField, MaskEnum | null>
+
 const FIELD_OPTIONS: { label: string; value: SearchField }[] = [
   { label: 'ID', value: 'number' },
   { label: 'CPF', value: 'cpf' },
@@ -25,6 +28,14 @@ const FIELD_OPTIONS: { label: string; value: SearchField }[] = [
   { label: 'Email', value: 'email' },
   { label: 'Data de Nascimento', value: 'birthDate' }
 ]
+
+const FIELD_MASKS: MaskMap = {
+  cpf: 'cpf',
+  birthDate: 'date',
+  number: null,
+  name: null,
+  email: null
+}
 
 function ListTable<T extends SearchableItem>({
   dataSource,
@@ -68,13 +79,27 @@ function ListTable<T extends SearchableItem>({
     }
 
     if (!search.trim()) return dataSource
-    const term = search.toLowerCase()
-    return dataSource.filter((item) =>
-      String(item[searchField] ?? '')
-        .toLowerCase()
-        .includes(term)
-    )
+    const isMasked = !!FIELD_MASKS[searchField]
+    const searchTerm = isMasked
+      ? search.replace(/\D/g, '').toLowerCase()
+      : search.toLowerCase()
+    return dataSource.filter((item) => {
+      const raw = String(item[searchField] ?? '')
+      const itemValue = isMasked
+        ? raw.replace(/\D/g, '').toLowerCase()
+        : raw.toLowerCase()
+      return itemValue.includes(searchTerm)
+    })
   }, [dataSource, search, searchField, dateRange, isDateField])
+
+  function handleReset() {
+    setSearch('')
+    setDateRange([null, null])
+    onReload()
+  }
+
+  const currentFieldLabel =
+    FIELD_OPTIONS.find((f) => f.value === searchField)?.label ?? ''
 
   if (loading) {
     return <LayoutSpinner />
@@ -82,45 +107,54 @@ function ListTable<T extends SearchableItem>({
 
   return (
     <>
-      <Flex gap={16} align='center' className={styles.filters}>
-        <Select
-          value={searchField}
-          onChange={handleFieldChange}
-          options={FIELD_OPTIONS}
-          style={{ flex: 1 }}
-        />
-
-        {isDateField ? (
-          <Flex gap={8} style={{ flex: 1 }}>
-            <DatePicker
-              value={dateRange[0]}
-              onChange={(date) => setDateRange([date, dateRange[1]])}
-              format='DD/MM/YYYY'
-              placeholder='Data inicial'
-              style={{ flex: 1 }}
-            />
-            <DatePicker
-              value={dateRange[1]}
-              onChange={(date) => setDateRange([dateRange[0], date])}
-              format='DD/MM/YYYY'
-              placeholder='Data final'
-              style={{ flex: 1 }}
-            />
-          </Flex>
-        ) : (
-          <Input
-            placeholder={`Pesquisar por ${FIELD_OPTIONS.find((f) => f.value === searchField)?.label}`}
-            allowClear
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ flex: 1 }}
+      <div className={styles.filters}>
+        <div className={styles.filtersGroup}>
+          <Select
+            className={styles.filterSelect}
+            rootClassName={styles.filterSelectDropdown}
+            value={searchField}
+            onChange={handleFieldChange}
+            options={FIELD_OPTIONS}
           />
-        )}
 
-        <Button mode='icon' onClick={onReload}>
+          {isDateField ? (
+            <div className={styles.dateRange}>
+              <DatePicker
+                className={styles.dateInput}
+                rootClassName={styles.filterDatepicker}
+                value={dateRange[0]}
+                onChange={(date) => setDateRange([date, dateRange[1]])}
+                format='DD/MM/YYYY'
+                placeholder='Data inicial'
+              />
+              <span className={styles.dateSeparator}>—</span>
+              <DatePicker
+                className={styles.dateInput}
+                rootClassName={styles.filterDatepicker}
+                value={dateRange[1]}
+                onChange={(date) => setDateRange([dateRange[0], date])}
+                format='DD/MM/YYYY'
+                placeholder='Data final'
+              />
+            </div>
+          ) : (
+            <Input
+              className={styles.searchInput}
+              placeholder={`Pesquisar por ${currentFieldLabel}`}
+              allowClear
+              value={search}
+              onChange={(e) => {
+                const mask = FIELD_MASKS[searchField]
+                setSearch(mask ? masks(e.target.value, mask) : e.target.value)
+              }}
+            />
+          )}
+        </div>
+
+        <Button mode='icon' onClick={handleReset}>
           <ArrowCounterClockwiseIcon />
         </Button>
-      </Flex>
+      </div>
 
       <div className={styles.tableWrapper}>
         <Table
