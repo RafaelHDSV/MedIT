@@ -82,7 +82,6 @@ export function useDoctorsColumns({
         key: 'crm',
         width: 120,
         ellipsis: true,
-        sorter: (a: any, b: any) => (a.crm ?? '').localeCompare(b.crm ?? ''),
         render: (crm: string) => (
           <TooltipColumn text={crm ? masks(crm, 'crm') : undefined} />
         )

@@ -5,43 +5,48 @@ import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import Button from '../Button/Button'
 import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
+import type { DateValue } from '../MultiDatepicker/types'
 import styles from './ListTable.module.scss'
 
-type SearchField = 'name' | 'email' | 'cpf' | 'crm' | 'number' | 'birthDate'
+type SearchField = 'number' | 'cpf' | 'name' | 'email' | 'birthDate'
+
+interface SearchableItem {
+  number?: string
+  cpf?: string
+  name?: string | string[]
+  email?: string | string[]
+  birthDate?: Date | string
+}
 
 const FIELD_OPTIONS: { label: string; value: SearchField }[] = [
+  { label: 'ID', value: 'number' },
+  { label: 'CPF', value: 'cpf' },
   { label: 'Nome', value: 'name' },
   { label: 'Email', value: 'email' },
-  { label: 'CPF', value: 'cpf' },
-  { label: 'CRM', value: 'crm' },
-  { label: 'ID', value: 'number' },
-  { label: 'Data de Nascimento', value: 'birthDate' },
+  { label: 'Data de Nascimento', value: 'birthDate' }
 ]
 
-function ListTable<K extends Record<string, any>>({
+function ListTable<T extends SearchableItem>({
   dataSource,
   columns,
   pageSize = 6,
   loading,
   onReload
 }: {
-  dataSource: K[]
-  columns: ColumnType<K>[]
+  dataSource: T[]
+  columns: ColumnType<T>[]
   pageSize?: number
   loading: boolean
   onReload: () => void
 }) {
-  const [searchField, setSearchField] = useState<SearchField>('name')
+  const [searchField, setSearchField] = useState<SearchField>('number')
   const [search, setSearch] = useState('')
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([null, null])
+  const [dateRange, setDateRange] = useState<[DateValue, DateValue]>([
+    null,
+    null
+  ])
 
   const isDateField = searchField === 'birthDate'
-
-  function handleReset() {
-    setSearch('')
-    setDateRange([null, null])
-    onReload()
-  }
 
   function handleFieldChange(field: SearchField) {
     setSearchField(field)
@@ -55,14 +60,19 @@ function ListTable<K extends Record<string, any>>({
       if (!start || !end) return dataSource
       return dataSource.filter((item) => {
         const date = dayjs(item.birthDate)
-        return date.isAfter(start.startOf('day')) && date.isBefore(end.endOf('day'))
+        const itemTimestamp = date.startOf('day').valueOf()
+        const startTimestamp = start.startOf('day').valueOf()
+        const endTimestamp = end.endOf('day').valueOf()
+        return itemTimestamp >= startTimestamp && itemTimestamp <= endTimestamp
       })
     }
 
     if (!search.trim()) return dataSource
     const term = search.toLowerCase()
     return dataSource.filter((item) =>
-      String(item[searchField] ?? '').toLowerCase().includes(term)
+      String(item[searchField] ?? '')
+        .toLowerCase()
+        .includes(term)
     )
   }, [dataSource, search, searchField, dateRange, isDateField])
 
@@ -77,7 +87,7 @@ function ListTable<K extends Record<string, any>>({
           value={searchField}
           onChange={handleFieldChange}
           options={FIELD_OPTIONS}
-          style={{ width: 200 }}
+          style={{ flex: 1 }}
         />
 
         {isDateField ? (
@@ -99,7 +109,7 @@ function ListTable<K extends Record<string, any>>({
           </Flex>
         ) : (
           <Input
-            placeholder={`Pesquisar por ${FIELD_OPTIONS.find(f => f.value === searchField)?.label}`}
+            placeholder={`Pesquisar por ${FIELD_OPTIONS.find((f) => f.value === searchField)?.label}`}
             allowClear
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -107,7 +117,7 @@ function ListTable<K extends Record<string, any>>({
           />
         )}
 
-        <Button mode='icon' onClick={handleReset}>
+        <Button mode='icon' onClick={onReload}>
           <ArrowCounterClockwiseIcon />
         </Button>
       </Flex>
