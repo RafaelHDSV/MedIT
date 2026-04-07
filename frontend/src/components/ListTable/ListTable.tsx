@@ -23,7 +23,7 @@ type SearchField =
   | 'updatedAt'
 
 interface SearchableItem {
-  number?: string
+  number?: number
   cpf?: string
   name?: string | string[]
   email?: string | string[]
