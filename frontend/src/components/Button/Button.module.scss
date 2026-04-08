@@ -1,5 +1,7 @@
 .button {
-  height: 2.5rem;
+  --button-height: 0;
+
+  height: var(--button-height);
   background-color: var(--primary-color);
   color: var(--white);
   border: none;

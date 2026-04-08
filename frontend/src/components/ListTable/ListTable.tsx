@@ -1,3 +1,4 @@
+import { useIsMobile } from '@/hooks/useIsMobile'
 import masks, { type MaskEnum } from '@/utils/masks'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { Input, Select, Table } from 'antd'
@@ -70,6 +71,7 @@ function ListTable<T extends SearchableItem>({
     null,
     null
   ])
+  const isMobile = useIsMobile()
 
   const isDateField = searchField === 'createdAt' || searchField === 'updatedAt'
 
@@ -153,9 +155,15 @@ function ListTable<T extends SearchableItem>({
           )}
         </div>
 
-        <Button mode='icon' onClick={onReload}>
-          <ArrowCounterClockwiseIcon />
-        </Button>
+        {isMobile ? (
+          <Button className='w-100' buttonHeight='2rem' onClick={onReload}>
+            Atualizar
+          </Button>
+        ) : (
+          <Button mode='icon' onClick={onReload}>
+            <ArrowCounterClockwiseIcon />
+          </Button>
+        )}
       </div>
 
       <div className={styles.tableWrapper}>

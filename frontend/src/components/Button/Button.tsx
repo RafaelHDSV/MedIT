@@ -4,10 +4,18 @@ import styles from './Button.module.scss'
 
 interface IButtonProps extends ButtonProps {
   mode?: 'primary' | 'secondary' | 'outline' | 'icon'
-  children: React.ReactNode
+  buttonHeight?: string
 }
 
-function Button({ htmlType, loading, children, mode, ...props }: IButtonProps) {
+function Button({
+  mode,
+  buttonHeight = '2.5rem',
+  htmlType,
+  loading,
+  children,
+  className,
+  ...props
+}: IButtonProps) {
   const isIcon = mode === 'icon'
 
   const type = useMemo(() => {
@@ -27,7 +35,12 @@ function Button({ htmlType, loading, children, mode, ...props }: IButtonProps) {
 
   return (
     <AntdButton
-      className={`${styles.button} ${mode ? styles[mode] : ''}`}
+      className={`${styles.button} ${mode ? styles[mode] : ''} ${className ?? ''}`}
+      style={
+        {
+          '--button-height': buttonHeight
+        } as React.CSSProperties
+      }
       type={type}
       loading={loading}
       htmlType={htmlType}
