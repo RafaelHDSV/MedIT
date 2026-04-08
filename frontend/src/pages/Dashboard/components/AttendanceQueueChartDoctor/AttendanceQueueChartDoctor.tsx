@@ -52,58 +52,60 @@ function AttendanceQueueChartDoctor() {
       asideText={`${data.length} atendimentos`}
       gridArea='attendanceQueueChart'
     >
-      
-        <div className={styles.queueList}>
-          {loading
-            ? Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className={styles.queueItem}>
-                  <div className={styles.avatarSkeleton} />
-                  <span
-                    className={styles.skeleton}
-                    style={{ width: 120, height: 14 }}
-                  />
-                  <span
-                    className={styles.skeleton}
-                    style={{ width: 50, height: 14 }}
-                  />
-                  <span
-                    className={styles.skeleton}
-                    style={{ width: 80, height: 14 }}
-                  />
-                  <span
-                    className={styles.skeleton}
-                    style={{ width: 90, height: 14 }}
-                  />
-                  <div className={styles.tagSkeleton} />
-                  <div className={styles.buttonSkeleton} />
-                </div>
-              ))
-            : visibleData.map((item) => (
-                <div key={String(item._id)} className={styles.queueItem}>
-                  <UserBall name={item.patientName} />
-                  <strong className={styles.name}>{item.patientName}</strong>
-                  <span className={styles.detailAge}>-- anos</span>
-                  <span className={styles.detailSymptom}>--</span>
-                  <span className={styles.detailWaiting}>Aguardando...</span>
-                  <RiskTag risk={item.risk} />
-                  <button
-                    className={styles.startButton}
-                    onClick={() => console.log('Iniciar atendimento', item._id)}
-                  >
-                    Iniciar Atendimento
-                  </button>
-                </div>
-              ))}
-        </div>
+      <div
+        className={styles.queueList}
+        style={{ alignSelf: 'flex-start', width: '100%' }}
+      >
+        {loading
+          ? Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className={styles.queueItem}>
+                <div className={styles.avatarSkeleton} />
+                <span
+                  className={styles.skeleton}
+                  style={{ width: 120, height: 14 }}
+                />
+                <span
+                  className={styles.skeleton}
+                  style={{ width: 50, height: 14 }}
+                />
+                <span
+                  className={styles.skeleton}
+                  style={{ width: 80, height: 14 }}
+                />
+                <span
+                  className={styles.skeleton}
+                  style={{ width: 90, height: 14 }}
+                />
+                <div className={styles.tagSkeleton} />
+                <div className={styles.buttonSkeleton} />
+              </div>
+            ))
+          : visibleData.map((item) => (
+              <div key={String(item._id)} className={styles.queueItem}>
+                <UserBall name={item.patientName} />
+                <strong className={styles.name}>{item.patientName}</strong>
+                <span className={styles.detailAge}>-- anos</span>
+                <span className={styles.detailSymptom}>--</span>
+                <span className={styles.detailWaiting}>Aguardando...</span>
+                <RiskTag risk={item.risk} />
+                <button
+                  className={styles.startButton}
+                  onClick={() => console.log('Iniciar atendimento', item._id)}
+                >
+                  Iniciar Atendimento
+                </button>
+              </div>
+            ))}
+      </div>
 
-        {!loading && !showAll && hiddenCount > 0 && (
-          <button
-            className={styles.showMoreButton}
-            onClick={() => setShowAll(true)}
-          >
-            + {hiddenCount} atendimentos
-          </button>
-        )}
+      {!loading && !showAll && hiddenCount > 0 && (
+        <button
+          className={styles.showMoreButton}
+          onClick={() => setShowAll(true)}
+        >
+          + {hiddenCount} atendimentos
+        </button>
+      )}
     </DashboardCard>
   )
 }
