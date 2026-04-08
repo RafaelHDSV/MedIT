@@ -14,7 +14,8 @@ export type OpeningHours = Record<WeekDay, IOpeningHour>
 export interface IUnit extends IBaseInterface {
   name: string
   address: string
-  maxOccupancy: number
-  openingHours: OpeningHours
+  maxOccupancy?: number
+  scale?: string
+  openingHours?: OpeningHours
   phone?: string
 }

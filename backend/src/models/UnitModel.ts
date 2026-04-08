@@ -16,8 +16,11 @@ const UnitSchema = new mongoose.Schema<IUnit>(
     },
     maxOccupancy: {
       type: Number,
-      required: [true, 'A capacidade máxima da unidade é obrigatória'],
-      min: [1, 'A capacidade máxima deve ser pelo menos 1']
+      default: 100
+    },
+    scale: {
+      type: String,
+      trim: true
     },
     openingHours: {
       type: Map,

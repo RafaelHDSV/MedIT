@@ -58,6 +58,11 @@ export const ROUTES = {
       'Gerencie o cadastro e o controle de medicamentos disponíveis.',
     path: '/auth/medications'
   },
+  UNIT_MEDICATIONS: {
+    name: 'Medicamentos da Unidade',
+    description: 'Gerencie os medicamentos e controle de estoque de uma unidade.',
+    path: '/auth/medications/:unitId'
+  },
   ATTENDANCES: {
     name: 'Histórico de atendimentos',
     description: 'Consulte o histórico de atendimentos realizados no sistema.',

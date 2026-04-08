@@ -5,6 +5,7 @@ import { PORT } from './globals/Config.js'
 import authRoutes from './routes/authRoutes.js'
 import dashboardRoutes from './routes/dashboardRoutes.js'
 import doctorsRoutes from './routes/doctorsRoutes.js'
+import medicationRoutes from './routes/medicationRoutes.js'
 import nursesRoutes from './routes/nursesRoutes.js'
 import patientsRoutes from './routes/patientsRoutes.js'
 import unitsRoutes from './routes/unitsRoutes.js'
@@ -27,6 +28,7 @@ app.use('/doctors', doctorsRoutes)
 app.use('/nurses', nursesRoutes)
 app.use('/patients', patientsRoutes)
 app.use('/units', unitsRoutes)
+app.use('/medications', medicationRoutes)
 app.use('/dashboard', dashboardRoutes)
 
 app.listen(PORT, () => {
