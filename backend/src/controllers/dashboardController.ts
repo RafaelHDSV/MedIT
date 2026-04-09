@@ -1,56 +1,191 @@
-import { faker } from '@faker-js/faker'
 import { Request, Response } from 'express'
-import { AttendanceRisk } from '../interfaces/IAttendance.js'
-import { getUnitService } from '../services/unitServices.js'
+import {
+  IAdminStatusCard,
+  IDashboardStatusCards,
+  IDoctorStatusCard,
+  INurseStatusCard
+} from '../interfaces/IDashboard.js'
+import { UserLevels } from '../interfaces/IUser.js'
+import {
+  getAttendanceByTime,
+  getAttendanceOcuppation,
+  getAttendanceQueue,
+  getAttended,
+  getAverageTime,
+  getDoctorAverageTime,
+  getEntries,
+  getHighRisk,
+  getInAttendance,
+  getTriageAverageTime,
+  getTriaged,
+  getWaitingForDoctor,
+  getWaitingForTriage
+} from '../services/attendanceService.js'
+import { getUnitService } from '../services/unitService.js'
 
-// TODO: Atualizar os dados para serem dinâmicos, utilizando os dados reais da unidade de saúde
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
-  const { unitId, level } = req.query
+  const { unitId, userId, level, period } = req.query
 
-  const unit = await getUnitService(unitId as string)
-  const occupied = 47
-  const maxOccupancy = unit.data?.maxOccupancy || 0
-  const occupancyRate = Math.round((occupied / maxOccupancy) * 100)
+  const unit = await getUnitService({ unitId: String(unitId) })
 
-  const adminData = {
-    entries: 142,
-    inAttendance: 46,
-    attended: 96,
-    occupancy: occupancyRate,
-    averageTime: 23,
-    highRisk: 8
+  async function getAdminData(): Promise<IAdminStatusCard | undefined> {
+    try {
+      const [
+        entries,
+        inAttendance,
+        attended,
+        occupancy,
+        averageTime,
+        highRisk
+      ] = await Promise.all([
+        getEntries({
+          unitId: String(unitId),
+          period: String(period)
+        }),
+        getInAttendance({
+          unitId: String(unitId)
+        }),
+        getAttended({
+          unitId: String(unitId),
+          period: String(period)
+        }),
+        getAttendanceOcuppation({
+          unitId: String(unitId),
+          maxOccupancy: Number(unit.data?.maxOccupancy)
+        }),
+        getAverageTime({
+          unitId: String(unitId),
+          period: String(period)
+        }),
+        getHighRisk({
+          unitId: String(unitId),
+          period: String(period)
+        })
+      ])
+
+      if (
+        entries === undefined ||
+        inAttendance === undefined ||
+        attended === undefined ||
+        occupancy === undefined ||
+        averageTime === undefined ||
+        highRisk === undefined
+      ) {
+        throw new Error('Erro ao buscar dados do dashboard')
+      }
+
+      return {
+        entries,
+        inAttendance,
+        attended,
+        occupancy,
+        averageTime,
+        highRisk
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const doctorData = {
-    waitingPatients: 14,
-    attended: 96,
-    averageTime: 18,
-    assertiveness: 52
+  async function getDoctorData(): Promise<IDoctorStatusCard | undefined> {
+    try {
+      const [waitingPatients, attended, averageTime] = await Promise.all([
+        getWaitingForDoctor({
+          unitId: String(unitId)
+        }),
+        getAttended({
+          unitId: String(unitId),
+          period: String(period),
+          doctorId: String(userId)
+        }),
+        getDoctorAverageTime({
+          unitId: String(unitId),
+          period: String(period),
+          doctorId: String(userId)
+        })
+      ])
+
+      if (
+        waitingPatients === undefined ||
+        attended === undefined ||
+        averageTime === undefined
+      ) {
+        throw new Error('Erro ao buscar dados do dashboard')
+      }
+
+      return {
+        waitingPatients,
+        attended,
+        averageTime,
+        // VIEIRA: Adicionar assertividade IA
+        assertiveness: 0
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const nurseData = {
-    waitingPatients: 25,
-    triagedPatients: 96,
-    averageTime: 18
+  async function getNurseData(): Promise<INurseStatusCard | undefined> {
+    try {
+      const [waitingPatients, triagedPatients, averageTime] = await Promise.all(
+        [
+          getWaitingForTriage({
+            unitId: String(unitId)
+          }),
+          getTriaged({
+            unitId: String(unitId),
+            period: String(period),
+            nurseId: String(userId)
+          }),
+          getTriageAverageTime({
+            unitId: String(unitId),
+            period: String(period),
+            nurseId: String(userId)
+          })
+        ]
+      )
+
+      if (
+        waitingPatients === undefined ||
+        triagedPatients === undefined ||
+        averageTime === undefined
+      ) {
+        throw new Error('Erro ao buscar dados do dashboard')
+      }
+
+      return {
+        waitingPatients,
+        triagedPatients,
+        averageTime
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const data = () => {
+  const data: () => Promise<IDashboardStatusCards | undefined> = async () => {
     switch (level) {
-      case 'admin':
-        return adminData
-      case 'doctor':
-        return doctorData
-      case 'nurse':
-        return nurseData
+      case UserLevels.ADMIN:
+        return await getAdminData()
+      case UserLevels.DOCTOR:
+        return await getDoctorData()
+      case UserLevels.NURSE:
+        return await getNurseData()
       default:
         return
     }
   }
 
-  res.json({
-    message: 'Cards de status do dashboard encontrados com sucesso',
-    data: data()
-  })
+  try {
+    res.json({
+      message: 'Dados do dashboard carregados com sucesso',
+      data: await data()
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erro ao buscar dados do dashboard'
+    })
+  }
 }
 
 export const getDashboardAttendanceByTime = async (
@@ -58,10 +193,12 @@ export const getDashboardAttendanceByTime = async (
   res: Response
 ) => {
   try {
-    const data = Array.from({ length: 12 }).map((_, hour) => ({
-      hour,
-      total: Math.floor(Math.random() * 200)
-    }))
+    const { unitId, period } = req.query
+
+    const data = await getAttendanceByTime({
+      unitId: String(unitId),
+      period: String(period)
+    })
 
     res.json({
       message: 'Atendimentos por hora carregados com sucesso',
@@ -79,25 +216,11 @@ export const getDashboardAttendanceQueue = async (
   res: Response
 ) => {
   try {
-    const data = faker.helpers.multiple(
-      () => ({
-        _id: faker.string.uuid(),
-        patientName: faker.person.fullName(),
-        status: faker.helpers.arrayElement([
-          'Em transporte',
-          'Entrada',
-          'Aguardando Triagem',
-          'Em Triagem',
-          'Aguardando Médico',
-          'Em Atendimento',
-          'Aguardando Exames',
-          'Aguardando Resultados',
-          'Aguardando Alta'
-        ]),
-        risk: faker.helpers.arrayElement(Object.values(AttendanceRisk))
-      }),
-      { count: 66 }
-    )
+    const { unitId } = req.query
+
+    const data = await getAttendanceQueue({
+      unitId: String(unitId)
+    })
 
     res.json({
       message: 'Fila de atendimento carregada com sucesso',

@@ -1,10 +1,8 @@
 import mongoose from 'mongoose'
-import { IAdmin } from '../interfaces/IAdmin.js'
 import { IBaseUser, UserLevels } from '../interfaces/IUser.js'
-import { UserModel } from './UserModel.js'
-
-const AdminSchema = new mongoose.Schema<IAdmin>()
+import AdminSchema from '../schema/AdminSchema.js'
+import { User } from './UserModel.js'
 
 export const Admin = mongoose
-  .model<IBaseUser, UserModel>('User')
+  .model<IBaseUser, User>('User')
   .discriminator(UserLevels.ADMIN, AdminSchema)

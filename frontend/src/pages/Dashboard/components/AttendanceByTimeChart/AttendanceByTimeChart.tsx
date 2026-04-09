@@ -1,45 +1,98 @@
-import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
+import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
+import type { Periods } from '@/interfaces/globals'
 import type { IDashboardAttendanceByTime } from '@/interfaces/IDashboard'
-import type { IError } from '@/interfaces/IError'
+import DashboardRepository from '@/repositories/DashboardRepository'
+import masks from '@/utils/masks'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
-import { message, Tooltip } from 'antd'
-import axios, { AxiosError } from 'axios'
+import { Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
-function AttendanceByTimeChart() {
+interface IAttendanceByTimeChartProps {
+  selectedPeriod: Periods
+}
+
+function AttendanceByTimeChart({
+  selectedPeriod
+}: IAttendanceByTimeChartProps) {
+  const { user } = useAuth()
   const [data, setData] = useState<IDashboardAttendanceByTime[]>([])
   const [loading, setLoading] = useState(true)
   const max = Math.max(...data.map((d) => d.total), 1)
+  const avg =
+    data.length > 0
+      ? data.reduce((sum, d) => sum + d.total, 0) / data.length
+      : 0
 
   useEffect(() => {
     async function fetchAttendanceByTime() {
       setLoading(true)
       try {
-        const response = await api.get('/dashboard/attendance-by-time')
-        const data = response.data.data
+        const response = await DashboardRepository.getAttendanceByTime({
+          params: {
+            unitId: user?.unitId,
+            period: selectedPeriod
+          }
+        })
+        const data = response.data
         setData(data)
       } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao pegar atendimentos por hora'
-        )
+        handleApiError({
+          err,
+          defaultMessage: 'Erro ao pegar atendimentos por hora'
+        })
       } finally {
         setLoading(false)
       }
     }
 
     fetchAttendanceByTime()
-  }, [])
+  }, [selectedPeriod, user?.unitId])
+
+  function getPeriodConfig(period: string) {
+    switch (period) {
+      case 'day':
+        return {
+          title: 'Atendimentos por Hora',
+          suffix: 'h',
+          aside: 'por hora'
+        }
+      case 'week':
+        return {
+          title: 'Atendimentos por Dia',
+          suffix: '',
+          aside: 'por dia'
+        }
+      case 'month':
+        return {
+          title: 'Atendimentos por Dia',
+          suffix: '',
+          aside: 'por dia'
+        }
+      case 'year':
+        return {
+          title: 'Atendimentos por Mês',
+          suffix: '',
+          aside: 'por mês'
+        }
+      default:
+        return {
+          title: '',
+          suffix: '',
+          aside: ''
+        }
+    }
+  }
+
+  const periodLabels = getPeriodConfig(selectedPeriod)
 
   return (
     <DashboardCard
-      title='Atendimentos por Hora'
+      title={periodLabels.title}
       icon={ClockCountdownIcon}
-      asideText='30 p/ hora'
+      asideText={`${avg >= 1 ? Math.round(avg) : avg.toFixed(1)} ${periodLabels.aside}`}
       gridArea='attendanceByTimeChart'
     >
       <div className={styles.chart}>
@@ -55,13 +108,25 @@ function AttendanceByTimeChart() {
             ))
           : data.map((item, index) => (
               <div key={index} className={styles.barContainer}>
-                <Tooltip title={`${item.total} atendimentos às ${item.hour}h`}>
+                <Tooltip
+                  title={
+                    item.total > 0
+                      ? `${masks(item.total, 'number')} atendimentos`
+                      : 'Sem atendimentos'
+                  }
+                >
                   <div
-                    className={styles.bar}
-                    style={{ height: `${(item.total / max) * 200}px` }}
+                    className={`${styles.bar} ${item.total === 0 ? styles.barEmpty : ''}`}
+                    style={{
+                      height:
+                        item.total > 0 ? `${(item.total / max) * 180}px` : '8px'
+                    }}
                   />
                 </Tooltip>
-                <span className={styles.label}>{item.hour}h</span>
+                <span className={styles.label}>
+                  {item.label}
+                  {periodLabels.suffix}
+                </span>
               </div>
             ))}
       </div>

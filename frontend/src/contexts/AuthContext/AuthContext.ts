@@ -4,7 +4,7 @@ import { createContext } from 'react'
 
 export interface AuthContextType {
   user: IBaseUser | null
-  login: (payload: LoginPayload) => Promise<boolean>
+  login: (payload: LoginPayload) => void
   logout: () => void
 }
 

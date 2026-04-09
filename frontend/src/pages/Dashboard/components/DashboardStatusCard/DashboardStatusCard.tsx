@@ -32,7 +32,7 @@ function DashboardStatusCard({
       <Icon className={styles.icon} size={24} />
 
       <div className={styles.texts}>
-        {value && <span className={styles.value}>{value}</span>}
+        <span className={styles.value}>{value ?? '-'}</span>
         <span className={styles.label}>{label}</span>
       </div>
     </div>

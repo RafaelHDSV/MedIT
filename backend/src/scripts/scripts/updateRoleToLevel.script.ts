@@ -1,4 +1,4 @@
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
 const updateRoleToLevel: Script = {
@@ -8,7 +8,7 @@ const updateRoleToLevel: Script = {
   async run() {
     console.log("🔄 Atualizando campo 'role' para 'level'...")
 
-    const result = await UserModel.updateMany(
+    const result = await User.updateMany(
       { role: { $exists: true } },
       [
         {

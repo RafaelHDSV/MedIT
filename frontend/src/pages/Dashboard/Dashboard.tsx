@@ -1,9 +1,15 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import Button from '@/components/Button/Button'
+import { InputSelect } from '@/components/FormComponents/FormComponents'
+import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
+import { Periods, PeriodsLabels } from '@/interfaces/globals'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
-import type { IError } from '@/interfaces/IError'
 import { UserLevels } from '@/interfaces/IUser'
+import DashboardRepository from '@/repositories/DashboardRepository'
+import { ROUTES } from '@/routes/constants'
+import masks from '@/utils/masks'
+import { timeFormatter } from '@/utils/timeFormatter'
 import {
   BedIcon,
   BombIcon,
@@ -13,9 +19,8 @@ import {
   TimerIcon,
   UsersThreeIcon
 } from '@phosphor-icons/react'
-import { message } from 'antd'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
@@ -23,34 +28,40 @@ import styles from './Dashboard.module.scss'
 
 function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [dashboardStatusData, setDashboardStatusData] =
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
+  const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
+  const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
 
   useEffect(() => {
     async function fetchDashboardStatus() {
       setLoading(true)
 
       try {
-        const response = await api.get(`/dashboard/status-cards`, {
-          params: { unitId: user?.unitId, level: user?.level }
+        const response = await DashboardRepository.getStatusCards({
+          params: {
+            userId: user?._id,
+            unitId: user?.unitId,
+            level: user?.level,
+            period: selectedPeriod
+          }
         })
-        const data = response.data.data
+        const data = response.data
         setDashboardStatusData(data)
       } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao pegar dados do dashboard'
-        )
+        handleApiError({
+          err,
+          defaultMessage: 'Erro ao pegar dados do dashboard'
+        })
       } finally {
         setLoading(false)
       }
     }
 
     fetchDashboardStatus()
-  }, [user?.unitId, user?.level])
+  }, [user?.unitId, user?.level, user?._id, selectedPeriod])
 
   const cardsData = useMemo(() => {
     switch (user?.level) {
@@ -58,7 +69,9 @@ function Dashboard() {
         return [
           {
             Icon: DoorOpenIcon,
-            value: dashboardStatusData?.entries,
+            value: dashboardStatusData?.entries
+              ? masks(dashboardStatusData?.entries, 'number')
+              : undefined,
             label: 'Entradas'
           },
           {
@@ -68,22 +81,31 @@ function Dashboard() {
           },
           {
             Icon: CheckCircleIcon,
-            value: dashboardStatusData?.attended,
+            value: dashboardStatusData?.attended
+              ? masks(dashboardStatusData?.attended, 'number')
+              : undefined,
             label: 'Atendidos'
           },
           {
             Icon: BedIcon,
-            value: `${dashboardStatusData?.occupancy}%`,
+            value:
+              dashboardStatusData?.occupancy !== undefined
+                ? `${dashboardStatusData?.occupancy}%`
+                : undefined,
             label: 'Ocupação'
           },
           {
             Icon: TimerIcon,
-            value: `${dashboardStatusData?.averageTime}min`,
+            value: dashboardStatusData?.averageTime
+              ? timeFormatter(dashboardStatusData.averageTime)
+              : undefined,
             label: 'Tempo médio'
           },
           {
             Icon: BombIcon,
-            value: dashboardStatusData?.highRisk,
+            value: dashboardStatusData?.highRisk
+              ? masks(dashboardStatusData?.highRisk, 'number')
+              : undefined,
             label: 'Risco alto'
           }
         ]
@@ -92,7 +114,7 @@ function Dashboard() {
           {
             Icon: HourglassIcon,
             value: dashboardStatusData?.waitingPatients,
-            label: 'Pacientes aguardando'
+            label: 'Pacientes aguardando atendimento'
           },
           {
             Icon: CheckCircleIcon,
@@ -101,12 +123,16 @@ function Dashboard() {
           },
           {
             Icon: TimerIcon,
-            value: `${dashboardStatusData?.averageTime}min`,
-            label: 'Tempo médio'
+            value: dashboardStatusData?.averageTime
+              ? timeFormatter(dashboardStatusData.averageTime)
+              : undefined,
+            label: 'Tempo médio de atendimento'
           },
           {
             Icon: UsersThreeIcon,
-            value: `${dashboardStatusData?.assertiveness}%`,
+            value: dashboardStatusData?.assertiveness
+              ? `${dashboardStatusData?.assertiveness}%`
+              : 'n/a',
             label: 'Assertividade IA vs Médico(a)'
           }
         ]
@@ -115,17 +141,19 @@ function Dashboard() {
           {
             Icon: HourglassIcon,
             value: dashboardStatusData?.waitingPatients,
-            label: 'Pacientes aguardando'
+            label: 'Pacientes aguardando triagem'
           },
           {
             Icon: CheckCircleIcon,
             value: dashboardStatusData?.triagedPatients,
-            label: 'Pacientes triados hoje'
+            label: 'Pacientes triados'
           },
           {
             Icon: TimerIcon,
-            value: `${dashboardStatusData?.averageTime}min`,
-            label: 'Tempo médio'
+            value: dashboardStatusData?.averageTime
+              ? timeFormatter(dashboardStatusData.averageTime)
+              : undefined,
+            label: 'Tempo médio de triagem'
           }
         ]
       case UserLevels.PATIENT:
@@ -140,26 +168,47 @@ function Dashboard() {
       case UserLevels.ADMIN:
         return (
           <>
-            <AttendanceByTimeChart />
+            <AttendanceByTimeChart selectedPeriod={selectedPeriod} />
             <AttendanceQueueChart />
           </>
         )
       case UserLevels.DOCTOR:
-        return <></>
+        return <AttendanceQueueChart />
       case UserLevels.NURSE:
         return <></>
       case UserLevels.PATIENT:
-        return <></>
+        return (
+          <>
+            <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
+              Pré cadastro
+            </Button>
+          </>
+        )
       default:
         return <></>
     }
-  }, [user?.level])
+  }, [user?.level, navigate, selectedPeriod])
 
   return (
     <>
-      <AuthLayoutHeader />
+      <AuthLayoutHeader
+        actionComponent={
+          shouldShowPeriodSelect && (
+            <InputSelect
+              className={styles.periodSelect}
+              placeholder='Período'
+              options={Object.entries(PeriodsLabels).map(([key, value]) => ({
+                label: value,
+                value: key
+              }))}
+              value={selectedPeriod}
+              onChange={setSelectedPeriod}
+            />
+          )
+        }
+      />
 
-      <div className={styles.container}>
+      <div className={`${styles.container} ${styles[user?.level ?? '']}`}>
         {cardsData.map(({ Icon, value, label }) => (
           <DashboardStatusCard
             key={label}

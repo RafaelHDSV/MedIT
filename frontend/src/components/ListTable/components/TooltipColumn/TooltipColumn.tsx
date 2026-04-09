@@ -10,8 +10,7 @@ interface ITooltipColumnProps {
 }
 
 function TooltipColumn({ text, icon: Icon, className }: ITooltipColumnProps) {
-  if (!text) return
-  const display = text || 'n/a'
+  const display = text ? text : 'n/a'
 
   const spanContent = () => {
     if (Icon) {

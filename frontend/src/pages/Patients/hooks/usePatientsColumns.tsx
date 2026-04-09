@@ -1,13 +1,13 @@
-import { api } from '@/api/api'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
-import type { IError } from '@/interfaces/IError'
+import { handleApiError } from '@/helpers/handleApiError'
 import type { BloodType, IPatient } from '@/interfaces/IPatient'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
+import { sorterFunctionByNumber } from '@/utils/sorterFunction'
 import { DropIcon } from '@phosphor-icons/react'
 import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import axios, { AxiosError } from 'axios'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -44,22 +44,18 @@ export function usePatientsColumns({
   const handleDelete = useCallback(
     async (patient: IPatient) => {
       Modal.confirm({
-        title: 'Deseja deletar este paciente?',
+        title: `Deseja deletar ${patient?.name ?? 'o paciente'}?`,
         content: `Esta ação não pode ser desfeita.`,
         okText: 'Sim, deletar',
         cancelText: 'Cancelar',
         okButtonProps: { danger: true },
         async onOk() {
           try {
-            await api.delete(`/patients/${patient._id}`)
+            await PatientsRepository.deletePatient({ patientId: patient._id })
             message.success('Paciente deletado com sucesso!')
             fetchPatients()
           } catch (err) {
-            if (!axios.isAxiosError(err)) return
-            const error = err as AxiosError<IError>
-            message.error(
-              error.response?.data?.message ?? 'Erro ao deletar paciente'
-            )
+            handleApiError({ err, defaultMessage: 'Erro ao deletar paciente' })
           }
         }
       })
@@ -76,7 +72,7 @@ export function usePatientsColumns({
   const columns: ColumnsType<IPatient> = useMemo(
     () => [
       commonColumns.id(),
-      commonColumns.name(),
+      commonColumns.name({}),
       commonColumns.cpf(),
       commonColumns.email(),
       commonColumns.birthDate(),
@@ -87,8 +83,11 @@ export function usePatientsColumns({
         key: 'weight',
         width: 80,
         ellipsis: true,
+        sorter: sorterFunctionByNumber('weight'),
         render: (weight: number) => (
-          <TooltipColumn text={`${weight?.toString()} kg`} />
+          <TooltipColumn
+            text={weight ? `${weight?.toString()} kg` : undefined}
+          />
         )
       },
       {
@@ -97,8 +96,11 @@ export function usePatientsColumns({
         key: 'height',
         width: 80,
         ellipsis: true,
+        sorter: sorterFunctionByNumber('height'),
         render: (height: number) => (
-          <TooltipColumn text={`${height?.toString()} m`} />
+          <TooltipColumn
+            text={height ? `${height?.toString()} m` : undefined}
+          />
         )
       },
       {
@@ -116,7 +118,9 @@ export function usePatientsColumns({
         width: 250,
         ellipsis: true,
         render: (conditions: string[]) => (
-          <TooltipColumn text={conditions.join(', ')} />
+          <TooltipColumn
+            text={conditions ? conditions.join(', ') : undefined}
+          />
         )
       },
       {
@@ -126,7 +130,7 @@ export function usePatientsColumns({
         width: 250,
         ellipsis: true,
         render: (allergies: string[]) => (
-          <TooltipColumn text={allergies.join(', ')} />
+          <TooltipColumn text={allergies ? allergies.join(', ') : undefined} />
         )
       },
       commonColumns.createdAt(),

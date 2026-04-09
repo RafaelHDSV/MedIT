@@ -108,7 +108,7 @@ function ConfigDevContent() {
               </Checkbox>
 
               <Button
-                mode='secondary'
+                mode='outline'
                 type='text'
                 danger
                 size='small'

@@ -1,3 +1,5 @@
+import AuthRepository from '@/repositories/AuthRepository'
+import { Modal } from 'antd'
 import axios from 'axios'
 
 export const api = axios.create({
@@ -44,16 +46,49 @@ api.interceptors.response.use(
 
         return api(originalRequest)
       } catch {
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        localStorage.removeItem('user')
+        const modal = Modal.warning({
+          title: 'Sessão expirada',
+          content:
+            'Por favor, logue novamente para continuar utilizando o sistema',
+          okText: 'Ok',
+          closable: false,
+          maskClosable: false,
+          okButtonProps: {
+            danger: true,
+            autoFocus: true,
+            size: 'middle'
+          },
+          async onOk() {
+            modal.update({
+              okButtonProps: {
+                loading: true,
+                danger: true
+              }
+            })
 
-        localStorage.setItem(
-          'sessionExpired',
-          'Sua sessão expirou. Faça login novamente.'
-        )
+            try {
+              await AuthRepository.logout({
+                refreshToken
+              })
 
-        window.location.href = '/'
+              localStorage.removeItem('accessToken')
+              localStorage.removeItem('refreshToken')
+              localStorage.removeItem('user')
+              window.location.href = '/'
+            } catch (err) {
+              console.error(err)
+            } finally {
+              modal.update({
+                okButtonProps: {
+                  loading: false,
+                  danger: true
+                }
+              })
+            }
+          }
+        })
+
+        return Promise.reject(error)
       }
     }
 

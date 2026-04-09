@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import {
   FormItem,
@@ -7,7 +6,7 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { DayjsType } from '@/components/MultiDatepicker/types'
-import type { IError } from '@/interfaces/IError'
+import { handleApiError } from '@/helpers/handleApiError'
 import {
   BloodType,
   type IPatient,
@@ -15,10 +14,10 @@ import {
   type PatientFormValues
 } from '@/interfaces/IPatient'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/ListTable/ListTable.module.scss'
@@ -57,8 +56,11 @@ function ModalContent({
     try {
       setLoading(true)
 
-      await api.put(`/patients/${patient?._id || params.id}`, {
-        ...values
+      await PatientsRepository.editPatient({
+        patientId: patient?._id || params.id,
+        body: {
+          ...values
+        }
       })
 
       if (useOnlyModal) {
@@ -70,22 +72,11 @@ function ModalContent({
       message.success(`Paciente atualizado com sucesso`)
       handleClose()
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response?.data?.errors)
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro nas validações ao adicionar paciente'
-        )
-      } else {
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao adicionar paciente'
-        )
-      }
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao adicionar paciente',
+        setFieldErrors
+      })
     } finally {
       setLoading(false)
     }
@@ -109,7 +100,7 @@ function ModalContent({
       footer={null}
       centered
     >
-      <h2>Editar paciente</h2>
+      <h2>Editar {patient?.name ?? 'paciente'}</h2>
 
       <Form
         form={form}

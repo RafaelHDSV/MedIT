@@ -1,13 +1,11 @@
-import { api } from '@/api/api'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
+import { handleApiError } from '@/helpers/handleApiError'
 import type { IDoctor } from '@/interfaces/IDoctor'
-import type { IError } from '@/interfaces/IError'
+import DoctorsRepository from '@/repositories/DoctorsRepository'
 import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import { message, Modal } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -45,22 +43,18 @@ export function useDoctorsColumns({
   const handleDelete = useCallback(
     async (doctor: IDoctor) => {
       Modal.confirm({
-        title: 'Deseja deletar este médico(a)?',
+        title: `Deseja deletar ${doctor.name ?? 'o médico(a)'}?`,
         content: `Esta ação não pode ser desfeita.`,
         okText: 'Sim, deletar',
         cancelText: 'Cancelar',
         okButtonProps: { danger: true },
         async onOk() {
           try {
-            await api.delete(`/doctors/${doctor._id}`)
+            await DoctorsRepository.deleteDoctor({ doctorId: doctor._id })
             message.success('Médico(a) deletado com sucesso!')
             fetchDoctors()
           } catch (err) {
-            if (!axios.isAxiosError(err)) return
-            const error = err as AxiosError<IError>
-            message.error(
-              error.response?.data?.message ?? 'Erro ao deletar médico(a)'
-            )
+            handleApiError({ err, defaultMessage: 'Erro ao deletar médico(a)' })
           }
         }
       })
@@ -77,7 +71,7 @@ export function useDoctorsColumns({
   const columns: ColumnsType<IDoctor> = useMemo(
     () => [
       commonColumns.id(),
-      commonColumns.name(),
+      commonColumns.name({}),
       commonColumns.cpf(),
       commonColumns.email(),
       commonColumns.birthDate(),
@@ -88,7 +82,9 @@ export function useDoctorsColumns({
         key: 'crm',
         width: 120,
         ellipsis: true,
-        render: (crm: string) => <TooltipColumn text={masks(crm, 'crm')} />
+        render: (crm: string) => (
+          <TooltipColumn text={crm ? masks(crm, 'crm') : undefined} />
+        )
       },
       commonColumns.createdAt(),
       commonColumns.updatedAt(),

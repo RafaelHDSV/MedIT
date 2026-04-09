@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import {
   FormItem,
@@ -7,6 +6,7 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { DayjsType } from '@/components/MultiDatepicker/types'
+import { handleApiError } from '@/helpers/handleApiError'
 import {
   DoctorSpecializations,
   DoctorSpecializationsLabels,
@@ -14,14 +14,13 @@ import {
   type IDoctor,
   type IDoctorFormErrors
 } from '@/interfaces/IDoctor'
-import type { IError } from '@/interfaces/IError'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import DoctorsRepository from '@/repositories/DoctorsRepository'
 import capitalize from '@/utils/capitalize'
 import masks from '@/utils/masks'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
@@ -69,9 +68,12 @@ function ModalContent({
       setLoading(true)
 
       if (isEditMode) {
-        await api.put(`/doctors/${doctor?._id || params.id}`, {
-          ...values,
-          crm: masks(values.crm, 'crm')
+        await DoctorsRepository.editDoctor({
+          doctorId: doctor?._id || params.id,
+          body: {
+            ...values,
+            crm: masks(values.crm, 'crm')
+          }
         })
 
         if (useOnlyModal) {
@@ -80,7 +82,9 @@ function ModalContent({
           fetchDoctorDetails?.()
         }
       } else {
-        await api.post('/doctors', { ...values, crm: masks(values.crm, 'crm') })
+        await DoctorsRepository.createDoctor({
+          body: { ...values, crm: masks(values.crm, 'crm') }
+        })
         fetchDoctors?.()
       }
 
@@ -89,22 +93,11 @@ function ModalContent({
       )
       handleClose()
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response?.data?.errors)
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro nas validações ao adicionar médico(a)'
-        )
-      } else {
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao adicionar médico(a)'
-        )
-      }
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao adicionar médico(a)',
+        setFieldErrors
+      })
     } finally {
       setLoading(false)
     }
@@ -132,7 +125,11 @@ function ModalContent({
       footer={null}
       centered
     >
-      <h2>{isEditMode ? 'Editar médico(a)' : 'Adicionar médico(a)'}</h2>
+      <h2>
+        {isEditMode
+          ? `Editar ${doctor?.name ?? 'o médico(a)'}`
+          : 'Adicionar médico(a)'}
+      </h2>
 
       <Form
         form={form}

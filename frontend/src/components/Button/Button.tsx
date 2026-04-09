@@ -3,11 +3,21 @@ import { useMemo } from 'react'
 import styles from './Button.module.scss'
 
 interface IButtonProps extends ButtonProps {
-  mode?: 'primary' | 'secondary' | 'icon'
-  children: React.ReactNode
+  mode?: 'primary' | 'secondary' | 'outline' | 'icon'
+  fontSize?: number
+  buttonHeight?: string
 }
 
-function Button({ htmlType, loading, children, mode, ...props }: IButtonProps) {
+function Button({
+  mode,
+  fontSize = 16,
+  buttonHeight = '2.5rem',
+  htmlType,
+  loading,
+  children,
+  className,
+  ...props
+}: IButtonProps) {
   const isIcon = mode === 'icon'
 
   const type = useMemo(() => {
@@ -15,6 +25,8 @@ function Button({ htmlType, loading, children, mode, ...props }: IButtonProps) {
       case 'primary':
         return 'primary'
       case 'secondary':
+        return 'text'
+      case 'outline':
         return 'default'
       case 'icon':
         return 'default'
@@ -25,7 +37,13 @@ function Button({ htmlType, loading, children, mode, ...props }: IButtonProps) {
 
   return (
     <AntdButton
-      className={mode ? styles[mode] : styles.button}
+      className={`${styles.button} ${mode ? styles[mode] : ''} ${className ?? ''}`}
+      style={
+        {
+          '--button-height': buttonHeight,
+          '--button-font-size': `${fontSize}px`
+        } as React.CSSProperties
+      }
       type={type}
       loading={loading}
       htmlType={htmlType}

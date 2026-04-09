@@ -1,93 +1,93 @@
+import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
+import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
-import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
+import { ROUTES } from '@/routes/constants'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-export function useAttendancesColumns() {
-  // const navigate = useNavigate()
+interface IUseAttendancesColumnsProps {
+  canGoToDetails: boolean
+}
 
-  // TODO: Implementar navegação para detalhes do atendimento
+export function useAttendancesColumns({
+  canGoToDetails
+}: IUseAttendancesColumnsProps) {
+  const navigate = useNavigate()
+
   const handleNavigateToDetails = useCallback(
     (id: ObjectId | undefined) => {
-      if (!id) return
-      // navigate(ROUTES.ATTENDANCES_DETAILS.path.replace(':id', id.toString()))
+      if (!id || !canGoToDetails) return
+      // VIEIRA: Implementar navegação para detalhes do atendimento
+      navigate(ROUTES.ATTENDANCES.path.replace(':id', id.toString()))
     },
-    [
-      // navigate
-    ]
+    [navigate, canGoToDetails]
   )
+
+  const commonColumns = getCommonColumns<IAttendance>({
+    handleNavigateToDetails
+  })
+
+  // VIEIRA: Adicionar assertividade IA
+  const assertivenessIA = true
 
   const columns: ColumnsType<IAttendance> = useMemo(
     () => [
-      {
-        title: 'ID',
-        dataIndex: 'number',
-        key: 'number'
-      },
-      {
-        title: 'Nome',
-        dataIndex: 'name',
-        key: 'name',
-        render: (name: string, record) => (
-          <span
-            role='button'
-            tabIndex={0}
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleNavigateToDetails(record._id)}
-            onKeyDown={(e) =>
-              e.key === 'Enter' && handleNavigateToDetails(record._id)
-            }
-          >
-            {name}
-          </span>
-        )
-      },
-      {
-        title: 'Data de Nascimento',
-        dataIndex: 'birthDate',
-        key: 'birthDate',
-        render: (date: Date | string) =>
-          `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
-      },
+      commonColumns.id(),
+      commonColumns.name({ canGoToDetails }),
+      commonColumns.birthDate(),
       {
         title: 'Queixa',
         dataIndex: 'complaint',
-        key: 'complaint'
+        key: 'complaint',
+        width: 140,
+        ellipsis: true,
+        render: (text: string) => <TooltipColumn text={text} />
       },
       {
         title: 'Atendido em',
         dataIndex: 'date',
         key: 'date',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
+        width: 180,
+        ellipsis: true,
+        render: (date: Date | string) => (
+          <TooltipColumn
+            text={
+              date
+                ? `${dayjs(date).format('DD/MM/YYYY')} às ${dayjs(date).format('HH:mm')}`
+                : undefined
+            }
+          />
+        )
       },
       {
         title: 'Risco',
         dataIndex: 'risk',
         key: 'risk',
-        render: (risk: string) => <RiskTag risk={risk as AttendanceRisk} />
+        width: 160,
+        ellipsis: true,
+        render: (risk: string) =>
+          risk ? <RiskTag risk={risk as AttendanceRisk} /> : 'n/a'
       },
       {
         title: 'Diagnóstico',
         dataIndex: 'diagnosis',
-        key: 'diagnosis'
+        key: 'diagnosis',
+        width: 120,
+        ellipsis: true,
+        render: (text: string) => (
+          <TooltipColumn
+            text={text ? `${text} ${assertivenessIA && '✅'}` : undefined}
+          />
+        )
       },
-      {
-        title: 'Criado em',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
-      },
-      {
-        title: 'Atualizado em',
-        dataIndex: 'updatedAt',
-        key: 'updatedAt',
-        render: (date: Date | string) => dayjs(date).format('DD/MM/YYYY HH:mm')
-      }
+      commonColumns.createdAt(),
+      commonColumns.updatedAt()
     ],
-    [handleNavigateToDetails]
+    [commonColumns, assertivenessIA, canGoToDetails]
   )
 
   return columns

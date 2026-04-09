@@ -1,11 +1,13 @@
 .button {
-  height: 2.5rem;
+  --button-height: 0;
+  --button-font-size: 0 height: var(--button-height);
+
   background-color: var(--primary-color);
   color: var(--white);
   border: none;
   border-radius: 0.5rem;
   padding: 0.5rem 1.5rem;
-  font-size: 16px;
+  font-size: var(--button-font-size);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -15,15 +17,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2rem !important;
+  height: 2rem !important;
   padding: 0 !important;
-  border-radius: 0.5rem !important;
-  background-color: var(--primary-color);
-  color: var(--white);
-  border: none;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
 
   svg {
     font-size: 1rem;
@@ -34,6 +30,39 @@
   &:focus-visible {
     background-color: var(--primary-opaque) !important;
     color: var(--primary-color) !important;
+    outline: 1px solid var(--primary-color);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.secondary {
+  color: var(--gray-1);
+  background-color: var(--gray-3);
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--gray-2);
+    color: var(--gray-2);
+    outline: 2px solid var(--gray-1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.outline {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  background-color: transparent;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--primary-opaque);
+    color: var(--primary-color);
     outline: 2px solid var(--primary-color);
   }
 

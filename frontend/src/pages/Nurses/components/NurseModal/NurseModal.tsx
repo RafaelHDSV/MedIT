@@ -1,4 +1,3 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import {
   FormItem,
@@ -7,8 +6,8 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { DayjsType } from '@/components/MultiDatepicker/types'
+import { handleApiError } from '@/helpers/handleApiError'
 import { UF } from '@/interfaces/globals'
-import type { IError } from '@/interfaces/IError'
 import {
   NurseCorenType,
   NurseShiftsLabels,
@@ -17,10 +16,10 @@ import {
   type NurseFormValues
 } from '@/interfaces/INurse'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import NursesRepository from '@/repositories/NursesRepository'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
@@ -61,9 +60,12 @@ function ModalContent({
       setLoading(true)
 
       if (isEditMode) {
-        await api.put(`/nurses/${nurse?._id || params.id}`, {
-          ...values,
-          coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+        await NursesRepository.editNurse({
+          nurseId: nurse?._id || params.id,
+          body: {
+            ...values,
+            coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+          }
         })
 
         if (useOnlyModal) {
@@ -72,9 +74,11 @@ function ModalContent({
           fetchNurseDetails?.()
         }
       } else {
-        await api.post('/nurses', {
-          ...values,
-          coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+        await NursesRepository.createNurse({
+          body: {
+            ...values,
+            coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+          }
         })
         fetchNurses?.()
       }
@@ -84,22 +88,11 @@ function ModalContent({
       )
       handleClose()
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response?.data?.errors)
-        console.error(error)
-        message.error(
-          error.response?.data?.message ||
-            'Erro nas validações ao adicionar enfermeiro(a)'
-        )
-      } else {
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao adicionar enfermeiro(a)'
-        )
-      }
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao adicionar enfermeiro(a)',
+        setFieldErrors
+      })
     } finally {
       setLoading(false)
     }
@@ -124,7 +117,11 @@ function ModalContent({
       footer={null}
       centered
     >
-      <h2>{isEditMode ? 'Editar enfermeiro(a)' : 'Adicionar enfermeiro(a)'}</h2>
+      <h2>
+        {isEditMode
+          ? `Editar ${nurse?.name ?? 'o enfermeiro(a)'}`
+          : 'Adicionar enfermeiro(a)'}
+      </h2>
 
       <Form
         form={form}

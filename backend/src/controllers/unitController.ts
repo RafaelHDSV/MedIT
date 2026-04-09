@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
-import { getAllUnitsService, getUnitService, createUnitService } from '../services/unitServices.js'
+import { createUnitService, getAllUnitsService, getUnitService } from '../services/unitServices.js'
 
 export const getUnit = async (req: Request, res: Response) => {
   const { id } = req.params
 
   try {
-    const unit = await getUnitService(id as string)
+    const unit = await getUnitService({ unitId: id as string })
     if (unit.status !== 200) {
       return res.status(unit.status).json({ message: unit.message })
     }

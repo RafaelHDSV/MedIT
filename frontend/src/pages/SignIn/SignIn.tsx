@@ -1,10 +1,11 @@
 import Button from '@/components/Button/Button'
 import { FormItem } from '@/components/FormComponents/FormComponents'
+import { handleApiError } from '@/helpers/handleApiError'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
-import { Flex, Form, Input, message } from 'antd'
+import { Flex, Form, Input } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from '../../components/FormComponents/FormComponents.module.scss'
 import { useAuth } from '../../hooks/useAuth'
@@ -20,6 +21,7 @@ export default function SignIn() {
   const navigate = useNavigate()
   const [formRef] = useForm()
   const [loading, setLoading] = useState(false)
+  const identifierValue = Form.useWatch('identifier', formRef)
 
   async function handleLogin() {
     setLoading(true)
@@ -39,24 +41,14 @@ export default function SignIn() {
         payload.cpf = cleanIdentifier
       }
 
-      const success = await login(payload)
-      if (success) navigate(ROUTES.DASHBOARD.path)
+      await login(payload)
+      navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
-      console.error(err)
-      message.error('Email/CPF ou senha inválidos')
+      handleApiError({ err, defaultMessage: 'Email/CPF ou senha inválidos' })
     } finally {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    const msg = localStorage.getItem('sessionExpired')
-
-    if (msg) {
-      message.warning(msg)
-      localStorage.removeItem('sessionExpired')
-    }
-  }, [])
 
   return (
     <Form
@@ -83,11 +75,7 @@ export default function SignIn() {
       >
         <Input
           placeholder='Digite seu CPF ou email'
-          maxLength={
-            validators(formRef.getFieldValue('identifier'), 'validCpf')
-              ? 14
-              : 200
-          }
+          maxLength={validators(identifierValue, 'validCpf') ? 14 : 200}
         />
       </FormItem>
       <FormItem

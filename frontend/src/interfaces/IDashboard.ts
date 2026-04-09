@@ -1,4 +1,4 @@
-import type { AttendanceRisk } from './IAttendance'
+import type { AttendanceRisk, AttendanceStatus } from './IAttendance'
 
 export interface IAdminStatusCard {
   entries: number
@@ -31,11 +31,11 @@ export interface IDashboardStatusCards
 export interface IDashboardQueueItem {
   _id: string
   patientName: string
-  status: string
+  status: AttendanceStatus
   risk: AttendanceRisk
 }
 
 export interface IDashboardAttendanceByTime {
-  hour: number
+  label: number
   total: number
 }

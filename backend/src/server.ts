@@ -9,7 +9,7 @@ import medicationRoutes from './routes/medicationRoutes.js'
 import nursesRoutes from './routes/nursesRoutes.js'
 import patientsRoutes from './routes/patientsRoutes.js'
 import unitsRoutes from './routes/unitsRoutes.js'
-import userRoutes from './routes/userRoutes.js'
+import usersRoutes from './routes/usersRoutes.js'
 
 const app = express()
 
@@ -23,13 +23,13 @@ app.get('/', (_req, res) => {
 })
 
 app.use('/auth', authRoutes)
-app.use('/users', userRoutes)
-app.use('/doctors', doctorsRoutes)
-app.use('/nurses', nursesRoutes)
-app.use('/patients', patientsRoutes)
-app.use('/units', unitsRoutes)
-app.use('/medications', medicationRoutes)
-app.use('/dashboard', dashboardRoutes)
+app.use('/auth/users', usersRoutes)
+app.use('/auth/doctors', doctorsRoutes)
+app.use('/auth/nurses', nursesRoutes)
+app.use('/auth/patients', patientsRoutes)
+app.use('/auth/units', unitsRoutes)
+app.use('/auth/dashboard', dashboardRoutes)
+app.use('/auth/medications', medicationRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando! ${PORT}`)

@@ -1,11 +1,9 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
+import { handleApiError } from '@/helpers/handleApiError'
 import type { IDoctor } from '@/interfaces/IDoctor'
-import type { IError } from '@/interfaces/IError'
-import { Flex, message } from 'antd'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
+import DoctorsRepository from '@/repositories/DoctorsRepository'
+import { Flex } from 'antd'
 import { useEffect, useState } from 'react'
 import styles from '../../components/ListTable/ListTable.module.scss'
 import DoctorModal from './components/DoctorModal/DoctorModal'
@@ -21,17 +19,13 @@ function Doctors() {
     setLoading(true)
 
     try {
-      const response = await api.get('/doctors')
-      const data = response.data
-      setDoctors(data)
+      const response = await DoctorsRepository.getDoctor()
+      setDoctors(response)
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-      console.error(error)
-      message.error(
-        error.response?.data?.message ||
-          'Erro ao carregar a listagem de médicos(as)'
-      )
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao carregar a listagem de médicos(as)'
+      })
     } finally {
       setLoading(false)
     }

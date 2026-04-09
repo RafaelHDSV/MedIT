@@ -1,14 +1,12 @@
-import { api } from '@/api/api'
 import Button from '@/components/Button/Button'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
+import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
-import type { IError } from '@/interfaces/IError'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from '../../components/FormComponents/FormComponents.module.scss'
@@ -34,31 +32,26 @@ function SignUp() {
     try {
       const values = await formRef.validateFields()
 
-      await api.post('/patients', {
-        ...values,
-        cpf: values.cpf.replace(/\D/g, '')
+      await PatientsRepository.createPatient({
+        body: {
+          ...values,
+          cpf: values.cpf.replace(/\D/g, '')
+        }
       })
 
       message.success('Usuário criado com sucesso!')
 
-      const success = await login({
+      await login({
         email: values.email,
         password: values.password
       })
-
-      if (success) navigate(ROUTES.DASHBOARD.path)
+      navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
-      if (!axios.isAxiosError(err)) return
-      const error = err as AxiosError<IError>
-
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response?.data?.errors)
-        message.error('Corrija os campos destacados.')
-      } else {
-        message.error(
-          error.response?.data?.message ?? 'Erro ao cadastrar usuário.'
-        )
-      }
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao cadastrar usuário.',
+        setFieldErrors
+      })
     } finally {
       setLoading(false)
     }

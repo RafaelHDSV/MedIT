@@ -1,10 +1,7 @@
-import { api } from '@/api/api'
-import type { IError } from '@/interfaces/IError'
 import { type IBaseUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
+import AuthRepository from '@/repositories/AuthRepository'
 import { message, Modal } from 'antd'
-import type { AxiosError } from 'axios'
-import axios from 'axios'
 import { useState, type ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
 
@@ -18,49 +15,24 @@ export function AuthProvider({ children }: Props) {
     return stored ? JSON.parse(stored) : null
   })
 
-  async function login({
-    email,
-    cpf,
-    password
-  }: LoginPayload): Promise<boolean> {
-    try {
-      const response = await api.post('/auth/login', {
+  async function login({ email, cpf, password }: LoginPayload) {
+    const response = await AuthRepository.login({
+      body: {
         email,
         cpf,
         password
-      })
-
-      const { accessToken, refreshToken, user } = response.data
-
-      const formattedUser: IBaseUser = {
-        _id: user._id,
-        name: user.name,
-        cpf: user.cpf,
-        level: user.level,
-        email: user.email,
-        number: user.number,
-        unitId: user.unitId
       }
+    })
 
-      setUser(formattedUser)
+    const { accessToken, refreshToken, user } = response
 
-      localStorage.setItem('user', JSON.stringify(formattedUser))
-      localStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
+    setUser(user)
 
-      return true
-    } catch (err) {
-      if (!axios.isAxiosError(err)) return false
+    localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('accessToken', accessToken)
+    localStorage.setItem('refreshToken', refreshToken)
 
-      const error = err as AxiosError<IError>
-
-      console.error('Erro no login', error)
-      message.error(
-        error.response?.data?.message || 'Email/CPF ou senha inválidos'
-      )
-
-      return false
-    }
+    return true
   }
 
   async function logout() {
@@ -93,7 +65,7 @@ export function AuthProvider({ children }: Props) {
         try {
           const refreshToken = localStorage.getItem('refreshToken')
 
-          await api.post('/auth/logout', { refreshToken })
+          await AuthRepository.logout({ refreshToken })
 
           localStorage.removeItem('accessToken')
           localStorage.removeItem('refreshToken')

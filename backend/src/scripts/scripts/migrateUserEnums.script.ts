@@ -1,4 +1,4 @@
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 
 const levelMap: Record<string, string> = {
   ADMIN: 'admin',
@@ -20,7 +20,7 @@ const migrateUserEnums = {
   async run() {
     {
       try {
-        const users = await UserModel.find()
+        const users = await User.find()
 
         let updatedCount = 0
 

@@ -28,3 +28,17 @@ export const UF = {
   TO: 'TO'
 } as const
 export type UF = (typeof UF)[keyof typeof UF]
+
+export const Periods = {
+  DAY: 'day',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year'
+} as const
+export type Periods = (typeof Periods)[keyof typeof Periods]
+export const PeriodsLabels: Record<Periods, string> = {
+  [Periods.DAY]: 'Dia',
+  [Periods.WEEK]: 'Semana',
+  [Periods.MONTH]: 'Mês',
+  [Periods.YEAR]: 'Ano'
+}

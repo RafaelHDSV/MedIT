@@ -1,3 +1,5 @@
+@use '../../styles/abstract/breakpoints' as *;
+
 .multi-datepicker {
   --input-border-color: #d9d9d9;
   --input-bg: #fff;
@@ -52,5 +54,11 @@
     width: 210px !important;
     box-shadow: none !important;
     opacity: 1 !important;
+  }
+}
+
+@include max-sm {
+  :global(.ant-picker-panels) {
+    flex-direction: column !important;
   }
 }

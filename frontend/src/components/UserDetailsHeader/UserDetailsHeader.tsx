@@ -51,6 +51,7 @@ function UserDetailsHeader({
         </div>
       </div>
 
+      {/* VIEIRA: Validar tags */}
       {statusTag && statusTagText && (
         <Tag status={statusTag}>{statusTagText}</Tag>
       )}

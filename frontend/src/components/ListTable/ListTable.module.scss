@@ -12,11 +12,112 @@
   gap: 1rem;
 }
 
-.tableWrapper {
-  flex: 1;
+.filters {
+  display: flex;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 3%);
+
+  @include max-sm {
+    flex-direction: column;
+    flex: 1;
+  }
 }
 
-.userTable {
+.filtersGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+
+  @include max-sm {
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+  }
+}
+
+.filterSelect {
+  min-width: 180px;
+  max-width: 100%;
+
+  @include max-sm {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+.searchInput {
+  flex: 1;
+  width: 100%;
+}
+
+.filterSelect :global(.ant-select-selector) {
+  border-radius: 0.75rem;
+  border-color: var(--border);
+}
+
+.filterSelect :global(.ant-select-focused .ant-select-selector) {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-opaque);
+}
+
+.filterSelectDropdown :global {
+  .ant-select-item-option-selected {
+    background-color: var(--primary-opaque);
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+}
+
+.searchInput,
+.filterDateRange {
+  width: 100%;
+
+  flex: 1;
+  min-width: 0;
+}
+
+.searchInput {
+  :global(.ant-input) {
+    border-radius: 0.75rem;
+    border-color: var(--border);
+  }
+
+  :global(.ant-input:focus),
+  :global(.ant-input-focused) {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-opaque);
+  }
+
+  :global(.ant-input-prefix) {
+    color: var(--gray);
+  }
+}
+
+.filterDatepicker :global {
+  .ant-picker-cell-selected {
+    .ant-picker-cell-inner {
+      background: var(--primary-color);
+      color: var(--white);
+    }
+  }
+
+  .ant-picker-cell-in-view .ant-picker-cell-in-range-before,
+  .ant-picker-cell-in-view .ant-picker-cell-in-range-after {
+    background: var(--primary-opaque);
+  }
+}
+
+.listTable {
   border-radius: 1rem;
   border: 1px solid var(--border);
   max-width: 100%;
@@ -108,12 +209,6 @@
             font-size: 12px;
           }
 
-          &:nth-child(2) {
-            color: var(--primary-color);
-            text-decoration: underline;
-            font-weight: 500;
-          }
-
           &:first-child {
             color: var(--gray);
           }
@@ -133,4 +228,10 @@
       }
     }
   }
+}
+
+.clickableItem {
+  color: var(--primary-color);
+  text-decoration: underline;
+  font-weight: 500;
 }

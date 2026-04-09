@@ -1,85 +1,67 @@
-import { api } from '@/api/api'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
-import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
-import RiskTag from '@/components/RiskTag/RiskTag'
-import UserBall from '@/components/UserBall/UserBall'
+import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
-import type { IError } from '@/interfaces/IError'
+import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
-import { message } from 'antd'
-import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
+import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/AttendanceQueueChartAdmin'
+import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 
-interface IAttendanceItemProps {
+export interface IAttendanceItemProps {
   item?: IDashboardQueueItem
   loading?: boolean
 }
 
 function AttendanceItem({ item, loading }: IAttendanceItemProps) {
-  if (loading) {
-    return (
-      <div className={styles.queueItem}>
-        <div className={styles.leftAside}>
-          <div className={`${styles.avatarSkeleton}`} />
+  const { user } = useAuth()
 
-          <div className={styles.info}>
-            <span className={`${styles.name} ${styles.skeleton}`} />
-            <span className={`${styles.status} ${styles.skeleton}`} />
-          </div>
-        </div>
-
-        <div className={`${styles.tagSkeleton}`} />
-      </div>
-    )
+  switch (user?.level) {
+    case 'admin':
+      return <AttendanceQueueChartAdmin item={item} loading={loading} />
+    case 'doctor':
+      return <AttendanceQueueChartDoctor item={item} loading={loading} />
+    default:
+      return <></>
   }
-
-  return (
-    <div className={styles.queueItem}>
-      <div className={styles.leftAside}>
-        <UserBall name={item?.patientName} />
-
-        <div className={styles.info}>
-          <TooltipColumn className={styles.name} text={item?.patientName} />
-          <TooltipColumn className={styles.status} text={item?.status} />
-        </div>
-      </div>
-
-      <RiskTag risk={item?.risk} />
-    </div>
-  )
 }
 
 function AttendanceQueueChart() {
+  const { user } = useAuth()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true)
+
       try {
-        const response = await api.get('/dashboard/attendance-queue')
-        const data = response.data.data
+        const response = await DashboardRepository.getAttendanceQueue({
+          params: {
+            unitId: user?.unitId
+          }
+        })
+        const data = response.data
         setData(data)
       } catch (err) {
-        if (!axios.isAxiosError(err)) return
-        const error = err as AxiosError<IError>
-        console.error(error)
-        message.error(
-          error.response?.data?.message || 'Erro ao pegar fila de atendimento'
-        )
+        handleApiError({
+          err,
+          defaultMessage: 'Erro ao pegar fila de atendimento'
+        })
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [])
+  }, [user?.unitId])
 
   return (
     <DashboardCard
       title='Fila de Atendimento'
       icon={StethoscopeIcon}
-      asideText={`${data.length} atendimentos`}
+      asideText={`${data?.length} atendimentos`}
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>
@@ -88,10 +70,7 @@ function AttendanceQueueChart() {
               <AttendanceItem key={i} loading={loading} />
             ))
           : data.map((item) => (
-              <AttendanceItem
-                key={`${item.patientName}_${item.risk}`}
-                item={item}
-              />
+              <AttendanceItem key={String(item._id)} item={item} />
             ))}
       </div>
     </DashboardCard>

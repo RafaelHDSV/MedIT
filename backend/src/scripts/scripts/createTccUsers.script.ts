@@ -7,7 +7,7 @@ import { Admin } from '../../models/AdminModel.js'
 import { Doctor } from '../../models/DoctorModel.js'
 import { Nurse } from '../../models/NurseModel.js'
 import { Patient } from '../../models/PatientModel.js'
-import UserModel from '../../models/UserModel.js'
+import User from '../../models/UserModel.js'
 import { Script } from '../types.js'
 
 const createTccUsers: Script = {
@@ -44,7 +44,7 @@ const createTccUsers: Script = {
 
       while (exists) {
         crm = generateCRM()
-        exists = Boolean(await UserModel.findOne({ crm }))
+        exists = Boolean(await User.findOne({ crm }))
       }
 
       return crm
@@ -62,7 +62,7 @@ const createTccUsers: Script = {
 
       while (exists) {
         coren = generateCOREN()
-        exists = Boolean(await UserModel.findOne({ coren }))
+        exists = Boolean(await User.findOne({ coren }))
       }
 
       return coren
@@ -188,7 +188,7 @@ const createTccUsers: Script = {
       const email = `${levelItem.level}.${member.short}@yopmail.com`
 
       try {
-        const alreadyExists = await UserModel.findOne({ email })
+        const alreadyExists = await User.findOne({ email })
 
         if (alreadyExists) {
           console.log('⚠️ Já existe:', email)

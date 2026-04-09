@@ -83,10 +83,10 @@ interface IInputSelectProps extends SelectProps {
   inputHeight?: string
 }
 
-function InputSelect({ inputHeight, ...rest }: IInputSelectProps) {
+function InputSelect({ className, inputHeight, ...rest }: IInputSelectProps) {
   return (
     <Select
-      className={styles.select}
+      className={`${styles.select} ${className || ''}`}
       style={{ '--input-height': inputHeight || '3rem' } as React.CSSProperties}
       {...rest}
     />
@@ -102,7 +102,7 @@ interface IInputDateProps {
 
 function InputDate({
   value: initialValue,
-  inputHeight,
+  inputHeight = '3rem',
   dateType,
   onChange
 }: IInputDateProps) {
@@ -129,7 +129,7 @@ function InputDate({
   return (
     <MultiDatepicker
       className={styles.multiDatepicker}
-      style={{ '--input-height': inputHeight || '3rem' } as React.CSSProperties}
+      style={{ '--input-height': inputHeight } as React.CSSProperties}
       type={type}
       defaultPickerType={type}
       options={[type]}
@@ -146,3 +146,4 @@ function InputDate({
 }
 
 export { FormItem, InputDate, InputSelect, InputText }
+

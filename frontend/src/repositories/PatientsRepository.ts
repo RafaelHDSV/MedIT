@@ -1,0 +1,51 @@
+import { api } from '@/api/api'
+import type { PatientFormValues } from '@/interfaces/IPatient'
+import type { ObjectId } from 'mongoose'
+import { Repository } from './Repository'
+
+class PatientsRepositoy extends Repository {
+  async getPatient() {
+    return this.handle(() => {
+      return this.api.get(`${this.path}`)
+    })
+  }
+
+  async createPatient({ body }: { body: PatientFormValues }) {
+    return this.handle(() => {
+      return this.api.post(`${this.path}`, body)
+    })
+  }
+
+  async editPatient({
+    patientId,
+    body
+  }: {
+    patientId: string | ObjectId | undefined
+    body: PatientFormValues
+  }) {
+    return this.handle(() => {
+      return this.api.put(`${this.path}/${patientId}`, body)
+    })
+  }
+
+  async deletePatient({ patientId }: { patientId: ObjectId | undefined }) {
+    return this.handle(() => {
+      return this.api.delete(`${this.path}/${patientId}`)
+    })
+  }
+
+  async getAttendances({
+    patientId
+  }: {
+    patientId: ObjectId | string | undefined
+  }) {
+    return this.handle(() => {
+      return this.api.get(`${this.path}/${patientId}/attendances`)
+    })
+  }
+}
+
+export default new PatientsRepositoy({
+  path: '/auth/patients',
+  api
+})
