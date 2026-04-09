@@ -23,9 +23,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
+import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import styles from './Dashboard.module.scss'
-import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -174,11 +174,7 @@ function Dashboard() {
           </>
         )
       case UserLevels.DOCTOR:
-        return (
-          <>
-            <AttendanceQueueChartDoctor />
-          </>
-        )
+        return <AttendanceQueueChartDoctor />
       case UserLevels.NURSE:
         return <></>
       case UserLevels.PATIENT:
@@ -213,13 +209,7 @@ function Dashboard() {
         }
       />
 
-      <div
-        className={
-          user?.level === UserLevels.DOCTOR
-            ? styles.containerDoctor
-            : styles.container
-        }
-      >
+      <div className={`${styles.container} ${styles[user?.level ?? '']}`}>
         {cardsData.map(({ Icon, value, label }) => (
           <DashboardStatusCard
             key={label}

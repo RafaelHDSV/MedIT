@@ -6,7 +6,13 @@
   grid-template-rows: auto;
   gap: 1rem;
   height: 100%;
+}
 
+.periodSelect {
+  width: 6rem;
+}
+
+.admin {
   grid-template-areas:
     'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
     'dashboardCard5 dashboardCard6 attendanceQueueChart attendanceQueueChart'
@@ -40,17 +46,36 @@
   }
 }
 
-.containerDoctor {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: auto auto;
-  gap: 1rem;
+.doctor {
   grid-template-areas:
     'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
     'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart'
-    ;
-}
+    'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart'
+    'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart'
+    'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart';
 
-.periodSelect {
-  width: 6rem;
+  @include max-lg {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'dashboardCard1 dashboardCard2'
+      'dashboardCard3 dashboardCard4'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart';
+  }
+
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'dashboardCard1'
+      'dashboardCard2'
+      'dashboardCard3'
+      'dashboardCard4'
+      'attendanceQueueChart'
+      'attendanceQueueChart'
+      'attendanceQueueChart'
+      'attendanceQueueChart';
+  }
 }
