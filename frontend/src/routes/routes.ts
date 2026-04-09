@@ -3,6 +3,7 @@ import {
   CalendarDotsIcon,
   ChartBarIcon,
   FirstAidIcon,
+  HouseIcon,
   PillIcon,
   StethoscopeIcon,
   type Icon
@@ -129,6 +130,22 @@ const patientDetails: IRoute = {
   }
 }
 
+const units: IRoute = {
+  name: ROUTES.UNITS.name,
+  description: ROUTES.UNITS.description,
+  path: ROUTES.UNITS.path,
+  icon: HouseIcon,
+  meta: {
+    hidden: false,
+    levels: [
+      UserLevels.ADMIN,
+      UserLevels.DOCTOR,
+      UserLevels.NURSE,
+      UserLevels.PATIENT
+    ]
+  }
+}
+
 const medications: IRoute = {
   name: ROUTES.MEDICAMENTS.name,
   description: ROUTES.MEDICAMENTS.description,
@@ -142,22 +159,6 @@ const medications: IRoute = {
       UserLevels.NURSE,
       UserLevels.PATIENT
     ]
-  }
-}
-
-const unitMedications: IRoute = {
-  name: ROUTES.UNIT_MEDICATIONS.name,
-  description: ROUTES.UNIT_MEDICATIONS.description,
-  path: ROUTES.UNIT_MEDICATIONS.path,
-  meta: {
-    hidden: true,
-    levels: [
-      UserLevels.ADMIN,
-      UserLevels.DOCTOR,
-      UserLevels.NURSE,
-      UserLevels.PATIENT
-    ],
-    canGoBack: true
   }
 }
 
@@ -218,6 +219,7 @@ const routes: IRoute[] = [
   nurseDetails,
   patients,
   patientDetails,
+  units,
   medications,
   preRegistration
 ]

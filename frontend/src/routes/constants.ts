@@ -52,11 +52,16 @@ export const ROUTES = {
     description: 'Visualize e gerencie as informações completas do paciente.',
     path: '/auth/patients/:id'
   },
+  UNITS: {
+    name: 'Unidades',
+    description: 'Visualize e gerencie as unidades.',
+    path: '/auth/units'
+  },
   MEDICAMENTS: {
     name: 'Medicamentos',
     description:
       'Gerencie o cadastro e o controle de medicamentos disponíveis.',
-    path: '/auth/medications/:unitId'
+    path: '/auth/medications'
   },
   PRE_REGISTRATION: {
     name: 'Pré-Cadastro',
