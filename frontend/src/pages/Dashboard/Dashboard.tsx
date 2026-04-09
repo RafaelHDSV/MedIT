@@ -23,7 +23,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
-import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import styles from './Dashboard.module.scss'
 
@@ -174,7 +173,7 @@ function Dashboard() {
           </>
         )
       case UserLevels.DOCTOR:
-        return <AttendanceQueueChartDoctor />
+        return <AttendanceQueueChart />
       case UserLevels.NURSE:
         return <></>
       case UserLevels.PATIENT:

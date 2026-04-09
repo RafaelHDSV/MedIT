@@ -48,72 +48,114 @@
     flex-direction: column;
     font-size: 14px;
     min-width: 0;
-
-    .name {
-      font-weight: 600;
-    }
-
-    .status {
-      color: var(--gray);
-    }
+    gap: 0.5rem;
   }
-}
 
-.avatarSkeleton {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--gray-3);
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -150%;
-    height: 100%;
-    width: 150%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.4),
-      transparent
-    );
-    animation: shimmer 1.2s infinite;
+  .name {
+    font-weight: 600;
+    font-size: 16px;
   }
-}
 
-.tagSkeleton {
-  width: 80px;
-  height: 24px;
-  border-radius: 6px;
-  background: var(--gray-3);
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -150%;
-    height: 100%;
-    width: 150%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.4),
-      transparent
-    );
-    animation: shimmer 1.2s infinite;
+  .status {
+    color: var(--gray);
   }
-}
 
-.name,
-.status {
-  &.skeleton {
+  .detailsSecondary {
+    color: var(--light-gray);
+  }
+
+  .patientInfo {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    max-width: 15rem;
+    width: 100%;
+  }
+
+  .detailsRisk {
+    max-width: 5rem;
+    width: 100%;
+  }
+
+  .skeleton {
+    display: flex;
+    background-color: var(--gray-3);
     height: 14px;
     width: 120px;
     border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      height: 100%;
+      width: 150%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      animation: shimmer 1.2s infinite;
+    }
+  }
+
+  .avatarSkeleton {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gray-3);
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      height: 100%;
+      width: 150%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      animation: shimmer 1.2s infinite;
+    }
+  }
+
+  .tagSkeleton {
+    width: 80px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--gray-3);
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      height: 100%;
+      width: 150%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      animation: shimmer 1.2s infinite;
+    }
+  }
+
+  @keyframes shimmer {
+    100% {
+      left: 150%;
+    }
   }
 }
