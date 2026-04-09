@@ -4,6 +4,7 @@ import {
   AttendanceRisk,
   AttendanceStatus
 } from '../../interfaces/IAttendance.js'
+import { BloodType } from '../../interfaces/IPatient.js'
 import { Attendance } from '../../models/AttendanceModel.js'
 import { Doctor } from '../../models/DoctorModel.js'
 import { Nurse } from '../../models/NurseModel.js'
@@ -13,16 +14,13 @@ import { Unit } from '../../models/UnitModel.js'
 const createAttendances = {
   name: 'create-attendances',
   description: 'Simulação de 1 ano de atendimentos (realista)',
-
   async run() {
     console.log('❌ Deletando os atendimentos já criados anteriormente')
     const deleted = await Attendance.deleteMany()
     console.log(`❌ Deletando ${deleted.deletedCount} atendimentos`)
-
     console.log('🚀 Criando atendimentos do ANO inteiro...')
 
     const units = await Unit.find()
-
     if (!units.length) {
       console.log('❌ Nenhuma unidade encontrada')
       process.exit()
@@ -211,7 +209,6 @@ const createAttendances = {
 
     // Índice round-robin para distribuir atendimentos igualmente entre unidades
     let unitPoolIndex = 0
-
     const attendances = []
     let attendanceNumber = 1
     let currentDate = new Date(startDate)
@@ -222,7 +219,6 @@ const createAttendances = {
       for (let i = 0; i < attendancesPerDay; i++) {
         const hour = faker.number.int({ min: 6, max: 22 })
         const minute = faker.number.int({ min: 0, max: 59 })
-
         const date = new Date(currentDate)
         date.setHours(hour, minute)
         if (date > now) continue
@@ -283,8 +279,121 @@ const createAttendances = {
       currentDate.setDate(currentDate.getDate() + 1)
     }
 
-    console.log(`📦 Inserindo ${attendances.length} atendimentos...`)
+    // ------------------------------------------------------------------ //
+    //  Garante mínimo de 10 atendimentos em andamento por unidade
+    // ------------------------------------------------------------------ //
+    const MIN_ACTIVE = 10
 
+    for (const pool of unitPools) {
+      const activeSet = activePatientIdsByUnit.get(pool.unitId.toString())!
+
+      const currentActive = attendances.filter(
+        (a) =>
+          a.unitId.toString() === pool.unitId.toString() &&
+          activeStatuses.includes(a.status)
+      ).length
+
+      const missing = MIN_ACTIVE - currentActive
+      if (missing <= 0) continue
+
+      console.log(
+        `⚙️  Unidade ${pool.unitId}: adicionando ${missing} atendimento(s) em andamento`
+      )
+
+      for (let i = 0; i < missing; i++) {
+        // Data recente (entre 30 min e 2h atrás) para garantir status ativo
+        const minutesAgo = faker.number.int({ min: 30, max: 120 })
+        const date = new Date(now.getTime() - minutesAgo * 60_000)
+
+        const risk = faker.helpers.arrayElement(riskDistribution)
+        const { status, history } = generateStatusFlow(date, risk)
+
+        const finalStatus = activeStatuses.includes(status)
+          ? status
+          : AttendanceStatus.IN_ATTENDANCE
+
+        const finalHistory = activeStatuses.includes(status)
+          ? history
+          : [{ status: AttendanceStatus.IN_ATTENDANCE, changedAt: date }]
+
+        // Tenta pegar paciente disponível; cria um novo se necessário
+        let available = pool.patients.filter(
+          (id) => !activeSet.has(id.toString())
+        )
+
+        if (available.length === 0) {
+          console.log(
+            `🧑‍⚕️  Sem pacientes disponíveis na unidade ${pool.unitId} — criando novo paciente`
+          )
+
+          const firstName = faker.person.firstName()
+          const lastName = faker.person.lastName()
+          const cpf = faker.string.numeric(11)
+
+          const newPatient = (await Patient.create({
+            name: `${firstName} ${lastName}`,
+            cpf,
+            email: faker.internet.email({
+              firstName,
+              lastName,
+              provider: 'seed.med.br'
+            }),
+            password: 'fastpass',
+            gender: faker.helpers.arrayElement(['male', 'female']),
+            birthDate: faker.date.birthdate({ min: 18, max: 80, mode: 'age' }),
+            cellphone: Number(faker.string.numeric(11)),
+            unitId: pool.unitId.toString(),
+            weight: faker.number.float({
+              min: 50,
+              max: 120,
+              fractionDigits: 1
+            }),
+            height: faker.number.float({
+              min: 1.5,
+              max: 2.0,
+              fractionDigits: 2
+            }),
+            bloodType: faker.helpers.arrayElement(Object.values(BloodType)),
+            conditions: [],
+            allergies: []
+          } as any)) as { _id: Types.ObjectId }
+
+          const newId = new Types.ObjectId(String(newPatient._id))
+          pool.patients.push(newId)
+          available = [newId]
+        }
+
+        const patientId = faker.helpers.arrayElement(available)
+        activeSet.add(patientId.toString())
+
+        const nurseId = faker.helpers.arrayElement(pool.nurses)
+        const doctorId = faker.helpers.arrayElement(pool.doctors)
+
+        attendances.push({
+          number: attendanceNumber++,
+          complaint: faker.helpers.arrayElement(complaints),
+          diagnosis: undefined,
+          date,
+          risk,
+          status: finalStatus,
+          unitId: pool.unitId,
+          patientId,
+          nurseId,
+          doctorId:
+            finalStatus !== AttendanceStatus.WAITING_TRIAGE
+              ? doctorId
+              : undefined,
+          medicationsIds: [],
+          changesHistory: finalHistory,
+          vitalSigns: randomVitalSigns(),
+          iaConditionId: new Types.ObjectId(),
+          createdAt: date,
+          updatedAt: date
+        })
+      }
+    }
+
+    console.log(`📦 Inserindo ${attendances.length} atendimentos...`)
     await Attendance.insertMany(attendances, { timestamps: false })
 
     console.log('\n📊 Atendimentos por unidade:')
