@@ -1,30 +1,32 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
+import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { handleApiError } from '@/helpers/handleApiError'
-import { useAuth } from '@/hooks/useAuth'
 import type { ILocation } from '@/interfaces/ILocation'
-import { Col, Form, Input, message, Modal, Row, Spin } from 'antd'
-import { useEffect, useState } from 'react'
+import UnitsRepository from '@/repositories/UnitsRepository'
+import { Col, Form, Input, message, Modal, Row, Skeleton } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './Locations.module.scss'
 
 function Locations() {
-  const { user } = useAuth()
+  const [form] = Form.useForm()
+  const navigate = useNavigate()
   const [locations, setLocations] = useState<ILocation[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [form] = Form.useForm()
-  const navigate = useNavigate()
   // VIEIRA: Verificar possibilidade de nível Medit
   const isMedit = false
 
   async function fetchLocations() {
+    setLoading(true)
+
     try {
-      const response = await api.get('/auth/units')
-      setLocations(response.data.data)
+      const response = await UnitsRepository.getUnits()
+      setLocations(response.data)
     } catch (err) {
       handleApiError({ err, defaultMessage: 'Erro ao buscar localizações' })
     } finally {
@@ -36,8 +38,20 @@ function Locations() {
     fetchLocations()
   }, [])
 
+  const filteredLocations = useMemo(() => {
+    if (!searchTerm || searchTerm === '') return locations
+    const search = searchTerm.toLowerCase()
+
+    return locations.filter(
+      (loc) =>
+        loc.name.toLowerCase().includes(search) ||
+        loc.address.toLowerCase().includes(search)
+    )
+  }, [searchTerm, locations])
+
   const handleCreate = async (values: any) => {
     setSubmitting(true)
+
     try {
       const addressString = `${values.street}, ${values.number} - ${values.neighborhood}, ${values.city} - ${values.state}, CEP: ${values.zipCode}`
       const submissionData = {
@@ -57,14 +71,7 @@ function Locations() {
     }
   }
 
-  const filteredLocations = locations.filter(
-    (loc) =>
-      loc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      loc.address.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
   const getStatus = () => {
-    // Basic mock for status based on hours, since we don't have full logic here
     const random = Math.random()
     if (random > 0.6) return { text: 'Aberto', className: styles.aberto }
     if (random > 0.3) return { text: 'Fechando', className: styles.fechando }
@@ -73,16 +80,6 @@ function Locations() {
 
   return (
     <>
-      <AuthLayoutHeader
-        actionComponent={
-          isMedit && (
-            <Button onClick={() => setIsModalOpen(true)}>
-              Adicionar Unidade
-            </Button>
-          )
-        }
-      />
-
       <Modal
         title='Cadastrar Unidade'
         open={isModalOpen}
@@ -174,55 +171,69 @@ function Locations() {
           </Row>
         </Form>
       </Modal>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <input
-            type='text'
-            placeholder='Buscar localização...'
+
+      <section>
+        <AuthLayoutHeader
+          actionComponent={
+            isMedit && (
+              <Button onClick={() => setIsModalOpen(true)}>
+                Adicionar Unidade
+              </Button>
+            )
+          }
+        />
+
+        {/* VIEIRA: Adicionar filtros igual médico */}
+        <FormItem name='search' inputHeight='2.5rem'>
+          <InputText
+            className='w-100'
+            placeholder='Buscar localização'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
           />
-        </div>
+        </FormItem>
 
-        {loading ? (
-          <div className={styles.loader}>
-            <Spin size='large' />
-          </div>
-        ) : (
-          <div className={styles.grid}>
-            {filteredLocations.map((location) => {
-              const status = getStatus()
-              return (
-                <div
-                  key={location._id}
-                  className={styles.card}
-                  onClick={() => navigate(`/auth/medications/${location._id}`)}
-                >
-                  <div className={styles.cardHeader}>
-                    <h3>{location.name}</h3>
-                    <span className={`${styles.badge} ${status.className}`}>
-                      {status.text}
-                    </span>
+        <div className={styles.grid}>
+          {loading
+            ? Array.from({ length: 9 }).map((_item, index) => {
+                return (
+                  <Skeleton.Button key={index} className={styles.skeleton} />
+                )
+              })
+            : filteredLocations.map((location) => {
+                const status = getStatus()
+
+                return (
+                  <div
+                    key={location._id}
+                    className={styles.card}
+                    onClick={() =>
+                      navigate(`/auth/medications/${location._id}`)
+                    }
+                  >
+                    <div className={styles.cardHeader}>
+                      <h3>{location.name}</h3>
+                      <span className={`${styles.badge} ${status.className}`}>
+                        {status.text}
+                      </span>
+                    </div>
+                    {location.scale && (
+                      <p
+                        style={{
+                          margin: '4px 0',
+                          fontSize: '14px',
+                          color: '#666'
+                        }}
+                      >
+                        <strong>Escala:</strong> {location.scale}
+                      </p>
+                    )}
+                    <p className={styles.address}>{location.address}</p>
                   </div>
-                  {location.scale && (
-                    <p
-                      style={{
-                        margin: '4px 0',
-                        fontSize: '14px',
-                        color: '#666'
-                      }}
-                    >
-                      <strong>Escala:</strong> {location.scale}
-                    </p>
-                  )}
-                  <p className={styles.address}>{location.address}</p>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
+                )
+              })}
+        </div>
+      </section>
     </>
   )
 }
