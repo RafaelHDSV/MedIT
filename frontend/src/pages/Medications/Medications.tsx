@@ -137,10 +137,7 @@ function Medications() {
             <Input placeholder='Ex: Analgésico e antitérmico' />
           </Form.Item>
           <Form.Item name='description' label='Descrição'>
-            <Input.TextArea
-              placeholder='Descrição do medicamento...'
-              rows={3}
-            />
+            <Input.TextArea placeholder='Descrição do medicamento' rows={3} />
           </Form.Item>
           <Form.Item
             name='requiresPrescription'
@@ -249,7 +246,7 @@ function Medications() {
           </div>
           <input
             type='text'
-            placeholder='Buscar medicamento...'
+            placeholder='Buscar medicamento'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchInput}
