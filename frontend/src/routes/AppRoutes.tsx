@@ -56,6 +56,10 @@ function AppRoutes() {
             path={ROUTES.MEDICAMENTS.path}
             element={<pages.Medications />}
           />
+           <Route
+            path={ROUTES.DOCTORSSERVICE.path}
+            element={<pages.DoctorsServices />}
+          />
           <Route
             path={ROUTES.ATTENDANCES.path}
             element={<pages.Attendances />}

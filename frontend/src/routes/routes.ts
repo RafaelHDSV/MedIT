@@ -145,6 +145,19 @@ const medications: IRoute = {
   }
 }
 
+const doctorsservices: IRoute = {
+  name: ROUTES.DOCTORSSERVICE.name,
+  description: ROUTES.DOCTORSSERVICE.description,
+  path: ROUTES.DOCTORSSERVICE.path,
+  icon: PillIcon,
+  meta: {
+    hidden: false,
+    levels: [
+      UserLevels.DOCTOR
+    ]
+  }
+}
+
 const attendances: IRoute = {
   name: ROUTES.ATTENDANCES.name,
   description: ROUTES.ATTENDANCES.description,
@@ -203,7 +216,8 @@ const routes: IRoute[] = [
   patients,
   patientDetails,
   medications,
-  preRegistration
+  preRegistration,
+  doctorsservices
 ]
 
 export default routes
