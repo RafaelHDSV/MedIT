@@ -117,7 +117,11 @@ function ModalContent({
       footer={null}
       centered
     >
-      <h2>{isEditMode ? 'Editar enfermeiro(a)' : 'Adicionar enfermeiro(a)'}</h2>
+      <h2>
+        {isEditMode
+          ? `Editar ${nurse?.name ?? 'o enfermeiro(a)'}`
+          : 'Adicionar enfermeiro(a)'}
+      </h2>
 
       <Form
         form={form}

@@ -62,7 +62,7 @@ export function MultiDatepickerContainer({
 
 interface IInputDate {
   type?: DayjsType
-  onDateTypeChange: (type: DayjsType) => void
+  onDateTypeChange?: (type: DayjsType) => void
   onDateChange: (value: DayjsValue) => void
   value: DayjsValue
   defaultValue?: DayjsValue
@@ -121,27 +121,27 @@ export default function MultiDatepicker({
     options.includes('date') && {
       key: 'date',
       label: 'Diário',
-      onClick: () => onDateTypeChange('date')
+      onClick: () => onDateTypeChange?.('date')
     },
     options.includes('week') && {
       key: 'week',
       label: 'Semanal',
-      onClick: () => onDateTypeChange('week')
+      onClick: () => onDateTypeChange?.('week')
     },
     options.includes('range') && {
       key: 'range',
       label: 'Intervalo',
-      onClick: () => onDateTypeChange('range')
+      onClick: () => onDateTypeChange?.('range')
     },
     options.includes('month') && {
       key: 'month',
       label: 'Mensal',
-      onClick: () => onDateTypeChange('month')
+      onClick: () => onDateTypeChange?.('month')
     },
     options.includes('year') && {
       key: 'year',
       label: 'Anual',
-      onClick: () => onDateTypeChange('year')
+      onClick: () => onDateTypeChange?.('year')
     }
   ].filter(Boolean) as MenuProps['items']
 
@@ -168,12 +168,14 @@ export default function MultiDatepicker({
       }}
     >
       {type === 'range' ? (
-        <DatePicker.RangePicker
-          {...commonProps}
-          value={value as RangeValue}
-          onChange={handleRangeChange}
-          format={getMultiDatepickerFormat({ type, mode: 'display' })}
-        />
+        <div ref={pickerRef} className='w-100'>
+          <DatePicker.RangePicker
+            {...commonProps}
+            value={value as RangeValue}
+            onChange={handleRangeChange}
+            format={INPUT_PARSE_FORMATS.range}
+          />
+        </div>
       ) : (
         <div ref={pickerRef} className='w-100'>
           <DatePicker

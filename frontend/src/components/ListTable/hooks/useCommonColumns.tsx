@@ -1,13 +1,17 @@
 import Button from '@/components/Button/Button'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
-import { sorterFunction } from '@/utils/sorterFunction'
+import {
+  sorterFunctionByDate,
+  sorterFunctionById
+} from '@/utils/sorterFunction'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { Flex, Tooltip } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import TooltipColumn from '../components/TooltipColumn/TooltipColumn'
+import styles from '../ListTable.module.scss'
 
 interface IGetCommonColumnsProps<K> {
   handleNavigateToDetails: (id: ObjectId | undefined) => void
@@ -26,26 +30,38 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       dataIndex: 'number',
       key: 'number',
       width: 60,
-      sorter: sorterFunction,
+      sorter: sorterFunctionById,
       render: (_id: string) => <TooltipColumn text={_id} />
     }),
-    name: (): ColumnType<K> => ({
+    name: ({
+      canGoToDetails = true
+    }: {
+      canGoToDetails?: boolean
+    }): ColumnType<K> => ({
       title: 'Nome',
       dataIndex: 'name',
       key: 'name',
       width: 180,
       ellipsis: true,
-      render: (name: string, record: K) => (
-        <span
-          role='button'
-          tabIndex={0}
-          className='ellipsis'
-          style={{ cursor: 'pointer' }}
-          onClick={() => handleNavigateToDetails(record?._id)}
-        >
+      render: (name: string, record: K) => {
+        return canGoToDetails ? (
+          name ? (
+            <span
+              role='button'
+              tabIndex={0}
+              className={`${styles.clickableItem ?? ''} ellipsis`}
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleNavigateToDetails(record?._id)}
+            >
+              <TooltipColumn text={name} />
+            </span>
+          ) : (
+            'n/a'
+          )
+        ) : (
           <TooltipColumn text={name} />
-        </span>
-      )
+        )
+      }
     }),
     cpf: (): ColumnType<K> => ({
       title: 'CPF',
@@ -53,7 +69,9 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'cpf',
       width: 140,
       ellipsis: true,
-      render: (cpf: string) => <TooltipColumn text={masks(cpf, 'cpf')} />
+      render: (cpf: string) => (
+        <TooltipColumn text={cpf ? masks(cpf, 'cpf') : undefined} />
+      )
     }),
     email: (): ColumnType<K> => ({
       title: 'E-mail',
@@ -69,9 +87,14 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'birthDate',
       width: 180,
       ellipsis: true,
+      sorter: sorterFunctionByDate('birthDate'),
       render: (date: Date | string) => (
         <TooltipColumn
-          text={`${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`}
+          text={
+            date
+              ? `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
+              : undefined
+          }
         />
       )
     }),
@@ -82,7 +105,9 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       width: 140,
       ellipsis: true,
       render: (cellphone: string) => (
-        <TooltipColumn text={masks(cellphone, 'cellphone')} />
+        <TooltipColumn
+          text={cellphone ? masks(cellphone, 'cellphone') : undefined}
+        />
       )
     }),
     createdAt: (): ColumnType<K> => ({
@@ -91,9 +116,11 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'createdAt',
       width: 160,
       ellipsis: true,
-      sorter: sorterFunction,
+      sorter: sorterFunctionByDate('createdAt'),
       render: (date: Date | string) => (
-        <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
+        <TooltipColumn
+          text={date ? dayjs(date).format('DD/MM/YYYY HH:mm') : undefined}
+        />
       )
     }),
     updatedAt: (): ColumnType<K> => ({
@@ -102,9 +129,11 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       key: 'updatedAt',
       width: 160,
       ellipsis: true,
-      sorter: sorterFunction,
+      sorter: sorterFunctionByDate('updatedAt'),
       render: (date: Date | string) => (
-        <TooltipColumn text={dayjs(date).format('DD/MM/YYYY HH:mm')} />
+        <TooltipColumn
+          text={date ? dayjs(date).format('DD/MM/YYYY HH:mm') : undefined}
+        />
       )
     }),
     actions: (): ColumnType<K> => ({

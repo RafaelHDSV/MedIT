@@ -33,7 +33,7 @@ function Dashboard() {
   const [dashboardStatusData, setDashboardStatusData] =
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
-  const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.DAY)
+  const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
   const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
 
   useEffect(() => {
@@ -133,7 +133,7 @@ function Dashboard() {
             Icon: UsersThreeIcon,
             value: dashboardStatusData?.assertiveness
               ? `${dashboardStatusData?.assertiveness}%`
-              : 'N/A',
+              : 'n/a',
             label: 'Assertividade IA vs Médico(a)'
           }
         ]

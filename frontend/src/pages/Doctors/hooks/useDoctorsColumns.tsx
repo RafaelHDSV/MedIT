@@ -43,7 +43,7 @@ export function useDoctorsColumns({
   const handleDelete = useCallback(
     async (doctor: IDoctor) => {
       Modal.confirm({
-        title: 'Deseja deletar este médico(a)?',
+        title: `Deseja deletar ${doctor.name ?? 'o médico(a)'}?`,
         content: `Esta ação não pode ser desfeita.`,
         okText: 'Sim, deletar',
         cancelText: 'Cancelar',
@@ -71,7 +71,7 @@ export function useDoctorsColumns({
   const columns: ColumnsType<IDoctor> = useMemo(
     () => [
       commonColumns.id(),
-      commonColumns.name(),
+      commonColumns.name({}),
       commonColumns.cpf(),
       commonColumns.email(),
       commonColumns.birthDate(),
@@ -82,7 +82,9 @@ export function useDoctorsColumns({
         key: 'crm',
         width: 120,
         ellipsis: true,
-        render: (crm: string) => <TooltipColumn text={masks(crm, 'crm')} />
+        render: (crm: string) => (
+          <TooltipColumn text={crm ? masks(crm, 'crm') : undefined} />
+        )
       },
       commonColumns.createdAt(),
       commonColumns.updatedAt(),

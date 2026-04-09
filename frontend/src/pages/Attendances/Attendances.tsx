@@ -9,17 +9,22 @@ import { useCallback, useEffect, useState } from 'react'
 import styles from '../../components/ListTable/ListTable.module.scss'
 import { useAttendancesColumns } from './hooks/useAttendancesColumns'
 
-function Attendances() {
+interface IAttendancesProps {
+  doctorId?: string
+}
+
+function Attendances({ doctorId }: IAttendancesProps) {
   const { user } = useAuth()
   const [attendances, setAttendances] = useState<IAttendance[]>([])
   const [loading, setLoading] = useState(true)
+  const canGoToDetails = !doctorId
 
   const fetchAttendances = useCallback(async () => {
     setLoading(true)
 
     try {
       const response = await DoctorsRepository.getAttendances({
-        doctorId: user?._id
+        doctorId: doctorId ? doctorId : user?._id
       })
       setAttendances(response)
     } catch (err) {
@@ -30,18 +35,18 @@ function Attendances() {
     } finally {
       setLoading(false)
     }
-  }, [user?._id])
+  }, [user?._id, doctorId])
 
   useEffect(() => {
     fetchAttendances()
   }, [fetchAttendances])
 
-  const columns = useAttendancesColumns()
+  const columns = useAttendancesColumns({ canGoToDetails })
 
   return (
     <div className={styles.tableContent}>
       <Flex vertical className={styles.container}>
-        <AuthLayoutHeader />
+        {!doctorId && <AuthLayoutHeader />}
 
         <ListTable<IAttendance>
           dataSource={attendances}

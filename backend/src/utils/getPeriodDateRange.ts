@@ -1,70 +1,43 @@
 export const getPeriodDateRange = (period: string) => {
-  const now = new Date()
+  const now = new Date(
+    new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' })
+  )
+
+  const year = now.getFullYear()
+  const month = now.getMonth()
+  const date = now.getDate()
+  const day = now.getDay()
 
   let start: Date
   let end: Date
 
-  const base = new Date(
-    Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      0,
-      0,
-      0,
-      0
-    )
-  )
-
   switch (period) {
     case 'day':
-      start = new Date(base)
-
-      end = new Date(base)
-      end.setUTCHours(23, 59, 59, 999)
+      start = new Date(Date.UTC(year, month, date, 0, 0, 0, 0))
+      end = new Date(Date.UTC(year, month, date + 1, 0, 0, 0, 0) - 1)
       break
 
     case 'week': {
-      const dayOfWeek = base.getUTCDay()
+      const startDate = date - day
 
-      start = new Date(base)
-      start.setUTCDate(base.getUTCDate() - dayOfWeek)
-
-      end = new Date(start)
-      end.setUTCDate(start.getUTCDate() + 6)
-      end.setUTCHours(23, 59, 59, 999)
+      start = new Date(Date.UTC(year, month, startDate, 0, 0, 0, 0))
+      end = new Date(Date.UTC(year, month, startDate + 7, 0, 0, 0, 0) - 1)
       break
     }
 
     case 'month':
-      start = new Date(
-        Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), 1, 0, 0, 0, 0)
-      )
-
-      end = new Date(
-        Date.UTC(
-          base.getUTCFullYear(),
-          base.getUTCMonth() + 1,
-          0,
-          23,
-          59,
-          59,
-          999
-        )
-      )
+      start = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0))
+      end = new Date(Date.UTC(year, month + 1, 1, 0, 0, 0, 0) - 1)
       break
 
     case 'year':
-      start = new Date(Date.UTC(base.getUTCFullYear(), 0, 1, 0, 0, 0, 0))
-
-      end = new Date(Date.UTC(base.getUTCFullYear(), 11, 31, 23, 59, 59, 999))
+      start = new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0))
+      end = new Date(Date.UTC(year + 1, 0, 1, 0, 0, 0, 0) - 1)
       break
 
     default:
-      start = new Date(base)
-
-      end = new Date(base)
-      end.setUTCHours(23, 59, 59, 999)
+      start = new Date(Date.UTC(year, month, date, 0, 0, 0, 0))
+      end = new Date(Date.UTC(year, month, date + 1, 0, 0, 0, 0) - 1)
       break
   }
 

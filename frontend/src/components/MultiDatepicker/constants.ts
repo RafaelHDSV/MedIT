@@ -69,23 +69,33 @@ export function useInputMask(
     const container = pickerRef.current as HTMLElement
     if (!container) return
 
-    const input = container.querySelector<HTMLInputElement>('input')
-    if (!input) return
+    const inputs = container.querySelectorAll<HTMLInputElement>('input')
+    if (!inputs?.length) return
 
-    const handleInput = (e: Event) => {
-      const target = e.target as HTMLInputElement
-      const masked = applyDateMask(target.value, maskConfig.mask)
+    const listeners = new Map<HTMLInputElement, (e: Event) => void>()
 
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        'value'
-      )?.set
+    inputs.forEach((input) => {
+      const handleInput = (e: Event) => {
+        const target = e.target as HTMLInputElement
+        const masked = applyDateMask(target.value, maskConfig.mask)
 
-      nativeInputValueSetter?.call(target, masked)
-      target.dispatchEvent(new Event('input', { bubbles: true }))
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value'
+        )?.set
+
+        nativeInputValueSetter?.call(target, masked)
+        target.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+
+      listeners.set(input, handleInput)
+      input.addEventListener('input', handleInput)
+    })
+
+    return () => {
+      listeners.forEach((handler, input) => {
+        input.removeEventListener('input', handler)
+      })
     }
-
-    input.addEventListener('input', handleInput)
-    return () => input.removeEventListener('input', handleInput)
   }, [pickerRef, type])
 }

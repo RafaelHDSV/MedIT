@@ -1,5 +1,7 @@
 .button {
-  height: 2.5rem;
+  --button-height: 0;
+
+  height: var(--button-height);
   background-color: var(--primary-color);
   color: var(--white);
   border: none;
@@ -15,6 +17,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2rem !important;
+  height: 2rem !important;
   padding: 0 !important;
 
   svg {
@@ -26,7 +30,7 @@
   &:focus-visible {
     background-color: var(--primary-opaque) !important;
     color: var(--primary-color) !important;
-    outline: 2px solid var(--primary-color);
+    outline: 1px solid var(--primary-color);
   }
 
   &:active {
@@ -35,6 +39,22 @@
 }
 
 .secondary {
+  color: var(--gray-1);
+  background-color: var(--gray-3);
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--gray-2);
+    color: var(--gray-2);
+    outline: 2px solid var(--gray-1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.outline {
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
   background-color: transparent;

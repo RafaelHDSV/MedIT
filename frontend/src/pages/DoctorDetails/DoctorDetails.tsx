@@ -83,6 +83,7 @@ function DoctorDetails() {
             />
 
             <DeleteModal
+              user={doctor}
               label='médico(a)'
               apiName='doctors'
               buttonText='Deletar médico(a)'
@@ -158,13 +159,14 @@ function DoctorDetails() {
         <UserDetailsCard
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
-          // VIEIRA Tirar slice e quando clicar mostrar todos
-          itens={attendances?.slice(0, 5)?.map((attendance) => ({
+          itens={attendances?.map((attendance) => ({
             key: attendance._id,
             label: dayjs(attendance.date).format('DD/MM/YYYY'),
-            value: `${attendance.diagnosis ?? ''} - ${attendance.complaint}`
+            value: attendance.complaint
           }))}
           loading={loading}
+          doctorId={String(doctor?._id)}
+          isAttendanceHistory
         />
       </div>
     </section>

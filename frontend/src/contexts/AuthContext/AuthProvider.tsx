@@ -1,4 +1,3 @@
-import { handleApiError } from '@/helpers/handleApiError'
 import { type IBaseUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
 import AuthRepository from '@/repositories/AuthRepository'
@@ -17,27 +16,23 @@ export function AuthProvider({ children }: Props) {
   })
 
   async function login({ email, cpf, password }: LoginPayload) {
-    try {
-      const response = await AuthRepository.login({
-        body: {
-          email,
-          cpf,
-          password
-        }
-      })
+    const response = await AuthRepository.login({
+      body: {
+        email,
+        cpf,
+        password
+      }
+    })
 
-      const { accessToken, refreshToken, user } = response
+    const { accessToken, refreshToken, user } = response
 
-      setUser(user)
+    setUser(user)
 
-      localStorage.setItem('user', JSON.stringify(user))
-      localStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
+    localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('accessToken', accessToken)
+    localStorage.setItem('refreshToken', refreshToken)
 
-      return true
-    } catch (err) {
-      handleApiError({ err, defaultMessage: 'Email/CPF ou senha inválidos' })
-    }
+    return true
   }
 
   async function logout() {

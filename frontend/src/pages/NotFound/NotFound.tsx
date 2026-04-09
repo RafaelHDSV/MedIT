@@ -26,7 +26,7 @@ export default function NotFound() {
           Ir para o Dashboard
         </Button>
 
-        <Button mode='secondary' onClick={() => navigate(-1)}>
+        <Button mode='outline' onClick={() => navigate(-1)}>
           Voltar
         </Button>
       </Flex>

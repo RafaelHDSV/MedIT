@@ -8,16 +8,23 @@ import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-export function useAttendancesColumns() {
+
+interface IUseAttendancesColumnsProps {
+  canGoToDetails: boolean
+}
+
+export function useAttendancesColumns({
+  canGoToDetails
+}: IUseAttendancesColumnsProps) {
   const navigate = useNavigate()
 
   const handleNavigateToDetails = useCallback(
     (id: ObjectId | undefined) => {
-      if (!id) return
+      if (!id || !canGoToDetails) return
       // VIEIRA: Implementar navegação para detalhes do atendimento
       navigate(ROUTES.ATTENDANCES.path.replace(':id', id.toString()))
     },
-    [navigate]
+    [navigate, canGoToDetails]
   )
 
   const commonColumns = getCommonColumns<IAttendance>({
@@ -30,7 +37,7 @@ export function useAttendancesColumns() {
   const columns: ColumnsType<IAttendance> = useMemo(
     () => [
       commonColumns.id(),
-      commonColumns.name(),
+      commonColumns.name({ canGoToDetails }),
       commonColumns.birthDate(),
       {
         title: 'Queixa',
@@ -48,7 +55,11 @@ export function useAttendancesColumns() {
         ellipsis: true,
         render: (date: Date | string) => (
           <TooltipColumn
-            text={`${dayjs(date).format('DD/MM/YYYY')} às ${dayjs(date).format('HH:mm')}  `}
+            text={
+              date
+                ? `${dayjs(date).format('DD/MM/YYYY')} às ${dayjs(date).format('HH:mm')}`
+                : undefined
+            }
           />
         )
       },
@@ -58,7 +69,8 @@ export function useAttendancesColumns() {
         key: 'risk',
         width: 160,
         ellipsis: true,
-        render: (risk: string) => <RiskTag risk={risk as AttendanceRisk} />
+        render: (risk: string) =>
+          risk ? <RiskTag risk={risk as AttendanceRisk} /> : 'n/a'
       },
       {
         title: 'Diagnóstico',
@@ -67,13 +79,15 @@ export function useAttendancesColumns() {
         width: 120,
         ellipsis: true,
         render: (text: string) => (
-          <TooltipColumn text={`${text} ${assertivenessIA && '✅'}`} />
+          <TooltipColumn
+            text={text ? `${text} ${assertivenessIA && '✅'}` : undefined}
+          />
         )
       },
       commonColumns.createdAt(),
       commonColumns.updatedAt()
     ],
-    [commonColumns, assertivenessIA]
+    [commonColumns, assertivenessIA, canGoToDetails]
   )
 
   return columns
