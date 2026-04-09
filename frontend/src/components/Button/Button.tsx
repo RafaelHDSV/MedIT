@@ -4,11 +4,13 @@ import styles from './Button.module.scss'
 
 interface IButtonProps extends ButtonProps {
   mode?: 'primary' | 'secondary' | 'outline' | 'icon'
+  fontSize?: number
   buttonHeight?: string
 }
 
 function Button({
   mode,
+  fontSize = 16,
   buttonHeight = '2.5rem',
   htmlType,
   loading,
@@ -38,7 +40,8 @@ function Button({
       className={`${styles.button} ${mode ? styles[mode] : ''} ${className ?? ''}`}
       style={
         {
-          '--button-height': buttonHeight
+          '--button-height': buttonHeight,
+          '--button-font-size': `${fontSize}px`
         } as React.CSSProperties
       }
       type={type}

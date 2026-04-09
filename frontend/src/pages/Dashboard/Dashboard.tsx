@@ -173,7 +173,7 @@ function Dashboard() {
           </>
         )
       case UserLevels.DOCTOR:
-        return <></>
+        return <AttendanceQueueChart />
       case UserLevels.NURSE:
         return <></>
       case UserLevels.PATIENT:
@@ -208,7 +208,7 @@ function Dashboard() {
         }
       />
 
-      <div className={styles.container}>
+      <div className={`${styles.container} ${styles[user?.level ?? '']}`}>
         {cardsData.map(({ Icon, value, label }) => (
           <DashboardStatusCard
             key={label}
