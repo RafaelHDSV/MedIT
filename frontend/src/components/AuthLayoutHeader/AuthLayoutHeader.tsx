@@ -1,3 +1,4 @@
+import { useAuth } from '@/hooks/useAuth'
 import routes from '@/routes/routes'
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { matchPath, useLocation } from 'react-router-dom'
@@ -14,8 +15,10 @@ function AuthLayoutHeader({
   marginBottom = 16,
   actionComponent
 }: IAuthLayoutHeaderProps) {
+  const { user } = useAuth()
+  const { unitId } = user || {}
   const location = useLocation()
-  const currentRoute = routes.find((route) =>
+  const currentRoute = routes(unitId).find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)
   )
   const {

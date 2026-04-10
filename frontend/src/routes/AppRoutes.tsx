@@ -1,3 +1,4 @@
+import { useAuth } from '@/hooks/useAuth'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import * as pages from '../pages/routerPages'
 import AuthRoute from './AuthRoute'
@@ -5,6 +6,9 @@ import { ROUTES } from './constants'
 import UnauthRoute from './UnauthRoute'
 
 function AppRoutes() {
+  const { user } = useAuth()
+  const { unitId } = user || {}
+
   return (
     <BrowserRouter>
       <Routes>
@@ -54,7 +58,7 @@ function AppRoutes() {
           />
           <Route path={ROUTES.UNITS.path} element={<pages.Units />} />
           <Route
-            path={ROUTES.MEDICAMENTS.path}
+            path={ROUTES.MEDICAMENTS(unitId).path}
             element={<pages.Medications />}
           />
           <Route

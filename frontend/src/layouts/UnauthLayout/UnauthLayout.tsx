@@ -1,5 +1,6 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Logo from '@/components/Logo/Logo'
+import { useAuth } from '@/hooks/useAuth'
 import routes from '@/routes/routes'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { matchPath, Outlet, useLocation } from 'react-router-dom'
@@ -7,8 +8,10 @@ import TypewriterComponent from 'typewriter-effect'
 import styles from './UnauthLayout.module.scss'
 
 export default function UnauthLayout() {
+  const { user } = useAuth()
+  const { unitId } = user || {}
   const location = useLocation()
-  const currentRoute = routes.find((route) =>
+  const currentRoute = routes(unitId).find((route) =>
     matchPath({ path: route.path, end: true }, location.pathname)
   )
   const isSignUpPage = currentRoute?.path === '/sign-up'
