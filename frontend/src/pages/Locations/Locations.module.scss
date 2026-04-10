@@ -13,58 +13,33 @@
 }
 
 .card {
-  background: white;
+  background: var(--white);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: all ease-in-out 200ms;
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
-}
 
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 
-  h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1a1a1a;
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--black);
+    }
   }
-}
 
-.badge {
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.aberto {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.fechando {
-  background: #fff3e0;
-  color: #ef6c00;
-}
-
-.fechado {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.address {
-  font-size: 14px;
-  color: #757575;
-  line-height: 1.5;
+  .address {
+    font-size: 14px;
+    color: var(--light-gray);
+  }
 }
