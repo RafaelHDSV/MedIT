@@ -33,7 +33,7 @@ function Units() {
           unit.address
 
         return {
-          fullAddress: `${street}, ${number} - ${neighborhood}, ${city} - ${state}, ${zipCode ?? '18035640'}`,
+          fullAddress: `${street ?? '-'}, ${number ?? '-'} - ${neighborhood ?? '-'}, ${city ?? '-'} - ${state ?? '-'}, ${zipCode ?? '-'}`,
           ...unit
         }
       })
