@@ -10,7 +10,7 @@ const getUnitStatus = (unit: IUnit): { text: string; status: TagStatuses } => {
     })
   )
 
-  const dayMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
+  const dayMap = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
   const todayKey = dayMap[nowSP.getDay()]
 
   const todayHours = unit.openingHours?.[todayKey]

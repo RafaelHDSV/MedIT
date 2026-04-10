@@ -62,7 +62,8 @@ function Units() {
   }, [searchTerm, units])
 
   function handleToMedications(unitId: string) {
-    navigate(ROUTES.MEDICAMENTS.path.replace(':unitId', unitId))
+    // VIEIRA: Erro para outras unidades
+    navigate(ROUTES.MEDICAMENTS(unitId).path.replace(':unitId', unitId))
   }
 
   return (
