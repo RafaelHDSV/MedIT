@@ -1,4 +1,4 @@
-import { IBaseInterface } from './IBaseInterface.js'
+import type { IBaseInterface } from './IBaseInterface'
 
 type WeekDay = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
 

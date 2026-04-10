@@ -3,17 +3,17 @@ import { Col, Form, Input, message, Modal, Row } from 'antd'
 import { useState } from 'react'
 
 // VIEIRA: Verificar possibilidade de nível Medit
-interface ILocationsModalProps {
+interface IUnitsModalProps {
   isModalOpen: boolean
   setIsModalOpen: (visible: boolean) => void
-  fetchLocations: () => void
+  fetchUnits: () => void
 }
 
-function LocationsModal({
+function UnitsModal({
   isModalOpen,
   setIsModalOpen,
-  fetchLocations
-}: ILocationsModalProps) {
+  fetchUnits
+}: IUnitsModalProps) {
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
 
@@ -31,7 +31,7 @@ function LocationsModal({
       message.success('Unidade cadastrada com sucesso!')
       setIsModalOpen(false)
       form.resetFields()
-      fetchLocations()
+      fetchUnits()
     } catch {
       message.error('Erro ao cadastrar unidade')
     } finally {
@@ -134,4 +134,4 @@ function LocationsModal({
   )
 }
 
-export default LocationsModal
+export default UnitsModal

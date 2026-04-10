@@ -1,9 +1,7 @@
 import { TagStatuses } from '@/components/Tag/Tag';
-import type { ILocation } from '@/interfaces/ILocation';
+import type { IUnit } from '@/interfaces/IUnit';
 
-const getLocationStatus = (
-  location: ILocation
-): { text: string; status: TagStatuses } => {
+const getUnitStatus = (unit: IUnit): { text: string; status: TagStatuses } => {
   const now = new Date()
 
   const nowSP = new Date(
@@ -15,7 +13,7 @@ const getLocationStatus = (
   const dayMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
   const todayKey = dayMap[nowSP.getDay()]
 
-  const todayHours = location.openingHours?.[todayKey]
+  const todayHours = unit.openingHours?.[todayKey]
 
   if (!todayHours) {
     return { text: 'Fechado', status: TagStatuses.ERROR }
@@ -44,5 +42,5 @@ const getLocationStatus = (
   return { text: 'Aberto', status: TagStatuses.SUCCESS }
 }
 
-export { getLocationStatus };
+export { getUnitStatus };
 

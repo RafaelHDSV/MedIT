@@ -2,12 +2,12 @@ import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import { InputSelect } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
-import type { ILocation } from '@/interfaces/ILocation'
 import type { IMedication } from '@/interfaces/IMedication'
 import {
   MedicationAvailabilityStatus,
   MedicationAvailabilityStatusLabels
 } from '@/interfaces/IMedication'
+import type { IUnit } from '@/interfaces/IUnit'
 import { UserLevels } from '@/interfaces/IUser'
 import {
   Button,
@@ -27,7 +27,7 @@ function Medications() {
   const { user } = useAuth()
   const location = useLocation()
   const unitId = user?.unitId
-  const [unit, setUnit] = useState<ILocation | null>(null)
+  const [unit, setUnit] = useState<IUnit | null>(null)
   const [medications, setMedications] = useState<IMedication[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')

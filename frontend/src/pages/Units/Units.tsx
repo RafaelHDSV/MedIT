@@ -3,63 +3,63 @@ import Button from '@/components/Button/Button'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import Tag from '@/components/Tag/Tag'
 import { handleApiError } from '@/helpers/handleApiError'
-import type { ILocation } from '@/interfaces/ILocation'
+import type { IUnit } from '@/interfaces/IUnit'
 import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
 import { Skeleton } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import LocationsModal from './components/LocationsModal/LocationsModal'
-import styles from './Locations.module.scss'
-import { getLocationStatus } from './locationsFunctions'
+import UnitsModal from './components/UnitsModal/UnitsModal'
+import styles from './Units.module.scss'
+import { getUnitStatus } from './unitsFunctions'
 
-function Locations() {
+function Units() {
   const navigate = useNavigate()
-  const [locations, setLocations] = useState<ILocation[]>([])
+  const [units, setUnits] = useState<IUnit[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   // VIEIRA: Verificar possibilidade de nível Medit
   const isMedit = false
 
-  async function fetchLocations() {
+  async function fetchUnits() {
     setLoading(true)
 
     try {
       const response = await UnitsRepository.getUnits()
-      setLocations(response)
+      setUnits(response)
     } catch (err) {
-      handleApiError({ err, defaultMessage: 'Erro ao buscar localizações' })
+      handleApiError({ err, defaultMessage: 'Erro ao buscar unidades' })
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchLocations()
+    fetchUnits()
   }, [])
 
-  const filteredLocations = useMemo(() => {
-    if (!searchTerm || searchTerm === '') return locations
+  const filteredUnits = useMemo(() => {
+    if (!searchTerm || searchTerm === '') return units
     const search = searchTerm.toLowerCase()
 
-    return locations.filter(
+    return units.filter(
       (loc) =>
         loc.name.toLowerCase().includes(search) ||
         loc.address.toLowerCase().includes(search)
     )
-  }, [searchTerm, locations])
+  }, [searchTerm, units])
 
-  function handleToMedications(locationId: string) {
-    navigate(ROUTES.MEDICAMENTS.path.replace(':unitId', locationId))
+  function handleToMedications(unitId: string) {
+    navigate(ROUTES.MEDICAMENTS.path.replace(':unitId', unitId))
   }
 
   return (
     <>
-      <LocationsModal
+      <UnitsModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        fetchLocations={fetchLocations}
+        fetchUnits={fetchUnits}
       />
 
       <section>
@@ -90,22 +90,22 @@ function Locations() {
                   <Skeleton.Button key={index} className={styles.skeleton} />
                 )
               })
-            : filteredLocations?.map((location) => {
-                const statusInfo = getLocationStatus(location)
+            : filteredUnits?.map((unit) => {
+                const statusInfo = getUnitStatus(unit)
 
                 return (
                   <div
-                    key={location._id}
+                    key={String(unit._id)}
                     className={styles.card}
-                    onClick={() => handleToMedications(location._id)}
+                    onClick={() => handleToMedications(String(unit._id))}
                   >
                     <div className={styles.cardHeader}>
-                      <h3>{location.name}</h3>
+                      <h3>{unit.name}</h3>
 
                       <Tag status={statusInfo.status}>{statusInfo.text}</Tag>
                     </div>
 
-                    <p className={styles.address}>{location.address}</p>
+                    <p className={styles.address}>{unit.address}</p>
                   </div>
                 )
               })}
@@ -115,4 +115,4 @@ function Locations() {
   )
 }
 
-export default Locations
+export default Units
