@@ -10,9 +10,11 @@ const UnitSchema = new mongoose.Schema<IUnit>(
       minlength: [2, 'O nome da unidade deve ter pelo menos 2 caracteres']
     },
     address: {
-      type: String,
-      required: [true, 'O endereço da unidade é obrigatório'],
-      trim: true
+      street: String,
+      number: Number,
+      neighborhood: String,
+      city: String,
+      state: String
     },
     maxOccupancy: {
       type: Number,
