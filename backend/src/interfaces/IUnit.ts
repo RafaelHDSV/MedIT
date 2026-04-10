@@ -17,6 +17,7 @@ interface IAddress {
   neighborhood: string
   city: string
   state: string
+  zipCode: number
 }
 
 export interface IUnit extends IBaseInterface {

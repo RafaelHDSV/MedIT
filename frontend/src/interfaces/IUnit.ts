@@ -17,11 +17,13 @@ interface IAddress {
   neighborhood: string
   city: string
   state: string
+  zipCode: number
 }
 
 export interface IUnit extends IBaseInterface {
   name: string
   address: IAddress
+  fullAddress?: string
   maxOccupancy: number
   openingHours: OpeningHours
   phone: string

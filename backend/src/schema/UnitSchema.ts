@@ -14,7 +14,8 @@ const UnitSchema = new mongoose.Schema<IUnit>(
       number: Number,
       neighborhood: String,
       city: String,
-      state: String
+      state: String,
+      zipCode: Number
     },
     maxOccupancy: {
       type: Number,

@@ -27,7 +27,18 @@ function Units() {
 
     try {
       const response = await UnitsRepository.getUnits()
-      setUnits(response)
+
+      const formatResponse = response.map((unit: IUnit) => {
+        const { street, number, neighborhood, city, state, zipCode } =
+          unit.address
+
+        return {
+          fullAddress: `${street}, ${number} - ${neighborhood}, ${city} - ${state}, ${zipCode ?? '18035640'}`,
+          ...unit
+        }
+      })
+
+      setUnits(formatResponse)
     } catch (err) {
       handleApiError({ err, defaultMessage: 'Erro ao buscar unidades' })
     } finally {
@@ -46,7 +57,7 @@ function Units() {
     return units.filter(
       (loc) =>
         loc.name.toLowerCase().includes(search) ||
-        loc.address.toLowerCase().includes(search)
+        loc.fullAddress?.toLowerCase().includes(search)
     )
   }, [searchTerm, units])
 
@@ -105,7 +116,7 @@ function Units() {
                       <Tag status={statusInfo.status}>{statusInfo.text}</Tag>
                     </div>
 
-                    <p className={styles.address}>{unit.address}</p>
+                    <p className={styles.address}>{unit.fullAddress}</p>
                   </div>
                 )
               })}
