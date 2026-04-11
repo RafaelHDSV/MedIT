@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
 import { Unit } from '../models/UnitModel.js'
-import { createUnitService, getUnitService } from '../services/unitService.js'
 
-export const getUnits = async (req: Request, res: Response) => {
+export const getUnits = async (_req: Request, res: Response) => {
   try {
     const units = await Unit.find().sort({ createdAt: 1 })
     if (!units || units.length === 0) {
@@ -18,15 +17,21 @@ export const getUnits = async (req: Request, res: Response) => {
 
 export const getUnit = async (req: Request, res: Response) => {
   const { id } = req.params
+  if (!id) {
+    return res.status(400).json({ message: 'ID da unidade não informado!' })
+  }
 
   try {
-    const units = await getUnitService({ unitId: id as string })
-    if (units.status !== 200) {
-      return res.status(units.status).json({ message: units.message })
+    const unit = await Unit.findById(id)
+    if (!unit) {
+      return res
+        .status(404)
+        .json({ message: 'Unidade de saúde não encontrada' })
     }
-    return res.json({
-      message: 'Unidades encontradas com sucesso!',
-      data: units
+
+    return res.status(200).json({
+      message: 'Unidade encontrada com sucesso!',
+      data: unit
     })
   } catch (err) {
     console.error(err)
@@ -36,10 +41,12 @@ export const getUnit = async (req: Request, res: Response) => {
 
 export const createUnit = async (req: Request, res: Response) => {
   try {
-    const response = await createUnitService(req.body)
+    const unit = new Unit(req.body)
+    await unit.save()
+
     return res
-      .status(response.status)
-      .json({ message: response.message, data: response.data })
+      .status(201)
+      .json({ message: 'Unidade criada com sucesso', data: unit })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao criar unidade de saúde' })

@@ -1,6 +1,8 @@
 import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import Button from '@/components/Button/Button'
 import { InputSelect } from '@/components/FormComponents/FormComponents'
+import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { IMedication } from '@/interfaces/IMedication'
 import {
@@ -8,18 +10,11 @@ import {
   MedicationAvailabilityStatusLabels
 } from '@/interfaces/IMedication'
 import type { IUnit } from '@/interfaces/IUnit'
-import { UserLevels } from '@/interfaces/IUser'
+import MedicationModel from '@/models/MedicationModel'
+import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Modal,
-  Spin,
-  Switch
-} from 'antd'
+import getFullAddress from '@/utils/getFullAddress'
+import { Form, Input, InputNumber, message, Modal, Spin, Switch } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
@@ -38,13 +33,16 @@ function Medications() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
+  const canAddMedication = MedicationModel.canAddMedication(user?.level)
+  const description = `${unit?.name} - ${getFullAddress(unit?.address)}`
 
   const fetchUnitInfo = useCallback(async () => {
     try {
-      const response = await api.get(`/auth/units/${unitId}`)
-      setUnit(response.data.data)
-    } catch {
-      message.error('Erro ao buscar unidade')
+      const response = await UnitsRepository.getUnit({ id: unitId })
+      console.log(response)
+      setUnit(response.data)
+    } catch (err) {
+      handleApiError({ err, defaultMessage: 'Erro ao buscar unidade' })
     }
   }, [unitId])
 
@@ -62,6 +60,7 @@ function Medications() {
 
   useEffect(() => {
     const hasUnitId = unitId !== ':unitId'
+
     if (hasUnitId) {
       fetchUnitInfo()
       fetchMedications()
@@ -109,12 +108,13 @@ function Medications() {
   return (
     <>
       <AuthLayoutHeader
+        description={description}
         actionComponent={
-          user?.level === UserLevels.ADMIN ? (
-            <Button type='primary' onClick={() => setIsModalOpen(true)}>
+          canAddMedication && (
+            <Button onClick={() => setIsModalOpen(true)}>
               Adicionar Medicamento
             </Button>
-          ) : undefined
+          )
         }
       />
 
@@ -240,60 +240,48 @@ function Medications() {
         )}
       </Modal>
 
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <div className={styles.titleSection}>
-            <h2>Medicamentos</h2>
-            {unit && (
-              <span className={styles.subtitle}>
-                {unit?.name} - {unit?.address?.city}
-              </span>
-            )}
-          </div>
-          <input
-            type='text'
-            placeholder='Buscar medicamento'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-          />
-        </div>
-
-        {loading ? (
-          <div className={styles.loader}>
-            <Spin size='large' />
-          </div>
-        ) : (
-          <div className={styles.grid}>
-            {filteredMedications.map((med) => (
-              <div
-                key={String(med._id)}
-                className={styles.card}
-                onClick={() => {
-                  setSelectedMedication(med)
-                  setIsDetailsModalOpen(true)
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className={styles.cardInfo}>
-                  <h3>{med.name}</h3>
-                  <p>{med.category}</p>
-                </div>
-                <div className={styles.cardFooter}>
-                  <span
-                    className={`${styles.badge} ${getBadgeClass(med.availabilityStatus)}`}
-                  >
-                    {med.availabilityStatus}
-                  </span>
-                  <span className={styles.quantity}>
-                    {med.stockQuantity} un.
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      <div className={styles.header}>
+        <input
+          type='text'
+          placeholder='Buscar medicamento'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={styles.searchInput}
+        />
       </div>
+
+      {loading ? (
+        <div className={styles.loader}>
+          <Spin size='large' />
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {filteredMedications.map((med) => (
+            <div
+              key={String(med._id)}
+              className={styles.card}
+              onClick={() => {
+                setSelectedMedication(med)
+                setIsDetailsModalOpen(true)
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className={styles.cardInfo}>
+                <h3>{med.name}</h3>
+                <p>{med.category}</p>
+              </div>
+              <div className={styles.cardFooter}>
+                <span
+                  className={`${styles.badge} ${getBadgeClass(med.availabilityStatus)}`}
+                >
+                  {med.availabilityStatus}
+                </span>
+                <span className={styles.quantity}>{med.stockQuantity} un.</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   )
 }

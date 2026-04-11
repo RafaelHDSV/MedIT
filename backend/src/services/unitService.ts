@@ -8,9 +8,3 @@ export const getUnitService = async ({ unitId }: { unitId: string }) => {
 
   return { status: 200, message: 'Unidade de saúde encontrada', data: unit }
 }
-
-export const createUnitService = async (unitData: any) => {
-  const newUnit = new Unit(unitData)
-  await newUnit.save()
-  return { status: 201, message: 'Unidade criada com sucesso', data: newUnit }
-}

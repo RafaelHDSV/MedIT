@@ -7,6 +7,12 @@ class UnitsRepository extends Repository {
       return this.api.get(`${this.path}`)
     })
   }
+
+  async getUnit({ id }: { id?: string }) {
+    return this.handle(() => {
+      return this.api.get(`${this.path}/${id}`)
+    })
+  }
 }
 
 export default new UnitsRepository({

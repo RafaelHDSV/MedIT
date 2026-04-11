@@ -11,7 +11,7 @@ interface IOpeningHour {
 
 type OpeningHours = Record<WeekDay, IOpeningHour>
 
-interface IAddress {
+export interface IAddress {
   street: string
   number: number
   neighborhood: string

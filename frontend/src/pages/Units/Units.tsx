@@ -6,6 +6,7 @@ import { handleApiError } from '@/helpers/handleApiError'
 import type { IUnit } from '@/interfaces/IUnit'
 import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
+import getFullAddress from '@/utils/getFullAddress'
 import { Skeleton } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -29,11 +30,8 @@ function Units() {
       const response = await UnitsRepository.getUnits()
 
       const formatResponse = response.map((unit: IUnit) => {
-        const { street, number, neighborhood, city, state, zipCode } =
-          unit.address
-
         return {
-          fullAddress: `${street ?? '-'}, ${number ?? '-'} - ${neighborhood ?? '-'}, ${city ?? '-'} - ${state ?? '-'}, ${zipCode ?? '-'}`,
+          fullAddress: getFullAddress(unit.address),
           ...unit
         }
       })
