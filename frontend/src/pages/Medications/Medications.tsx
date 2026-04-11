@@ -9,6 +9,7 @@ import {
 } from '@/interfaces/IMedication'
 import type { IUnit } from '@/interfaces/IUnit'
 import { UserLevels } from '@/interfaces/IUser'
+import { ROUTES } from '@/routes/constants'
 import {
   Button,
   Form,
@@ -19,13 +20,14 @@ import {
   Spin,
   Switch
 } from 'antd'
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
 
 function Medications() {
   const { user } = useAuth()
   const { unitId } = useParams()
+  const navigate = useNavigate()
   const [unit, setUnit] = useState<IUnit | null>(null)
   const [medications, setMedications] = useState<IMedication[]>([])
   const [loading, setLoading] = useState(true)
@@ -37,33 +39,38 @@ function Medications() {
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
 
-  async function fetchUnitInfo() {
+  const fetchUnitInfo = useCallback(async () => {
     try {
-      const response = await api.get(`/units/${unitId}`)
+      const response = await api.get(`/auth/units/${unitId}`)
       setUnit(response.data.data)
     } catch {
       message.error('Erro ao buscar unidade')
     }
-  }
+  }, [unitId])
 
-  async function fetchMedications() {
+  const fetchMedications = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await api.get(`/medications/unit/${unitId}`)
+      const response = await api.get(`/auth/medications/unit/${unitId}`)
       setMedications(response.data.data)
     } catch {
       message.error('Erro ao buscar medicamentos')
     } finally {
       setLoading(false)
     }
-  }
+  }, [unitId])
 
   useEffect(() => {
-    if (unitId) {
+    const hasUnitId = unitId !== ':unitId'
+    if (hasUnitId) {
       fetchUnitInfo()
       fetchMedications()
+    } else {
+      if (user?.unitId) {
+        navigate(ROUTES.MEDICAMENTS.path.replace(':unitId', user?.unitId))
+      }
     }
-  }, [unitId])
+  }, [unitId, user?.unitId, fetchUnitInfo, fetchMedications, navigate])
 
   const filteredMedications = medications.filter(
     (med) =>
@@ -74,7 +81,7 @@ function Medications() {
   const handleCreate = async (values: any) => {
     setSubmitting(true)
     try {
-      await api.post('/medications', { ...values, unitId })
+      await api.post('/auth/medications', { ...values, unitId })
       message.success('Medicamento cadastrado com sucesso!')
       setIsModalOpen(false)
       form.resetFields()
@@ -239,7 +246,7 @@ function Medications() {
             <h2>Medicamentos</h2>
             {unit && (
               <span className={styles.subtitle}>
-                {unit.name} - {unit.address}
+                {unit?.name} - {unit?.address?.city}
               </span>
             )}
           </div>
@@ -260,7 +267,7 @@ function Medications() {
           <div className={styles.grid}>
             {filteredMedications.map((med) => (
               <div
-                key={med._id}
+                key={String(med._id)}
                 className={styles.card}
                 onClick={() => {
                   setSelectedMedication(med)
