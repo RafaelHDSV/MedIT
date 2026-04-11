@@ -3,7 +3,6 @@ import {
   CalendarDotsIcon,
   ChartBarIcon,
   FirstAidIcon,
-  HouseIcon,
   PillIcon,
   StethoscopeIcon,
   type Icon
@@ -134,9 +133,8 @@ const units: IRoute = {
   name: ROUTES.UNITS.name,
   description: ROUTES.UNITS.description,
   path: ROUTES.UNITS.path,
-  icon: HouseIcon,
   meta: {
-    hidden: false,
+    hidden: true,
     levels: [
       UserLevels.ADMIN,
       UserLevels.DOCTOR,
