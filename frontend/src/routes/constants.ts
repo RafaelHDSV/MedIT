@@ -61,7 +61,7 @@ export const ROUTES = {
     name: 'Medicamentos',
     description:
       'Gerencie o cadastro e o controle de medicamentos disponíveis.',
-    path: `/auth/units//:unitId/medications`
+    path: `/auth/units/:unitId/medications`
   },
   PRE_REGISTRATION: {
     name: 'Pré-Cadastro',
