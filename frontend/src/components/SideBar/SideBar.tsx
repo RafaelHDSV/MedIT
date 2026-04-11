@@ -18,7 +18,6 @@ interface ISidebarItemsProps {
 
 function SidebarItems({ isCompact }: ISidebarItemsProps) {
   const { user } = useAuth()
-  const { unitId } = user || {}
   const location = useLocation()
   const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>(
     INITIAL_GROUPS_STATE
@@ -45,7 +44,7 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
       if (renderedGroups.has(groupName)) return null
       renderedGroups.add(groupName)
 
-      const groupRoutes = routes(unitId).filter(
+      const groupRoutes = routes.filter(
         (r) =>
           r.meta?.group?.name === groupName &&
           !r.meta?.hidden &&
@@ -116,7 +115,7 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
     )
   }
 
-  return <ul className={styles.menuList}>{routes(unitId)?.map(renderRoute)}</ul>
+  return <ul className={styles.menuList}>{routes?.map(renderRoute)}</ul>
 }
 
 interface ISideBarProps {

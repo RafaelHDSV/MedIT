@@ -146,10 +146,10 @@ const units: IRoute = {
   }
 }
 
-const medications = (unitId?: string): IRoute => ({
-  name: ROUTES.MEDICAMENTS(unitId).name,
-  description: ROUTES.MEDICAMENTS(unitId).description,
-  path: ROUTES.MEDICAMENTS(unitId).path,
+const medications: IRoute = {
+  name: ROUTES.MEDICAMENTS.name,
+  description: ROUTES.MEDICAMENTS.description,
+  path: ROUTES.MEDICAMENTS.path,
   icon: PillIcon,
   meta: {
     hidden: false,
@@ -160,7 +160,7 @@ const medications = (unitId?: string): IRoute => ({
       UserLevels.PATIENT
     ]
   }
-})
+}
 
 const attendances: IRoute = {
   name: ROUTES.ATTENDANCES.name,
@@ -206,7 +206,7 @@ const preRegistration: IRoute = {
   }
 }
 
-const routes = (unitId?: string) => [
+const routes = [
   signIn,
   signUp,
   dashboard,
@@ -220,7 +220,7 @@ const routes = (unitId?: string) => [
   patients,
   patientDetails,
   units,
-  medications(unitId),
+  medications,
   preRegistration
 ]
 

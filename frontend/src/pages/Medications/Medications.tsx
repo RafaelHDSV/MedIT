@@ -20,13 +20,12 @@ import {
   Switch
 } from 'antd'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
 
 function Medications() {
   const { user } = useAuth()
-  const location = useLocation()
-  const unitId = user?.unitId
+  const { unitId } = useParams()
   const [unit, setUnit] = useState<IUnit | null>(null)
   const [medications, setMedications] = useState<IMedication[]>([])
   const [loading, setLoading] = useState(true)

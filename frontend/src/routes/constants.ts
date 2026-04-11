@@ -57,12 +57,12 @@ export const ROUTES = {
     description: 'Visualize e gerencie as unidades.',
     path: '/auth/units'
   },
-  MEDICAMENTS: (unitId?: string) => ({
+  MEDICAMENTS: {
     name: 'Medicamentos',
     description:
       'Gerencie o cadastro e o controle de medicamentos disponíveis.',
-    path: `/auth/units/${unitId}/medications`
-  }),
+    path: `/auth/units//:unitId/medications`
+  },
   PRE_REGISTRATION: {
     name: 'Pré-Cadastro',
     description:
