@@ -33,11 +33,11 @@ export const MedicationCategoriesLabels = {
   [MedicationCategories.ANTIBIOTICS]: 'Antibióticos',
   [MedicationCategories.ANTIVIRALS]: 'Antivirais',
   [MedicationCategories.ANTIFUNGALS]: 'Antifungais',
-  [MedicationCategories.ANTICONVULSANTS]: 'Anticonvulsantes',
-  [MedicationCategories.ANTIDEPRESSANTS]: 'Antidepressantes',
+  [MedicationCategories.ANTICONVULSANTS]: 'Anticonvulsivantes',
+  [MedicationCategories.ANTIDEPRESSANTS]: 'Antidepressivos',
   [MedicationCategories.ANTIPSICOTICOS]: 'Antipsicóticos',
-  [MedicationCategories.ANTISEPTICS]: 'Antisépticos',
-  [MedicationCategories.ANTIVENOMS]: 'Antivenomas',
+  [MedicationCategories.ANTISEPTICS]: 'Anti-sépticos',
+  [MedicationCategories.ANTIVENOMS]: 'Antivenenos',
   [MedicationCategories.OTHER]: 'Outro'
 }
 
