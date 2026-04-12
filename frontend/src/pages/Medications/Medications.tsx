@@ -1,7 +1,8 @@
-import { api } from '@/api/api'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
-import { InputSelect } from '@/components/FormComponents/FormComponents'
+import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
+import { LayoutSpinner } from '@/components/LayoutSpinner/LayoutSpinner'
+import Tag, { TagStatuses } from '@/components/Tag/Tag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { IMedication } from '@/interfaces/IMedication'
@@ -11,50 +12,59 @@ import {
 } from '@/interfaces/IMedication'
 import type { IUnit } from '@/interfaces/IUnit'
 import MedicationModel from '@/models/MedicationModel'
+import MedicationsRepository from '@/repositories/MedicationsRepository'
 import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
 import getFullAddress from '@/utils/getFullAddress'
-import { Form, Input, InputNumber, message, Modal, Spin, Switch } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import masks from '@/utils/masks'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
+import MedicationDetailsModal from './components/MedicationDetailsModal/MedicationDetailsModal'
+import MedicationModal from './components/MedicationModal/MedicationModal'
 
 function Medications() {
   const { user } = useAuth()
   const { unitId } = useParams()
   const navigate = useNavigate()
-  const [unit, setUnit] = useState<IUnit | null>(null)
+
+  const [unit, setUnit] = useState<IUnit | undefined>()
   const [medications, setMedications] = useState<IMedication[]>([])
-  const [loading, setLoading] = useState(true)
+  const [unitsLoading, setUnitsLoading] = useState(true)
+  const [medicationsLoading, setMedicationsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedMedication, setSelectedMedication] =
-    useState<IMedication | null>(null)
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
-  const [form] = Form.useForm()
-  const [submitting, setSubmitting] = useState(false)
+  const [selectedMedication, setSelectedMedication] = useState<
+    IMedication | undefined
+  >()
+
+  const loading = unitsLoading || medicationsLoading
   const canAddMedication = MedicationModel.canAddMedication(user?.level)
   const description = `${unit?.name} - ${getFullAddress(unit?.address)}`
 
   const fetchUnitInfo = useCallback(async () => {
+    setUnitsLoading(true)
+
     try {
       const response = await UnitsRepository.getUnit({ id: unitId })
-      console.log(response)
       setUnit(response.data)
     } catch (err) {
       handleApiError({ err, defaultMessage: 'Erro ao buscar unidade' })
+    } finally {
+      setUnitsLoading(false)
     }
   }, [unitId])
 
   const fetchMedications = useCallback(async () => {
-    setLoading(true)
+    setMedicationsLoading(true)
+
     try {
-      const response = await api.get(`/auth/medications/unit/${unitId}`)
-      setMedications(response.data.data)
-    } catch {
-      message.error('Erro ao buscar medicamentos')
+      const response = await MedicationsRepository.getMedications({ unitId })
+      setMedications(response.data)
+    } catch (err) {
+      handleApiError({ err, defaultMessage: 'Erro ao buscar medicamentos' })
     } finally {
-      setLoading(false)
+      setMedicationsLoading(false)
     }
   }, [unitId])
 
@@ -71,217 +81,95 @@ function Medications() {
     }
   }, [unitId, user?.unitId, fetchUnitInfo, fetchMedications, navigate])
 
-  const filteredMedications = medications.filter(
-    (med) =>
-      med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      med.category.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredMedications = useMemo(() => {
+    if (!searchTerm || searchTerm === '') return medications
+    const search = searchTerm.toLowerCase()
 
-  const handleCreate = async (values: any) => {
-    setSubmitting(true)
-    try {
-      await api.post('/auth/medications', { ...values, unitId })
-      message.success('Medicamento cadastrado com sucesso!')
-      setIsModalOpen(false)
-      form.resetFields()
-      fetchMedications()
-    } catch {
-      message.error('Erro ao cadastrar medicamento')
-    } finally {
-      setSubmitting(false)
-    }
+    return medications?.filter(
+      (medication) =>
+        medication.name.toLowerCase().includes(search) ||
+        medication.category.toLowerCase().includes(search)
+    )
+  }, [searchTerm, medications])
+
+  const STATUS_MAP: Record<MedicationAvailabilityStatus, TagStatuses> = {
+    [MedicationAvailabilityStatus.AVAILABLE]: TagStatuses.SUCCESS,
+    [MedicationAvailabilityStatus.LOW_STOCK]: TagStatuses.WARNING,
+    [MedicationAvailabilityStatus.UNAVAILABLE]: TagStatuses.ERROR
   }
 
-  const getBadgeClass = (status: MedicationAvailabilityStatus) => {
-    switch (status) {
-      case MedicationAvailabilityStatus.AVAILABLE:
-        return styles.available
-      case MedicationAvailabilityStatus.LOW_STOCK:
-        return styles.lowStock
-      case MedicationAvailabilityStatus.UNAVAILABLE:
-        return styles.unavailable
-      default:
-        return ''
-    }
+  if (loading) {
+    return <LayoutSpinner />
   }
 
   return (
     <>
-      <AuthLayoutHeader
-        description={description}
-        actionComponent={
-          canAddMedication && (
-            <Button onClick={() => setIsModalOpen(true)}>
-              Adicionar Medicamento
-            </Button>
-          )
-        }
+      <MedicationModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        fetchMedications={fetchMedications}
       />
 
-      <Modal
-        title='Cadastrar Medicamento'
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onOk={() => form.submit()}
-        confirmLoading={submitting}
-        okText='Salvar'
-        cancelText='Cancelar'
-      >
-        <Form form={form} layout='vertical' onFinish={handleCreate}>
-          <Form.Item
-            name='name'
-            label='Nome do Medicamento'
-            rules={[{ required: true, message: 'Obrigatório' }]}
-          >
-            <Input placeholder='Ex: Paracetamol 500mg' />
-          </Form.Item>
-          <Form.Item
-            name='category'
-            label='Categoria'
-            rules={[{ required: true, message: 'Obrigatório' }]}
-          >
-            <Input placeholder='Ex: Analgésico e antitérmico' />
-          </Form.Item>
-          <Form.Item name='description' label='Descrição'>
-            <Input.TextArea placeholder='Descrição do medicamento' rows={3} />
-          </Form.Item>
-          <Form.Item
-            name='requiresPrescription'
-            label='Necessita de Receita Médica?'
-            valuePropName='checked'
-            initialValue={false}
-          >
-            <Switch checkedChildren='Sim' unCheckedChildren='Não' />
-          </Form.Item>
-          <Form.Item
-            name='availabilityStatus'
-            label='Status'
-            rules={[{ required: true, message: 'Obrigatório' }]}
-          >
-            <InputSelect
-              placeholder='Selecione o status'
-              options={Object.entries(MedicationAvailabilityStatusLabels).map(
-                ([key, value]) => ({
-                  label: value,
-                  value: key
-                })
-              )}
-            />
-          </Form.Item>
-          <Form.Item
-            name='stockQuantity'
-            label='Quantidade em Estoque'
-            rules={[{ required: true, message: 'Obrigatório' }]}
-          >
-            <InputNumber min={0} style={{ width: '100%' }} />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <MedicationDetailsModal
+        selectedMedication={selectedMedication}
+        setSelectedMedication={setSelectedMedication}
+      />
 
-      <Modal
-        title='Detalhes do Medicamento'
-        open={isDetailsModalOpen}
-        onCancel={() => setIsDetailsModalOpen(false)}
-        footer={[
-          <Button key='close' onClick={() => setIsDetailsModalOpen(false)}>
-            Fechar
-          </Button>
-        ]}
-      >
-        {selectedMedication && (
-          <div
-            style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
-          >
-            <div
-              style={{
-                padding: '12px',
-                backgroundColor: selectedMedication.requiresPrescription
-                  ? '#fff1f0'
-                  : '#f6ffed',
-                border: `1px solid ${selectedMedication.requiresPrescription ? '#ffa39e' : '#b7eb8f'}`,
-                borderRadius: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontWeight: 500,
-                color: selectedMedication.requiresPrescription
-                  ? '#cf1322'
-                  : '#389e0d'
-              }}
-            >
-              <span style={{ fontSize: '18px' }}>
-                {selectedMedication.requiresPrescription ? '⚠️' : '✅'}
-              </span>
-              {selectedMedication.requiresPrescription
-                ? 'Venda sob prescrição médica.'
-                : 'Medicamento de livre acesso / venda livre.'}
-            </div>
-
-            <div>
-              <strong>Nome:</strong> {selectedMedication.name}
-            </div>
-            <div>
-              <strong>Categoria:</strong> {selectedMedication.category}
-            </div>
-            <div>
-              <strong>Status:</strong> {selectedMedication.availabilityStatus}
-            </div>
-            <div>
-              <strong>Estoque:</strong> {selectedMedication.stockQuantity} un.
-            </div>
-            <div>
-              <strong>Descrição:</strong>
-              <p style={{ marginTop: '4px', whiteSpace: 'pre-wrap' }}>
-                {selectedMedication.description ||
-                  'Nenhuma descrição disponível.'}
-              </p>
-            </div>
-          </div>
-        )}
-      </Modal>
-
-      <div className={styles.header}>
-        <input
-          type='text'
-          placeholder='Buscar medicamento'
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles.searchInput}
+      <section>
+        <AuthLayoutHeader
+          description={description}
+          actionComponent={
+            canAddMedication && (
+              <Button onClick={() => setIsModalOpen(true)}>
+                Adicionar Medicamento
+              </Button>
+            )
+          }
         />
-      </div>
 
-      {loading ? (
-        <div className={styles.loader}>
-          <Spin size='large' />
-        </div>
-      ) : (
+        <FormItem name='search' inputHeight='2.5rem'>
+          <InputText
+            className='w-100'
+            placeholder='Buscar medicamento'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </FormItem>
+
         <div className={styles.grid}>
-          {filteredMedications.map((med) => (
+          {filteredMedications?.map((medication) => (
             <div
-              key={String(med._id)}
+              key={String(medication._id)}
               className={styles.card}
               onClick={() => {
-                setSelectedMedication(med)
-                setIsDetailsModalOpen(true)
+                setSelectedMedication(medication)
               }}
-              style={{ cursor: 'pointer' }}
             >
               <div className={styles.cardInfo}>
-                <h3>{med.name}</h3>
-                <p>{med.category}</p>
+                <span className={styles.title}>{medication.name}</span>
+                <span className={styles.subtitle}>{medication.category}</span>
               </div>
+
               <div className={styles.cardFooter}>
-                <span
-                  className={`${styles.badge} ${getBadgeClass(med.availabilityStatus)}`}
+                <Tag
+                  status={STATUS_MAP[medication.availabilityStatus]}
+                  fontSize={12}
                 >
-                  {med.availabilityStatus}
+                  {
+                    MedicationAvailabilityStatusLabels[
+                      medication.availabilityStatus
+                    ]
+                  }
+                </Tag>
+
+                <span className={styles.quantity}>
+                  {masks(medication.stockQuantity, 'number')} un.
                 </span>
-                <span className={styles.quantity}>{med.stockQuantity} un.</span>
               </div>
             </div>
           ))}
         </div>
-      )}
+      </section>
     </>
   )
 }

@@ -53,9 +53,9 @@ function Units() {
     const search = searchTerm.toLowerCase()
 
     return units.filter(
-      (loc) =>
-        loc.name.toLowerCase().includes(search) ||
-        loc.fullAddress?.toLowerCase().includes(search)
+      (unit) =>
+        unit.name.toLowerCase().includes(search) ||
+        unit.fullAddress?.toLowerCase().includes(search)
     )
   }, [searchTerm, units])
 
