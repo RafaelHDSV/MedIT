@@ -2,17 +2,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--gray-2);
-  color: var(--gray);
-  border: 1px solid var(--border);
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   font-size: 12px;
   border-radius: 1rem;
   padding: 0.5rem 1rem;
-  cursor: pointer;
 
-  &:hover {
-    animation: hoverEffect 1s infinite;
-    background-color: var(--gray-3);
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      animation: hoverEffect 1s infinite;
+      background-color: var(--gray-3);
+    }
   }
 
   &.selected {
@@ -27,13 +30,7 @@
 }
 
 @keyframes hoverEffect {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }

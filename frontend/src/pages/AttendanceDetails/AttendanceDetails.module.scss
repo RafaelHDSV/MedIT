@@ -1,36 +1,21 @@
 .page {
   display: grid;
-  grid-template-columns: 1fr 280px;
+  grid-template-columns: 1fr 330px;
   grid-template-rows: auto 1fr;
-  gap: 24px;
-  padding: 0;
-  background: #f9f9f7;
-  min-height: 100vh;
+  gap: 32px;
 }
 
 .left {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-.header {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.title {
-  font-size: 22px;
-  font-weight: 500;
+  gap: 32px;
 }
 
 .sectionTitle {
-   font-size: 14px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--black);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .card {
@@ -55,29 +40,30 @@
   padding-left: 32px;
 }
 
-.infoRow {
+.detailsLineWrapper {
+  min-height: 56px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 0.5px solid #e5e5e5;
-  min-height: 48px;
 
-  &:last-child {
-  border-bottom: none;
-}
+  &:last-child > :global(.container) {
+    border-bottom: none;
+  }
 }
 
-.infoLabel {
-  font-size: 13px;
-  color: #111;
-  font-weight: 600;
-}
+.vitalInput {
+  font-size: 22px;
+  font-weight: 700;
+  color: #D85A30;
+  border: none;
+  border-bottom: 1.5px solid #D85A30;
+  background: transparent;
+  width: 100%;
+  text-align: center;
+  outline: none;
 
-.infoValue {
-  font-size: 13px;
-  font-weight: 400;
-  color: #888;
+  &::placeholder {
+    color: #D85A3066;
+  }
 }
 
 .badgeRisco {
@@ -116,7 +102,7 @@
   background: #fff;
   border: 0.5px solid #e5e5e5;
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -125,13 +111,13 @@
 }
 
 .vitalValue {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
   color: #D85A30;
 }
 
 .vitalLabel {
-  font-size: 11px;
+  font-size: 15px;
   color: #888;
   text-align: left;
 }
@@ -139,16 +125,7 @@
 .sintomas {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sintomaTag {
-  border: 1px solid #df4509;
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 13px;
-  background: transparent;
-  color: #df4509;
+  gap: 10px;
 }
 
 .sidebar {
@@ -179,7 +156,7 @@
 }
 
 .condicaoNome {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   margin-bottom: 6px;
 }
@@ -198,7 +175,7 @@
 }
 
 .barPct {
-  font-size: 11px;
+  font-size: 15px;
   color: #D85A30;
   border-bottom: 0.5px solid var(--border);
 }

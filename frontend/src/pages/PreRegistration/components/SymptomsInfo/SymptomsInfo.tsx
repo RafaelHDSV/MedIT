@@ -1,6 +1,6 @@
-import { Flex, Tag } from 'antd'
+import { Flex } from 'antd'
+import SymptomTag from '@/components/SymptomTag/SymptomTag'
 import parentStyles from '../../PreRegistration.module.scss'
-import styles from './SymptomsInfo.module.scss'
 
 interface ISymptomsInfoProps {
   selectedSymptoms: string[]
@@ -11,7 +11,6 @@ function SymptomsInfo({
   selectedSymptoms,
   setSelectedSymptoms
 }: ISymptomsInfoProps) {
-  // VIEIRA: Adicionar dinâmico
   const symptoms = [
     'Febre',
     'Dor de cabeça',
@@ -48,13 +47,13 @@ function SymptomsInfo({
 
       <Flex wrap='wrap' gap={8}>
         {symptoms.map((symptom) => (
-          <Tag
+          <SymptomTag
             key={symptom}
+            symptom={symptom}
+            clickable
+            selected={selectedSymptoms.includes(symptom)}
             onClick={() => handleSelectSymptoms(symptom)}
-            className={`${styles.symptomTag} ${selectedSymptoms.includes(symptom) ? styles.selected : ''}`}
-          >
-            {symptom}
-          </Tag>
+          />
         ))}
       </Flex>
     </div>

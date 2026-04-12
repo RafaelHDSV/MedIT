@@ -1,123 +1,184 @@
-import React from "react";
-import styles from "./AttendanceDetails.module.scss";
+import { AttendanceRisk } from "@/interfaces/IAttendance";
+import { UserLevels } from "@/interfaces/IUser";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import AuthLayoutHeader from "@/components/AuthLayoutHeader/AuthLayoutHeader";
 import Button from "@/components/Button/Button";
+import DetailsLine from "@/components/DetailsLine/DetailsLine";
+import RiskTag from "@/components/RiskTag/RiskTag";
+import SymptomTag from "@/components/SymptomTag/SymptomTag";
+import styles from "./AttendanceDetails.module.scss";
 
-function BadgeRisco({ risco }: { risco: string }) {
-  const mod = risco === "Baixo" ? styles.baixo : risco === "Alto" ? styles.alto : styles.medio;
-  return <span className={`${styles.badgeRisco} ${mod}`}>{risco}</span>;
-}
+function VitalCard({ value, label, suffix, onChange }: {
+  value: string | number;
+  label: string;
+  suffix?: string;
+  onChange?: (value: string) => void;
+}) {
+  const { user } = useAuth();
+  const isNurse = user?.level === UserLevels.NURSE;
+  const [inputValue, setInputValue] = useState(String(value));
 
-function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className={styles.infoRow}>
-      <span className={styles.infoLabel}>{label}</span>
-      <span className={styles.infoValue}>{children}</span>
-    </div>
-  );
-}
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    onChange?.(e.target.value);
+  };
 
-function VitalCard({ value, label }: { value: string; label: string }) {
   return (
     <div className={styles.vitalCard}>
-      <span className={styles.vitalValue}>{value}</span>
+      {isNurse ? (
+        <input
+          className={styles.vitalInput}
+          value={inputValue}
+          onChange={handleChange}
+          placeholder="0"
+        />
+      ) : (
+        <span className={styles.vitalValue}>{value}{suffix}</span>
+      )}
       <span className={styles.vitalLabel}>{label}</span>
     </div>
   );
 }
 
-function BarCompatibilidade({ pct }: { pct: number }) {
+function CondicaoCard({ nome, compatibilidade }: { nome: string; compatibilidade: number }) {
   return (
-    <div>
+    <div className={styles.condicaoItem}>
+      <p className={styles.condicaoNome}>{nome}</p>
       <div className={styles.barBg}>
-        <div className={styles.barFill} style={{ width: `${pct}%` }} />
+        <div className={styles.barFill} style={{ width: `${compatibilidade}%` }} />
       </div>
-      <span className={styles.barPct}>{pct}% compatibilidade</span>
+      <span className={styles.barPct}>{compatibilidade}% compatibilidade</span>
     </div>
   );
 }
 
 function AttendanceDetails() {
-  const paciente = {
-    nome: "Rafael Silva", idade: 20, sexo: "Masculino", alergias: "Dipirona",
-    queixaPrincipal: "Náusea", chegada: "23:41", risco: "Médio", condicoes: "Hipertensão",
+  const { user } = useAuth();
+  const isNurse = user?.level === UserLevels.NURSE;
+
+  const patient = {
+    name: "Rafael Silva",
+    age: 20,
+    gender: "Masculino",
+    allergies: "Dipirona",
+    mainComplaint: "Náusea",
+    arrivalTime: "23:41",
+    risk: AttendanceRisk.URGENT,
+    conditions: "Hipertensão",
   };
-  const sinaisVitais = {
-    temperatura: "37.8°", pressaoArterial: "130/85", freqRespiratoria: "18 irpm",
-    freqCardiaca: "88 bpm", saturacaoO2: "96%", escalaDor: "7/10",
+
+  const vitalSigns = {
+    temperature: 37.8,
+    bloodPressure: "130/85",
+    respiratoryRate: 18,
+    heartRate: 88,
+    oxygenSaturation: 96,
+    painScale: 7,
   };
-  const sintomas = ["Febre", "Dor de cabeça", "Dor no corpo", "Fadiga", "Calafrios"];
-  const condicoesSugeridas = [
-    { nome: "Dengue", compatibilidade: 87 },
-    { nome: "Gripe (Influenza)", compatibilidade: 72 },
-    { nome: "COVID-19", compatibilidade: 58 },
-    { nome: "Chikungunya", compatibilidade: 41 },
-    { nome: "Catapora", compatibilidade: 21 },
-    { nome: "Caxumba", compatibilidade: 11 },
+
+  const symptoms = ["Febre", "Dor de cabeça", "Dor no corpo", "Fadiga", "Calafrios"];
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+
+  const handleToggleSymptom = (symptom: string) => {
+    setSelectedSymptoms((prev) =>
+      prev.includes(symptom) ? prev.filter((s) => s !== symptom) : [...prev, symptom]
+    );
+  };
+
+  const suggestedConditions = [
+    { name: "Dengue", compatibility: 87 },
+    { name: "Gripe (Influenza)", compatibility: 72 },
+    { name: "COVID-19", compatibility: 58 },
+    { name: "Chikungunya", compatibility: 41 },
+    { name: "Catapora", compatibility: 21 },
+    { name: "Caxumba", compatibility: 11 },
   ];
 
   return (
-  <div className={styles.page}>
+    <>
+      <AuthLayoutHeader
+        actionComponent={
+          <Button>Finalizar atendimento</Button>
+        }
+      />
 
-    <div className={styles.header}>
-      <h1 className={styles.title}>Atendimento</h1>
-      <Button className={styles.btnFinalizar}>Finalizar atendimento</Button>
-    </div>
+      <div className={styles.page}>
 
-    <div className={styles.left}>
-      <section>
-        <p className={styles.sectionTitle}>Informações do Paciente</p>
-        <div className={styles.card}>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoColLeft}>
-              <InfoRow label="Nome">{paciente.nome}</InfoRow>
-              <InfoRow label="Idade">{paciente.idade} anos</InfoRow>
-              <InfoRow label="Sexo">{paciente.sexo}</InfoRow>
-              <InfoRow label="Alergias">{paciente.alergias}</InfoRow>
+        <div className={styles.left}>
+          <section>
+            <div className={styles.card}>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoColLeft}>
+                  <div className={styles.detailsLineWrapper}>
+                    <DetailsLine label="Nome" value={patient.name} />
+                  </div>
+                  <div className={styles.detailsLineWrapper}>
+                    <DetailsLine label="Idade" value={`${patient.age} anos`} />
+                  </div>
+                  <div className={styles.detailsLineWrapper}>
+                    <DetailsLine label="Sexo" value={patient.gender} />
+                  </div>
+                  <div className={`${styles.detailsLineWrapper} ${styles.last}`}>
+                    <DetailsLine label="Alergias" value={patient.allergies} />
+                  </div>
+                </div>
+                <div className={styles.infoColRight}>
+                  <div className={styles.detailsLineWrapper}>
+                    <DetailsLine label="Queixa principal" value={patient.mainComplaint} />
+                  </div>
+                  <div className={styles.detailsLineWrapper}>
+                    <DetailsLine label="Chegada" value={patient.arrivalTime} />
+                  </div>
+                  <div className={styles.detailsLineWrapper}>
+                    <DetailsLine label="Risco" value={<RiskTag risk={patient.risk} />} />
+                  </div>
+                  <div className={`${styles.detailsLineWrapper} ${styles.last}`}>
+                    <DetailsLine label="Condições" value={patient.conditions} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className={styles.infoColRight}>
-              <InfoRow label="Queixa principal">{paciente.queixaPrincipal}</InfoRow>
-              <InfoRow label="Chegada">{paciente.chegada}</InfoRow>
-              <InfoRow label="Risco"><BadgeRisco risco={paciente.risco} /></InfoRow>
-              <InfoRow label="Condições">{paciente.condicoes}</InfoRow>
+          </section>
+
+          <section>
+            <p className={styles.sectionTitle}>Sinais Vitais</p>
+            <div className={styles.vitaisGrid}>
+              <VitalCard label="Temperatura" value={vitalSigns.temperature} suffix="°" />
+              <VitalCard label="Pressão Arterial" value={vitalSigns.bloodPressure} />
+              <VitalCard label="Freq. Respiratória" value={vitalSigns.respiratoryRate} suffix=" irpm" />
+              <VitalCard label="Fre. Cardíaca" value={vitalSigns.heartRate} suffix=" bpm" />
+              <VitalCard label="Saturação O2" value={vitalSigns.oxygenSaturation} suffix="%" />
+              <VitalCard label="Escala de Dor" value={vitalSigns.painScale} suffix="/10" />
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      <section>
-        <p className={styles.sectionTitle}>Sinais Vitais</p>
-        <div className={styles.vitaisGrid}>
-          <VitalCard value={sinaisVitais.temperatura} label="Temperatura" />
-          <VitalCard value={sinaisVitais.pressaoArterial} label="Pressão Arterial" />
-          <VitalCard value={sinaisVitais.freqRespiratoria} label="Freq. Respiratória" />
-          <VitalCard value={sinaisVitais.freqCardiaca} label="Fre. Cardíaca" />
-          <VitalCard value={sinaisVitais.saturacaoO2} label="Saturação O2" />
-          <VitalCard value={sinaisVitais.escalaDor} label="Escala de Dor" />
+          <section>
+            <p className={styles.sectionTitle}>Sintomas Relatados</p>
+            <div className={styles.sintomas}>
+              {symptoms.map((symptom) => (
+                <SymptomTag
+                  key={symptom}
+                  symptom={symptom}
+                  clickable={isNurse}
+                  selected={selectedSymptoms.includes(symptom)}
+                  onClick={() => handleToggleSymptom(symptom)}
+                />
+              ))}
+            </div>
+          </section>
         </div>
-      </section>
 
-      <section>
-        <p className={styles.sectionTitle}>Sintomas Relatados</p>
-        <div className={styles.sintomas}>
-          {sintomas.map((s) => (
-            <span key={s} className={styles.sintomaTag}>{s}</span>
+        <div className={styles.sidebar}>
+          <p className={styles.sidebarTitle}>Condições sugeridas</p>
+          {suggestedConditions.map((condition) => (
+            <CondicaoCard key={condition.name} nome={condition.name} compatibilidade={condition.compatibility} />
           ))}
         </div>
-      </section>
-    </div>
 
-    <div className={styles.sidebar}>
-      <p className={styles.sidebarTitle}>Condições sugeridas</p>
-      {condicoesSugeridas.map((c) => (
-        <div key={c.nome} className={styles.condicaoItem}>
-          <p className={styles.condicaoNome}>{c.nome}</p>
-          <BarCompatibilidade pct={c.compatibilidade} />
-        </div>
-      ))}
-    </div>
-
-  </div>
+      </div>
+    </>
   );
 }
 
-export default AttendanceDetails
+export default AttendanceDetails;
