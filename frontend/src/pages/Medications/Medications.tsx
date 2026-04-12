@@ -9,7 +9,8 @@ import { useAuth } from '@/hooks/useAuth'
 import type { IMedication } from '@/interfaces/IMedication'
 import {
   MedicationAvailabilityStatus,
-  MedicationAvailabilityStatusLabels
+  MedicationAvailabilityStatusLabels,
+  MedicationCategoriesLabels
 } from '@/interfaces/IMedication'
 import type { IUnit } from '@/interfaces/IUnit'
 import MedicationModel from '@/models/MedicationModel'
@@ -124,7 +125,9 @@ function Medications() {
           >
             <div className={styles.cardInfo}>
               <span className={styles.title}>{medication.name}</span>
-              <span className={styles.subtitle}>{medication.category}</span>
+              <span className={styles.subtitle}>
+                {MedicationCategoriesLabels[medication.category]}
+              </span>
             </div>
 
             <div className={styles.cardFooter}>
@@ -140,7 +143,9 @@ function Medications() {
               </Tag>
 
               <span className={styles.quantity}>
-                {masks(medication.stockQuantity, 'number')} un.
+                {medication.stockQuantity === 0
+                  ? 'Sem medicamentos'
+                  : `${masks(medication.stockQuantity, 'number')} un.`}
               </span>
             </div>
           </div>

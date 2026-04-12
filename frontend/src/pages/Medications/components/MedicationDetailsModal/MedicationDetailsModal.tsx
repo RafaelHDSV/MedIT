@@ -1,8 +1,30 @@
+import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import {
   MedicationAvailabilityStatusLabels,
+  MedicationCategoriesLabels,
   type IMedication
 } from '@/interfaces/IMedication'
+import masks from '@/utils/masks'
 import { Modal } from 'antd'
+import styles from './MedicationDetailsModal.module.scss'
+
+function PrescriptionAlert({
+  requiresPrescription
+}: {
+  requiresPrescription: boolean
+}) {
+  return (
+    <div
+      className={`${styles.prescriptionAlert} ${requiresPrescription ? styles.requiresPrescription : styles.notRequiresPrescription}`}
+    >
+      {requiresPrescription ? (
+        <span>⚠️ Venda sob prescrição médica</span>
+      ) : (
+        <span>✅ Medicamento de livre acesso</span>
+      )}
+    </div>
+  )
+}
 
 interface IMedicationDetailsModal {
   selectedMedication?: IMedication
@@ -20,64 +42,46 @@ function MedicationDetailsModal({
   }
 
   if (!selectedMedication) return
+  const {
+    name,
+    requiresPrescription,
+    description,
+    category,
+    availabilityStatus,
+    stockQuantity
+  } = selectedMedication
 
   return (
     <Modal
-      title='Detalhes do Medicamento'
+      className={styles.modal}
       open={isOpen}
       onCancel={resetMedication}
       footer={null}
       centered
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <div
-          style={{
-            padding: '12px',
-            backgroundColor: selectedMedication.requiresPrescription
-              ? '#fff1f0'
-              : '#f6ffed',
-            border: `1px solid ${selectedMedication.requiresPrescription ? '#ffa39e' : '#b7eb8f'}`,
-            borderRadius: '6px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontWeight: 500,
-            color: selectedMedication.requiresPrescription
-              ? '#cf1322'
-              : '#389e0d'
-          }}
-        >
-          <span style={{ fontSize: '18px' }}>
-            {selectedMedication.requiresPrescription ? '⚠️' : '✅'}
-          </span>
-          {selectedMedication.requiresPrescription
-            ? 'Venda sob prescrição médica.'
-            : 'Medicamento de livre acesso / venda livre.'}
-        </div>
+      <h2>Detalhes do {name}</h2>
 
-        <div>
-          <strong>Nome:</strong> {selectedMedication.name}
-        </div>
-        <div>
-          <strong>Categoria:</strong> {selectedMedication.category}
-        </div>
-        <div>
-          <strong>Status:</strong>{' '}
-          {
-            MedicationAvailabilityStatusLabels[
-              selectedMedication.availabilityStatus
-            ]
+      <div className={styles.content}>
+        <PrescriptionAlert requiresPrescription={requiresPrescription} />
+
+        <DetailsLine label='Nome' value={name} />
+        <DetailsLine label='Descrição' value={description} />
+        <DetailsLine
+          label='Categoria'
+          value={MedicationCategoriesLabels[category]}
+        />
+        <DetailsLine
+          label='Status'
+          value={MedicationAvailabilityStatusLabels[availabilityStatus]}
+        />
+        <DetailsLine
+          label='Estoque'
+          value={
+            stockQuantity === 0
+              ? 'Sem medicamentos'
+              : `${masks(stockQuantity, 'number')} unidade${stockQuantity > 1 ? 's' : ''}`
           }
-        </div>
-        <div>
-          <strong>Estoque:</strong> {selectedMedication.stockQuantity} unidades
-        </div>
-        <div>
-          <strong>Descrição:</strong>
-          <p style={{ marginTop: '4px', whiteSpace: 'pre-wrap' }}>
-            {selectedMedication.description || 'Nenhuma descrição disponível.'}
-          </p>
-        </div>
+        />
       </div>
     </Modal>
   )
