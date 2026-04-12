@@ -166,11 +166,9 @@ const attendanceDetails: IRoute = {
   description: ROUTES.ATTENDANCE_DETAILS.description,
   path: ROUTES.ATTENDANCE_DETAILS.path,
   meta: {
+    canGoBack: true,
     hidden: true,
-    levels: [
-      UserLevels.DOCTOR,
-      UserLevels.NURSE
-    ]
+    levels: [UserLevels.DOCTOR, UserLevels.NURSE]
   }
 }
 

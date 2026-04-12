@@ -63,12 +63,6 @@ export const ROUTES = {
       'Gerencie o cadastro e o controle de medicamentos disponíveis.',
     path: `/auth/units/:unitId/medications`
   },
-   ATTENDANCE_DETAILS: {
-    name: 'Atendimento',
-    description:
-      'Informações do Paciente',
-    path: '/auth/attendance'
-  },
   PRE_REGISTRATION: {
     name: 'Pré-Cadastro',
     description:
@@ -79,6 +73,11 @@ export const ROUTES = {
     name: 'Histórico de atendimentos',
     description: 'Consulte o histórico de atendimentos realizados no sistema.',
     path: '/auth/attendances'
+  },
+  ATTENDANCE_DETAILS: {
+    name: 'Resumo do atendimento',
+    description: 'Visualize um resumo geral do atendimento até o momento',
+    path: '/auth/attendances/:attendanceId'
   },
   TRIAGES: {
     name: 'Histórico de triagens',
