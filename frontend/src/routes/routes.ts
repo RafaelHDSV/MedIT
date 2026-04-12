@@ -150,6 +150,7 @@ const medications: IRoute = {
   path: ROUTES.MEDICAMENTS.path,
   icon: PillIcon,
   meta: {
+    canGoBack: true,
     hidden: false,
     levels: [
       UserLevels.ADMIN,

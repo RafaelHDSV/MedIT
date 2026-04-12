@@ -3,6 +3,7 @@ import Button from '@/components/Button/Button'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import Tag from '@/components/Tag/Tag'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
 import type { IUnit } from '@/interfaces/IUnit'
 import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
@@ -15,11 +16,14 @@ import styles from './Units.module.scss'
 import { getUnitStatus } from './unitsFunctions'
 
 function Units() {
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [units, setUnits] = useState<IUnit[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const activeUnit = user?.unitId
+
   // VIEIRA: Verificar possibilidade de nível Medit
   const isMedit = false
 
@@ -102,11 +106,12 @@ function Units() {
               })
             : filteredUnits?.map((unit) => {
                 const statusInfo = getUnitStatus(unit)
+                const isActive = activeUnit === unit._id
 
                 return (
                   <div
                     key={String(unit._id)}
-                    className={styles.card}
+                    className={`${styles.card} ${isActive ? styles.isActive : ''}`}
                     onClick={() => handleToMedications(String(unit._id))}
                   >
                     <div className={styles.cardHeader}>

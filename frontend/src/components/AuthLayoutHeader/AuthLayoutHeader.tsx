@@ -8,13 +8,15 @@ interface IAuthLayoutHeaderProps {
   marginBottom?: number
   actionComponent?: React.ReactNode
   description?: string
+  handleGoBack?: () => void
 }
 
 function AuthLayoutHeader({
   type,
   marginBottom = 16,
   actionComponent,
-  description: descriptionParams
+  description: descriptionParams,
+  handleGoBack: handleGoBackParams
 }: IAuthLayoutHeaderProps) {
   const location = useLocation()
   const currentRoute = routes.find((route) =>
@@ -30,6 +32,11 @@ function AuthLayoutHeader({
   const description = descriptionParams ?? routeDescription
 
   function handleGoBack() {
+    if (handleGoBackParams) {
+      handleGoBackParams()
+      return
+    }
+
     window.history.back()
   }
 

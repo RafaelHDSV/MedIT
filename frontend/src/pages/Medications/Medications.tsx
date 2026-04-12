@@ -98,6 +98,10 @@ function Medications() {
     [MedicationAvailabilityStatus.UNAVAILABLE]: TagStatuses.ERROR
   }
 
+  function handleGoBack() {
+    navigate(ROUTES.UNITS.path)
+  }
+
   if (loading) {
     return <LayoutSpinner />
   }
@@ -118,6 +122,7 @@ function Medications() {
       <section>
         <AuthLayoutHeader
           description={description}
+          handleGoBack={handleGoBack}
           actionComponent={
             canAddMedication && (
               <Button onClick={() => setIsModalOpen(true)}>
