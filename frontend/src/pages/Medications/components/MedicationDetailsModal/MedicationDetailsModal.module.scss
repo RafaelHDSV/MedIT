@@ -2,6 +2,10 @@
   max-width: 30rem;
   width: 100% !important;
 
+  h2 {
+    max-width: 95%;
+  }
+
   .content {
     display: flex;
     flex-direction: column;
