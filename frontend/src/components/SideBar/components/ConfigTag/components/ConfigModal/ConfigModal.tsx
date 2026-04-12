@@ -84,7 +84,7 @@ function ConfigDevContent() {
 
         <div className={styles.addTask}>
           <Input
-            placeholder='Nova tarefa...'
+            placeholder='Nova tarefa'
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             onPressEnter={handleAddTask}

@@ -1,18 +1,70 @@
-export const MaterialAvailabilityStatus = {
-  AVAILABLE: 'Disponível',
-  LOW_STOCK: 'Estoque Baixo',
-  UNAVAILABLE: 'Indisponível'
+import type { Types } from 'mongoose'
+import type { IBaseInterface } from './IBaseInterface'
+
+export const MedicationAvailabilityStatus = {
+  AVAILABLE: 'available',
+  LOW_STOCK: 'low stock',
+  UNAVAILABLE: 'unavailable'
 } as const
+export type MedicationAvailabilityStatus =
+  (typeof MedicationAvailabilityStatus)[keyof typeof MedicationAvailabilityStatus]
+export const MedicationAvailabilityStatusLabels = {
+  [MedicationAvailabilityStatus.AVAILABLE]: 'Disponível',
+  [MedicationAvailabilityStatus.LOW_STOCK]: 'Estoque Baixo',
+  [MedicationAvailabilityStatus.UNAVAILABLE]: 'Indisponível'
+}
 
-export type MaterialAvailabilityStatus = typeof MaterialAvailabilityStatus[keyof typeof MaterialAvailabilityStatus]
+export const MedicationCategories = {
+  ANALGESICS: 'analgesics',
+  ANTIBIOTICS: 'antibiotics',
+  ANTIVIRALS: 'antivirals',
+  ANTIFUNGALS: 'antifungals',
+  ANTICONVULSANTS: 'anticonvulsants',
+  ANTIDEPRESSANTS: 'antidepressants',
+  ANTIPSICOTICOS: 'antipsicoticos',
+  ANTISEPTICS: 'antiseptics',
+  ANTIVENOMS: 'antivenoms',
+  OTHER: 'other'
+} as const
+export type MedicationCategories =
+  (typeof MedicationCategories)[keyof typeof MedicationCategories]
+export const MedicationCategoriesLabels = {
+  [MedicationCategories.ANALGESICS]: 'Analgésicos',
+  [MedicationCategories.ANTIBIOTICS]: 'Antibióticos',
+  [MedicationCategories.ANTIVIRALS]: 'Antivirais',
+  [MedicationCategories.ANTIFUNGALS]: 'Antifungais',
+  [MedicationCategories.ANTICONVULSANTS]: 'Anticonvulsantes',
+  [MedicationCategories.ANTIDEPRESSANTS]: 'Antidepressantes',
+  [MedicationCategories.ANTIPSICOTICOS]: 'Antipsicóticos',
+  [MedicationCategories.ANTISEPTICS]: 'Antisépticos',
+  [MedicationCategories.ANTIVENOMS]: 'Antivenomas',
+  [MedicationCategories.OTHER]: 'Outro'
+}
 
-export interface IMedication {
-  _id: string
+export interface IMedication extends IBaseInterface {
+  name: string
+  category: MedicationCategories
+  description: string
+  requiresPrescription: boolean
+  availabilityStatus: MedicationAvailabilityStatus
+  stockQuantity: number
+  unitId: Types.ObjectId
+}
+
+export interface MedicationFormValues {
   name: string
   category: string
-  description?: string
-  requiresPrescription?: boolean
-  availabilityStatus: MaterialAvailabilityStatus
+  description: string
+  requiresPrescription: boolean
   stockQuantity: number
   unitId: string
+}
+
+export interface IMedicationFormErrors {
+  name?: string
+  category?: string
+  description?: string
+  requiresPrescription?: string
+  stockQuantity?: string
+  unitId?: string
 }

@@ -10,9 +10,12 @@ const UnitSchema = new mongoose.Schema<IUnit>(
       minlength: [2, 'O nome da unidade deve ter pelo menos 2 caracteres']
     },
     address: {
-      type: String,
-      required: [true, 'O endereço da unidade é obrigatório'],
-      trim: true
+      street: String,
+      number: Number,
+      neighborhood: String,
+      city: String,
+      state: String,
+      zipCode: Number
     },
     maxOccupancy: {
       type: Number,
@@ -36,6 +39,10 @@ const UnitSchema = new mongoose.Schema<IUnit>(
         message:
           'Por favor, insira um telefone válido (apenas números, 10 ou 11 dígitos).'
       }
+    },
+    partnerUnitIds: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Unit' }],
+      default: []
     }
   },
   { timestamps: true }

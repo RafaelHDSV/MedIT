@@ -1,18 +1,14 @@
-import { theme as antdTheme, ConfigProvider, Flex } from 'antd'
-
-function renderEmpty() {
-  return (
-    <Flex vertical align='center' justify='center' gap={16}>
-      <img src='/no-data.svg' alt='No data' className='noDataImage' />
-      <span>Nenhuma informação encontrada para essa consulta</span>
-    </Flex>
-  )
-}
+import Empty from '@/components/Empty/Empty'
+import { theme as antdTheme, ConfigProvider } from 'antd'
 
 function AntdConfigProvider({ children }: { children: React.ReactNode }) {
   const primaryColor = getComputedStyle(document.documentElement)
     .getPropertyValue('--primary-color')
     .trim()
+
+  function renderEmpty() {
+    return <Empty />
+  }
 
   return (
     <ConfigProvider

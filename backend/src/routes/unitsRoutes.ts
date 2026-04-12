@@ -1,10 +1,10 @@
 import express from 'express'
-import { getAllUnits, getUnit, createUnit } from '../controllers/unitController.js'
+import { createUnit, getUnit, getUnits } from '../controllers/unitController.js'
 import { authMiddleware } from '../middlewares/authMiddleware.js'
 
 const router = express.Router()
 
-router.get('/', authMiddleware, getAllUnits)
+router.get('/', authMiddleware, getUnits)
 router.get('/:id', authMiddleware, getUnit)
 router.post('/', authMiddleware, createUnit)
 

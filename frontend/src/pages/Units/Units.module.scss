@@ -1,0 +1,49 @@
+.skeleton {
+  :global(.ant-skeleton-button) {
+    width: 100% !important;
+    min-height: 9rem;
+    height: 100%;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all ease-in-out 200ms;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--black);
+    }
+  }
+
+  .address {
+    font-size: 14px;
+    color: var(--light-gray);
+  }
+}
+
+.isActive {
+  border: 2px solid var(--primary-color);
+}

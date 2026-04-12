@@ -4,7 +4,7 @@ import { ROUTES } from '@/routes/constants'
 import routes, { type IRoute } from '@/routes/routes'
 import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { matchPath, NavLink, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
 import ConfigTag from './components/ConfigTag/ConfigTag'
 import UserTag from './components/UserTag/UserTag'
@@ -99,11 +99,16 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
       <li key={route.path}>
         <NavLink
           to={route.path}
-          className={({ isActive }) =>
-            isActive || location.pathname === route.path
+          className={({ isActive }) => {
+            const isActiveWithParamsValidation = !!matchPath(
+              { path: route.path, end: true },
+              location.pathname
+            )
+
+            return isActive || isActiveWithParamsValidation
               ? styles.activeLink
               : styles.link
-          }
+          }}
           end={route.path === ROUTES.DASHBOARD.path}
         >
           <div className={styles.linkContent}>
@@ -115,7 +120,7 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
     )
   }
 
-  return <ul className={styles.menuList}>{routes.map(renderRoute)}</ul>
+  return <ul className={styles.menuList}>{routes?.map(renderRoute)}</ul>
 }
 
 interface ISideBarProps {

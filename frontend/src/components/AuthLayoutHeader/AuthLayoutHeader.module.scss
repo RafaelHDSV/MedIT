@@ -7,7 +7,7 @@
   gap: 0.5rem;
   width: 100%;
   min-width: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 
   @include max-md {
     align-items: flex-start;

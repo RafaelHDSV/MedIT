@@ -1,5 +1,5 @@
-import { Types } from 'mongoose'
-import { IBaseInterface } from './IBaseInterface.js'
+import type { Types } from 'mongoose'
+import type { IBaseInterface } from './IBaseInterface'
 
 type WeekDay = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
 
@@ -12,7 +12,7 @@ interface IOpeningHour {
 
 type OpeningHours = Record<WeekDay, IOpeningHour>
 
-interface IAddress {
+export interface IAddress {
   street: string
   number: number
   neighborhood: string
@@ -24,6 +24,7 @@ interface IAddress {
 export interface IUnit extends IBaseInterface {
   name: string
   address: IAddress
+  fullAddress?: string
   maxOccupancy: number
   openingHours: OpeningHours
   phone: string
