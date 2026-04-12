@@ -22,7 +22,6 @@ const UNIT_IDS = [
   '69d2981909395bf057e0513f' // UBS Aparecidinha
 ]
 
-// Tipo de unidade para calibrar quantidades em estoque
 type UnitProfile = 'ubs' | 'upa' | 'hospital' | 'especialidades'
 
 const UNIT_PROFILE: Record<string, UnitProfile> = {
@@ -40,7 +39,6 @@ const UNIT_PROFILE: Record<string, UnitProfile> = {
   '69d2981909395bf057e0513f': 'ubs'
 }
 
-// Faixas de estoque por perfil de unidade (min e max por medicamento)
 const STOCK_RANGE: Record<UnitProfile, { min: number; max: number }> = {
   ubs: { min: 0, max: 300 },
   upa: { min: 0, max: 800 },
@@ -48,17 +46,34 @@ const STOCK_RANGE: Record<UnitProfile, { min: number; max: number }> = {
   especialidades: { min: 0, max: 500 }
 }
 
+// Quantos medicamentos por unidade serão forçadamente indisponíveis.
+// Distribuídos de forma uniforme ao longo do catálogo.
+const FORCED_UNAVAILABLE_COUNT = 5
+
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-function resolveStatus(
-  qty: number,
-  profile: UnitProfile
-): MedicationAvailabilityStatus {
+function resolveStatus(qty: number): MedicationAvailabilityStatus {
   if (qty === 0) return MedicationAvailabilityStatus.UNAVAILABLE
   if (qty <= 50) return MedicationAvailabilityStatus.LOW_STOCK
   return MedicationAvailabilityStatus.AVAILABLE
+}
+
+/**
+ * Retorna um conjunto de índices distribuídos uniformemente ao longo do
+ * catálogo para serem forçados como indisponíveis.
+ * Índices fixos garantem que cada execução do seed produza o mesmo resultado.
+ *
+ * Exemplo com 50 meds e count=5 → step=10 → índices: 0, 10, 20, 30, 40
+ */
+function unavailableIndexes(total: number, count: number): Set<number> {
+  const step = Math.floor(total / count)
+  const indexes = new Set<number>()
+  for (let i = 0; i < count; i++) {
+    indexes.add(i * step)
+  }
+  return indexes
 }
 
 // ---------------------------------------------------------------------------
@@ -506,13 +521,22 @@ const seedMedications: Script = {
   name: 'create-medications',
   description:
     'Insere 50 medicamentos reais em cada unidade de saúde cadastrada no sistema',
+
   async run() {
     console.log('Deletando os medicamentos já existentes')
     const removed = await MedicationModel.deleteMany({})
-    console.log(`Foram deletados ${removed.deletedCount} medicamentos`)
+    console.log(`Foram deletados ${removed.deletedCount} medicamentos\n`)
 
     console.log(
       `Iniciando seed de ${MEDICATIONS.length} medicamentos em ${UNIT_IDS.length} unidades...\n`
+    )
+
+    // Índices fixos ao longo do catálogo que serão forçados como indisponíveis
+    // em todas as unidades. Fixos = resultado idempotente a cada execução.
+    // Com 50 meds e count=5 → step=10 → índices: 0, 10, 20, 30, 40
+    const forcedUnavailable = unavailableIndexes(
+      MEDICATIONS.length,
+      FORCED_UNAVAILABLE_COUNT
     )
 
     let totalInserted = 0
@@ -521,25 +545,35 @@ const seedMedications: Script = {
     for (const unitId of UNIT_IDS) {
       const profile = UNIT_PROFILE[unitId]
       const { min, max } = STOCK_RANGE[profile]
-      console.log(`\nUnidade ${unitId} [${profile}]`)
+      console.log(`Unidade ${unitId} [${profile}]`)
 
-      for (const template of MEDICATIONS) {
+      for (let i = 0; i < MEDICATIONS.length; i++) {
+        const template = MEDICATIONS[i]
+
         try {
-          // Estoque aleatório dentro da faixa do perfil da unidade.
-          // Antivenenos e morfina têm volumes menores por política de controle.
-          const isControlled =
-            template.category === MedicationCategories.ANTIVENOMS ||
-            template.name.toLowerCase().includes('morfina')
+          let stockQuantity: number
 
-          const stockMin = isControlled
-            ? Math.max(1, Math.floor(min / 10))
-            : min
-          const stockMax = isControlled
-            ? Math.max(5, Math.floor(max / 10))
-            : max
-          const stockQuantity = randomInt(stockMin, stockMax)
+          if (forcedUnavailable.has(i)) {
+            // Slot reservado → forçar estoque zerado independente do perfil
+            stockQuantity = 0
+          } else {
+            const isControlled =
+              template.category === MedicationCategories.ANTIVENOMS ||
+              template.name.toLowerCase().includes('morfina')
 
-          const availabilityStatus = resolveStatus(stockQuantity, profile)
+            const stockMin = isControlled
+              ? Math.max(1, Math.floor(min / 10))
+              : min
+            const stockMax = isControlled
+              ? Math.max(5, Math.floor(max / 10))
+              : max
+
+            // Garante ao menos 1 fora dos slots reservados para não
+            // gerar indisponíveis "acidentais" que prejudiquem os disponíveis
+            stockQuantity = Math.max(1, randomInt(stockMin, stockMax))
+          }
+
+          const availabilityStatus = resolveStatus(stockQuantity)
 
           await MedicationModel.create({
             name: template.name,
@@ -560,9 +594,11 @@ const seedMedications: Script = {
           totalErrors++
         }
       }
+
+      console.log()
     }
 
-    console.log('\n─────────────────────────────────────────')
+    console.log('─────────────────────────────────────────')
     console.log(`✅ Inseridos : ${totalInserted}`)
     console.log(`❌ Erros     : ${totalErrors}`)
     console.log('─────────────────────────────────────────')
