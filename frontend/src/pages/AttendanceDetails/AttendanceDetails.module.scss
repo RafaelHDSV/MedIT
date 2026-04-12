@@ -3,7 +3,7 @@
   grid-template-columns: 1fr 280px;
   grid-template-rows: auto 1fr;
   gap: 24px;
-  padding: 28px 32px;
+  padding: 0;
   background: #f9f9f7;
   min-height: 100vh;
 }
@@ -26,25 +26,10 @@
   font-weight: 500;
 }
 
-.btnFinalizar {
-  background: #D85A30;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-
-  &:hover {
-    background: #c04f28;
-  }
-}
-
 .sectionTitle {
    font-size: 14px;
   font-weight: 700;
-  color: #111;
+  color: var(--black);
   margin-bottom: 12px;
 }
 
@@ -58,12 +43,12 @@
 .infoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
+  column-gap: 2rem;
 }
 
 .infoColLeft {
   padding-right: 32px;
-  border-right: 0.5px solid #e5e5e5;
+  border-right: none;
 }
 
 .infoColRight {
@@ -167,7 +152,7 @@
 }
 
 .sidebar {
-  background: #fff;
+  background: rgba(216, 90, 48, 0.08);
   border: 0.5px solid #e5e5e5;
   border-radius: 12px;
   padding: 20px;
@@ -188,14 +173,14 @@
 
 .sidebarTitle {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   color: #111;
   margin-bottom: 12px;
 }
 
 .condicaoNome {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
@@ -215,5 +200,5 @@
 .barPct {
   font-size: 11px;
   color: #D85A30;
-  font-weight: 500;
+  border-bottom: 0.5px solid var(--border);
 }

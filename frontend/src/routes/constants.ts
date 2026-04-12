@@ -58,11 +58,11 @@ export const ROUTES = {
       'Gerencie o cadastro e o controle de medicamentos disponíveis.',
     path: '/auth/medications'
   },
-   DOCTORSSERVICE: {
+   ATTENDANCE_DETAILS: {
     name: 'Atendimento',
     description:
       'Informações do Paciente',
-    path: '/auth/DoctorsServices'
+    path: '/auth/attendance'
   },
   PRE_REGISTRATION: {
     name: 'Pré-Cadastro',

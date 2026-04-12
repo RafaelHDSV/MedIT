@@ -1,5 +1,6 @@
 import React from "react";
-import styles from "./DoctorsService.module.scss";
+import styles from "./AttendanceDetails.module.scss";
+import Button from "@/components/Button/Button";
 
 function BadgeRisco({ risco }: { risco: string }) {
   const mod = risco === "Baixo" ? styles.baixo : risco === "Alto" ? styles.alto : styles.medio;
@@ -35,7 +36,7 @@ function BarCompatibilidade({ pct }: { pct: number }) {
   );
 }
 
-function DoctorsService() {
+function AttendanceDetails() {
   const paciente = {
     nome: "Rafael Silva", idade: 20, sexo: "Masculino", alergias: "Dipirona",
     queixaPrincipal: "Náusea", chegada: "23:41", risco: "Médio", condicoes: "Hipertensão",
@@ -59,7 +60,7 @@ function DoctorsService() {
 
     <div className={styles.header}>
       <h1 className={styles.title}>Atendimento</h1>
-      <button className={styles.btnFinalizar}>Finalizar atendimento</button>
+      <Button className={styles.btnFinalizar}>Finalizar atendimento</Button>
     </div>
 
     <div className={styles.left}>
@@ -119,4 +120,4 @@ function DoctorsService() {
   );
 }
 
-export default DoctorsService
+export default AttendanceDetails

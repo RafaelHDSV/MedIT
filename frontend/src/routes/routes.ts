@@ -145,15 +145,15 @@ const medications: IRoute = {
   }
 }
 
-const doctorsservices: IRoute = {
-  name: ROUTES.DOCTORSSERVICE.name,
-  description: ROUTES.DOCTORSSERVICE.description,
-  path: ROUTES.DOCTORSSERVICE.path,
-  icon: PillIcon,
+const attendanceDetails: IRoute = {
+  name: ROUTES.ATTENDANCE_DETAILS.name,
+  description: ROUTES.ATTENDANCE_DETAILS.description,
+  path: ROUTES.ATTENDANCE_DETAILS.path,
   meta: {
-    hidden: false,
+    hidden: true,
     levels: [
-      UserLevels.DOCTOR
+      UserLevels.DOCTOR,
+      UserLevels.NURSE
     ]
   }
 }
@@ -217,7 +217,7 @@ const routes: IRoute[] = [
   patientDetails,
   medications,
   preRegistration,
-  doctorsservices
+  attendanceDetails
 ]
 
 export default routes
