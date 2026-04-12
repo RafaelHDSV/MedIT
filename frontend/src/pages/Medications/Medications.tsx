@@ -3,12 +3,11 @@ import Button from '@/components/Button/Button'
 import Empty from '@/components/Empty/Empty'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { LayoutSpinner } from '@/components/LayoutSpinner/LayoutSpinner'
-import Tag, { TagStatuses } from '@/components/Tag/Tag'
+import Tag from '@/components/Tag/Tag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { IMedication } from '@/interfaces/IMedication'
 import {
-  MedicationAvailabilityStatus,
   MedicationAvailabilityStatusLabels,
   MedicationCategoriesLabels
 } from '@/interfaces/IMedication'
@@ -24,6 +23,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
 import MedicationDetailsModal from './components/MedicationDetailsModal/MedicationDetailsModal'
 import MedicationModal from './components/MedicationModal/MedicationModal'
+import { MEDICATIONS_STATUS_MAP } from './medicationsConstants'
 
 function Medications() {
   const { user } = useAuth()
@@ -94,12 +94,6 @@ function Medications() {
     )
   }, [searchTerm, medications])
 
-  const STATUS_MAP: Record<MedicationAvailabilityStatus, TagStatuses> = {
-    [MedicationAvailabilityStatus.AVAILABLE]: TagStatuses.SUCCESS,
-    [MedicationAvailabilityStatus.LOW_STOCK]: TagStatuses.WARNING,
-    [MedicationAvailabilityStatus.UNAVAILABLE]: TagStatuses.ERROR
-  }
-
   function handleGoBack() {
     navigate(ROUTES.UNITS.path)
   }
@@ -132,7 +126,7 @@ function Medications() {
 
             <div className={styles.cardFooter}>
               <Tag
-                status={STATUS_MAP[medication.availabilityStatus]}
+                status={MEDICATIONS_STATUS_MAP[medication.availabilityStatus]}
                 fontSize={12}
               >
                 {

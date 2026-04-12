@@ -1,4 +1,5 @@
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
+import Tag from '@/components/Tag/Tag'
 import {
   MedicationAvailabilityStatusLabels,
   MedicationCategoriesLabels,
@@ -6,6 +7,7 @@ import {
 } from '@/interfaces/IMedication'
 import masks from '@/utils/masks'
 import { Modal } from 'antd'
+import { MEDICATIONS_STATUS_MAP } from '../../medicationsConstants'
 import styles from './MedicationDetailsModal.module.scss'
 
 function PrescriptionAlert({
@@ -72,7 +74,14 @@ function MedicationDetailsModal({
         />
         <DetailsLine
           label='Status'
-          value={MedicationAvailabilityStatusLabels[availabilityStatus]}
+          value={
+            <Tag
+              status={MEDICATIONS_STATUS_MAP[availabilityStatus]}
+              fontSize={12}
+            >
+              {MedicationAvailabilityStatusLabels[availabilityStatus]}
+            </Tag>
+          }
         />
         <DetailsLine
           label='Estoque'
