@@ -1,4 +1,5 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
+import Alert from '@/components/Alert/Alert'
 import Button from '@/components/Button/Button'
 import Empty from '@/components/Empty/Empty'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
@@ -19,7 +20,7 @@ import { ROUTES } from '@/routes/constants'
 import getFullAddress from '@/utils/getFullAddress'
 import masks from '@/utils/masks'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
 import MedicationDetailsModal from './components/MedicationDetailsModal/MedicationDetailsModal'
 import MedicationModal from './components/MedicationModal/MedicationModal'
@@ -165,6 +166,16 @@ function Medications() {
       />
 
       <section>
+        <Alert
+          message={
+            <>
+              Clique na seta de voltar ao lado do título ou{' '}
+              <Link to={ROUTES.UNITS.path}>aqui</Link> para ver unidades
+              parceiras e encontrar o medicamento desejado em outras unidades
+            </>
+          }
+        />
+
         <AuthLayoutHeader
           description={description}
           handleGoBack={handleGoBack}
