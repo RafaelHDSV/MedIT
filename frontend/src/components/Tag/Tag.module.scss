@@ -1,7 +1,9 @@
 .tag {
+  --tag-font-size: 0;
+
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: var(--tag-font-size);
   font-weight: 700;
 }
 
