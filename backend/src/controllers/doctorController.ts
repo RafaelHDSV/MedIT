@@ -15,6 +15,7 @@ export const getUsers = async (_req: Request, res: Response) => {
     return res.status(404).json({ message: 'Nenhum médico(a) encontrado' })
   }
 
+  // VIEIRA: Verificar se não tá fora do padrão (status, message)
   res.json(users)
 }
 

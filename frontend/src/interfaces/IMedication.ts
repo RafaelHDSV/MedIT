@@ -1,5 +1,5 @@
-import { Types } from 'mongoose'
-import { IBaseInterface } from './IBaseInterface.js'
+import type { Types } from 'mongoose'
+import type { IBaseInterface } from './IBaseInterface'
 
 export const MedicationAvailabilityStatus = {
   AVAILABLE: 'available',
@@ -43,15 +43,28 @@ export const MedicationCategoriesLabels = {
 
 export interface IMedication extends IBaseInterface {
   name: string
-  // VIEIRA: Adicionar novos campos para atribuição de medicamento a pacientes
-  // dosage: string
-  // frequency: string
-  // route: string
-  // duration: string
   category: MedicationCategories
   description: string
   requiresPrescription: boolean
   availabilityStatus: MedicationAvailabilityStatus
   stockQuantity: number
   unitId: Types.ObjectId
+}
+
+export interface MedicationFormValues {
+  name: string
+  category: string
+  description: string
+  requiresPrescription: boolean
+  stockQuantity: number
+  unitId: string
+}
+
+export interface IMedicationFormErrors {
+  name?: string
+  category?: string
+  description?: string
+  requiresPrescription?: string
+  stockQuantity?: string
+  unitId?: string
 }

@@ -15,7 +15,7 @@ function DetailsLine({ label, value }: IDetailsLineProps) {
   return (
     <div className={styles.container}>
       <span className={styles.label}>{label}</span>
-      <Tooltip title={String(value)}>
+      <Tooltip title={!isObject ? String(value) : ''}>
         <span className={`${styles.value} ${!isObject ? 'ellipsis' : ''}`}>
           {value}
         </span>
