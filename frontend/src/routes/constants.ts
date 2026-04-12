@@ -53,7 +53,7 @@ export const ROUTES = {
     path: '/auth/patients/:id'
   },
   UNITS: {
-    name: 'Unidades',
+    name: 'Unidades parceiras',
     description: 'Visualize e gerencie as unidades.',
     path: '/auth/units'
   },
