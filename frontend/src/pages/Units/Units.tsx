@@ -9,7 +9,7 @@ import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
 import getFullAddress from '@/utils/getFullAddress'
 import { Skeleton } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UnitsModal from './components/UnitsModal/UnitsModal'
 import styles from './Units.module.scss'
@@ -22,16 +22,16 @@ function Units() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const activeUnit = user?.unitId
+  const activeUnitId = user?.unitId
 
   // VIEIRA: Verificar possibilidade de nível Medit
   const isMedit = false
 
-  async function fetchUnits() {
+  const fetchUnits = useCallback(async () => {
     setLoading(true)
 
     try {
-      const response = await UnitsRepository.getUnits()
+      const response = await UnitsRepository.getUnits({ activeUnitId })
 
       const formatResponse = response.map((unit: IUnit) => {
         return {
@@ -46,11 +46,11 @@ function Units() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [activeUnitId])
 
   useEffect(() => {
     fetchUnits()
-  }, [])
+  }, [fetchUnits])
 
   const filteredUnits = useMemo(() => {
     if (!searchTerm || searchTerm === '') return units
@@ -106,7 +106,7 @@ function Units() {
               })
             : filteredUnits?.map((unit) => {
                 const statusInfo = getUnitStatus(unit)
-                const isActive = activeUnit === unit._id
+                const isActive = activeUnitId === unit._id
 
                 return (
                   <div

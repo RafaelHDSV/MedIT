@@ -1,14 +1,32 @@
 import { Request, Response } from 'express'
 import { Unit } from '../models/UnitModel.js'
 
-export const getUnits = async (_req: Request, res: Response) => {
+export const getUnits = async (req: Request, res: Response) => {
+  const { activeUnitId } = req.query
+  if (!activeUnitId) {
+    return res.status(400).json({ message: 'ID da unidade não informado!' })
+  }
+
   try {
-    const units = await Unit.find().sort({ createdAt: 1 })
+    const activeUnit =
+      await Unit.findById(activeUnitId).select('partnerUnitIds')
+    if (!activeUnit) {
+      return res.status(404).json({ message: 'Unidade ativa não encontrada' })
+    }
+
+    const partnerUnitIds = [...activeUnit.partnerUnitIds, activeUnitId]
+    if (!partnerUnitIds || partnerUnitIds.length === 0) {
+      return res.status(200).json({ message: 'Não existem unidades parceiras' })
+    }
+
+    const units = await Unit.find({
+      _id: { $in: partnerUnitIds }
+    } as any).sort({ createdAt: -1 })
     if (!units || units.length === 0) {
       return res.status(404).json({ message: 'Nenhuma unidade encontrada' })
     }
 
-    res.json(units)
+    res.status(200).json(units)
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao buscar unidades de saúde' })

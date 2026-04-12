@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { IBaseInterface } from './IBaseInterface.js'
 
 type WeekDay = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
@@ -26,4 +27,5 @@ export interface IUnit extends IBaseInterface {
   maxOccupancy: number
   openingHours: OpeningHours
   phone: string
+  partnerUnitIds: Types.ObjectId[]
 }

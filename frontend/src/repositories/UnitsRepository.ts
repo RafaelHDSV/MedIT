@@ -2,9 +2,9 @@ import { api } from '@/api/api'
 import { Repository } from './Repository'
 
 class UnitsRepository extends Repository {
-  async getUnits() {
+  async getUnits({ activeUnitId }: { activeUnitId?: string }) {
     return this.handle(() => {
-      return this.api.get(`${this.path}`)
+      return this.api.get(`${this.path}`, { params: { activeUnitId } })
     })
   }
 
