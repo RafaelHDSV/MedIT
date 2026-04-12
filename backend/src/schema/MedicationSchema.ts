@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import {
   IMedication,
-  MedicationAvailabilityStatus
+  MedicationAvailabilityStatus,
+  MedicationCategories
 } from '../interfaces/IMedications.js'
 
 const MedicationSchema = new mongoose.Schema<IMedication>(
@@ -12,43 +13,27 @@ const MedicationSchema = new mongoose.Schema<IMedication>(
       trim: true,
       minlength: [2, 'O nome do medicamento deve ter pelo menos 2 caracteres']
     },
-    dosage: {
-      type: String,
-      required: [true, 'A dosagem do medicamento é obrigatória'],
-      trim: true
-    },
-    frequency: {
-      type: String,
-      required: [true, 'A frequência do medicamento é obrigatória'],
-      trim: true
-    },
-    route: {
-      type: String,
-      required: [true, 'A via de administração do medicamento é obrigatória'],
-      trim: true
-    },
-    duration: {
-      type: String,
-      required: [true, 'A duração do tratamento é obrigatória'],
-      trim: true
-    },
     category: {
       type: String,
+      enum: Object.values(MedicationCategories),
       required: [true, 'A categoria do medicamento é obrigatória'],
       trim: true
     },
     description: {
       type: String,
+      required: [true, 'A descrição do medicamento é obrigatória'],
       trim: true
     },
     requiresPrescription: {
       type: Boolean,
+      required: [true, 'A necessidade de receita médica é obrigatória'],
       default: false
     },
     availabilityStatus: {
       type: String,
       enum: Object.values(MedicationAvailabilityStatus),
-      default: MedicationAvailabilityStatus.UNAVAILABLE
+      required: [true, 'O status de disponibilidade é obrigatório'],
+      trim: true
     },
     stockQuantity: {
       type: Number,

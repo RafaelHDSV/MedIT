@@ -1,5 +1,6 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
+import Empty from '@/components/Empty/Empty'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { LayoutSpinner } from '@/components/LayoutSpinner/LayoutSpinner'
 import Tag, { TagStatuses } from '@/components/Tag/Tag'
@@ -102,8 +103,50 @@ function Medications() {
     navigate(ROUTES.UNITS.path)
   }
 
-  if (loading) {
-    return <LayoutSpinner />
+  function content() {
+    if (loading) {
+      return <LayoutSpinner />
+    }
+
+    if (!medications || medications.length === 0) {
+      return <Empty />
+    }
+
+    return (
+      <div className={styles.grid}>
+        {filteredMedications?.map((medication) => (
+          <div
+            key={String(medication._id)}
+            className={styles.card}
+            onClick={() => {
+              setSelectedMedication(medication)
+            }}
+          >
+            <div className={styles.cardInfo}>
+              <span className={styles.title}>{medication.name}</span>
+              <span className={styles.subtitle}>{medication.category}</span>
+            </div>
+
+            <div className={styles.cardFooter}>
+              <Tag
+                status={STATUS_MAP[medication.availabilityStatus]}
+                fontSize={12}
+              >
+                {
+                  MedicationAvailabilityStatusLabels[
+                    medication.availabilityStatus
+                  ]
+                }
+              </Tag>
+
+              <span className={styles.quantity}>
+                {masks(medication.stockQuantity, 'number')} un.
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
   }
 
   return (
@@ -131,7 +174,6 @@ function Medications() {
             )
           }
         />
-
         <FormItem name='search' inputHeight='2.5rem'>
           <InputText
             className='w-100'
@@ -141,39 +183,7 @@ function Medications() {
           />
         </FormItem>
 
-        <div className={styles.grid}>
-          {filteredMedications?.map((medication) => (
-            <div
-              key={String(medication._id)}
-              className={styles.card}
-              onClick={() => {
-                setSelectedMedication(medication)
-              }}
-            >
-              <div className={styles.cardInfo}>
-                <span className={styles.title}>{medication.name}</span>
-                <span className={styles.subtitle}>{medication.category}</span>
-              </div>
-
-              <div className={styles.cardFooter}>
-                <Tag
-                  status={STATUS_MAP[medication.availabilityStatus]}
-                  fontSize={12}
-                >
-                  {
-                    MedicationAvailabilityStatusLabels[
-                      medication.availabilityStatus
-                    ]
-                  }
-                </Tag>
-
-                <span className={styles.quantity}>
-                  {masks(medication.stockQuantity, 'number')} un.
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        {content()}
       </section>
     </>
   )

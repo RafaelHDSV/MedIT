@@ -14,16 +14,57 @@ export const MedicationAvailabilityStatusLabels = {
   [MedicationAvailabilityStatus.UNAVAILABLE]: 'Indisponível'
 }
 
+export const MedicationCategories = {
+  ANALGESICS: 'analgesics',
+  ANTIBIOTICS: 'antibiotics',
+  ANTIVIRALS: 'antivirals',
+  ANTIFUNGALS: 'antifungals',
+  ANTICONVULSANTS: 'anticonvulsants',
+  ANTIDEPRESSANTS: 'antidepressants',
+  ANTIPSICOTICOS: 'antipsicoticos',
+  ANTISEPTICS: 'antiseptics',
+  ANTIVENOMS: 'antivenoms',
+  OTHER: 'other'
+} as const
+export type MedicationCategories =
+  (typeof MedicationCategories)[keyof typeof MedicationCategories]
+export const MedicationCategoriesLabels = {
+  [MedicationCategories.ANALGESICS]: 'Analgésicos',
+  [MedicationCategories.ANTIBIOTICS]: 'Antibióticos',
+  [MedicationCategories.ANTIVIRALS]: 'Antivirais',
+  [MedicationCategories.ANTIFUNGALS]: 'Antifungais',
+  [MedicationCategories.ANTICONVULSANTS]: 'Anticonvulsantes',
+  [MedicationCategories.ANTIDEPRESSANTS]: 'Antidepressantes',
+  [MedicationCategories.ANTIPSICOTICOS]: 'Antipsicóticos',
+  [MedicationCategories.ANTISEPTICS]: 'Antisépticos',
+  [MedicationCategories.ANTIVENOMS]: 'Antivenomas',
+  [MedicationCategories.OTHER]: 'Outro'
+}
+
 export interface IMedication extends IBaseInterface {
   name: string
-  dosage: string
-  frequency: string
-  route: string
-  duration: string
-  category: string
-  description?: string
-  requiresPrescription?: boolean
+  category: MedicationCategories
+  description: string
+  requiresPrescription: boolean
   availabilityStatus: MedicationAvailabilityStatus
   stockQuantity: number
   unitId: Types.ObjectId
+}
+
+export interface MedicationFormValues {
+  name: string
+  category: string
+  description: string
+  requiresPrescription: boolean
+  stockQuantity: number
+  unitId: string
+}
+
+export interface IMedicationFormErrors {
+  name?: string
+  category?: string
+  description?: string
+  requiresPrescription?: string
+  stockQuantity?: string
+  unitId?: string
 }
