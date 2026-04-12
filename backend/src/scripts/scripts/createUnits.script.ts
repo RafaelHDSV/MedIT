@@ -198,7 +198,7 @@ const createUnits = {
     console.log('🚀 Criando novas unidades')
     for (let i = 0; i < UNITS_DATA.length; i++) {
       const data = UNITS_DATA[i]
-      const unit = await Unit.create(data)
+      const unit = await Unit.create(data as any)
       console.log(`✅ [${i + 1}/${UNITS_DATA.length}] ${unit.name}`)
     }
 

@@ -129,12 +129,28 @@ const patientDetails: IRoute = {
   }
 }
 
+const units: IRoute = {
+  name: ROUTES.UNITS.name,
+  description: ROUTES.UNITS.description,
+  path: ROUTES.UNITS.path,
+  meta: {
+    hidden: true,
+    levels: [
+      UserLevels.ADMIN,
+      UserLevels.DOCTOR,
+      UserLevels.NURSE,
+      UserLevels.PATIENT
+    ]
+  }
+}
+
 const medications: IRoute = {
   name: ROUTES.MEDICAMENTS.name,
   description: ROUTES.MEDICAMENTS.description,
   path: ROUTES.MEDICAMENTS.path,
   icon: PillIcon,
   meta: {
+    canGoBack: true,
     hidden: false,
     levels: [
       UserLevels.ADMIN,
@@ -202,7 +218,7 @@ const preRegistration: IRoute = {
   }
 }
 
-const routes: IRoute[] = [
+const routes = [
   signIn,
   signUp,
   dashboard,
@@ -215,6 +231,7 @@ const routes: IRoute[] = [
   nurseDetails,
   patients,
   patientDetails,
+  units,
   medications,
   preRegistration,
   attendanceDetails

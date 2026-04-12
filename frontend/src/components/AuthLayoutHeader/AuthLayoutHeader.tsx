@@ -7,12 +7,16 @@ interface IAuthLayoutHeaderProps {
   type?: 'unauth'
   marginBottom?: number
   actionComponent?: React.ReactNode
+  description?: string
+  handleGoBack?: () => void
 }
 
 function AuthLayoutHeader({
   type,
   marginBottom = 16,
-  actionComponent
+  actionComponent,
+  description: descriptionParams,
+  handleGoBack: handleGoBackParams
 }: IAuthLayoutHeaderProps) {
   const location = useLocation()
   const currentRoute = routes.find((route) =>
@@ -25,7 +29,14 @@ function AuthLayoutHeader({
   } = currentRoute ?? {}
   const { canGoBack } = meta ?? {}
 
+  const description = descriptionParams ?? routeDescription
+
   function handleGoBack() {
+    if (handleGoBackParams) {
+      handleGoBackParams()
+      return
+    }
+
     window.history.back()
   }
 
@@ -59,7 +70,7 @@ function AuthLayoutHeader({
           <h2 className={titleStyles()}>{routeName}</h2>
         </div>
 
-        <p className={descriptionStyles()}>{routeDescription}</p>
+        <p className={descriptionStyles()}>{description}</p>
       </div>
 
       {actionComponent && actionComponent}

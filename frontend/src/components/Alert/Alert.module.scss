@@ -1,0 +1,143 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  animation: slideDown 1s ease;
+
+  // ── Tipos ────────────────────────────────────────────────────────────────
+  &.info {
+    background: var(--alert-info-background);
+    border-color: var(--alert-info-border);
+    color: var(--alert-info-color);
+
+    .icon {
+      color: var(--alert-info-border);
+    }
+    .closeBtn:hover {
+      color: var(--alert-info-border);
+    }
+  }
+
+  &.success {
+    background: var(--alert-success-background);
+    border-color: var(--alert-success-border);
+    color: var(--alert-success-color);
+
+    .icon {
+      color: var(--alert-success-border);
+    }
+    .closeBtn:hover {
+      color: var(--alert-success-border);
+    }
+  }
+
+  &.warning {
+    background: var(--alert-warning-background);
+    border-color: var(--alert-warning-border);
+    color: var(--alert-warning-color);
+
+    .icon {
+      color: var(--alert-warning-border);
+    }
+    .closeBtn:hover {
+      color: var(--alert-warning-border);
+    }
+  }
+
+  &.error {
+    background: var(--alert-error-background);
+    border-color: var(--alert-error-border);
+    color: var(--alert-error-color);
+
+    .icon {
+      color: var(--alert-error-border);
+    }
+    .closeBtn:hover {
+      color: var(--alert-error-border);
+    }
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.message {
+  font-weight: 500;
+
+  a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: inherit;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.description {
+  font-weight: 400;
+  opacity: 0.8;
+  font-size: 12px;
+
+  a {
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: inherit;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.5;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  :global(.anticon) {
+    font-size: 12px;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

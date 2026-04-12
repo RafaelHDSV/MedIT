@@ -1,56 +1,30 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
-import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
-import RiskTag from '@/components/RiskTag/RiskTag'
-import UserBall from '@/components/UserBall/UserBall'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
-import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
+import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/AttendanceQueueChartAdmin'
+import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 
-interface IAttendanceItemProps {
+export interface IAttendanceItemProps {
   item?: IDashboardQueueItem
   loading?: boolean
 }
 
 function AttendanceItem({ item, loading }: IAttendanceItemProps) {
-  if (loading) {
-    return (
-      <div className={styles.queueItem}>
-        <div className={styles.leftAside}>
-          <div className={`${styles.avatarSkeleton}`} />
+  const { user } = useAuth()
 
-          <div className={styles.info}>
-            <span className={`${styles.name} ${styles.skeleton}`} />
-            <span className={`${styles.status} ${styles.skeleton}`} />
-          </div>
-        </div>
-
-        <div className={`${styles.tagSkeleton}`} />
-      </div>
-    )
+  switch (user?.level) {
+    case 'admin':
+      return <AttendanceQueueChartAdmin item={item} loading={loading} />
+    case 'doctor':
+      return <AttendanceQueueChartDoctor item={item} loading={loading} />
+    default:
+      return <></>
   }
-
-  return (
-    <div className={styles.queueItem}>
-      <div className={styles.leftAside}>
-        <UserBall name={item?.patientName} />
-
-        <div className={styles.info}>
-          <TooltipColumn className={styles.name} text={item?.patientName} />
-          <TooltipColumn
-            className={styles.status}
-            text={item?.status ? AttendanceStatusLabels[item?.status] : ''}
-          />
-        </div>
-      </div>
-
-      <RiskTag risk={item?.risk} />
-    </div>
-  )
 }
 
 function AttendanceQueueChart() {

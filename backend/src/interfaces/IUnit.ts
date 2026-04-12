@@ -1,20 +1,31 @@
+import { Types } from 'mongoose'
 import { IBaseInterface } from './IBaseInterface.js'
 
-export type WeekDay = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+type WeekDay = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
 
-export type TimeString = `${number}${number}:${number}${number}`
+type TimeString = `${number}${number}:${number}${number}`
 
-export interface IOpeningHour {
+interface IOpeningHour {
   open: TimeString
   close: TimeString
 }
 
-export type OpeningHours = Record<WeekDay, IOpeningHour>
+type OpeningHours = Record<WeekDay, IOpeningHour | null>
+
+interface IAddress {
+  street: string
+  number: number
+  neighborhood: string
+  city: string
+  state: string
+  zipCode: number
+}
 
 export interface IUnit extends IBaseInterface {
   name: string
-  address: string
+  address: IAddress
   maxOccupancy: number
   openingHours: OpeningHours
-  phone?: string
+  phone: string
+  partnerUnitIds: Types.ObjectId[]
 }

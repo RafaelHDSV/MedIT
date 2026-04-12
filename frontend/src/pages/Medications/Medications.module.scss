@@ -1,0 +1,51 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--white);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all ease-in-out 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--black);
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--gray);
+  }
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quantity {
+  font-size: 14px;
+  color: var(--gray-1);
+  font-weight: 500;
+}
