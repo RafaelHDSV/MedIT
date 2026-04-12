@@ -10,7 +10,7 @@ interface IOpeningHour {
   close: TimeString
 }
 
-type OpeningHours = Record<WeekDay, IOpeningHour>
+type OpeningHours = Record<WeekDay, IOpeningHour | null>
 
 export interface IAddress {
   street: string
