@@ -1,10 +1,12 @@
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import Tag from '@/components/Tag/Tag'
+import { useAuth } from '@/hooks/useAuth'
 import {
   MedicationAvailabilityStatusLabels,
   MedicationCategoriesLabels,
   type IMedication
 } from '@/interfaces/IMedication'
+import MedicationModel from '@/models/MedicationModel'
 import masks from '@/utils/masks'
 import { Modal } from 'antd'
 import { MEDICATIONS_STATUS_MAP } from '../../medicationsConstants'
@@ -37,6 +39,8 @@ function MedicationDetailsModal({
   selectedMedication,
   setSelectedMedication
 }: IMedicationDetailsModal) {
+  const { user } = useAuth()
+  const canSeeUnits = MedicationModel.canSeeUnits(user?.level)
   const isOpen = Boolean(selectedMedication)
 
   function resetMedication() {
@@ -83,14 +87,16 @@ function MedicationDetailsModal({
             </Tag>
           }
         />
-        <DetailsLine
-          label='Estoque'
-          value={
-            stockQuantity === 0
-              ? 'Sem medicamentos'
-              : `${masks(stockQuantity, 'number')} unidade${stockQuantity > 1 ? 's' : ''}`
-          }
-        />
+        {canSeeUnits && (
+          <DetailsLine
+            label='Estoque'
+            value={
+              stockQuantity === 0
+                ? 'Sem medicamentos'
+                : `${masks(stockQuantity, 'number')} unidade${stockQuantity > 1 ? 's' : ''}`
+            }
+          />
+        )}
       </div>
     </Modal>
   )

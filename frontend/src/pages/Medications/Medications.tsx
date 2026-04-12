@@ -42,6 +42,7 @@ function Medications() {
 
   const loading = unitsLoading || medicationsLoading
   const canAddMedication = MedicationModel.canAddMedication(user?.level)
+  const canSeeUnits = MedicationModel.canSeeUnits(user?.level)
   const description = `${unit?.name} - ${getFullAddress(unit?.address)}`
 
   const fetchUnitInfo = useCallback(async () => {
@@ -136,11 +137,13 @@ function Medications() {
                 }
               </Tag>
 
-              <span className={styles.quantity}>
-                {medication.stockQuantity === 0
-                  ? 'Sem medicamentos'
-                  : `${masks(medication.stockQuantity, 'number')} un.`}
-              </span>
+              {canSeeUnits && (
+                <span className={styles.quantity}>
+                  {medication.stockQuantity === 0
+                    ? 'Sem medicamentos'
+                    : `${masks(medication.stockQuantity, 'number')} un.`}
+                </span>
+              )}
             </div>
           </div>
         ))}
