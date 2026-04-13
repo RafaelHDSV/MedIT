@@ -1,68 +1,27 @@
 .page {
   display: grid;
-  grid-template-columns: 1fr 330px;
+  grid-template-columns: 1fr 20rem;
   grid-template-rows: auto 1fr;
-  gap: 32px;
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-.left {
+.mainContent {
   display: flex;
   flex-direction: column;
   gap: 32px;
-}
 
-.sectionTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--black);
-  margin-bottom: 16px;
-}
-
-.card {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-}
-
-.infoGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 2rem;
-}
-
-.infoColLeft {
-  padding-right: 32px;
-  border-right: none;
-}
-
-.infoColRight {
-  padding-left: 32px;
-}
-
-.detailsLineWrapper {
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-
-  &:last-child > :global(.container) {
-    border-bottom: none;
+  .title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 1rem !important;
   }
-}
 
-.vitalInput {
-  font-size: 22px;
-  font-weight: 700;
-  color: #D85A30;
-  border: none;
-  border-bottom: 1.5px solid #D85A30;
-  background: transparent;
-  width: 100%;
-  text-align: center;
-  outline: none;
-
-  &::placeholder {
-    color: #D85A3066;
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 2rem;
+    row-gap: 1rem;
   }
 }
 
@@ -73,53 +32,22 @@
   border-radius: 20px;
 
   &.baixo {
-    background: #EAF3DE;
-    color: #3B6D11;
-    border: 0.5px solid #C0DD97;
+    background: #eaf3de;
+    color: #3b6d11;
+    border: 0.5px solid #c0dd97;
   }
 
   &.medio {
-    background: #FAEEDA;
+    background: #faeeda;
     color: #f07f23;
-    border: 0.5px solid #FAC775;
+    border: 0.5px solid #fac775;
   }
 
   &.alto {
-    background: #FCEBEB;
-    color: #A32D2D;
-    border: 0.5px solid #F7C1C1;
+    background: #fcebeb;
+    color: #a32d2d;
+    border: 0.5px solid #f7c1c1;
   }
-}
-
-.vitaisGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  max-width: 100%;
-}
-
-.vitalCard {
-  background: #fff;
-  border: 0.5px solid #e5e5e5;
-  border-radius: 12px;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.vitalValue {
-  font-size: 28px;
-  font-weight: 700;
-  color: #D85A30;
-}
-
-.vitalLabel {
-  font-size: 15px;
-  color: #888;
-  text-align: left;
 }
 
 .sintomas {
@@ -171,11 +99,11 @@
 .barFill {
   height: 5px;
   border-radius: 4px;
-  background: #D85A30;
+  background: #d85a30;
 }
 
 .barPct {
   font-size: 15px;
-  color: #D85A30;
+  color: #d85a30;
   border-bottom: 0.5px solid var(--border);
 }

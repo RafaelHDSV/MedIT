@@ -75,6 +75,28 @@ const booleanMask = (value?: string) => {
   return value === 'true' || value === '1' ? 'Sim' : 'Não'
 }
 
+const temperatureMask = (value?: string) => {
+  if (!value) return ''
+
+  const onlyNumbers = value.replace(/\D/g, '')
+  if (!onlyNumbers) return ''
+
+  const number = Number(onlyNumbers) / 10
+  return number.toFixed(1)
+}
+
+const bloodPressureMask = (value?: string) => {
+  if (!value) return ''
+
+  const onlyNumbers = value.replace(/\D/g, '')
+  if (!onlyNumbers) return ''
+
+  const systolic = onlyNumbers.slice(0, 3)
+  const diastolic = onlyNumbers.slice(3, 6)
+
+  return diastolic ? `${systolic}/${diastolic}` : systolic
+}
+
 export type MaskEnum =
   | 'cpf'
   | 'cellphone'
@@ -84,6 +106,8 @@ export type MaskEnum =
   | 'height'
   | 'number'
   | 'boolean'
+  | 'temperature'
+  | 'bloodPressure'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -94,7 +118,7 @@ function masks(
   const result = String(value)
   if (!mask) return result
 
-  switch (mask.toLocaleLowerCase()) {
+  switch (mask) {
     case 'cpf':
       return cpfMask(result)
     case 'cellphone':
@@ -111,6 +135,10 @@ function masks(
       return numberMask(result)
     case 'boolean':
       return booleanMask(result)
+    case 'temperature':
+      return temperatureMask(result)
+    case 'bloodPressure':
+      return bloodPressureMask(result)
     default:
       return result
   }

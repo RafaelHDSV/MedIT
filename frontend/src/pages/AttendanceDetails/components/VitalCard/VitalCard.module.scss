@@ -1,0 +1,47 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+
+  .input {
+    border: none;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+
+    :global(.ant-input),
+    :global(.ant-input-affix-wrapper) {
+      font-weight: 700;
+      width: auto !important;
+      min-width: 0 !important;
+      text-align: center;
+      padding: 0 !important;
+    }
+
+    &::placeholder {
+      color: var(--primary-opaque);
+    }
+  }
+
+  .value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  .label {
+    font-size: 14px;
+    color: var(--gray);
+  }
+}
