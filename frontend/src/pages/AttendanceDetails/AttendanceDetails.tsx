@@ -9,32 +9,13 @@ import RiskTag from '@/components/RiskTag/RiskTag'
 import SymptomTag from '@/components/SymptomTag/SymptomTag'
 import styles from './AttendanceDetails.module.scss'
 import VitalCard from './components/VitalCard/VitalCard'
-
-function CondicaoCard({
-  nome,
-  compatibilidade
-}: {
-  nome: string
-  compatibilidade: number
-}) {
-  return (
-    <div className={styles.condicaoItem}>
-      <p className={styles.condicaoNome}>{nome}</p>
-      <div className={styles.barBg}>
-        <div
-          className={styles.barFill}
-          style={{ width: `${compatibilidade}%` }}
-        />
-      </div>
-      <span className={styles.barPct}>{compatibilidade}% compatibilidade</span>
-    </div>
-  )
-}
+import ConditionsCard from './components/ConditionsCard/ConditionsCard'
 
 function AttendanceDetails() {
   const { user } = useAuth()
   const isNurse = user?.level === UserLevels.NURSE
 
+  // VIEIRA: Adicionar back
   const patient = {
     name: 'Rafael Silva',
     age: 20,
@@ -62,7 +43,7 @@ function AttendanceDetails() {
     'Fadiga',
     'Calafrios'
   ]
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([])
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>(symptoms)
 
   const handleToggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
@@ -112,6 +93,7 @@ function AttendanceDetails() {
 
           <section>
             <h3 className={styles.title}>Sinais Vitais</h3>
+
             <div className={styles.grid}>
               <VitalCard
                 label='Temperatura'
@@ -146,8 +128,9 @@ function AttendanceDetails() {
           </section>
 
           <section>
-            <p className={styles.title}>Sintomas Relatados</p>
-            <div className={styles.sintomas}>
+            <h3 className={styles.title}>Sintomas Relatados</h3>
+
+            <div className={styles.symptoms}>
               {symptoms.map((symptom) => (
                 <SymptomTag
                   key={symptom}
@@ -162,12 +145,13 @@ function AttendanceDetails() {
         </div>
 
         <div className={styles.sidebar}>
-          <p className={styles.sidebarTitle}>Condições sugeridas</p>
+          <h3 className={styles.title}>Condições sugeridas</h3>
+
           {suggestedConditions.map((condition) => (
-            <CondicaoCard
-              key={condition.name}
-              nome={condition.name}
-              compatibilidade={condition.compatibility}
+            <ConditionsCard
+              key={`${condition.name}_${condition.compatibility}`}
+              name={condition.name}
+              compatibility={condition.compatibility}
             />
           ))}
         </div>

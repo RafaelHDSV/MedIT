@@ -11,12 +11,6 @@
   flex-direction: column;
   gap: 32px;
 
-  .title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 1rem !important;
-  }
-
   .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -25,85 +19,21 @@
   }
 }
 
-.badgeRisco {
-  font-size: 11px;
-  font-weight: 500;
-  padding: 3px 10px;
-  border-radius: 20px;
-
-  &.baixo {
-    background: #eaf3de;
-    color: #3b6d11;
-    border: 0.5px solid #c0dd97;
-  }
-
-  &.medio {
-    background: #faeeda;
-    color: #f07f23;
-    border: 0.5px solid #fac775;
-  }
-
-  &.alto {
-    background: #fcebeb;
-    color: #a32d2d;
-    border: 0.5px solid #f7c1c1;
-  }
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 1rem !important;
 }
 
-.sintomas {
+.symptoms {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 1rem;
 }
 
 .sidebar {
-  background: rgba(216, 90, 48, 0.08);
-  border: 0.5px solid #e5e5e5;
-  border-radius: 12px;
-  padding: 20px;
-  align-self: start;
-}
-
-.condicaoItem {
-  background: #fff;
-  border: 0.5px solid #e5e5e5;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 12px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.sidebarTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 12px;
-}
-
-.condicaoNome {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.barBg {
-  background: #f5f5f5;
-  border-radius: 4px;
-  height: 5px;
-  margin-bottom: 4px;
-}
-
-.barFill {
-  height: 5px;
-  border-radius: 4px;
-  background: #d85a30;
-}
-
-.barPct {
-  font-size: 15px;
-  color: #d85a30;
-  border-bottom: 0.5px solid var(--border);
+  background: var(--primary-opaque);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
 }
