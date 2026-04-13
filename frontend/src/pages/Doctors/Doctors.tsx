@@ -19,7 +19,7 @@ function Doctors() {
     setLoading(true)
 
     try {
-      const response = await DoctorsRepository.getDoctor()
+      const response = await DoctorsRepository.getDoctors()
       setDoctors(response)
     } catch (err) {
       handleApiError({

@@ -4,7 +4,7 @@ import type { ObjectId } from 'mongoose'
 import { Repository } from './Repository'
 
 class NursesRepositoy extends Repository {
-  async getNurse() {
+  async getNurses() {
     return this.handle(() => {
       return this.api.get(`${this.path}`)
     })

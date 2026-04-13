@@ -19,7 +19,7 @@ function Nurses() {
     setLoading(true)
 
     try {
-      const response = await NursesRepository.getNurse()
+      const response = await NursesRepository.getNurses()
       setNurses(response)
     } catch (err) {
       handleApiError({

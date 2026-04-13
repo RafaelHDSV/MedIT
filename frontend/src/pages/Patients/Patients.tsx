@@ -19,7 +19,7 @@ function Patients() {
     setLoading(true)
 
     try {
-      const response = await PatientsRepository.getPatient()
+      const response = await PatientsRepository.getPatients()
       setPatients(response)
     } catch (err) {
       handleApiError({
