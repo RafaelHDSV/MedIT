@@ -15,7 +15,7 @@ function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
   const { user } = useAuth()
   const [inputValue, setInputValue] = useState(String(value))
   const isNurse = user?.level === UserLevels.NURSE
-  const canEditVital = isNurse || true
+  const canEditVital = isNurse
 
   const labelsToMasks = () => {
     switch (label) {
