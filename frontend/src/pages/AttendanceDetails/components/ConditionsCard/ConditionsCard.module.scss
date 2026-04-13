@@ -1,0 +1,31 @@
+.item {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.bar {
+  background: var(--border);
+  border-radius: 0.5rem;
+  height: 0.45rem;
+  margin-bottom: 0.25rem;
+
+  .fill {
+    height: 100%;
+    border-radius: 0.5rem;
+    background: var(--primary-color);
+  }
+}
+
+.barPercentage {
+  font-size: 14px;
+  color: var(--primary-color);
+}

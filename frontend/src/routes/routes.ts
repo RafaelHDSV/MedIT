@@ -161,6 +161,17 @@ const medications: IRoute = {
   }
 }
 
+const attendanceDetails: IRoute = {
+  name: ROUTES.ATTENDANCE_DETAILS.name,
+  description: ROUTES.ATTENDANCE_DETAILS.description,
+  path: ROUTES.ATTENDANCE_DETAILS.path,
+  meta: {
+    canGoBack: true,
+    hidden: true,
+    levels: [UserLevels.DOCTOR, UserLevels.NURSE]
+  }
+}
+
 const attendances: IRoute = {
   name: ROUTES.ATTENDANCES.name,
   description: ROUTES.ATTENDANCES.description,
@@ -220,7 +231,8 @@ const routes = [
   patientDetails,
   units,
   medications,
-  preRegistration
+  preRegistration,
+  attendanceDetails
 ]
 
 export default routes

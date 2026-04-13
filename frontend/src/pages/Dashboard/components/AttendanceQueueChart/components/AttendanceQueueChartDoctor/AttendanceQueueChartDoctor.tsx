@@ -4,8 +4,12 @@ import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
 import type { IAttendanceItemProps } from '../../AttendanceQueueChart'
 import styles from '../../AttendanceQueueChart.module.scss'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@/routes/constants'
 
 function AttendanceQueueChartDoctor({ item, loading }: IAttendanceItemProps) {
+  const navigate = useNavigate()
+
   if (loading) {
     return (
       <div className={styles.queueItem}>
@@ -50,7 +54,14 @@ function AttendanceQueueChartDoctor({ item, loading }: IAttendanceItemProps) {
       <Button
         fontSize={12}
         buttonHeight='2rem'
-        onClick={() => console.log('Iniciar atendimento', item?._id)}
+        onClick={() =>
+          navigate(
+            ROUTES.ATTENDANCE_DETAILS.path.replace(
+              ':attendanceId',
+              item?._id ?? ''
+            )
+          )
+        }
       >
         Iniciar Atendimento
       </Button>

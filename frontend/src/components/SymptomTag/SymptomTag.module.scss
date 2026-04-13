@@ -1,0 +1,43 @@
+.symptomTag {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  font-size: 12px;
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.selected {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+
+  &:hover {
+    background-color: var(--primary-color);
+  }
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary-color);
+    animation: hoverEffect 1s infinite;
+    background-color: var(--gray-2);
+  }
+}
+
+@keyframes hoverEffect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

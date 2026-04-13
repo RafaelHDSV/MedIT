@@ -1,0 +1,40 @@
+.page {
+  display: grid;
+  grid-template-columns: 1fr 20rem;
+  grid-template-rows: auto 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 2rem;
+    row-gap: 1rem;
+  }
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 1rem !important;
+}
+
+.symptoms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sidebar {
+  background: var(--primary-opaque);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+  overflow-y: auto;
+}

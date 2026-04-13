@@ -29,13 +29,13 @@ export const Units = lazy(() => import('./Units/Units'))
 export const Medications = lazy(
   () => import('../pages/Medications/Medications')
 )
+export const AttendanceDetails = lazy(
+  () => import('../pages/AttendanceDetails/AttendanceDetails')
+)
 export const Attendances = lazy(
   () => import('../pages/Attendances/Attendances')
 )
 export const Triages = lazy(() => import('../pages/Triages/Triages'))
-export const TriagesDetails = lazy(
-  () => import('../pages/TriagesDetails/TriagesDetails')
-)
 export const PreRegistration = lazy(
   () => import('../pages/PreRegistration/PreRegistration')
 )

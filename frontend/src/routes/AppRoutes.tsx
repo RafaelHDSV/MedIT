@@ -58,13 +58,17 @@ function AppRoutes() {
             element={<pages.Medications />}
           />
           <Route
+            path={ROUTES.ATTENDANCE_DETAILS.path}
+            element={<pages.AttendanceDetails />}
+          />
+          <Route
             path={ROUTES.ATTENDANCES.path}
             element={<pages.Attendances />}
           />
           <Route path={ROUTES.TRIAGES.path} element={<pages.Triages />} />
           <Route
             path={ROUTES.TRIAGES_DETAILS.path}
-            element={<pages.TriagesDetails />}
+            element={<pages.AttendanceDetails />}
           />
           <Route
             path={ROUTES.PRE_REGISTRATION.path}
