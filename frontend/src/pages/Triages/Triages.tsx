@@ -1,85 +1,56 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
-import { AttendanceRisk } from '@/interfaces/IAttendance'
-import { ObjectId } from '@/utils/objectId'
-import { Table } from 'antd'
+import ListTable from '@/components/ListTable/ListTable'
+import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
+import { type IAttendance } from '@/interfaces/IAttendance'
+import NursesRepository from '@/repositories/NursesRepository'
+import { Flex } from 'antd'
+import { useCallback, useEffect, useState } from 'react'
 import styles from '../../components/ListTable/ListTable.module.scss'
 import { useTriagesColumns } from './hooks/useTriagesColumns'
 
 function ITriages() {
+  const { user } = useAuth()
+  const [triages, setTriages] = useState<IAttendance[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchAttendances = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const response = await NursesRepository.getAttendances({
+        nurseId: user?._id
+      })
+      setTriages(response)
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao carregar a listagem de atendimentos'
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [user?._id])
+
+  useEffect(() => {
+    fetchAttendances()
+  }, [fetchAttendances])
+
   const columns = useTriagesColumns()
 
-  // VIEIRA: Corrigir tipagem any
-  const data: any[] = [
-    {
-      _id: ObjectId('69bef9b46b9f5d4381a706a9'),
-      number: 1,
-      name: 'John Doe',
-      birthDate: new Date('1990-01-01'),
-      complaint: 'Náusea',
-      date: new Date(),
-      risk: AttendanceRisk.EMERGENCY
-    },
-    {
-      _id: ObjectId('69bef9bc7e5523fdd7c7a18b'),
-      number: 2,
-      name: 'Jane Smith',
-      birthDate: new Date('1985-05-15'),
-      complaint: 'Dor de cabeça',
-      date: new Date(),
-      risk: AttendanceRisk.URGENT
-    },
-    {
-      _id: ObjectId('69bef9bedb1e8c62ac29e060'),
-      number: 3,
-      name: 'Alice Johnson',
-      birthDate: new Date('1978-09-30'),
-      complaint: 'Dor abdominal',
-      date: new Date(),
-      risk: AttendanceRisk.NOT_URGENT
-    },
-    {
-      _id: ObjectId('69bef9c1d09e37a45f690251'),
-      number: 4,
-      name: 'Bob Brown',
-      birthDate: new Date('1992-07-20'),
-      complaint: 'Febre',
-      date: new Date(),
-      risk: AttendanceRisk.LESS_URGENT
-    },
-    {
-      _id: ObjectId('69bef9c39f7bcc9313543d2a'),
-      number: 5,
-      name: 'Charlie Davis',
-      birthDate: new Date('1988-11-10'),
-      complaint: 'Tosse',
-      date: new Date(),
-      risk: AttendanceRisk.VERY_URGENT
-    },
-    {
-      _id: ObjectId('69bef9c5d686012355a4cf4d'),
-      number: 6,
-      name: 'Emily Wilson',
-      birthDate: new Date('1995-03-25'),
-      complaint: 'Dor de garganta',
-      date: new Date(),
-      risk: AttendanceRisk.URGENT
-    }
-  ]
-
   return (
-    <div className='h-100'>
-      <AuthLayoutHeader />
+    <div className={styles.tableContent}>
+      <Flex vertical className={styles.container}>
+        <AuthLayoutHeader />
 
-      <Table
-        className={styles.listTable}
-        rowKey='_id'
-        dataSource={data}
-        columns={columns}
-        pagination={{ pageSize: 9 }}
-        size='middle'
-        bordered={false}
-        scroll={{ x: 'max-content' }}
-      />
+        <ListTable<IAttendance>
+          dataSource={triages}
+          pageSize={8}
+          columns={columns}
+          loading={loading}
+          onReload={fetchAttendances}
+        />
+      </Flex>
     </div>
   )
 }
