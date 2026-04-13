@@ -6,7 +6,6 @@ import {
 import MedicationModel from '../../models/MedicationModel.js'
 import { Script } from '../types.js'
 
-// IDs das unidades cadastradas no sistema
 const UNIT_IDS = [
   '69d2981909395bf057e050e6', // UBS Vila Hortência
   '69d2981909395bf057e050ee', // UBS Márcia Mendes
@@ -46,9 +45,40 @@ const STOCK_RANGE: Record<UnitProfile, { min: number; max: number }> = {
   especialidades: { min: 0, max: 500 }
 }
 
-// Quantos medicamentos por unidade serão forçadamente indisponíveis.
-// Distribuídos de forma uniforme ao longo do catálogo.
 const FORCED_UNAVAILABLE_COUNT = 5
+
+// Categorias restritas por perfil de unidade
+// Medicamentos não listados aqui ficam disponíveis em todos os perfis
+const PROFILE_BLOCKLIST: Partial<Record<UnitProfile, MedicationCategories[]>> =
+  {
+    ubs: [MedicationCategories.ANTIVENOMS],
+    especialidades: [MedicationCategories.ANTIVENOMS]
+  }
+
+// Medicamentos individuais restritos por nome (para casos que a categoria é ampla demais)
+const NAME_BLOCKLIST: Partial<Record<UnitProfile, string[]>> = {
+  ubs: [
+    'Morfina 10mg/mL solução injetável',
+    'Anfotericina B 50mg pó para solução injetável'
+  ],
+  especialidades: [
+    'Morfina 10mg/mL solução injetável',
+    'Haloperidol 5mg/mL solução injetável'
+  ]
+}
+
+function isAllowedForProfile(
+  med: MedicationTemplate,
+  profile: UnitProfile
+): boolean {
+  const blockedCategories = PROFILE_BLOCKLIST[profile] ?? []
+  if (blockedCategories.includes(med.category)) return false
+
+  const blockedNames = NAME_BLOCKLIST[profile] ?? []
+  if (blockedNames.includes(med.name)) return false
+
+  return true
+}
 
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -61,24 +91,29 @@ function resolveStatus(qty: number): MedicationAvailabilityStatus {
 }
 
 /**
- * Retorna um conjunto de índices distribuídos uniformemente ao longo do
- * catálogo para serem forçados como indisponíveis.
- * Índices fixos garantem que cada execução do seed produza o mesmo resultado.
+ * Retorna índices distribuídos uniformemente para slots zerados.
+ * O parâmetro `offset` rotaciona o ponto de início a cada unidade,
+ * garantindo que unidades diferentes tenham medicamentos indisponíveis
+ * em posições diferentes do catálogo.
  *
- * Exemplo com 50 meds e count=5 → step=10 → índices: 0, 10, 20, 30, 40
+ * Exemplo com 48 meds, count=5, step=9:
+ *   offset=0 → índices: 0, 9, 18, 27, 36
+ *   offset=1 → índices: 1, 10, 19, 28, 37
+ *   offset=2 → índices: 2, 11, 20, 29, 38
  */
-function unavailableIndexes(total: number, count: number): Set<number> {
+function unavailableIndexes(
+  total: number,
+  count: number,
+  offset: number
+): Set<number> {
   const step = Math.floor(total / count)
   const indexes = new Set<number>()
   for (let i = 0; i < count; i++) {
-    indexes.add(i * step)
+    indexes.add((i * step + offset) % total)
   }
   return indexes
 }
 
-// ---------------------------------------------------------------------------
-// Catálogo base com 50 medicamentos reais
-// ---------------------------------------------------------------------------
 interface MedicationTemplate {
   name: string
   category: MedicationCategories
@@ -87,441 +122,388 @@ interface MedicationTemplate {
 }
 
 const MEDICATIONS: MedicationTemplate[] = [
-  // ── ANALGÉSICOS ──────────────────────────────────────────────────────────
+  // ── ANALGÉSICOS
   {
     name: 'Paracetamol 500mg comprimido',
     category: MedicationCategories.ANALGESICS,
     description:
-      'Analgésico e antipirético. Indicado para dor leve a moderada e febre. Apresentação oral de 500 mg por comprimido.',
+      'Analgésico e antipirético. Indicado para dor leve a moderada e febre.',
     requiresPrescription: false
   },
   {
     name: 'Dipirona Sódica 500mg comprimido',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Analgésico e antipirético de uso oral. Indicado para dor e febre. Cada comprimido contém 500 mg de dipirona sódica.',
+    description: 'Analgésico e antipirético de uso oral.',
     requiresPrescription: false
   },
   {
     name: 'Dipirona Sódica 500mg/mL solução injetável',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Analgésico e antipirético para uso intravenoso ou intramuscular. Cada mL contém 500 mg de dipirona sódica.',
+    description: 'Analgésico e antipirético para uso IV ou IM.',
     requiresPrescription: true
   },
   {
     name: 'Ibuprofeno 600mg comprimido revestido',
     category: MedicationCategories.ANALGESICS,
     description:
-      'Anti-inflamatório não esteroidal (AINE) com ação analgésica e antipirética. Indicado para dor e inflamação de intensidade leve a moderada.',
+      'Anti-inflamatório não esteroidal com ação analgésica e antipirética.',
     requiresPrescription: false
   },
   {
     name: 'Tramadol 50mg cápsula',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Opioide de ação central indicado para dor moderada a intensa. Cada cápsula contém cloridrato de tramadol 50 mg.',
+    description: 'Opioide de ação central para dor moderada a intensa.',
     requiresPrescription: true
   },
   {
     name: 'Morfina 10mg/mL solução injetável',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Opioide potente utilizado no controle de dor intensa, especialmente em contexto pós-cirúrgico ou oncológico. Uso hospitalar.',
+    description: 'Opioide potente para dor intensa. Uso hospitalar.',
     requiresPrescription: true
   },
   {
     name: 'Codeína 30mg comprimido',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Opioide de potência intermediária indicado para dor moderada e tosse seca persistente. Uso com receituário especial.',
+    description: 'Opioide de potência intermediária para dor moderada.',
     requiresPrescription: true
   },
   {
     name: 'Cetoprofeno 100mg cápsula',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Anti-inflamatório não esteroidal indicado para artrite reumatoide, osteoartrite, dismenorreia e dor pós-operatória.',
+    description: 'AINE para artrite, dismenorreia e dor pós-operatória.',
     requiresPrescription: false
   },
   {
     name: 'Diclofenaco Sódico 50mg comprimido revestido',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Anti-inflamatório não esteroidal para tratamento de dor e inflamação em condições musculoesqueléticas e articulares.',
+    description: 'AINE para dor e inflamação musculoesquelética.',
     requiresPrescription: false
   },
   {
     name: 'Ácido Acetilsalicílico 500mg comprimido',
     category: MedicationCategories.ANALGESICS,
-    description:
-      'Analgésico, antipirético e anti-inflamatório. Em doses menores, utilizado como antiagregante plaquetário na prevenção cardiovascular.',
+    description: 'Analgésico, antipirético e antiagregante plaquetário.',
     requiresPrescription: false
   },
-
-  // ── ANTIBIÓTICOS ─────────────────────────────────────────────────────────
+  // ── ANTIBIÓTICOS
   {
     name: 'Amoxicilina 500mg cápsula',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Antibiótico betalactâmico de amplo espectro indicado para infecções bacterianas do trato respiratório, urinário e de pele.',
+    description: 'Antibiótico betalactâmico de amplo espectro.',
     requiresPrescription: true
   },
   {
     name: 'Amoxicilina + Clavulanato 875mg + 125mg comprimido',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Associação de antibiótico betalactâmico com inibidor de betalactamase para infecções por bactérias resistentes à amoxicilina isolada.',
+    description: 'Betalactâmico com inibidor de betalactamase.',
     requiresPrescription: true
   },
   {
     name: 'Azitromicina 500mg comprimido',
     category: MedicationCategories.ANTIBIOTICS,
     description:
-      'Antibiótico macrolídeo de dose única diária indicado para infecções respiratórias, sinusite, faringite e pneumonia comunitária.',
+      'Macrolídeo para infecções respiratórias e pneumonia comunitária.',
     requiresPrescription: true
   },
   {
     name: 'Ciprofloxacino 500mg comprimido',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Antibiótico fluoroquinolona de amplo espectro indicado para infecções urinárias complicadas, gastrointestinais e respiratórias.',
+    description: 'Fluoroquinolona de amplo espectro.',
     requiresPrescription: true
   },
   {
     name: 'Metronidazol 400mg comprimido',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Antibiótico e antiprotozoário indicado para infecções anaeróbias, tricomoníase, giardíase, amebíase e vaginose bacteriana.',
+    description: 'Antibiótico e antiprotozoário para infecções anaeróbias.',
     requiresPrescription: true
   },
   {
     name: 'Cefalexina 500mg cápsula',
     category: MedicationCategories.ANTIBIOTICS,
     description:
-      'Antibiótico cefalosporina de 1ª geração indicado para infecções de pele, tecidos moles, trato urinário e respiratório superior.',
+      'Cefalosporina 1ª geração para infecções de pele e trato urinário.',
     requiresPrescription: true
   },
   {
     name: 'Clindamicina 300mg cápsula',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Antibiótico lincosamida indicado para infecções graves por anaeróbios e cocos gram-positivos, incluindo infecções osteoarticulares.',
+    description: 'Lincosamida para infecções graves por anaeróbios.',
     requiresPrescription: true
   },
   {
     name: 'Doxiciclina 100mg cápsula',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Antibiótico tetraciclina indicado para leptospirose, riquetsioses, clamídia, sífilis em pacientes alérgicos à penicilina e acne grave.',
+    description: 'Tetraciclina para leptospirose, clamídia e acne grave.',
     requiresPrescription: true
   },
   {
     name: 'Sulfametoxazol + Trimetoprima 400mg + 80mg comprimido',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Combinação sulfonamida-diaminopirimidina indicada para infecções do trato urinário, pneumocistose e toxoplasmose profilática.',
+    description: 'Sulfonamida para ITU e pneumocistose.',
     requiresPrescription: true
   },
   {
     name: 'Gentamicina 80mg/2mL solução injetável',
     category: MedicationCategories.ANTIBIOTICS,
-    description:
-      'Antibiótico aminoglicosídeo de uso parenteral para infecções graves por gram-negativos. Requer monitoramento de função renal.',
+    description: 'Aminoglicosídeo parenteral para gram-negativos graves.',
     requiresPrescription: true
   },
-
-  // ── ANTIVIRAIS ───────────────────────────────────────────────────────────
+  // ── ANTIVIRAIS
   {
     name: 'Aciclovir 400mg comprimido',
     category: MedicationCategories.ANTIVIRALS,
-    description:
-      'Antiviral indicado para herpes simples labial e genital, herpes zóster e varicela. Inibe a replicação do DNA viral.',
+    description: 'Antiviral para herpes simples e zóster.',
     requiresPrescription: true
   },
   {
     name: 'Aciclovir 250mg pó para solução injetável',
     category: MedicationCategories.ANTIVIRALS,
     description:
-      'Antiviral para uso intravenoso em casos graves de herpes simples, encefalite herpética e varicela em imunossuprimidos.',
+      'Antiviral IV para casos graves de herpes em imunossuprimidos.',
     requiresPrescription: true
   },
   {
     name: 'Oseltamivir 75mg cápsula',
     category: MedicationCategories.ANTIVIRALS,
-    description:
-      'Inibidor de neuraminidase indicado para tratamento e profilaxia da influenza A e B. Deve ser iniciado nas primeiras 48 h de sintomas.',
+    description: 'Inibidor de neuraminidase para influenza A e B.',
     requiresPrescription: true
   },
   {
     name: 'Tenofovir Disoproxila 300mg comprimido',
     category: MedicationCategories.ANTIVIRALS,
-    description:
-      'Antiviral análogo de nucleotídeo utilizado no tratamento da infecção pelo HIV e hepatite B crônica, em associação a outros antirretrovirais.',
+    description: 'Antirretroviral para HIV e hepatite B.',
     requiresPrescription: true
   },
   {
     name: 'Lamivudina 150mg comprimido',
     category: MedicationCategories.ANTIVIRALS,
-    description:
-      'Análogo de nucleosídeo indicado para tratamento da infecção pelo HIV (em esquemas combinados) e hepatite B crônica.',
+    description: 'Análogo de nucleosídeo para HIV e hepatite B.',
     requiresPrescription: true
   },
-
-  // ── ANTIFÚNGICOS ─────────────────────────────────────────────────────────
+  // ── ANTIFÚNGICOS
   {
     name: 'Fluconazol 150mg cápsula',
     category: MedicationCategories.ANTIFUNGALS,
-    description:
-      'Antifúngico triazólico de dose única indicado para candidíase vulvovaginal. Também utilizado em candidíase orofaríngea e prevenção em imunossuprimidos.',
+    description: 'Triazólico dose única para candidíase vulvovaginal.',
     requiresPrescription: true
   },
   {
     name: 'Fluconazol 2mg/mL solução para infusão',
     category: MedicationCategories.ANTIFUNGALS,
-    description:
-      'Antifúngico triazólico intravenoso para candidemia, meningite criptocócica e outras infecções fúngicas invasivas.',
+    description: 'Antifúngico IV para candidemia e meningite criptocócica.',
     requiresPrescription: true
   },
   {
     name: 'Nistatina 100.000 UI/mL suspensão oral',
     category: MedicationCategories.ANTIFUNGALS,
-    description:
-      'Antifúngico polieno de uso tópico oral, indicado para candidíase orofaríngea. Não é absorvido pelo trato gastrointestinal.',
+    description: 'Antifúngico tópico oral para candidíase orofaríngea.',
     requiresPrescription: false
   },
   {
     name: 'Cetoconazol 200mg comprimido',
     category: MedicationCategories.ANTIFUNGALS,
-    description:
-      'Antifúngico imidazólico oral para dermatofitoses resistentes, candidíase mucocutânea crônica e paracoccidioidomicose.',
+    description: 'Imidazólico para dermatofitoses e candidíase mucocutânea.',
     requiresPrescription: true
   },
   {
     name: 'Anfotericina B 50mg pó para solução injetável',
     category: MedicationCategories.ANTIFUNGALS,
     description:
-      'Antifúngico polieno de amplo espectro para infecções fúngicas sistêmicas graves (aspergilose, candidemia, criptococose). Uso hospitalar estrito.',
+      'Antifúngico para infecções sistêmicas graves. Uso hospitalar estrito.',
     requiresPrescription: true
   },
-
-  // ── ANTICONVULSIVANTES ───────────────────────────────────────────────────
+  // ── ANTICONVULSIVANTES
   {
     name: 'Fenitoína 100mg comprimido',
     category: MedicationCategories.ANTICONVULSANTS,
-    description:
-      'Antiepiléptico de primeira linha para crises tônico-clônicas generalizadas e parciais. Requer monitoramento de nível sérico.',
+    description: 'Antiepiléptico para crises tônico-clônicas e parciais.',
     requiresPrescription: true
   },
   {
     name: 'Carbamazepina 200mg comprimido',
     category: MedicationCategories.ANTICONVULSANTS,
     description:
-      'Antiepiléptico indicado para epilepsia parcial e generalizada, neuralgia do trigêmeo e transtorno bipolar. Requer ajuste de dose gradual.',
+      'Antiepiléptico para epilepsia parcial e neuralgia do trigêmeo.',
     requiresPrescription: true
   },
   {
     name: 'Valproato de Sódio 500mg comprimido revestido',
     category: MedicationCategories.ANTICONVULSANTS,
-    description:
-      'Antiepiléptico de amplo espectro para ausências, crises mioclônicas e tônico-clônicas. Também utilizado na profilaxia de enxaqueca.',
+    description: 'Antiepiléptico de amplo espectro e profilaxia de enxaqueca.',
     requiresPrescription: true
   },
   {
     name: 'Fenobarbital 100mg comprimido',
     category: MedicationCategories.ANTICONVULSANTS,
-    description:
-      'Barbitúrico anticonvulsivante de longa duração indicado para epilepsia tônico-clônica e parcial. Uso com receituário especial.',
+    description: 'Barbitúrico anticonvulsivante de longa duração.',
     requiresPrescription: true
   },
   {
     name: 'Lamotrigina 100mg comprimido',
     category: MedicationCategories.ANTICONVULSANTS,
-    description:
-      'Antiepiléptico indicado como monoterapia ou terapia adjuvante em epilepsia parcial, Lennox-Gastaut e transtorno bipolar.',
+    description: 'Antiepiléptico para epilepsia parcial e transtorno bipolar.',
     requiresPrescription: true
   },
-
-  // ── ANTIDEPRESSIVOS ──────────────────────────────────────────────────────
+  // ── ANTIDEPRESSIVOS
   {
     name: 'Fluoxetina 20mg cápsula',
     category: MedicationCategories.ANTIDEPRESSANTS,
-    description:
-      'Inibidor seletivo da recaptação de serotonina (ISRS) indicado para depressão maior, TOC, bulimia nervosa e transtorno do pânico.',
+    description: 'ISRS para depressão maior, TOC e bulimia.',
     requiresPrescription: true
   },
   {
     name: 'Sertralina 50mg comprimido',
     category: MedicationCategories.ANTIDEPRESSANTS,
-    description:
-      'ISRS indicado para depressão maior, transtorno do pânico, fobia social, TEPT e TOC. Boa tolerabilidade em adultos e idosos.',
+    description: 'ISRS para depressão, pânico, fobia social e TOC.',
     requiresPrescription: true
   },
   {
     name: 'Escitalopram 10mg comprimido',
     category: MedicationCategories.ANTIDEPRESSANTS,
     description:
-      'ISRS de alta seletividade indicado para depressão maior e transtorno de ansiedade generalizada. Perfil de efeitos adversos favorável.',
+      'ISRS de alta seletividade para depressão e ansiedade generalizada.',
     requiresPrescription: true
   },
   {
     name: 'Amitriptilina 25mg comprimido',
     category: MedicationCategories.ANTIDEPRESSANTS,
-    description:
-      'Antidepressivo tricíclico indicado para depressão, dor crônica neuropática, enxaqueca profilática e fibromialgia.',
+    description: 'Tricíclico para depressão, dor neuropática e enxaqueca.',
     requiresPrescription: true
   },
   {
     name: 'Imipramina 25mg comprimido',
     category: MedicationCategories.ANTIDEPRESSANTS,
-    description:
-      'Antidepressivo tricíclico indicado para depressão maior e enurese noturna em crianças. Requer monitoramento cardíaco.',
+    description: 'Tricíclico para depressão maior e enurese noturna.',
     requiresPrescription: true
   },
-
-  // ── ANTIPSICÓTICOS ───────────────────────────────────────────────────────
+  // ── ANTIPSICÓTICOS
   {
     name: 'Haloperidol 5mg comprimido',
     category: MedicationCategories.ANTIPSICOTICOS,
     description:
-      'Antipsicótico típico (butirofenona) indicado para esquizofrenia, mania aguda, agitação psicomotora e síndrome de Tourette.',
+      'Antipsicótico típico para esquizofrenia e agitação psicomotora.',
     requiresPrescription: true
   },
   {
     name: 'Haloperidol 5mg/mL solução injetável',
     category: MedicationCategories.ANTIPSICOTICOS,
-    description:
-      'Formulação parenteral de haloperidol para controle rápido de agitação psicomotora intensa em ambiente hospitalar.',
+    description: 'Haloperidol parenteral para agitação intensa hospitalar.',
     requiresPrescription: true
   },
   {
     name: 'Risperidona 2mg comprimido',
     category: MedicationCategories.ANTIPSICOTICOS,
     description:
-      'Antipsicótico atípico indicado para esquizofrenia, transtorno bipolar e irritabilidade associada ao transtorno do espectro autista.',
+      'Antipsicótico atípico para esquizofrenia e transtorno bipolar.',
     requiresPrescription: true
   },
   {
     name: 'Quetiapina 200mg comprimido',
     category: MedicationCategories.ANTIPSICOTICOS,
     description:
-      'Antipsicótico atípico indicado para esquizofrenia, episódios maníacos e depressivos do transtorno bipolar.',
+      'Antipsicótico atípico para esquizofrenia e episódios bipolares.',
     requiresPrescription: true
   },
   {
     name: 'Olanzapina 10mg comprimido',
     category: MedicationCategories.ANTIPSICOTICOS,
     description:
-      'Antipsicótico atípico indicado para esquizofrenia e transtorno bipolar. Monitoramento de glicemia e perfil lipídico é recomendado.',
+      'Antipsicótico atípico com monitoramento de glicemia recomendado.',
     requiresPrescription: true
   },
-
-  // ── ANTISSÉPTICOS ────────────────────────────────────────────────────────
+  // ── ANTISSÉPTICOS
   {
     name: 'Clorexidina 0,12% solução para bochecho',
     category: MedicationCategories.ANTISEPTICS,
-    description:
-      'Antisséptico bucal indicado para controle da placa bacteriana, gengivite e profilaxia pós-cirúrgica odontológica.',
+    description: 'Antisséptico bucal para placa bacteriana e gengivite.',
     requiresPrescription: false
   },
   {
     name: 'Povidona Iodada 10% solução tópica',
     category: MedicationCategories.ANTISEPTICS,
     description:
-      'Antisséptico tópico de amplo espectro para limpeza e desinfecção de feridas, queimaduras e preparo de campo cirúrgico.',
+      'Antisséptico tópico para limpeza de feridas e campo cirúrgico.',
     requiresPrescription: false
   },
   {
     name: 'Álcool Etílico 70% solução',
     category: MedicationCategories.ANTISEPTICS,
     description:
-      'Antisséptico e desinfetante para higiene das mãos, preparo de pele e descontaminação de superfícies e equipamentos.',
+      'Antisséptico para higiene das mãos e descontaminação de superfícies.',
     requiresPrescription: false
   },
-
-  // ── ANTIVENENOS ──────────────────────────────────────────────────────────
+  // ── ANTIVENENOS
   {
     name: 'Soro Antibotrópico liofilizado (10 ampolas)',
     category: MedicationCategories.ANTIVENOMS,
     description:
-      'Imunoglobulinas equinas purificadas para neutralização do veneno de serpentes do gênero Bothrops (jararaca). Uso hospitalar exclusivo.',
+      'Imunoglobulinas para neutralização de veneno de Bothrops. Uso hospitalar.',
     requiresPrescription: true
   },
   {
     name: 'Soro Antiaracnídico liofilizado (5 ampolas)',
     category: MedicationCategories.ANTIVENOMS,
     description:
-      'Imunoglobulinas equinas purificadas para neutralização de venenos de escorpiões e aranhas (Loxosceles e Phoneutria). Uso hospitalar.',
+      'Imunoglobulinas para venenos de escorpiões e aranhas. Uso hospitalar.',
     requiresPrescription: true
   },
-
-  // ── OUTROS ───────────────────────────────────────────────────────────────
+  // ── OUTROS
   {
     name: 'Omeprazol 20mg cápsula',
     category: MedicationCategories.OTHER,
-    description:
-      'Inibidor de bomba de prótons indicado para úlcera péptica, DRGE, erradicação do H. pylori e prevenção de úlcera por AINEs.',
+    description: 'Inibidor de bomba de prótons para úlcera e DRGE.',
     requiresPrescription: false
   },
   {
     name: 'Metformina 850mg comprimido',
     category: MedicationCategories.OTHER,
-    description:
-      'Biguanida antidiabética indicada como primeira escolha no tratamento do diabetes mellitus tipo 2. Reduz a produção hepática de glicose.',
+    description: 'Biguanida antidiabética primeira escolha no DM2.',
     requiresPrescription: true
   },
   {
     name: 'Enalapril 10mg comprimido',
     category: MedicationCategories.OTHER,
-    description:
-      'Inibidor da ECA indicado para hipertensão arterial, insuficiência cardíaca e proteção renal no diabetes. Contraindicado na gestação.',
+    description: 'Inibidor da ECA para hipertensão e insuficiência cardíaca.',
     requiresPrescription: true
   },
   {
     name: 'Losartana Potássica 50mg comprimido',
     category: MedicationCategories.OTHER,
     description:
-      'Antagonista dos receptores de angiotensina II indicado para hipertensão arterial, nefropatia diabética e insuficiência cardíaca.',
+      'Antagonista da angiotensina II para hipertensão e nefropatia diabética.',
     requiresPrescription: true
   },
   {
     name: 'Sinvastatina 40mg comprimido',
     category: MedicationCategories.OTHER,
-    description:
-      'Inibidor da HMG-CoA redutase (estatina) indicado para dislipidemia e prevenção de eventos cardiovasculares.',
+    description: 'Estatina para dislipidemia e prevenção cardiovascular.',
     requiresPrescription: true
   },
   {
     name: 'Salbutamol 100mcg/dose aerossol',
     category: MedicationCategories.OTHER,
-    description:
-      'Broncodilatador beta-2 agonista de curta duração para alívio rápido do broncoespasmo em asma e DPOC.',
+    description: 'Broncodilatador beta-2 de curta duração para asma e DPOC.',
     requiresPrescription: true
   },
   {
     name: 'Dexametasona 4mg/mL solução injetável',
     category: MedicationCategories.OTHER,
     description:
-      'Corticosteroide de potente ação anti-inflamatória e imunossupressora para choque anafilático, edema cerebral e crises asmáticas graves.',
+      'Corticosteroide para choque anafilático e crises asmáticas graves.',
     requiresPrescription: true
   },
   {
     name: 'Hidroclorotiazida 25mg comprimido',
     category: MedicationCategories.OTHER,
-    description:
-      'Diurético tiazídico indicado para hipertensão arterial e edema associado a insuficiência cardíaca ou hepática.',
+    description: 'Diurético tiazídico para hipertensão e edema cardíaco.',
     requiresPrescription: true
   }
 ]
 
-// ---------------------------------------------------------------------------
-// Script
-// ---------------------------------------------------------------------------
 const seedMedications: Script = {
   name: 'create-medications',
   description:
-    'Insere 50 medicamentos reais em cada unidade de saúde cadastrada no sistema',
-
+    'Insere medicamentos reais em cada unidade com catálogo e disponibilidade variados por perfil',
   async run() {
     console.log('Deletando os medicamentos já existentes')
     const removed = await MedicationModel.deleteMany({})
@@ -531,30 +513,38 @@ const seedMedications: Script = {
       `Iniciando seed de ${MEDICATIONS.length} medicamentos em ${UNIT_IDS.length} unidades...\n`
     )
 
-    // Índices fixos ao longo do catálogo que serão forçados como indisponíveis
-    // em todas as unidades. Fixos = resultado idempotente a cada execução.
-    // Com 50 meds e count=5 → step=10 → índices: 0, 10, 20, 30, 40
-    const forcedUnavailable = unavailableIndexes(
-      MEDICATIONS.length,
-      FORCED_UNAVAILABLE_COUNT
-    )
-
     let totalInserted = 0
     let totalErrors = 0
 
-    for (const unitId of UNIT_IDS) {
+    for (let u = 0; u < UNIT_IDS.length; u++) {
+      const unitId = UNIT_IDS[u]
       const profile = UNIT_PROFILE[unitId]
       const { min, max } = STOCK_RANGE[profile]
-      console.log(`Unidade ${unitId} [${profile}]`)
 
-      for (let i = 0; i < MEDICATIONS.length; i++) {
-        const template = MEDICATIONS[i]
+      // Filtra medicamentos permitidos para este perfil de unidade
+      const allowedMeds = MEDICATIONS.filter((m) =>
+        isAllowedForProfile(m, profile)
+      )
+
+      // Índices zerados rotacionados pelo índice da unidade → cada unidade
+      // tem medicamentos indisponíveis em posições distintas do catálogo
+      const forcedUnavailable = unavailableIndexes(
+        allowedMeds.length,
+        FORCED_UNAVAILABLE_COUNT,
+        u
+      )
+
+      console.log(
+        `Unidade ${unitId} [${profile}] — ${allowedMeds.length} medicamentos, indisponíveis nos índices: [${[...forcedUnavailable].sort((a, b) => a - b).join(', ')}]`
+      )
+
+      for (let i = 0; i < allowedMeds.length; i++) {
+        const template = allowedMeds[i]
 
         try {
           let stockQuantity: number
 
           if (forcedUnavailable.has(i)) {
-            // Slot reservado → forçar estoque zerado independente do perfil
             stockQuantity = 0
           } else {
             const isControlled =
@@ -568,8 +558,6 @@ const seedMedications: Script = {
               ? Math.max(5, Math.floor(max / 10))
               : max
 
-            // Garante ao menos 1 fora dos slots reservados para não
-            // gerar indisponíveis "acidentais" que prejudiquem os disponíveis
             stockQuantity = Math.max(1, randomInt(stockMin, stockMax))
           }
 
