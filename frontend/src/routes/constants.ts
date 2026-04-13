@@ -77,7 +77,7 @@ export const ROUTES = {
   ATTENDANCE_DETAILS: {
     name: 'Resumo do atendimento',
     description: 'Visualize um resumo geral do atendimento até o momento',
-    path: '/auth/attendances/:attendanceId'
+    path: '/auth/attendance/:attendanceId'
   },
   TRIAGES: {
     name: 'Histórico de triagens',
@@ -86,7 +86,7 @@ export const ROUTES = {
   },
   TRIAGES_DETAILS: {
     name: 'Detalhes da triagem',
-    description: 'Visualize e gerencie as informações completas da triagem.',
-    path: '/auth/triages/:id'
+    description: 'Visualize um resumo das informações completas da triagem.',
+    path: '/auth/triage/:id'
   }
 }

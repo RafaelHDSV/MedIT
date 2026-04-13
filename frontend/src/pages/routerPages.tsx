@@ -36,9 +36,6 @@ export const Attendances = lazy(
   () => import('../pages/Attendances/Attendances')
 )
 export const Triages = lazy(() => import('../pages/Triages/Triages'))
-export const TriagesDetails = lazy(
-  () => import('../pages/TriagesDetails/TriagesDetails')
-)
 export const PreRegistration = lazy(
   () => import('../pages/PreRegistration/PreRegistration')
 )

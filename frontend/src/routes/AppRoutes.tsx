@@ -57,7 +57,7 @@ function AppRoutes() {
             path={ROUTES.MEDICAMENTS.path}
             element={<pages.Medications />}
           />
-           <Route
+          <Route
             path={ROUTES.ATTENDANCE_DETAILS.path}
             element={<pages.AttendanceDetails />}
           />
@@ -68,7 +68,7 @@ function AppRoutes() {
           <Route path={ROUTES.TRIAGES.path} element={<pages.Triages />} />
           <Route
             path={ROUTES.TRIAGES_DETAILS.path}
-            element={<pages.TriagesDetails />}
+            element={<pages.AttendanceDetails />}
           />
           <Route
             path={ROUTES.PRE_REGISTRATION.path}

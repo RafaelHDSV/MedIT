@@ -57,14 +57,15 @@ function AttendanceDetails() {
     { name: 'Dengue', compatibility: 87 },
     { name: 'Gripe (Influenza)', compatibility: 72 },
     { name: 'COVID-19', compatibility: 58 },
-    { name: 'Chikungunya', compatibility: 41 },
-    { name: 'Catapora', compatibility: 21 },
-    { name: 'Caxumba', compatibility: 11 }
+    { name: 'Chikungunya', compatibility: 41 }
+    // { name: 'Catapora', compatibility: 21 },
+    // { name: 'Caxumba', compatibility: 11 }
   ]
 
   return (
     <section>
       <AuthLayoutHeader
+        // VIEIRA: Validar
         actionComponent={<Button>Finalizar atendimento</Button>}
       />
 
