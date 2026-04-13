@@ -8,7 +8,12 @@ interface ISymptomTagProps {
   onClick?: () => void
 }
 
-function SymptomTag({ symptom, selected = false, clickable = false, onClick }: ISymptomTagProps) {
+function SymptomTag({
+  symptom,
+  selected = false,
+  clickable = false,
+  onClick
+}: ISymptomTagProps) {
   return (
     <Tag
       onClick={clickable ? onClick : undefined}
