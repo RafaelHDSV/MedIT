@@ -1,9 +1,15 @@
+@use '../../styles/abstract/breakpoints' as *;
+
 .page {
   display: grid;
   grid-template-columns: 1fr 20rem;
   grid-template-rows: auto 1fr;
   gap: 2rem;
   margin-top: 2rem;
+
+  @include max-md {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mainContent {
@@ -16,6 +22,10 @@
     grid-template-columns: repeat(3, 1fr);
     column-gap: 2rem;
     row-gap: 1rem;
+
+    @include max-md {
+      grid-template-columns: repeat(2, 1fr);
+    }    
   }
 }
 
