@@ -1,98 +1,123 @@
 import { faker } from '@faker-js/faker'
 import { DoctorSpecializations } from '../../interfaces/IDoctor.js'
+import { UserGender, UserLevels } from '../../interfaces/IUser.js'
 import { Doctor } from '../../models/DoctorModel.js'
 import { Script } from '../types.js'
 
-const createDoctors: Script = {
-  name: 'create-doctors',
-  description: 'Cria 30 médicos para testes',
+const UNITS_DOCTORS: { unitId: string; count: number }[] = [
+  { unitId: '69d2981909395bf057e0513f', count: 24 },
+  { unitId: '69d2981909395bf057e05137', count: 26 },
+  { unitId: '69d2981909395bf057e05127', count: 20 },
+  { unitId: '69d2981909395bf057e05115', count: 28 },
+  { unitId: '69d2981909395bf057e05105', count: 28 },
+  { unitId: '69d2981909395bf057e050f6', count: 26 },
+  { unitId: '69d2981909395bf057e0511e', count: 28 },
+  { unitId: '69d2981909395bf057e050e6', count: 30 },
+  { unitId: '69d2981909395bf057e0510c', count: 30 },
+  { unitId: '69d2981909395bf057e050ee', count: 26 },
+  { unitId: '69d2981909395bf057e05130', count: 29 },
+  { unitId: '69d2981909395bf057e050fd', count: 23 }
+]
+
+const createDoctorsByUnit: Script = {
+  name: 'create-doctors-by-unit',
+  description: 'Cria médicos distribuídos por unidade',
   async run() {
-    function generateCPF() {
-      let cpf = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10))
+    function generateCPF(): string {
+      const cpf = Array.from({ length: 9 }, () =>
+        Math.floor(Math.random() * 10)
+      )
 
       const calcDigit = (base: number[]) => {
-        let sum = base.reduce(
+        const sum = base.reduce(
           (acc, num, i) => acc + num * (base.length + 1 - i),
           0
         )
-        let rest = (sum * 10) % 11
+        const rest = (sum * 10) % 11
         return rest === 10 ? 0 : rest
       }
 
       cpf.push(calcDigit(cpf))
       cpf.push(calcDigit(cpf))
-
       return cpf.join('')
     }
 
-    function generatePhone() {
+    function generateCellphone(): number {
       return Number('119' + faker.number.int({ min: 10000000, max: 99999999 }))
     }
 
-    async function createDoctor() {
-      const gender = faker.helpers.arrayElement(['male', 'female'])
+    function generateCRM(): string {
+      return faker.number.int({ min: 100000, max: 999999 }).toString() + '/SP'
+    }
 
-      const name = faker.person.fullName({ sex: gender })
-      const invalidNameParts = [
-        'mr',
-        'mrs',
-        'miss',
-        'dr',
-        'jr',
-        'sr',
-        'ii',
-        'iii'
-      ]
-      const nameParts = name
+    function generateSpecialization(): string {
+      const specializations = Object.values(DoctorSpecializations)
+      const picked = faker.helpers.arrayElement(specializations)
+
+      if (picked === DoctorSpecializations.OTHER) {
+        return faker.helpers.arrayElement([
+          'acupuntura',
+          'medicina esportiva',
+          'medicina do trabalho'
+        ])
+      }
+
+      return picked.toLowerCase()
+    }
+
+    function buildEmail(name: string, index: number): string {
+      const invalidParts = ['mr', 'mrs', 'miss', 'dr', 'jr', 'sr', 'ii', 'iii']
+      const parts = name
         .trim()
         .split(/\s+/)
-        .map((part) => part.toLowerCase().replace(/\./g, ''))
-        .filter((part) => part && !invalidNameParts.includes(part))
-      const firstName = nameParts[0].toLowerCase()
-      const lastName = nameParts[nameParts.length - 1].toLowerCase()
-      const email = `doctor.${firstName}.${lastName}@yopmail.com`
+        .map((p) => p.toLowerCase().replace(/\./g, ''))
+        .filter((p) => p && !invalidParts.includes(p))
 
-      const specializations = Object.values(DoctorSpecializations)
-      const randomSpecialization: string =
-        faker.helpers.arrayElement(specializations)
-      let specialization: string
-      if (randomSpecialization === DoctorSpecializations.OTHER) {
-        const otherSpecialization = [
-          'Acupuntura',
-          'Medicina Esportiva',
-          'Medicina do Trabalho'
-        ]
-        specialization = faker.helpers.arrayElement(otherSpecialization)
-      } else {
-        specialization = randomSpecialization
-      }
+      const first = parts[0]
+      const last = parts[parts.length - 1]
+      return `doctor.${first}.${last}.${index}@yopmail.com`
+    }
 
-      const doctor = {
-        name,
-        cpf: generateCPF(),
-        email,
-        password: 'fastpass',
-        gender,
-        cellphone: generatePhone(),
-        birthDate: faker.date.birthdate({ min: 18, max: 85, mode: 'age' }),
-        crm: faker.number.int({ min: 100000, max: 999999 }).toString() + '/SP',
-        specialization
-      }
+    let totalCreated = 0
+    let emailIndex = 1
 
-      try {
-        const response = await Doctor.create(doctor)
-        console.log('✅ Criado:', response)
-      } catch (error: any) {
-        console.error('❌ Erro:', error.response?.data || error.message)
+    for (const { unitId, count } of UNITS_DOCTORS) {
+      console.log(
+        `\n📋 Criando ${count} médico(s) para unidade ...${unitId.slice(-6)}`
+      )
+
+      for (let i = 0; i < count; i++) {
+        const gender = faker.helpers.arrayElement(Object.values(UserGender))
+        const name = faker.person.fullName({
+          sex: gender === UserGender.MALE ? 'male' : 'female'
+        })
+
+        const doctor = {
+          name,
+          cpf: generateCPF(),
+          level: UserLevels.DOCTOR,
+          email: buildEmail(name, emailIndex++),
+          password: 'fastpass',
+          gender,
+          cellphone: generateCellphone(),
+          birthDate: faker.date.birthdate({ min: 25, max: 70, mode: 'age' }),
+          unitId,
+          crm: generateCRM(),
+          specialization: generateSpecialization()
+        }
+
+        try {
+          const response = await Doctor.create(doctor as any)
+          console.log(`  ✅ ${response.name} — ${doctor.crm}`)
+          totalCreated++
+        } catch (error: any) {
+          console.error(`  ❌ Erro:`, error.response?.data || error.message)
+        }
       }
     }
 
-    for (let i = 0; i < 30; i++) {
-      await createDoctor()
-    }
-
-    console.log('🚀 Seed finalizado')
+    console.log(`\n🚀 Seed finalizado — ${totalCreated} médico(s) criado(s)`)
   }
 }
 
-export default createDoctors
+export default createDoctorsByUnit
