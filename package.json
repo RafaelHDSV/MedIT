@@ -6,7 +6,10 @@
     "dev:backend": "cd backend && yarn && yarn dev",
     "format": "yarn base && concurrently \"yarn format:frontend\" \"yarn format:backend\"",
     "format:frontend": "cd frontend && yarn format",
-    "format:backend": "cd backend && yarn format"
+    "format:backend": "cd backend && yarn format",
+    "test": "yarn base && concurrently \"yarn test:frontend\" \"yarn test:backend\"",
+    "test:frontend": "cd frontend && yarn tsc",
+    "test:backend": "cd backend && yarn tsc"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
