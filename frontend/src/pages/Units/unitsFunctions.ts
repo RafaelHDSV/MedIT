@@ -1,5 +1,5 @@
-import { TagStatuses } from '@/components/Tag/Tag';
-import type { IUnit } from '@/interfaces/IUnit';
+import { TagStatuses } from '@/components/Tag/Tag'
+import type { IUnit } from '@/interfaces/IUnit'
 
 const getUnitStatus = (unit: IUnit): { text: string; status: TagStatuses } => {
   const now = new Date()
@@ -42,5 +42,4 @@ const getUnitStatus = (unit: IUnit): { text: string; status: TagStatuses } => {
   return { text: 'Aberto', status: TagStatuses.SUCCESS }
 }
 
-export { getUnitStatus };
-
+export { getUnitStatus }

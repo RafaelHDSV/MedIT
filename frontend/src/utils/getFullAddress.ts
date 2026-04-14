@@ -1,4 +1,4 @@
-import type { IAddress } from "@/interfaces/IUnit"
+import type { IAddress } from '@/interfaces/IUnit'
 
 const getFullAddress = (address?: IAddress) => {
   if (!address) return undefined

@@ -28,7 +28,6 @@ function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
     }
   }
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setInputValue(value)
