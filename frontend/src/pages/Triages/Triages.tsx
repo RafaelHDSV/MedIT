@@ -45,7 +45,6 @@ function ITriages() {
 
         <ListTable<IAttendance>
           dataSource={triages}
-          pageSize={8}
           columns={columns}
           loading={loading}
           onReload={fetchAttendances}

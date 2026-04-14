@@ -55,7 +55,7 @@ const FIELD_MASKS: MaskMap = {
 function ListTable<T extends SearchableItem>({
   dataSource,
   columns,
-  pageSize = 6,
+  pageSize = 15,
   loading,
   onReload
 }: {
