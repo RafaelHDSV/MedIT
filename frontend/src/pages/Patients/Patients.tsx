@@ -1,25 +1,28 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
 import type { IPatient } from '@/interfaces/IPatient'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import { Flex } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import styles from '../../components/ListTable/ListTable.module.scss'
 import PatientModal from './components/PatientModal/PatientModal'
 import { usePatientsColumns } from './hooks/usePatientsColumns'
 
 function Patients() {
+  const { user } = useAuth()
+  const { unitId } = user || {}
   const [patients, setPatients] = useState<IPatient[]>([])
   const [loading, setLoading] = useState(false)
   const [editingPatient, setEditingPatient] = useState<IPatient | null>(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
 
-  async function fetchPatients() {
+  const fetchPatients = useCallback(async () => {
     setLoading(true)
 
     try {
-      const response = await PatientsRepository.getPatients()
+      const response = await PatientsRepository.getPatients({ unitId })
       setPatients(response)
     } catch (err) {
       handleApiError({
@@ -29,11 +32,11 @@ function Patients() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [unitId])
 
   useEffect(() => {
     fetchPatients()
-  }, [])
+  }, [fetchPatients])
 
   const columns = usePatientsColumns({
     setEditingPatient,

@@ -4,9 +4,11 @@ import type { ObjectId } from 'mongoose'
 import { Repository } from './Repository'
 
 class PatientsRepositoy extends Repository {
-  async getPatients() {
+  async getPatients({ unitId }: { unitId?: string }) {
     return this.handle(() => {
-      return this.api.get(`${this.path}`)
+      return this.api.get(`${this.path}`, {
+        params: { unitId }
+      })
     })
   }
 

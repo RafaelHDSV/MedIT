@@ -7,8 +7,16 @@ import { Nurse } from '../models/NurseModel.js'
 import User from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
 
-export const getUsers = async (_req: Request, res: Response) => {
-  const users = await User.find({ level: 'nurse' })
+export const getUsers = async (req: Request, res: Response) => {
+  const { unitId } = req.query
+  if (!unitId || typeof unitId !== 'string') {
+    return res.status(400).json({ message: 'O ID da unidade é inválido!' })
+  }
+
+  const users = await User.find({
+    level: UserLevels.NURSE,
+    unitId: new Types.ObjectId(unitId)
+  } as any)
     .sort({ createdAt: -1 })
     .select('-password')
   if (!users || users.length === 0) {
