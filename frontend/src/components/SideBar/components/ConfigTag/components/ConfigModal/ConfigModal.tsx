@@ -1,9 +1,9 @@
+import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import { useAuth } from '@/hooks/useAuth'
+import { DoctorSpecializationsLabels } from '@/interfaces/IDoctor'
 import { UserLevelsLabels } from '@/interfaces/IUser'
 import { Input, Modal, Typography } from 'antd'
 import styles from './ConfigModal.module.scss'
-import DeleteModal from '@/components/DeleteModal/DeleteModal'
-import { DoctorSpecializationsLabels } from '@/interfaces/IDoctor'
 
 function ConfigBaseContent() {
   const { user } = useAuth()
@@ -142,10 +142,10 @@ function ConfigBaseContent() {
 
       <div className={styles.deleteArea}>
         <DeleteModal
-          label='conta'
+          user={userData}
+          label='usuário'
           apiName='users'
           buttonText='Encerrar conta'
-          overrideId={userData._id}
         />
       </div>
     </div>
