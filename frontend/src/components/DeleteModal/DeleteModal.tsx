@@ -11,7 +11,12 @@ interface IDeleteModalProps {
   overrideId?: string // Adicionado para suportar deleção de conta
 }
 
-function DeleteModal({ label, apiName, buttonText, overrideId }: IDeleteModalProps) {
+function DeleteModal({
+  label,
+  apiName,
+  buttonText,
+  overrideId
+}: IDeleteModalProps) {
   const params = useParams<{ id: string }>()
   const navigate = useNavigate()
 
@@ -46,8 +51,8 @@ function DeleteModal({ label, apiName, buttonText, overrideId }: IDeleteModalPro
 
           if (label === 'conta') {
             // Limpa os dados de autenticação e redireciona para SIGNIN
-            localStorage.clear() 
-            navigate(ROUTES.SIGNIN.path) 
+            localStorage.clear()
+            navigate(ROUTES.SIGNIN.path)
           } else {
             // Redireciona para a listagem do recurso (ex: DOCTORS)
             const routeKey = apiName.toUpperCase() as keyof typeof ROUTES
