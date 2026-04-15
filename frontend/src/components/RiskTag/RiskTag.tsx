@@ -15,6 +15,7 @@ interface IRiskColors {
 function RiskTag({ risk, className }: IRiskTagProps) {
   if (!risk) return
 
+  // VIEIRA: Centralizar cores no variables
   const colors: Record<AttendanceRisk, IRiskColors> = {
     [AttendanceRisk.EMERGENCY]: {
       color: '#E74C64',
@@ -25,8 +26,8 @@ function RiskTag({ risk, className }: IRiskTagProps) {
       bgColor: '#E78F4C33'
     },
     [AttendanceRisk.URGENT]: {
-      color: '#F0F326',
-      bgColor: '#F0F32633'
+      color: '#B3A800',
+      bgColor: '#F0F33266'
     },
     [AttendanceRisk.LESS_URGENT]: {
       color: '#2ECC71',
