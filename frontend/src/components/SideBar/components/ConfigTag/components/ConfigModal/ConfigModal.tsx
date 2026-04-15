@@ -1,148 +1,144 @@
-import Button from '@/components/Button/Button'
 import { useAuth } from '@/hooks/useAuth'
-import { useDevTasks } from '@/hooks/useDevTasks'
 import { UserLevelsLabels } from '@/interfaces/IUser'
-import { Checkbox, Divider, Input, message, Modal, Typography } from 'antd'
-import TextArea from 'antd/es/input/TextArea'
-import { useMemo, useState } from 'react'
+import { Input, Modal, Typography } from 'antd'
 import styles from './ConfigModal.module.scss'
-
-function ConfigDevContent() {
-  const { tasks, addTask, toggleTask, removeTask } = useDevTasks()
-  const [newTask, setNewTask] = useState('')
-  const [tasksJson, setTasksJson] = useState('')
-  const [visibleEditInput, setVisibleEditInput] = useState(false)
-
-  function handleAddTask() {
-    if (!newTask.trim()) return
-    addTask(newTask)
-    setNewTask('')
-  }
-
-  function handleToggleEdit() {
-    setVisibleEditInput((prev) => {
-      const next = !prev
-
-      if (!prev) {
-        setTasksJson(JSON.stringify(tasks, null, 2))
-      }
-
-      return next
-    })
-  }
-
-  return (
-    <>
-      <div className={styles.section}>
-        <Typography.Title level={5}>Preferências</Typography.Title>
-
-        <div className={styles.settingRow}>
-          <span>Alterar ordenação</span>
-
-          <Button onClick={handleToggleEdit}>Editar</Button>
-        </div>
-
-        {visibleEditInput && (
-          <>
-            <TextArea
-              rows={15}
-              value={tasksJson}
-              onChange={(e) => setTasksJson(e.target.value)}
-            />
-
-            <Button
-              type='primary'
-              onClick={() => {
-                try {
-                  const parsed = JSON.parse(tasksJson)
-
-                  localStorage.setItem('devTasks', JSON.stringify(parsed))
-
-                  window.location.reload()
-                } catch {
-                  message.error('JSON inválido')
-                }
-              }}
-            >
-              Salvar alterações
-            </Button>
-          </>
-        )}
-      </div>
-
-      <Divider />
-
-      <div className={styles.section}>
-        <div>
-          <Typography.Title level={5}>
-            Desenvolvimento ({tasks.length})
-          </Typography.Title>
-          <Typography.Paragraph type='secondary'>
-            Lista de tarefas pendentes do projeto.
-          </Typography.Paragraph>
-        </div>
-
-        <div className={styles.addTask}>
-          <Input
-            placeholder='Nova tarefa'
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            onPressEnter={handleAddTask}
-          />
-
-          <Button type='primary' onClick={handleAddTask}>
-            Adicionar
-          </Button>
-        </div>
-
-        <div className={styles.taskList}>
-          {tasks.map((task) => (
-            <div key={task.id} className={styles.taskItem}>
-              <Checkbox
-                checked={task.done}
-                onChange={() => toggleTask(task.id)}
-              >
-                <span className={task.done ? styles.taskDone : ''}>
-                  {task.title}
-                </span>
-              </Checkbox>
-
-              <Button
-                mode='outline'
-                type='text'
-                danger
-                size='small'
-                onClick={() => removeTask(task.id)}
-              >
-                Remover
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
-  )
-}
+import DeleteModal from '@/components/DeleteModal/DeleteModal'
+import { DoctorSpecializationsLabels } from '@/interfaces/IDoctor'
 
 function ConfigBaseContent() {
   const { user } = useAuth()
-  if (!user?.level) return
+  if (!user) return null
 
-  return <h2>Configuração do {UserLevelsLabels[user?.level]}</h2>
-}
+  const userData = user as any
+  
+  // Normaliza o level vindo do banco
+  const userLevel = String(userData.level).toUpperCase()
+  
+  const isAdmin = userLevel === 'ADMIN'
+  const isPatient = userLevel === 'PATIENT'
+  const isDoctor = userLevel === 'DOCTOR'
+  const isNurse = userLevel === 'NURSE'
 
-function ConfigContent() {
-  const { user } = useAuth()
-  const validDevelopmerEmail = ['vieira', 'rafa', 'take']
+  // Formatação de data (suporta $date do Mongo ou string direta)
+  const dataRaw = userData.birthDate?.$date || userData.birthDate
+  const dataFormatada = dataRaw 
+    ? new Date(dataRaw).toLocaleDateString('pt-BR') 
+    : '---'
 
-  if (
-    user &&
-    validDevelopmerEmail.some((email) => user.email.includes(email))
-  ) {
-    return <ConfigDevContent />
+  // Formatação de telefone
+  const telefone = userData.cellphone?.$numberLong || userData.cellphone || '---'
+
+  const formatGender = (gender: string) => {
+    const map: any = {
+      male: 'Masculino',
+      female: 'Feminino',
+      other: 'Outro'
+    }
+    return map[gender?.toLowerCase()] || gender || '---'
   }
 
-  return <ConfigBaseContent />
+  return (
+    <div className={styles.baseContent}>
+      <div className={styles.infoSection}>
+        <Typography.Text type="secondary" className={styles.sectionLabel}>
+          Informações básicas
+        </Typography.Text>
+        
+        {isAdmin ? (
+          /* DESIGN ADMINISTRADOR: Incluindo Data de Nascimento e Sexo */
+          <div className={styles.infoGridAdmin}>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Nome</span>
+              <span className={styles.value}>{userData.name}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>CPF</span>
+              <span className={styles.value}>{userData.cpf}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>E-mail</span>
+              <span className={styles.value}>{userData.email}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Sexo</span>
+              <span className={styles.value}>{formatGender(userData.gender)}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Nascimento</span>
+              <span className={styles.value}>{dataFormatada}</span>
+            </div>
+          </div>
+        ) : (
+          /* DESIGN OUTROS USUÁRIOS */
+          <div className={styles.inputGrid}>
+             <div className={styles.inputGroup}>
+                <label>Nome</label>
+                <Input value={userData.name} disabled />
+             </div>
+             <div className={styles.inputGroup}>
+                <label>CPF</label>
+                <Input value={userData.cpf} disabled />
+             </div>
+             <div className={styles.inputGroup}>
+                <label>Sexo</label>
+                <Input value={formatGender(userData.gender)} disabled />
+             </div>
+             <div className={styles.inputGroup}>
+                <label>Data de Nascimento</label>
+                <Input value={dataFormatada} disabled />
+             </div>
+             {isPatient && (
+               <div className={styles.inputGroup}>
+                  <label>Telefone</label>
+                  <Input value={telefone} />
+               </div>
+             )}
+          </div>
+        )}
+      </div>
+
+      {(isDoctor || isNurse) && (
+        <div className={styles.infoSection}>
+          <Typography.Text type="secondary" className={styles.sectionLabel}>
+            Informações alteráveis
+          </Typography.Text>
+          <div className={styles.inputGridHorizontal}>
+             {isDoctor && (
+               <>
+                <div className={styles.inputGroup}>
+                    <label>CRM</label>
+                    <Input value={userData.crm || '---'} />
+                </div>
+                <div className={styles.inputGroup}>
+                    <label>Especialidade</label>
+                    <Input value={DoctorSpecializationsLabels[userData.specialization as keyof typeof DoctorSpecializationsLabels] || userData.specialization || '---'} />
+                </div>
+               </>
+             )}
+             {isNurse && (
+                <div className={styles.inputGroup}>
+                    <label>COREN</label>
+                    <Input value={userData.coren || '---'} />
+                </div>
+             )}
+             <div className={styles.inputGroup}>
+                <label>Telefone</label>
+                <Input value={telefone} />
+             </div>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.deleteArea}>
+        <DeleteModal 
+          label="conta" 
+          apiName="users" 
+          buttonText="Encerrar conta" 
+          overrideId={userData._id} 
+        />
+      </div>
+    </div>
+  )
 }
 
 interface IConfigModalProps {
@@ -150,37 +146,27 @@ interface IConfigModalProps {
   setIsModalOpen: (bool: boolean) => void
 }
 
-function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
+export default function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   const { user } = useAuth()
-
-  function closeModal() {
-    setIsModalOpen(false)
-  }
-
-  const title = useMemo(() => {
-    if (user?.level) return `Configuração do ${UserLevelsLabels[user?.level]}`
-    return 'Configurações'
-  }, [user?.level])
+  const userLevel = String(user?.level).toUpperCase()
+  const isAdmin = userLevel === 'ADMIN'
 
   return (
     <Modal
       title={
-        <div>
-          <Typography.Title level={3}>{title}</Typography.Title>
-          <Typography.Paragraph>
-            Aqui você pode ajustar suas preferências e configurações de conta.
-          </Typography.Paragraph>
-        </div>
+        <Typography.Title level={3} style={{ margin: 0, textAlign: 'center' }}>
+          Configuração do {UserLevelsLabels[userLevel as keyof typeof UserLevelsLabels] || 'Usuário'}
+        </Typography.Title>
       }
       open={isModalOpen}
-      onCancel={closeModal}
+      onCancel={() => setIsModalOpen(false)}
       footer={null}
       centered
-      width={520}
+      width={isAdmin ? 500 : 750}
     >
-      <ConfigContent />
+      <div className={styles.modalBody}>
+        <ConfigBaseContent />
+      </div>
     </Modal>
   )
 }
-
-export default ConfigModal

@@ -1,43 +1,94 @@
 @use '../../../../../../styles/abstract/breakpoints' as *;
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.modalBody {
+  padding: 1rem 0;
 }
 
-.settingRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  min-width: 0;
+.baseContent {
+  .infoSection {
+    margin-bottom: 2rem;
 
-  @include max-md {
-    align-items: flex-start;
+    .sectionLabel {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #8c8c8c;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.05em;
+    }
   }
-}
 
-.addTask {
-  display: flex;
-  gap: 0.5rem;
-}
+  .infoGridAdmin {
+    display: flex;
+    flex-direction: column;
 
-.taskList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-}
+    .infoRow {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f0f0f0;
 
-.taskItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+      .label {
+        font-weight: 600;
+        color: #262626;
+      }
 
-.taskDone {
-  text-decoration: line-through;
-  opacity: 0.6;
+      .value {
+        color: #595959;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .inputGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+
+    @include max-md {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .inputGridHorizontal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    label {
+      font-weight: 600;
+      color: #434343;
+      font-size: 0.9rem;
+    }
+
+    :global(.ant-input) {
+      height: 40px;
+      border-radius: 6px;
+      background-color: #fafafa;
+
+      &:disabled {
+        background-color: #f5f5f5;
+        color: #8c8c8c;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .deleteArea {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f0f0;
+  }
 }
