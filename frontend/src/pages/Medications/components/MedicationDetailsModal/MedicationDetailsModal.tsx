@@ -65,7 +65,7 @@ function MedicationDetailsModal({
       footer={null}
       centered
     >
-      <h2>Detalhes do {name}</h2>
+      <h2>Detalhes de {name}</h2>
 
       <div className={styles.content}>
         <PrescriptionAlert requiresPrescription={requiresPrescription} />
