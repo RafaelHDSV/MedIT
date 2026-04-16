@@ -61,7 +61,6 @@ function AttendanceQueueChart() {
   }, [user?.unitId])
 
   const cardConfig = useMemo(() => {
-    // <-- adiciona isso antes do return
     switch (user?.level) {
       case 'nurse':
         return {
