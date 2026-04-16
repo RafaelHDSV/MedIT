@@ -175,7 +175,7 @@ function Dashboard() {
       case UserLevels.DOCTOR:
         return <AttendanceQueueChart />
       case UserLevels.NURSE:
-        return <></>
+        return <AttendanceQueueChart/>
       case UserLevels.PATIENT:
         return (
           <>

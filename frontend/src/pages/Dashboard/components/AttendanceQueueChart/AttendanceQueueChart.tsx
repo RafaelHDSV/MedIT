@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
 import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/AttendanceQueueChartAdmin'
 import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
+import AttendanceQueueChartNurse from './components/AttendanceQueueChartNurse/AttendanceQueueChartNurse'
 
 export interface IAttendanceItemProps {
   item?: IDashboardQueueItem
@@ -22,6 +23,8 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
       return <AttendanceQueueChartAdmin item={item} loading={loading} />
     case 'doctor':
       return <AttendanceQueueChartDoctor item={item} loading={loading} />
+    case 'nurse':
+      return <AttendanceQueueChartNurse item={item} loading={loading} />
     default:
       return <></>
   }
