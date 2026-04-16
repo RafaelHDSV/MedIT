@@ -1,11 +1,8 @@
-import { useIsMobile } from '@/hooks/useIsMobile'
 import masks, { type MaskEnum } from '@/utils/masks'
-import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { Input, Select, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
-import Button from '../Button/Button'
 import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
 import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
 import {
@@ -13,6 +10,7 @@ import {
   type DateValue,
   type DayjsValue
 } from '../MultiDatepicker/types'
+import ReloadButton from '../ReloadButton/ReloadButton'
 import styles from './ListTable.module.scss'
 
 type SearchField =
@@ -71,7 +69,6 @@ function ListTable<T extends SearchableItem>({
     null,
     null
   ])
-  const isMobile = useIsMobile()
 
   const isDateField = searchField === 'createdAt' || searchField === 'updatedAt'
 
@@ -155,15 +152,7 @@ function ListTable<T extends SearchableItem>({
           )}
         </div>
 
-        {isMobile ? (
-          <Button className='w-100' buttonHeight='2rem' onClick={onReload}>
-            Atualizar
-          </Button>
-        ) : (
-          <Button mode='icon' onClick={onReload}>
-            <ArrowCounterClockwiseIcon />
-          </Button>
-        )}
+        <ReloadButton onReload={onReload} />
       </div>
 
       <div className={styles.tableWrapper}>

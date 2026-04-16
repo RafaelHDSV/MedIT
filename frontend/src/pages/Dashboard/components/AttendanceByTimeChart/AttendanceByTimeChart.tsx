@@ -12,10 +12,12 @@ import styles from './AttendanceByTimeChart.module.scss'
 
 interface IAttendanceByTimeChartProps {
   selectedPeriod: Periods
+  reload: boolean
 }
 
 function AttendanceByTimeChart({
-  selectedPeriod
+  selectedPeriod,
+  reload
 }: IAttendanceByTimeChartProps) {
   const { user } = useAuth()
   const [data, setData] = useState<IDashboardAttendanceByTime[]>([])
@@ -49,7 +51,7 @@ function AttendanceByTimeChart({
     }
 
     fetchAttendanceByTime()
-  }, [selectedPeriod, user?.unitId])
+  }, [selectedPeriod, user?.unitId, reload])
 
   function getPeriodConfig(period: string) {
     switch (period) {

@@ -30,7 +30,11 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
   }
 }
 
-function AttendanceQueueChart() {
+interface IAttendanceQueueChartProps {
+  reload: boolean
+}
+
+function AttendanceQueueChart({reload}: IAttendanceQueueChartProps) {
   const { user } = useAuth()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,7 +62,7 @@ function AttendanceQueueChart() {
     }
 
     fetchData()
-  }, [user?.unitId])
+  }, [user?.unitId, reload])
 
   const cardConfig = useMemo(() => {
     switch (user?.level) {

@@ -1,6 +1,7 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import { InputSelect } from '@/components/FormComponents/FormComponents'
+import ReloadButton from '@/components/ReloadButton/ReloadButton'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import { Periods, PeriodsLabels } from '@/interfaces/globals'
@@ -19,7 +20,8 @@ import {
   TimerIcon,
   UsersThreeIcon
 } from '@phosphor-icons/react'
-import { useEffect, useMemo, useState } from 'react'
+import { Flex } from 'antd'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
@@ -33,35 +35,41 @@ function Dashboard() {
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
+  const [reload, setReload] = useState(false)
   const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
 
-  useEffect(() => {
-    async function fetchDashboardStatus() {
-      setLoading(true)
+  const fetchDashboardStatus = useCallback(async () => {
+    setLoading(true)
 
-      try {
-        const response = await DashboardRepository.getStatusCards({
-          params: {
-            userId: user?._id,
-            unitId: user?.unitId,
-            level: user?.level,
-            period: selectedPeriod
-          }
-        })
-        const data = response.data
-        setDashboardStatusData(data)
-      } catch (err) {
-        handleApiError({
-          err,
-          defaultMessage: 'Erro ao pegar dados do dashboard'
-        })
-      } finally {
-        setLoading(false)
-      }
+    try {
+      const response = await DashboardRepository.getStatusCards({
+        params: {
+          userId: user?._id,
+          unitId: user?.unitId,
+          level: user?.level,
+          period: selectedPeriod
+        }
+      })
+      const data = response.data
+      setDashboardStatusData(data)
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao pegar dados do dashboard'
+      })
+    } finally {
+      setLoading(false)
     }
+  }, [selectedPeriod, user])
 
+  useEffect(() => {
     fetchDashboardStatus()
-  }, [user?.unitId, user?.level, user?._id, selectedPeriod])
+  }, [fetchDashboardStatus])
+
+  function onReload() {
+    fetchDashboardStatus()
+    setReload((prev) => !prev)
+  }
 
   const cardsData = useMemo(() => {
     switch (user?.level) {
@@ -168,14 +176,17 @@ function Dashboard() {
       case UserLevels.ADMIN:
         return (
           <>
-            <AttendanceByTimeChart selectedPeriod={selectedPeriod} />
-            <AttendanceQueueChart />
+            <AttendanceByTimeChart
+              selectedPeriod={selectedPeriod}
+              reload={reload}
+            />
+            <AttendanceQueueChart reload={reload} />
           </>
         )
       case UserLevels.DOCTOR:
-        return <AttendanceQueueChart />
+        return <AttendanceQueueChart reload={reload} />
       case UserLevels.NURSE:
-        return <AttendanceQueueChart/>
+        return <AttendanceQueueChart reload={reload} />
       case UserLevels.PATIENT:
         return (
           <>
@@ -187,24 +198,28 @@ function Dashboard() {
       default:
         return <></>
     }
-  }, [user?.level, navigate, selectedPeriod])
+  }, [user?.level, navigate, selectedPeriod, reload])
 
   return (
     <>
       <AuthLayoutHeader
         actionComponent={
-          shouldShowPeriodSelect && (
-            <InputSelect
-              className={styles.periodSelect}
-              placeholder='Período'
-              options={Object.entries(PeriodsLabels).map(([key, value]) => ({
-                label: value,
-                value: key
-              }))}
-              value={selectedPeriod}
-              onChange={setSelectedPeriod}
-            />
-          )
+          <Flex align='center' gap={8}>
+            {shouldShowPeriodSelect && (
+              <InputSelect
+                className={styles.periodSelect}
+                placeholder='Período'
+                options={Object.entries(PeriodsLabels).map(([key, value]) => ({
+                  label: value,
+                  value: key
+                }))}
+                inputHeight='2rem'
+                value={selectedPeriod}
+                onChange={setSelectedPeriod}
+              />
+            )}
+            <ReloadButton onReload={onReload} />
+          </Flex>
         }
       />
 
