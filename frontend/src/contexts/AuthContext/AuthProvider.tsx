@@ -1,4 +1,4 @@
-import { type IBaseUser } from '@/interfaces/IUser'
+import { type IAuthUser } from '@/interfaces/IUser'
 import type { LoginPayload } from '@/pages/SignIn/SignIn'
 import AuthRepository from '@/repositories/AuthRepository'
 import { message, Modal } from 'antd'
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<IBaseUser | null>(() => {
+  const [user, setUser] = useState<IAuthUser | null>(() => {
     const stored = localStorage.getItem('user')
     return stored ? JSON.parse(stored) : null
   })
