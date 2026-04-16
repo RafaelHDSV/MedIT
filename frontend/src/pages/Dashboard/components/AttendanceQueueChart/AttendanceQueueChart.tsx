@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
 import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/AttendanceQueueChartAdmin'
 import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
@@ -65,21 +65,21 @@ function AttendanceQueueChart() {
       case 'nurse':
         return {
           title: 'Fila de Triagem',
-          asideText: `${data?.length} triagens`
+          asideText: 'triagens'
         }
       default:
         return {
           title: 'Fila de Atendimento',
-          asideText: `${data?.length} atendimentos`
+          asideText: 'atendimentos'
         }
     }
-  }, [user?.level, data?.length])
+  }, [user?.level])
 
   return (
     <DashboardCard
       title={cardConfig.title}
       icon={StethoscopeIcon}
-      asideText={cardConfig.asideText}
+      asideText={`${data?.length} ${cardConfig.asideText}`}
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>
