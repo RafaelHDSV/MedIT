@@ -35,7 +35,7 @@ function PatientsDetails() {
 
     try {
       const response = await UserRepository.getDetails({ userId: params.id })
-      setPatient(response)
+      setPatient(response.data)
     } catch (err) {
       handleApiError({
         err,
@@ -53,7 +53,7 @@ function PatientsDetails() {
       const response = await PatientsRepository.getAttendances({
         patientId: params.id
       })
-      setAttendances(response)
+      setAttendances(response.data)
     } catch (err) {
       handleApiError({
         err,

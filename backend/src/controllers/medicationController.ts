@@ -19,9 +19,11 @@ export const getMedicationsByUnit = async (req: Request, res: Response) => {
     return res
       .status(200)
       .json({ message: 'Medicamentos encontrados', data: medications })
-  } catch (err) {
-    console.error(err)
-    return res.status(500).json({ message: 'Erro ao buscar medicamentos' })
+  } catch (errors) {
+    console.error(errors)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao buscar medicamentos', errors })
   }
 }
 

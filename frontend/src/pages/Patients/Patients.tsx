@@ -23,7 +23,7 @@ function Patients() {
 
     try {
       const response = await PatientsRepository.getPatients({ unitId })
-      setPatients(response)
+      setPatients(response.data)
     } catch (err) {
       handleApiError({
         err,

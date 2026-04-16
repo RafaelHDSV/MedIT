@@ -26,7 +26,7 @@ function Attendances({ doctorId }: IAttendancesProps) {
       const response = await DoctorsRepository.getAttendances({
         doctorId: doctorId ? doctorId : user?._id
       })
-      setAttendances(response)
+      setAttendances(response.data)
     } catch (err) {
       handleApiError({
         err,

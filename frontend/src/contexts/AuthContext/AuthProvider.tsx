@@ -24,7 +24,7 @@ export function AuthProvider({ children }: Props) {
       }
     })
 
-    const { accessToken, refreshToken, user } = response
+    const { accessToken, refreshToken, user } = response.data
 
     setUser(user)
 

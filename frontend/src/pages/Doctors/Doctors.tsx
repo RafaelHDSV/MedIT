@@ -23,7 +23,7 @@ function Doctors() {
 
     try {
       const response = await DoctorsRepository.getDoctors({ unitId })
-      setDoctors(response)
+      setDoctors(response.data)
     } catch (err) {
       handleApiError({
         err,

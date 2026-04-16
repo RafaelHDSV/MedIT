@@ -16,13 +16,17 @@ export const login = async (req: Request, res: Response) => {
   }
 
   if (!user) {
-    return res.status(400).json({ message: 'Usuário não encontrado' })
+    return res
+      .status(400)
+      .json({ message: 'Usuário não encontrado', errors: { email, cpf } })
   }
 
   const validPassword = await user.comparePassword(password)
 
   if (!validPassword) {
-    return res.status(400).json({ message: 'Senha inválida' })
+    return res
+      .status(400)
+      .json({ message: 'Senha inválida', errors: { password } })
   }
 
   const { accessToken, refreshToken } = generateTokens(user._id)
@@ -30,9 +34,12 @@ export const login = async (req: Request, res: Response) => {
   await user.save()
 
   return res.json({
-    accessToken,
-    refreshToken,
-    user
+    message: 'Login efetuado com sucesso!',
+    data: {
+      accessToken,
+      refreshToken,
+      user
+    }
   })
 }
 
@@ -59,7 +66,10 @@ export const refresh = async (req: Request, res: Response) => {
     user.refreshToken = newRefreshToken
     await user.save()
 
-    return res.json({ accessToken, refreshToken: newRefreshToken })
+    return res.json({
+      message: 'Token atualizado com sucesso!',
+      data: { accessToken, refreshToken: newRefreshToken }
+    })
   } catch {
     return res.status(403).json({ message: 'Token inválido' })
   }

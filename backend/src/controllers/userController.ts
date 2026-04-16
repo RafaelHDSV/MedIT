@@ -6,10 +6,10 @@ export const getUser = async (req: Request, res: Response) => {
 
   const user = await User.findById(id)
   if (!user) {
-    return res.status(404).json({ message: 'Usuário não encontrado' })
+    return res.status(404).json({ message: 'Usuário não encontrado', id })
   }
 
-  res.json(user)
+  res.json({ message: 'Usuário encontrado com sucesso!', data: user })
 }
 
 export const deleteUser = async (req: Request, res: Response) => {

@@ -35,9 +35,10 @@ api.interceptors.response.use(
       }
 
       try {
-        const { data } = await api.post('/auth/refresh', {
+        const response = await api.post('/auth/refresh', {
           refreshToken
         })
+        const data = response?.data?.data
 
         localStorage.setItem('accessToken', data.accessToken)
         localStorage.setItem('refreshToken', data.refreshToken)

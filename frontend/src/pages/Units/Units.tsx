@@ -33,7 +33,7 @@ function Units() {
     try {
       const response = await UnitsRepository.getUnits({ activeUnitId })
 
-      const formatResponse = response.map((unit: IUnit) => {
+      const formatResponse = response?.data?.map((unit: IUnit) => {
         return {
           fullAddress: getFullAddress(unit.address),
           ...unit

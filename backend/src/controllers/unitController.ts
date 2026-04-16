@@ -26,10 +26,14 @@ export const getUnits = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Nenhuma unidade encontrada' })
     }
 
-    res.status(200).json(units)
-  } catch (err) {
-    console.error(err)
-    return res.status(500).json({ message: 'Erro ao buscar unidades de saúde' })
+    res
+      .status(200)
+      .json({ message: 'Unidades encontradas com sucesso!', data: units })
+  } catch (errors) {
+    console.error(errors)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao buscar unidades de saúde', errors })
   }
 }
 
@@ -44,16 +48,18 @@ export const getUnit = async (req: Request, res: Response) => {
     if (!unit) {
       return res
         .status(404)
-        .json({ message: 'Unidade de saúde não encontrada' })
+        .json({ message: 'Unidade de saúde não encontrada', id })
     }
 
     return res.status(200).json({
       message: 'Unidade encontrada com sucesso!',
       data: unit
     })
-  } catch (err) {
-    console.error(err)
-    return res.status(500).json({ message: 'Erro ao buscar unidade de saúde' })
+  } catch (errors) {
+    console.error(errors)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao buscar unidade de saúde', errors })
   }
 }
 
@@ -65,8 +71,10 @@ export const createUnit = async (req: Request, res: Response) => {
     return res
       .status(201)
       .json({ message: 'Unidade criada com sucesso', data: unit })
-  } catch (err) {
-    console.error(err)
-    return res.status(500).json({ message: 'Erro ao criar unidade de saúde' })
+  } catch (errors) {
+    console.error(errors)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao criar unidade de saúde', errors })
   }
 }

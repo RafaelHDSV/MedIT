@@ -181,9 +181,10 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
       message: 'Dados do dashboard carregados com sucesso',
       data: await data()
     })
-  } catch (error) {
+  } catch (errors) {
     res.status(500).json({
-      message: 'Erro ao buscar dados do dashboard'
+      message: 'Erro ao buscar dados do dashboard',
+      errors
     })
   }
 }
@@ -204,9 +205,10 @@ export const getDashboardAttendanceByTime = async (
       message: 'Atendimentos por hora carregados com sucesso',
       data
     })
-  } catch (error) {
+  } catch (errors) {
     res.status(500).json({
-      message: 'Erro ao buscar atendimentos por hora'
+      message: 'Erro ao buscar atendimentos por hora',
+      errors
     })
   }
 }
@@ -226,9 +228,10 @@ export const getDashboardAttendanceQueue = async (
       message: 'Fila de atendimento carregada com sucesso',
       data
     })
-  } catch (error) {
+  } catch (errors) {
     res.status(500).json({
-      message: 'Erro ao buscar fila de atendimento'
+      message: 'Erro ao buscar fila de atendimento',
+      errors
     })
   }
 }

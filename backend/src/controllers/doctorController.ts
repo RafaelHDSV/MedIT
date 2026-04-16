@@ -23,8 +23,7 @@ export const getUsers = async (req: Request, res: Response) => {
     return res.status(404).json({ message: 'Nenhum médico(a) encontrado' })
   }
 
-  // VIEIRA: Verificar se não tá fora do padrão (status, message)
-  res.json(users)
+  res.json({ message: 'Médicos encontrados com sucesso!', data: users })
 }
 
 export const createDoctor = async (req: Request, res: Response) => {
@@ -122,6 +121,7 @@ export const createDoctor = async (req: Request, res: Response) => {
     if (error.code === 11000) {
       const field = Object.keys(error.keyValue)[0]
       return res.status(400).json({
+        message: 'Campos inválidos',
         errors: { [field]: `${capitalize(field)} já está em uso` }
       })
     }
@@ -226,6 +226,7 @@ export const editDoctor = async (req: Request, res: Response) => {
     if (error.code === 11000) {
       const field = Object.keys(error.keyValue)[0]
       return res.status(400).json({
+        message: 'Campos inválidos',
         errors: { [field]: `${capitalize(field)} já está em uso` }
       })
     }
@@ -307,7 +308,10 @@ export const getAttendances = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Nenhum atendimento encontrado' })
     }
 
-    res.json(attendances)
+    res.json({
+      message: 'Atendimentos encontrados com sucesso!',
+      data: attendances
+    })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao buscar os atendimentos' })

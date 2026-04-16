@@ -21,7 +21,7 @@ function ITriages() {
       const response = await NursesRepository.getAttendances({
         nurseId: user?._id
       })
-      setTriages(response)
+      setTriages(response.data)
     } catch (err) {
       handleApiError({
         err,
