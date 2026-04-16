@@ -2,10 +2,12 @@ import Button from '@/components/Button/Button'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
+import { ROUTES } from '@/routes/constants'
+import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
+import { timeAgo } from '@/utils/timeAgo'
+import { useNavigate } from 'react-router-dom'
 import type { IAttendanceItemProps } from '../../AttendanceQueueChart'
 import styles from '../../AttendanceQueueChart.module.scss'
-import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@/routes/constants'
 
 function AttendanceQueueChartDoctor({ item, loading }: IAttendanceItemProps) {
   const navigate = useNavigate()
@@ -39,13 +41,17 @@ function AttendanceQueueChartDoctor({ item, loading }: IAttendanceItemProps) {
         <TooltipColumn className={styles.name} text={item?.patientName} />
       </div>
 
-      {/* VIEIRA: Adicionar back */}
-      <TooltipColumn className={styles.detailsSecondary} text='20 anos' />
-      <TooltipColumn className={styles.detailsSecondary} text='Naúsea' />
-      <TooltipColumn
-        className={styles.detailsSecondary}
-        text='Aguardando há 2 horas'
-      />
+      <div className={styles.detailsSecondary}>
+        <TooltipColumn
+          text={`${getAgeByBirthDate(item?.patientBirthDate)} anos`}
+        />
+      </div>
+      <div className={styles.detailsSecondary}>
+        <TooltipColumn text={item?.complaint} />
+      </div>
+      <div className={styles.detailsSecondary}>
+        <TooltipColumn text={timeAgo(item?.date)} />
+      </div>
 
       <div className={styles.detailsRisk}>
         <RiskTag risk={item?.risk} />

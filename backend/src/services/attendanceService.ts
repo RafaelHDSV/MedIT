@@ -559,6 +559,9 @@ export const getAttendanceQueue = async ({ unitId }: { unitId: string }) => {
         $project: {
           _id: 1,
           patientName: { $ifNull: ['$patient.name', 'Paciente'] },
+          patientBirthDate: {$ifNull: ['$patient.birthDate', 'Paciente']},
+          complaint: 1,
+          date: 1,
           status: 1,
           risk: 1
         }

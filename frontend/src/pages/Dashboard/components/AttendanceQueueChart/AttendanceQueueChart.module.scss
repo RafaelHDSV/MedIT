@@ -60,6 +60,17 @@
     color: var(--gray);
   }
 
+  .patientInfo {
+    max-width: 20rem;
+    width: 100% !important;
+  }
+
+  .detailsSecondary,
+  .detailsRisk {
+    max-width: 10rem;
+    width: 100% !important;
+  }
+
   .detailsSecondary {
     color: var(--light-gray);
   }
@@ -68,13 +79,6 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-    max-width: 15rem;
-    width: 100%;
-  }
-
-  .detailsRisk {
-    max-width: 5rem;
-    width: 100%;
   }
 
   .skeleton {

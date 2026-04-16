@@ -31,6 +31,9 @@ export interface IDashboardStatusCards
 export interface IDashboardQueueItem {
   _id: string
   patientName: string
+  patientBirthDate: Date
+  date: Date
+  complaint: string
   status: AttendanceStatus
   risk: AttendanceRisk
 }
