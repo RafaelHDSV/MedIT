@@ -231,11 +231,7 @@ function ConfigBaseContent() {
 
 function ConfigContent() {
   const { user } = useAuth()
-  const validDevelopmerEmail = [
-    // 'vieira',
-    'rafa',
-    'take'
-  ]
+  const validDevelopmerEmail = ['vieira', 'rafa', 'take']
 
   if (validDevelopmerEmail.some((email) => user?.email?.includes(email))) {
     return <ConfigDevContent />
