@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
 import type { IDoctor } from '@/interfaces/IDoctor'
 import type { INurse } from '@/interfaces/INurse'
 import type { IPatient } from '@/interfaces/IPatient'
@@ -17,6 +18,7 @@ interface IDeleteModalProps {
 }
 
 function DeleteModal({ user, label, apiName, buttonText }: IDeleteModalProps) {
+  const { logout } = useAuth()
   const params = useParams<{ id: string }>()
   const navigate = useNavigate()
   const idToDelete = user?._id || params.id
@@ -26,7 +28,7 @@ function DeleteModal({ user, label, apiName, buttonText }: IDeleteModalProps) {
     let actor
 
     if (isDeleteUserLogged) {
-      actor = `sua ${label}`
+      actor = `seu ${label}`
     } else if (user?.name) {
       actor = user.name
     } else {
@@ -69,8 +71,7 @@ function DeleteModal({ user, label, apiName, buttonText }: IDeleteModalProps) {
           )
 
           if (isDeleteUserLogged) {
-            // localStorage.clear()
-            navigate(ROUTES.SIGNIN.path)
+            logout()
           } else {
             const routeKey = apiName.toUpperCase() as keyof typeof ROUTES
             navigate(ROUTES[routeKey].path)
