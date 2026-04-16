@@ -1,155 +1,247 @@
-import DeleteModal from '@/components/DeleteModal/DeleteModal'
+import Button from '@/components/Button/Button'
+import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import { useAuth } from '@/hooks/useAuth'
+import { useDevTasks } from '@/hooks/useDevTasks'
 import { DoctorSpecializationsLabels } from '@/interfaces/IDoctor'
-import { UserLevelsLabels } from '@/interfaces/IUser'
-import { Input, Modal, Typography } from 'antd'
+import { NurseShiftsLabels } from '@/interfaces/INurse'
+import {
+  UserGender,
+  UserGendersLabels,
+  UserLevels,
+  UserLevelsLabels
+} from '@/interfaces/IUser'
+import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
+import masks from '@/utils/masks'
+import { Checkbox, Divider, Input, message, Modal, Typography } from 'antd'
+import TextArea from 'antd/es/input/TextArea'
+import dayjs from 'dayjs'
+import { useMemo, useState } from 'react'
 import styles from './ConfigModal.module.scss'
 
-function ConfigBaseContent() {
-  const { user } = useAuth()
-  if (!user) return null
+function ConfigDevContent() {
+  const { tasks, addTask, toggleTask, removeTask } = useDevTasks()
+  const [newTask, setNewTask] = useState('')
+  const [tasksJson, setTasksJson] = useState('')
+  const [visibleEditInput, setVisibleEditInput] = useState(false)
 
-  const userData = user as any
+  function handleAddTask() {
+    if (!newTask.trim()) return
+    addTask(newTask)
+    setNewTask('')
+  }
 
-  // Normaliza o level vindo do banco
-  const userLevel = String(userData.level).toUpperCase()
+  function handleToggleEdit() {
+    setVisibleEditInput((prev) => {
+      const next = !prev
 
-  const isAdmin = userLevel === 'ADMIN'
-  const isPatient = userLevel === 'PATIENT'
-  const isDoctor = userLevel === 'DOCTOR'
-  const isNurse = userLevel === 'NURSE'
+      if (!prev) {
+        setTasksJson(JSON.stringify(tasks, null, 2))
+      }
 
-  // Formatação de data (suporta $date do Mongo ou string direta)
-  const dataRaw = userData.birthDate?.$date || userData.birthDate
-  const dataFormatada = dataRaw
-    ? new Date(dataRaw).toLocaleDateString('pt-BR')
-    : '---'
-
-  // Formatação de telefone
-  const telefone =
-    userData.cellphone?.$numberLong || userData.cellphone || '---'
-
-  const formatGender = (gender: string) => {
-    const map: any = {
-      male: 'Masculino',
-      female: 'Feminino',
-      other: 'Outro'
-    }
-    return map[gender?.toLowerCase()] || gender || '---'
+      return next
+    })
   }
 
   return (
-    <div className={styles.baseContent}>
-      <div className={styles.infoSection}>
-        <Typography.Text type='secondary' className={styles.sectionLabel}>
-          Informações básicas
-        </Typography.Text>
+    <>
+      <div className={styles.section}>
+        <Typography.Title level={5}>Preferências</Typography.Title>
 
-        {isAdmin ? (
-          /* DESIGN ADMINISTRADOR: Incluindo Data de Nascimento e Sexo */
-          <div className={styles.infoGridAdmin}>
-            <div className={styles.infoRow}>
-              <span className={styles.label}>Nome</span>
-              <span className={styles.value}>{userData.name}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.label}>CPF</span>
-              <span className={styles.value}>{userData.cpf}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.label}>E-mail</span>
-              <span className={styles.value}>{userData.email}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.label}>Sexo</span>
-              <span className={styles.value}>
-                {formatGender(userData.gender)}
-              </span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.label}>Nascimento</span>
-              <span className={styles.value}>{dataFormatada}</span>
-            </div>
-          </div>
-        ) : (
-          /* DESIGN OUTROS USUÁRIOS */
-          <div className={styles.inputGrid}>
-            <div className={styles.inputGroup}>
-              <label>Nome</label>
-              <Input value={userData.name} disabled />
-            </div>
-            <div className={styles.inputGroup}>
-              <label>CPF</label>
-              <Input value={userData.cpf} disabled />
-            </div>
-            <div className={styles.inputGroup}>
-              <label>Sexo</label>
-              <Input value={formatGender(userData.gender)} disabled />
-            </div>
-            <div className={styles.inputGroup}>
-              <label>Data de Nascimento</label>
-              <Input value={dataFormatada} disabled />
-            </div>
-            {isPatient && (
-              <div className={styles.inputGroup}>
-                <label>Telefone</label>
-                <Input value={telefone} />
-              </div>
-            )}
-          </div>
+        <div className={styles.settingRow}>
+          <span>Alterar ordenação</span>
+
+          <Button onClick={handleToggleEdit}>Editar</Button>
+        </div>
+
+        {visibleEditInput && (
+          <>
+            <TextArea
+              rows={15}
+              value={tasksJson}
+              onChange={(e) => setTasksJson(e.target.value)}
+            />
+
+            <Button
+              type='primary'
+              onClick={() => {
+                try {
+                  const parsed = JSON.parse(tasksJson)
+
+                  localStorage.setItem('devTasks', JSON.stringify(parsed))
+
+                  window.location.reload()
+                } catch {
+                  message.error('JSON inválido')
+                }
+              }}
+            >
+              Salvar alterações
+            </Button>
+          </>
         )}
       </div>
 
-      {(isDoctor || isNurse) && (
-        <div className={styles.infoSection}>
-          <Typography.Text type='secondary' className={styles.sectionLabel}>
-            Informações alteráveis
-          </Typography.Text>
-          <div className={styles.inputGridHorizontal}>
-            {isDoctor && (
-              <>
-                <div className={styles.inputGroup}>
-                  <label>CRM</label>
-                  <Input value={userData.crm || '---'} />
-                </div>
-                <div className={styles.inputGroup}>
-                  <label>Especialidade</label>
-                  <Input
-                    value={
-                      DoctorSpecializationsLabels[
-                        userData.specialization as keyof typeof DoctorSpecializationsLabels
-                      ] ||
-                      userData.specialization ||
-                      '---'
-                    }
-                  />
-                </div>
-              </>
-            )}
-            {isNurse && (
-              <div className={styles.inputGroup}>
-                <label>COREN</label>
-                <Input value={userData.coren || '---'} />
-              </div>
-            )}
-            <div className={styles.inputGroup}>
-              <label>Telefone</label>
-              <Input value={telefone} />
-            </div>
-          </div>
-        </div>
-      )}
+      <Divider />
 
-      <div className={styles.deleteArea}>
+      <div className={styles.section}>
+        <div>
+          <Typography.Title level={5}>
+            Desenvolvimento ({tasks.length})
+          </Typography.Title>
+          <Typography.Paragraph type='secondary'>
+            Lista de tarefas pendentes do projeto.
+          </Typography.Paragraph>
+        </div>
+
+        <div className={styles.addTask}>
+          <Input
+            placeholder='Nova tarefa'
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+            onPressEnter={handleAddTask}
+          />
+
+          <Button type='primary' onClick={handleAddTask}>
+            Adicionar
+          </Button>
+        </div>
+
+        <div className={styles.taskList}>
+          {tasks.map((task) => (
+            <div key={task.id} className={styles.taskItem}>
+              <Checkbox
+                checked={task.done}
+                onChange={() => toggleTask(task.id)}
+              >
+                <span className={task.done ? styles.taskDone : ''}>
+                  {task.title}
+                </span>
+              </Checkbox>
+
+              <Button
+                mode='outline'
+                type='text'
+                danger
+                size='small'
+                onClick={() => removeTask(task.id)}
+              >
+                Remover
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+}
+
+function ConfigBaseContent() {
+  const { user } = useAuth()
+  if (!user || !user?.level) return
+  const isBiggerModal = user?.level !== UserLevels.ADMIN
+
+  return (
+    <div className={styles.section}>
+      <Typography.Text className={styles.sectionLabel}>
+        Informações básicas
+      </Typography.Text>
+
+      <div className={isBiggerModal ? styles.infoGrid : styles.singleInfoGrid}>
+        <DetailsLine label='ID' value={user.number} />
+        <DetailsLine label='Nome' value={user.name} />
+        <DetailsLine label='CPF' value={masks(user.cpf, 'cpf')} />
+        <DetailsLine label='E-mail' value={user.email} />
+        {user.gender && (
+          <DetailsLine
+            label='Sexo'
+            value={UserGendersLabels[user.gender as UserGender]}
+          />
+        )}
+        {user.birthDate && (
+          <DetailsLine
+            label='Data de nascimento'
+            value={`${dayjs(user.birthDate).format('DD/MM/YYYY')} (${getAgeByBirthDate(user.birthDate)} anos)`}
+          />
+        )}
+        <DetailsLine
+          label='Telefone'
+          value={masks(user.cellphone, 'cellphone')}
+        />
+        {user?.bloodType && (
+          <DetailsLine label='Tipo sanguíneo' value={user?.bloodType} />
+        )}
+        {user?.height && (
+          <DetailsLine label='Altura' value={`${user?.height} m`} />
+        )}
+        {user?.weight && (
+          <DetailsLine label='Peso' value={`${user?.weight} kg`} />
+        )}
+        {user?.coren && <DetailsLine label='COREN' value={user?.coren} />}
+        {user?.shift && (
+          <DetailsLine label='Turno' value={NurseShiftsLabels[user?.shift]} />
+        )}
+        {user?.crm && <DetailsLine label='CRM' value={user?.crm} />}
+        {user?.specialization && (
+          <DetailsLine
+            label='Especialização'
+            value={DoctorSpecializationsLabels[user?.specialization]}
+          />
+        )}
+      </div>
+
+      {/* VIEIRA: Adicionar funcionadalide de editar */}
+      {/* <Typography.Text className={styles.sectionLabel}>
+        Informações alteráveis
+      </Typography.Text>
+
+      <div className={styles.infoGrid}>
+        <div className={styles.inputGroup}>
+          <label>CRM</label>
+          <Input value={user?.crm} />
+        </div>
+        <div className={styles.inputGroup}>
+          <label>Especialidade</label>
+          <Input
+            value={
+              DoctorSpecializationsLabels[
+                user?.specialization as keyof typeof DoctorSpecializationsLabels
+              ]
+            }
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label>COREN</label>
+          <Input value={user?.coren} />
+        </div>
+      </div> */}
+
+      {/* VIEIRA: Adicionar funcionadalide de deletar */}
+      {/* <div className={styles.deleteArea}>
         <DeleteModal
-          user={userData}
+          user={user}
           label='usuário'
           apiName='users'
-          buttonText='Encerrar conta'
+          buttonText='Deletar conta'
         />
-      </div>
+      </div> */}
     </div>
   )
+}
+
+function ConfigContent() {
+  const { user } = useAuth()
+  const validDevelopmerEmail = [
+    // 'vieira',
+    'rafa',
+    'take'
+  ]
+
+  if (validDevelopmerEmail.some((email) => user?.email?.includes(email))) {
+    return <ConfigDevContent />
+  }
+
+  return <ConfigBaseContent />
 }
 
 interface IConfigModalProps {
@@ -157,32 +249,38 @@ interface IConfigModalProps {
   setIsModalOpen: (bool: boolean) => void
 }
 
-export default function ConfigModal({
-  isModalOpen,
-  setIsModalOpen
-}: IConfigModalProps) {
+function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   const { user } = useAuth()
-  const userLevel = String(user?.level).toUpperCase()
-  const isAdmin = userLevel === 'ADMIN'
+  const isBiggerModal = user?.level !== UserLevels.ADMIN
+
+  function closeModal() {
+    setIsModalOpen(false)
+  }
+
+  const title = useMemo(() => {
+    if (user?.level) return `Configuração do ${UserLevelsLabels[user?.level]}`
+    return 'Configurações'
+  }, [user?.level])
 
   return (
     <Modal
       title={
-        <Typography.Title level={3} style={{ margin: 0, textAlign: 'center' }}>
-          Configuração do{' '}
-          {UserLevelsLabels[userLevel as keyof typeof UserLevelsLabels] ||
-            'Usuário'}
-        </Typography.Title>
+        <div>
+          <Typography.Title level={3}>{title}</Typography.Title>
+          <Typography.Paragraph>
+            Aqui você pode ajustar suas preferências e configurações de conta.
+          </Typography.Paragraph>
+        </div>
       }
       open={isModalOpen}
-      onCancel={() => setIsModalOpen(false)}
+      onCancel={closeModal}
       footer={null}
       centered
-      width={isAdmin ? 500 : 750}
+      width={isBiggerModal ? 720 : 460}
     >
-      <div className={styles.modalBody}>
-        <ConfigBaseContent />
-      </div>
+      <ConfigContent />
     </Modal>
   )
 }
+
+export default ConfigModal
