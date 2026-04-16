@@ -40,6 +40,7 @@ function RiskTag({ risk, className }: IRiskTagProps) {
   }
 
   const label = AttendanceRiskLabels[risk]
+
   return (
     <Tooltip title={label} className={className ?? ''}>
       <span

@@ -4,10 +4,11 @@ import { useAuth } from '@/hooks/useAuth'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styles from './AttendanceQueueChart.module.scss'
 import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/AttendanceQueueChartAdmin'
 import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
+import AttendanceQueueChartNurse from './components/AttendanceQueueChartNurse/AttendanceQueueChartNurse'
 
 export interface IAttendanceItemProps {
   item?: IDashboardQueueItem
@@ -22,6 +23,8 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
       return <AttendanceQueueChartAdmin item={item} loading={loading} />
     case 'doctor':
       return <AttendanceQueueChartDoctor item={item} loading={loading} />
+    case 'nurse':
+      return <AttendanceQueueChartNurse item={item} loading={loading} />
     default:
       return <></>
   }
@@ -57,11 +60,26 @@ function AttendanceQueueChart() {
     fetchData()
   }, [user?.unitId])
 
+  const cardConfig = useMemo(() => {
+    switch (user?.level) {
+      case 'nurse':
+        return {
+          title: 'Fila de Triagem',
+          asideText: 'triagens'
+        }
+      default:
+        return {
+          title: 'Fila de Atendimento',
+          asideText: 'atendimentos'
+        }
+    }
+  }, [user?.level])
+
   return (
     <DashboardCard
-      title='Fila de Atendimento'
+      title={cardConfig.title}
       icon={StethoscopeIcon}
-      asideText={`${data?.length} atendimentos`}
+      asideText={`${data?.length} ${cardConfig.asideText}`}
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>

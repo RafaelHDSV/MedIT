@@ -79,3 +79,37 @@
       'attendanceQueueChart';
   }
 }
+
+.nurse {
+  grid-template-areas:
+    'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
+    'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart'
+    'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart'
+    'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart'
+    'attendanceQueueChart attendanceQueueChart attendanceQueueChart attendanceQueueChart';
+
+  @include max-lg {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'dashboardCard1 dashboardCard2'
+      'dashboardCard3 dashboardCard4'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart'
+      'attendanceQueueChart attendanceQueueChart';
+  }
+
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'dashboardCard1'
+      'dashboardCard2'
+      'dashboardCard3'
+      'dashboardCard4'
+      'attendanceQueueChart'
+      'attendanceQueueChart'
+      'attendanceQueueChart'
+      'attendanceQueueChart';
+  }
+}
