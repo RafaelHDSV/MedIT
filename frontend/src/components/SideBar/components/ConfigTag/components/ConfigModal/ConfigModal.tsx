@@ -1,9 +1,20 @@
 import Button from '@/components/Button/Button'
+import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import { useAuth } from '@/hooks/useAuth'
 import { useDevTasks } from '@/hooks/useDevTasks'
-import { UserLevelsLabels } from '@/interfaces/IUser'
+import { DoctorSpecializationsLabels } from '@/interfaces/IDoctor'
+import { NurseShiftsLabels } from '@/interfaces/INurse'
+import {
+  UserGender,
+  UserGendersLabels,
+  UserLevels,
+  UserLevelsLabels
+} from '@/interfaces/IUser'
+import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
+import masks from '@/utils/masks'
 import { Checkbox, Divider, Input, message, Modal, Typography } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
+import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import styles from './ConfigModal.module.scss'
 
@@ -126,19 +137,103 @@ function ConfigDevContent() {
 
 function ConfigBaseContent() {
   const { user } = useAuth()
-  if (!user?.level) return
+  if (!user || !user?.level) return
+  const isBiggerModal = user?.level !== UserLevels.ADMIN
 
-  return <h2>Configuração do {UserLevelsLabels[user?.level]}</h2>
+  return (
+    <div className={styles.section}>
+      <Typography.Text className={styles.sectionLabel}>
+        Informações básicas
+      </Typography.Text>
+
+      <div className={isBiggerModal ? styles.infoGrid : styles.singleInfoGrid}>
+        <DetailsLine label='ID' value={user.number} />
+        <DetailsLine label='Nome' value={user.name} />
+        <DetailsLine label='CPF' value={masks(user.cpf, 'cpf')} />
+        <DetailsLine label='E-mail' value={user.email} />
+        {user.gender && (
+          <DetailsLine
+            label='Sexo'
+            value={UserGendersLabels[user.gender as UserGender]}
+          />
+        )}
+        {user.birthDate && (
+          <DetailsLine
+            label='Data de nascimento'
+            value={`${dayjs(user.birthDate).format('DD/MM/YYYY')} (${getAgeByBirthDate(user.birthDate)} anos)`}
+          />
+        )}
+        <DetailsLine
+          label='Telefone'
+          value={masks(user.cellphone, 'cellphone')}
+        />
+        {user?.bloodType && (
+          <DetailsLine label='Tipo sanguíneo' value={user?.bloodType} />
+        )}
+        {user?.height && (
+          <DetailsLine label='Altura' value={`${user?.height} m`} />
+        )}
+        {user?.weight && (
+          <DetailsLine label='Peso' value={`${user?.weight} kg`} />
+        )}
+        {user?.coren && <DetailsLine label='COREN' value={user?.coren} />}
+        {user?.shift && (
+          <DetailsLine label='Turno' value={NurseShiftsLabels[user?.shift]} />
+        )}
+        {user?.crm && <DetailsLine label='CRM' value={user?.crm} />}
+        {user?.specialization && (
+          <DetailsLine
+            label='Especialização'
+            value={DoctorSpecializationsLabels[user?.specialization]}
+          />
+        )}
+      </div>
+
+      {/* VIEIRA: Adicionar funcionadalide de editar */}
+      {/* <Typography.Text className={styles.sectionLabel}>
+        Informações alteráveis
+      </Typography.Text>
+
+      <div className={styles.infoGrid}>
+        <div className={styles.inputGroup}>
+          <label>CRM</label>
+          <Input value={user?.crm} />
+        </div>
+        <div className={styles.inputGroup}>
+          <label>Especialidade</label>
+          <Input
+            value={
+              DoctorSpecializationsLabels[
+                user?.specialization as keyof typeof DoctorSpecializationsLabels
+              ]
+            }
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label>COREN</label>
+          <Input value={user?.coren} />
+        </div>
+      </div> */}
+
+      {/* VIEIRA: Adicionar funcionadalide de deletar */}
+      {/* <div className={styles.deleteArea}>
+        <DeleteModal
+          user={user}
+          label='usuário'
+          apiName='users'
+          buttonText='Deletar conta'
+        />
+      </div> */}
+    </div>
+  )
 }
 
 function ConfigContent() {
   const { user } = useAuth()
   const validDevelopmerEmail = ['vieira', 'rafa', 'take']
 
-  if (
-    user &&
-    validDevelopmerEmail.some((email) => user.email.includes(email))
-  ) {
+  if (validDevelopmerEmail.some((email) => user?.email?.includes(email))) {
     return <ConfigDevContent />
   }
 
@@ -152,6 +247,7 @@ interface IConfigModalProps {
 
 function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   const { user } = useAuth()
+  const isBiggerModal = user?.level !== UserLevels.ADMIN
 
   function closeModal() {
     setIsModalOpen(false)
@@ -176,7 +272,7 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
       onCancel={closeModal}
       footer={null}
       centered
-      width={520}
+      width={isBiggerModal ? 720 : 460}
     >
       <ConfigContent />
     </Modal>

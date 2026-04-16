@@ -41,3 +41,29 @@
   text-decoration: line-through;
   opacity: 0.6;
 }
+
+.sectionLabel {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.infoGrid,
+.singleInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 3rem;
+
+  @include max-sm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.singleInfoGrid {
+  grid-template-columns: 1fr;
+}
+
+.deleteArea {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
