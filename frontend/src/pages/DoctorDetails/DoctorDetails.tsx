@@ -165,7 +165,8 @@ function DoctorDetails() {
             value: attendance.complaint
           }))}
           loading={loading}
-          doctorId={String(doctor?._id)}
+          userId={String(doctor?._id)}
+          userType='doctor'
           isAttendanceHistory
         />
       </div>

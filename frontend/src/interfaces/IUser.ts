@@ -16,6 +16,7 @@ export const UserLevelsLabels = {
   [UserLevels.NURSE]: 'Enfermeiro(a)',
   [UserLevels.PATIENT]: 'Paciente'
 } as const
+export type LevelsTypes = 'admin' | 'doctor' | 'nurse' | 'patient'
 
 export const UserGender = {
   MALE: 'male',

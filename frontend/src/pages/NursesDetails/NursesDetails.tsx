@@ -150,12 +150,15 @@ function NursesDetails() {
         <UserDetailsCard
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
-          // VIEIRA Tirar slice e quando clicar mostrar todos
-          itens={attendances?.slice(0, 5)?.map((attendance) => ({
+          itens={attendances?.map((attendance) => ({
             key: attendance._id,
             label: dayjs(attendance.date).format('DD/MM/YYYY'),
             value: attendance.complaint
           }))}
+          loading={loading}
+          userId={String(nurse?._id)}
+          userType='nurse'
+          isAttendanceHistory
         />
       </div>
     </section>

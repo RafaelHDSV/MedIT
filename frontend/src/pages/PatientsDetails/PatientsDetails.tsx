@@ -113,7 +113,7 @@ function PatientsDetails() {
             { label: 'Nome', value: patient?.name },
             {
               label: 'Peso',
-              value: patient?.weight?.toString()
+              value: `${patient?.weight?.toString()} kg`
             },
             {
               label: 'E-mail',
@@ -121,7 +121,7 @@ function PatientsDetails() {
             },
             {
               label: 'Altura',
-              value: patient?.height?.toString()
+              value: `${patient?.height?.toString()} m`
             },
             {
               label: 'Telefone',
@@ -175,12 +175,15 @@ function PatientsDetails() {
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
           className={styles.attendanceHistoryCard}
-          // VIEIRA Tirar slice e quando clicar mostrar todos
-          itens={attendances?.slice(0, 5)?.map((attendance) => ({
+          itens={attendances?.map((attendance) => ({
             key: attendance._id,
             label: dayjs(attendance.date).format('DD/MM/YYYY'),
             value: attendance.complaint
           }))}
+          loading={loading}
+          userId={String(patient?._id)}
+          userType='patient'
+          isAttendanceHistory
         />
       </div>
     </section>

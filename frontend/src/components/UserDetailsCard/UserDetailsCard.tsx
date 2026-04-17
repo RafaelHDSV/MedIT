@@ -1,3 +1,4 @@
+import type { LevelsTypes } from '@/interfaces/IUser'
 import Attendances from '@/pages/Attendances/Attendances'
 import masks from '@/utils/masks'
 import type { Icon } from '@phosphor-icons/react'
@@ -15,7 +16,8 @@ interface IUserDetailsCardProps {
   itens?: IDetailsLineProps[]
   loading?: boolean
   useFullWidth?: boolean
-  doctorId?: string
+  userId?: string
+  userType?: LevelsTypes
   isAttendanceHistory?: boolean
 }
 
@@ -26,7 +28,8 @@ function UserDetailsCard({
   itens,
   loading = false,
   useFullWidth = false,
-  doctorId,
+  userId,
+  userType,
   isAttendanceHistory = false
 }: IUserDetailsCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -67,7 +70,7 @@ function UserDetailsCard({
         centered
         width={1000}
       >
-        <Attendances doctorId={doctorId} />
+        <Attendances userId={userId} userType={userType} />
       </Modal>
 
       <section className={`${styles.card} ${className ?? ''}`}>
