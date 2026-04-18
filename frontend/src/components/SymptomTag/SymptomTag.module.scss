@@ -16,7 +16,9 @@
   border-color: var(--primary-color);
 
   &:hover {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color) !important;
+    color: var(--white) !important;
+    border-color: var(--primary-color) !important;
   }
 }
 
