@@ -19,45 +19,6 @@ const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
   return AttendanceRisk.NOT_URGENT
 }
 
-const buildPreRegistrationComplaint = ({
-  mainComplaint,
-  painLevel,
-  selfMedicated,
-  symptomStartDate,
-  symptoms,
-  conditions,
-  allergies,
-  generalObservation
-}: {
-  mainComplaint: string
-  painLevel: number
-  selfMedicated: boolean
-  symptomStartDate: string
-  symptoms: string[]
-  conditions: string[]
-  allergies: string[]
-  generalObservation?: string
-}) => {
-  const lines = [
-    `Queixa principal: ${mainComplaint.trim()}`,
-    `Nível de dor (0–10): ${painLevel}`,
-    `Automedicou-se: ${selfMedicated ? 'Sim' : 'Não'}`,
-    `Início dos sintomas: ${symptomStartDate}`,
-    symptoms.length
-      ? `Sintomas informados: ${symptoms.join(', ')}`
-      : 'Sintomas informados: (nenhum selecionado)',
-    conditions.length
-      ? `Condições médicas: ${conditions.join(', ')}`
-      : undefined,
-    allergies.length ? `Alergias: ${allergies.join(', ')}` : undefined,
-    generalObservation?.trim()
-      ? `Observação geral: ${generalObservation.trim()}`
-      : undefined
-  ].filter(Boolean) as string[]
-
-  return lines.join('\n')
-}
-
 export const getUsers = async (req: Request, res: Response) => {
   const { unitId } = req.query
   if (!unitId || typeof unitId !== 'string') {
@@ -295,6 +256,13 @@ export const getAttendances = async (req: Request, res: Response) => {
           name: { $ifNull: ['$patient.name', null] },
           birthDate: { $ifNull: ['$patient.birthDate', null] },
           complaint: 1,
+          painLevel: 1,
+          selfMedicated: 1,
+          symptomStartDate: 1,
+          symptoms: 1,
+          generalObservation: 1,
+          conditions: 1,
+          allergies: 1,
           date: 1,
           risk: 1,
           status: 1,
@@ -323,33 +291,6 @@ export const getAttendances = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao buscar os atendimentos' })
-  }
-}
-
-export const listHealthUnitsForPatient = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const user = await User.findById(req.userId)
-    if (!user || user.level !== UserLevels.PATIENT) {
-      return res.status(403).json({
-        message: 'Você não tem permissão para listar unidades por esta rota.'
-      })
-    }
-
-    const units = await Unit.find()
-      .select('_id name')
-      .sort({ name: 1 })
-      .lean()
-
-    return res.status(200).json({
-      message: 'Unidades encontradas com sucesso!',
-      data: units
-    })
-  } catch (err) {
-    console.error(err)
-    return res.status(500).json({ message: 'Erro ao buscar unidades de saúde' })
   }
 }
 
@@ -465,17 +406,6 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
 
     await patient.save()
 
-    const complaint = buildPreRegistrationComplaint({
-      mainComplaint: mainComplaint!.trim(),
-      painLevel: Number(painLevel),
-      selfMedicated: Boolean(selfMedicated),
-      symptomStartDate: symptomStart.toLocaleDateString('pt-BR'),
-      symptoms: normalizedSymptoms,
-      conditions: normalizedConditions,
-      allergies: normalizedAllergies,
-      generalObservation
-    })
-
     const risk = provisionalRiskFromPain(Number(painLevel))
     const now = new Date()
 
@@ -486,7 +416,16 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
 
     const attendance = await Attendance.create({
       number: nextNumber,
-      complaint,
+      complaint: mainComplaint!.trim(),
+      painLevel: Number(painLevel),
+      selfMedicated: Boolean(selfMedicated),
+      symptomStartDate: symptomStart,
+      symptoms: normalizedSymptoms,
+      conditions: normalizedConditions,
+      allergies: normalizedAllergies,
+      ...(generalObservation?.trim()
+        ? { generalObservation: generalObservation.trim() }
+        : {}),
       date: now,
       risk,
       status: AttendanceStatus.ON_THE_WAY,

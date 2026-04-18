@@ -8,6 +8,7 @@ import styles from './PreRegistrationModal.module.scss'
 
 interface IPreRegistrationModalProps {
   values: PreRegistrationFormValues
+  selectedSymptoms: string[]
   submitForm: () => void
   isOpen: boolean
   setIsOpen: (open: boolean) => void
@@ -16,12 +17,21 @@ interface IPreRegistrationModalProps {
 
 function PreRegistrationModal({
   values,
+  selectedSymptoms,
   submitForm,
   isOpen,
   setIsOpen,
   loading
 }: IPreRegistrationModalProps) {
-  const { mainComplaint, symptomStartDate, selfMedicated, painLevel } = values
+  const {
+    mainComplaint,
+    symptomStartDate,
+    selfMedicated,
+    painLevel,
+    conditions,
+    allergies,
+    generalObservation
+  } = values
 
   function handleConfirm() {
     submitForm()
@@ -49,6 +59,23 @@ function PreRegistrationModal({
             value={masks(String(selfMedicated), 'boolean')}
           />
           <DetailsLine label='Nível de dor' value={painLevel} />
+          <DetailsLine
+            label='Sintomas selecionados'
+            value={
+              selectedSymptoms.length
+                ? selectedSymptoms.join(', ')
+                : 'Nenhum selecionado'
+            }
+          />
+          {conditions?.trim() && (
+            <DetailsLine label='Condições médicas' value={conditions} />
+          )}
+          {allergies?.trim() && (
+            <DetailsLine label='Alergias' value={allergies} />
+          )}
+          {generalObservation?.trim() && (
+            <DetailsLine label='Observação geral' value={generalObservation} />
+          )}
         </div>
 
         <Flex justify='flex-end'>

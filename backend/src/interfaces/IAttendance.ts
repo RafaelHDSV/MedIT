@@ -67,4 +67,11 @@ export interface IAttendance extends IBaseInterface {
   }[]
   vitalSigns?: IVitalSigns
   iaConditionId?: Types.ObjectId
+  painLevel?: number
+  selfMedicated?: boolean
+  symptomStartDate?: Date
+  symptoms?: string[]
+  generalObservation?: string
+  conditions?: string[]
+  allergies?: string[]
 }

@@ -87,7 +87,14 @@ const AttendanceSchema = new Schema<IAttendance>(
     iaConditionId: {
       type: Schema.Types.ObjectId,
       ref: 'IACondition'
-    }
+    },
+    painLevel: { type: Number },
+    selfMedicated: { type: Boolean },
+    symptomStartDate: { type: Date },
+    symptoms: [{ type: String }],
+    generalObservation: { type: String },
+    conditions: [{ type: String }],
+    allergies: [{ type: String }]
   },
   {
     timestamps: true

@@ -34,6 +34,13 @@ export interface IDashboardQueueItem {
   patientBirthDate: Date
   date: Date
   complaint: string
+  painLevel?: number
+  selfMedicated?: boolean
+  symptomStartDate?: Date
+  symptoms?: string[]
+  generalObservation?: string
+  conditions?: string[]
+  allergies?: string[]
   status: AttendanceStatus
   risk: AttendanceRisk
 }

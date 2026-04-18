@@ -583,6 +583,13 @@ export const getAttendanceQueue = async ({
           patientName: { $ifNull: ['$patient.name', 'Paciente'] },
           patientBirthDate: { $ifNull: ['$patient.birthDate', 'Paciente'] },
           complaint: 1,
+          painLevel: 1,
+          selfMedicated: 1,
+          symptomStartDate: 1,
+          symptoms: 1,
+          generalObservation: 1,
+          conditions: 1,
+          allergies: 1,
           date: 1,
           status: 1,
           risk: 1

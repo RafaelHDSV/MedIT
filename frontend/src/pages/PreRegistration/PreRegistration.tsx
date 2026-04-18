@@ -58,6 +58,7 @@ function PreRegistration() {
         }
       })
 
+      setIsOpen(false)
       message.success('Solicitação de atendimento registrada com sucesso!')
       navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
@@ -87,6 +88,7 @@ function PreRegistration() {
     <>
       <PreRegistrationModal
         values={form.getFieldsValue()}
+        selectedSymptoms={selectedSymptoms}
         submitForm={form.submit}
         isOpen={isOpen}
         setIsOpen={setIsOpen}

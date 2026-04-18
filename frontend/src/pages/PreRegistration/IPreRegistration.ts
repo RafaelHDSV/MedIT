@@ -2,17 +2,17 @@ import type { UserGender } from '@/interfaces/IUser'
 import type { Dayjs } from 'dayjs'
 
 export interface PreRegistrationFormValues {
-  birthDate: Dayjs | null
-  gender: UserGender
-  painLevel: number
   mainComplaint: string
+  painLevel: number
   selfMedicated: boolean
   symptomStartDate: Dayjs | null
-  conditions?: string[]
-  allergies?: string[]
-  generalObservation?: string
-  unitId?: string
   symptoms: string[]
+  unitId: string
+  birthDate: Dayjs | null
+  gender: UserGender
+  conditions?: string
+  allergies?: string
+  generalObservation?: string
 }
 
 export interface IPreRegistrationErrors {
@@ -26,5 +26,4 @@ export interface IPreRegistrationErrors {
   allergies?: string
   generalObservation?: string
   unitId?: string
-  symptoms?: string
 }
