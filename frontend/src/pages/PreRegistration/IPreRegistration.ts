@@ -11,6 +11,8 @@ export interface PreRegistrationFormValues {
   conditions?: string[]
   allergies?: string[]
   generalObservation?: string
+  unitId?: string
+  symptoms: string[]
 }
 
 export interface IPreRegistrationErrors {
@@ -23,4 +25,6 @@ export interface IPreRegistrationErrors {
   conditions?: string
   allergies?: string
   generalObservation?: string
+  unitId?: string
+  symptoms?: string
 }

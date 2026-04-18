@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import type { PatientFormValues } from '@/interfaces/IPatient'
+import type { PreRegistrationFormValues } from '@/pages/PreRegistration/IPreRegistration'
 import type { ObjectId } from 'mongoose'
 import { Repository } from './Repository'
 
@@ -43,6 +44,12 @@ class PatientsRepositoy extends Repository {
   }) {
     return this.handle(() => {
       return this.api.get(`${this.path}/${patientId}/attendances`)
+    })
+  }
+
+  async createPatientAttendance({ body }: { body: PreRegistrationFormValues }) {
+    return this.handle(() => {
+      return this.api.post(`${this.path}/attendances`, body)
     })
   }
 }

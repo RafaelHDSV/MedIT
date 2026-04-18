@@ -25,7 +25,6 @@ function PreRegistrationModal({
 
   function handleConfirm() {
     submitForm()
-    setIsOpen(false)
   }
 
   return (

@@ -1,9 +1,13 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
+import PatientsRepository from '@/repositories/PatientsRepository'
+import { ROUTES } from '@/routes/constants'
 import { Flex, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type {
   IPreRegistrationErrors,
   PreRegistrationFormValues
@@ -14,6 +18,8 @@ import PreRegistrationModal from './components/PreRegistrationModal/PreRegistrat
 import SymptomsInfo from './components/SymptomsInfo/SymptomsInfo'
 
 function PreRegistration() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [form] = useForm()
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -23,11 +29,37 @@ function PreRegistration() {
   async function onFinish(values: PreRegistrationFormValues) {
     try {
       setLoading(true)
+      setFieldErrors({})
 
-      // VIEIRA: Adicionar back
-      console.log('Dados do pré-cadastro:', values)
+      const unitId = values.unitId || user?.unitId
+      if (!unitId) {
+        setFieldErrors({
+          unitId: 'Selecione a unidade de saúde onde deseja ser atendido(a).'
+        })
+        message.error(
+          'Selecione a unidade de saúde onde deseja ser atendido(a).'
+        )
+        return
+      }
 
-      message.success(`Pré cadastro finalizado com sucesso!`)
+      await PatientsRepository.createPatientAttendance({
+        body: {
+          mainComplaint: values.mainComplaint,
+          painLevel: values.painLevel,
+          selfMedicated: values.selfMedicated,
+          symptomStartDate: values.symptomStartDate,
+          symptoms: selectedSymptoms,
+          unitId,
+          birthDate: values.birthDate,
+          gender: values.gender,
+          conditions: values.conditions,
+          allergies: values.allergies,
+          generalObservation: values.generalObservation
+        }
+      })
+
+      message.success('Solicitação de atendimento registrada com sucesso!')
+      navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
       handleApiError({
         err,
