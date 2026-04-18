@@ -52,6 +52,14 @@ class PatientsRepositoy extends Repository {
       return this.api.post(`${this.path}/attendances`, body)
     })
   }
+
+  async confirmPatientArrival({ attendanceId }: { attendanceId: string }) {
+    return this.handle(() =>
+      this.api.post(
+        `${this.path}/attendances/${attendanceId}/confirm-arrival`
+      )
+    )
+  }
 }
 
 export default new PatientsRepositoy({

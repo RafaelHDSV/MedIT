@@ -5,9 +5,11 @@ import ReloadButton from '@/components/ReloadButton/ReloadButton'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import { Periods, PeriodsLabels } from '@/interfaces/globals'
+import { AttendanceStatus, type IAttendance } from '@/interfaces/IAttendance'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
+import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import { timeFormatter } from '@/utils/timeFormatter'
@@ -20,7 +22,7 @@ import {
   TimerIcon,
   UsersThreeIcon
 } from '@phosphor-icons/react'
-import { Flex } from 'antd'
+import { Flex, message } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
@@ -36,6 +38,9 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
   const [reload, setReload] = useState(false)
+  const [onTheWayAttendance, setOnTheWayAttendance] =
+    useState<IAttendance | null>(null)
+  const [arrivalLoading, setArrivalLoading] = useState(false)
   const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
 
   const fetchDashboardStatus = useCallback(async () => {
@@ -65,6 +70,30 @@ function Dashboard() {
   useEffect(() => {
     fetchDashboardStatus()
   }, [fetchDashboardStatus])
+
+  const fetchPatientOnTheWay = useCallback(async () => {
+    if (user?.level !== UserLevels.PATIENT || !user?._id) {
+      setOnTheWayAttendance(null)
+      return
+    }
+
+    try {
+      const response = await PatientsRepository.getAttendances({
+        patientId: user._id
+      })
+      const list = response.data as IAttendance[]
+      const pending = list?.find(
+        (a) => a.status === AttendanceStatus.ON_THE_WAY
+      )
+      setOnTheWayAttendance(pending ?? null)
+    } catch {
+      setOnTheWayAttendance(null)
+    }
+  }, [user?._id, user?.level])
+
+  useEffect(() => {
+    void fetchPatientOnTheWay()
+  }, [fetchPatientOnTheWay])
 
   function onReload() {
     fetchDashboardStatus()
@@ -189,16 +218,52 @@ function Dashboard() {
         return <AttendanceQueueChart reload={reload} />
       case UserLevels.PATIENT:
         return (
-          <>
+          <Flex vertical gap={12} align='flex-start'>
             <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
               Clique para iniciar uma nova consulta
             </Button>
-          </>
+            {onTheWayAttendance?._id ? (
+              <Button
+                type='primary'
+                loading={arrivalLoading}
+                onClick={async () => {
+                  try {
+                    setArrivalLoading(true)
+                    await PatientsRepository.confirmPatientArrival({
+                      attendanceId: String(onTheWayAttendance._id)
+                    })
+                    message.success(
+                      'Chegada confirmada. Você entrou na fila de triagem da unidade.'
+                    )
+                    setOnTheWayAttendance(null)
+                    onReload()
+                  } catch (err) {
+                    handleApiError({
+                      err,
+                      defaultMessage: 'Não foi possível confirmar sua chegada.'
+                    })
+                  } finally {
+                    setArrivalLoading(false)
+                  }
+                }}
+              >
+                Confirmar chegada ao hospital
+              </Button>
+            ) : null}
+          </Flex>
         )
       default:
         return <></>
     }
-  }, [user?.level, navigate, selectedPeriod, reload])
+  }, [
+    user?.level,
+    navigate,
+    selectedPeriod,
+    reload,
+    onTheWayAttendance,
+    arrivalLoading,
+    onReload
+  ])
 
   return (
     <>

@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+  confirmPatientArrival,
   createPatient,
   createPatientAttendance,
   deletePatient,
@@ -16,6 +17,11 @@ router.get('/', authMiddleware, getUsers)
 router.put('/:id', authMiddleware, editPatient)
 router.delete('/:id', authMiddleware, deletePatient)
 router.get('/:id/attendances', authMiddleware, getAttendances)
+router.post(
+  '/attendances/:attendanceId/confirm-arrival',
+  authMiddleware,
+  confirmPatientArrival
+)
 router.post('/attendances', authMiddleware, createPatientAttendance)
 
 export default router

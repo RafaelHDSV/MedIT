@@ -19,6 +19,9 @@ const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
   return AttendanceRisk.NOT_URGENT
 }
 
+const attendanceIdFromParams = (value: string | string[] | undefined) =>
+  String(Array.isArray(value) ? value[0] : value)
+
 export const getUsers = async (req: Request, res: Response) => {
   const { unitId } = req.query
   if (!unitId || typeof unitId !== 'string') {
@@ -252,6 +255,7 @@ export const getAttendances = async (req: Request, res: Response) => {
       },
       {
         $project: {
+          _id: 1,
           number: 1,
           name: { $ifNull: ['$patient.name', null] },
           birthDate: { $ifNull: ['$patient.birthDate', null] },
@@ -291,6 +295,58 @@ export const getAttendances = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao buscar os atendimentos' })
+  }
+}
+
+export const confirmPatientArrival = async (req: Request, res: Response) => {
+  try {
+    const rawId = attendanceIdFromParams(req.params.attendanceId)
+    if (!Types.ObjectId.isValid(rawId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+
+    const patient = await Patient.findById(req.userId)
+    if (!patient || patient.level !== UserLevels.PATIENT) {
+      return res.status(403).json({
+        message: 'Apenas pacientes podem confirmar chegada por esta rota.'
+      })
+    }
+
+    const now = new Date()
+    const match = {
+      _id: new Types.ObjectId(rawId),
+      patientId: patient._id,
+      status: AttendanceStatus.ON_THE_WAY
+    }
+
+    const updated = await Attendance.findOneAndUpdate(
+      match as never,
+      {
+        $set: { status: AttendanceStatus.WAITING_TRIAGE },
+        $push: {
+          changesHistory: {
+            status: AttendanceStatus.WAITING_TRIAGE,
+            changedAt: now
+          }
+        }
+      },
+      { new: true }
+    )
+
+    if (!updated) {
+      return res.status(409).json({
+        message:
+          'Não foi possível confirmar a chegada. Verifique se o atendimento é seu e se ainda está com status "a caminho".'
+      })
+    }
+
+    return res.json({
+      message: 'Chegada confirmada. Você entrou na fila de triagem.',
+      data: updated
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao confirmar chegada.' })
   }
 }
 
@@ -428,12 +484,10 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
         : {}),
       date: now,
       risk,
-      status: AttendanceStatus.WAITING_TRIAGE,
+      status: AttendanceStatus.ON_THE_WAY,
       unitId: unitIdStr,
       patientId: String(patient._id),
-      changesHistory: [
-        { status: AttendanceStatus.WAITING_TRIAGE, changedAt: now }
-      ]
+      changesHistory: [{ status: AttendanceStatus.ON_THE_WAY, changedAt: now }]
     })
 
     return res.status(201).json({
