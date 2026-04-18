@@ -191,7 +191,7 @@ function Dashboard() {
         return (
           <>
             <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
-              Pré cadastro
+              Clique para iniciar uma nova consulta
             </Button>
           </>
         )
