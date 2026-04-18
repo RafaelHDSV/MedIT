@@ -6,7 +6,7 @@ import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import { Flex, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type {
   IPreRegistrationErrors,
@@ -19,6 +19,7 @@ import SymptomsInfo from './components/SymptomsInfo/SymptomsInfo'
 
 function PreRegistration() {
   const { user } = useAuth()
+  console.log(user)
   const navigate = useNavigate()
   const [form] = useForm()
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([])
@@ -83,6 +84,13 @@ function PreRegistration() {
       )
     }
   }
+
+  useEffect(() => {
+    form.setFieldsValue({
+      allergies: user?.allergies?.join(', ') || '',
+      conditions: user?.conditions?.join(', ') || ''
+    })
+  }, [form, user?.allergies, user?.conditions])
 
   return (
     <>
