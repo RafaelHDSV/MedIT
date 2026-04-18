@@ -1,5 +1,6 @@
 import { Types } from 'mongoose'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
+import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 
@@ -507,13 +508,34 @@ export const getAttendanceByTime = async ({
   }
 }
 
-export const getAttendanceQueue = async ({ unitId }: { unitId: string }) => {
+export const getAttendanceQueue = async ({
+  unitId,
+  level
+}: {
+  unitId: string
+  level?: UserLevels
+}) => {
+  const status = () => {
+    switch (level) {
+      case UserLevels.ADMIN:
+        return ACTIVE_STATUSES
+      case UserLevels.DOCTOR:
+        return [AttendanceStatus.WAITING_ATTENDANCE]
+      case UserLevels.NURSE:
+        return [AttendanceStatus.WAITING_TRIAGE]
+      case UserLevels.PATIENT:
+        return []
+      default:
+        return []
+    }
+  }
+
   try {
     const data = await Attendance.aggregate([
       {
         $match: {
           unitId: new Types.ObjectId(unitId),
-          status: { $in: ACTIVE_STATUSES }
+          status: { $in: status() }
         }
       },
       {
@@ -559,7 +581,7 @@ export const getAttendanceQueue = async ({ unitId }: { unitId: string }) => {
         $project: {
           _id: 1,
           patientName: { $ifNull: ['$patient.name', 'Paciente'] },
-          patientBirthDate: {$ifNull: ['$patient.birthDate', 'Paciente']},
+          patientBirthDate: { $ifNull: ['$patient.birthDate', 'Paciente'] },
           complaint: 1,
           date: 1,
           status: 1,

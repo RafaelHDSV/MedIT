@@ -34,7 +34,7 @@ interface IAttendanceQueueChartProps {
   reload: boolean
 }
 
-function AttendanceQueueChart({reload}: IAttendanceQueueChartProps) {
+function AttendanceQueueChart({ reload }: IAttendanceQueueChartProps) {
   const { user } = useAuth()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -46,7 +46,8 @@ function AttendanceQueueChart({reload}: IAttendanceQueueChartProps) {
       try {
         const response = await DashboardRepository.getAttendanceQueue({
           params: {
-            unitId: user?.unitId
+            unitId: user?.unitId,
+            level: user?.level
           }
         })
         const data = response.data
@@ -62,7 +63,7 @@ function AttendanceQueueChart({reload}: IAttendanceQueueChartProps) {
     }
 
     fetchData()
-  }, [user?.unitId, reload])
+  }, [user?.unitId, user?.level, reload])
 
   const cardConfig = useMemo(() => {
     switch (user?.level) {

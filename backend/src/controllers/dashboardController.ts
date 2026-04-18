@@ -218,10 +218,11 @@ export const getDashboardAttendanceQueue = async (
   res: Response
 ) => {
   try {
-    const { unitId } = req.query
+    const { unitId, level } = req.query
 
     const data = await getAttendanceQueue({
-      unitId: String(unitId)
+      unitId: String(unitId),
+      level: level ? (level as UserLevels) : undefined
     })
 
     res.json({

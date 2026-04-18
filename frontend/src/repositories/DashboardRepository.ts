@@ -42,6 +42,7 @@ class AuthRepository extends Repository {
   }: {
     params: {
       unitId: ObjectId | string | undefined
+      level?: UserLevels
     }
   }) {
     return this.handle(() => {
