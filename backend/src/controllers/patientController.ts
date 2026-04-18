@@ -428,10 +428,12 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
         : {}),
       date: now,
       risk,
-      status: AttendanceStatus.ON_THE_WAY,
+      status: AttendanceStatus.WAITING_TRIAGE,
       unitId: unitIdStr,
       patientId: String(patient._id),
-      changesHistory: [{ status: AttendanceStatus.ON_THE_WAY, changedAt: now }]
+      changesHistory: [
+        { status: AttendanceStatus.WAITING_TRIAGE, changedAt: now }
+      ]
     })
 
     return res.status(201).json({

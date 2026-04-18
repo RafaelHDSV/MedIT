@@ -2,6 +2,7 @@ import { AttendanceRisk } from '@/interfaces/IAttendance'
 import { UserLevels } from '@/interfaces/IUser'
 import { useAuth } from '@/hooks/useAuth'
 import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
@@ -10,10 +11,18 @@ import SymptomTag from '@/components/SymptomTag/SymptomTag'
 import styles from './AttendanceDetails.module.scss'
 import VitalCard from './components/VitalCard/VitalCard'
 import ConditionsCard from './components/ConditionsCard/ConditionsCard'
+import { handleApiError } from '@/helpers/handleApiError'
+import AttendancesFlowRepository from '@/repositories/AttendancesFlowRepository'
+import { ROUTES } from '@/routes/constants'
+import { Flex, message } from 'antd'
 
 function AttendanceDetails() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { attendanceId } = useParams<{ attendanceId: string }>()
+  const [triageLoading, setTriageLoading] = useState(false)
   const isNurse = user?.level === UserLevels.NURSE
+  const isDoctor = user?.level === UserLevels.DOCTOR
 
   // VIEIRA: Adicionar back
   const patient = {
@@ -62,11 +71,44 @@ function AttendanceDetails() {
     // { name: 'Caxumba', compatibility: 11 }
   ]
 
+  async function handleCompleteTriage() {
+    if (!attendanceId) return
+    try {
+      setTriageLoading(true)
+      await AttendancesFlowRepository.completeTriage({
+        attendanceId: String(attendanceId)
+      })
+      message.success(
+        'Triagem concluída. O paciente foi encaminhado à fila médica.'
+      )
+      navigate(ROUTES.DASHBOARD.path)
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao concluir a triagem.'
+      })
+    } finally {
+      setTriageLoading(false)
+    }
+  }
+
+  const headerActions = (
+    <Flex gap={8} wrap='wrap' justify='flex-end'>
+      {isNurse && attendanceId ? (
+        <Button loading={triageLoading} onClick={handleCompleteTriage}>
+          Concluir triagem
+        </Button>
+      ) : null}
+      {isDoctor ? <Button>Finalizar atendimento</Button> : null}
+    </Flex>
+  )
+
   return (
     <section>
       <AuthLayoutHeader
-        // VIEIRA: Validar
-        actionComponent={<Button>Finalizar atendimento</Button>}
+        actionComponent={
+          isNurse || isDoctor ? headerActions : undefined
+        }
       />
 
       <div className={styles.page}>

@@ -30,6 +30,7 @@ export interface IDashboardStatusCards
 
 export interface IDashboardQueueItem {
   _id: string
+  number?: number
   patientName: string
   patientBirthDate: Date
   date: Date

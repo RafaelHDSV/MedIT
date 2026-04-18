@@ -2,6 +2,7 @@ import cors from 'cors'
 import express from 'express'
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
+import attendancesRoutes from './routes/attendancesRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import dashboardRoutes from './routes/dashboardRoutes.js'
 import doctorsRoutes from './routes/doctorsRoutes.js'
@@ -29,6 +30,7 @@ app.use('/auth/nurses', nursesRoutes)
 app.use('/auth/patients', patientsRoutes)
 app.use('/auth/units', unitsRoutes)
 app.use('/auth/dashboard', dashboardRoutes)
+app.use('/auth/attendances', attendancesRoutes)
 app.use('/auth/medications', medicationRoutes)
 
 app.listen(PORT, () => {

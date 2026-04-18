@@ -182,7 +182,8 @@ export const getWaitingForDoctor = async ({ unitId }: { unitId: string }) => {
   try {
     return await Attendance.countDocuments({
       unitId,
-      status: AttendanceStatus.WAITING_ATTENDANCE
+      status: AttendanceStatus.WAITING_ATTENDANCE,
+      $or: [{ doctorId: null }, { doctorId: { $exists: false } }]
     })
   } catch (err) {
     console.error(err)
@@ -287,7 +288,8 @@ export const getWaitingForTriage = async ({ unitId }: { unitId: string }) => {
   try {
     return await Attendance.countDocuments({
       unitId,
-      status: AttendanceStatus.WAITING_TRIAGE
+      status: AttendanceStatus.WAITING_TRIAGE,
+      $or: [{ nurseId: null }, { nurseId: { $exists: false } }]
     })
   } catch (err) {
     console.error(err)
@@ -531,12 +533,21 @@ export const getAttendanceQueue = async ({
   }
 
   try {
+    const poolMatch: Record<string, unknown> = {
+      unitId: new Types.ObjectId(unitId),
+      status: { $in: status() }
+    }
+
+    if (level === UserLevels.NURSE) {
+      poolMatch.$or = [{ nurseId: null }, { nurseId: { $exists: false } }]
+    }
+    if (level === UserLevels.DOCTOR) {
+      poolMatch.$or = [{ doctorId: null }, { doctorId: { $exists: false } }]
+    }
+
     const data = await Attendance.aggregate([
       {
-        $match: {
-          unitId: new Types.ObjectId(unitId),
-          status: { $in: status() }
-        }
+        $match: poolMatch
       },
       {
         $lookup: {
@@ -580,6 +591,7 @@ export const getAttendanceQueue = async ({
       {
         $project: {
           _id: 1,
+          number: 1,
           patientName: { $ifNull: ['$patient.name', 'Paciente'] },
           patientBirthDate: { $ifNull: ['$patient.birthDate', 'Paciente'] },
           complaint: 1,
