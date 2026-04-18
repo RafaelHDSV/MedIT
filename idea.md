@@ -10,6 +10,7 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
 - [3. Objetivo geral](#3-objetivo-geral)
 - [4. Objetivos específicos](#4-objetivos-específicos)
 - [5. Descrição do sistema](#5-descrição-do-sistema)
+  - [5.9 Jornada do paciente: pré-atendimento remoto, chegada e filas](#59-jornada-do-paciente-pré-atendimento-remoto-chegada-e-filas)
 - [6. Arquitetura e stack](#6-arquitetura-e-stack)
 - [7. Modelo de atendimento no código](#7-modelo-de-atendimento-no-código)
 - [8. Mecanismo inteligente (regras)](#8-mecanismo-inteligente-regras)
@@ -151,6 +152,18 @@ Indicadores como tempo de permanência/fila, volume por classificação de risco
 
 Essas regras devem ser aplicadas de forma consistente na **API** (filtros por `unitId`, `doctorId`, `nurseId`, `patientId`, etc.) e na **interface**, evitando vazamento de dados entre unidades ou entre profissionais.
 
+### 5.9 Jornada do paciente: pré-atendimento remoto, chegada e filas
+
+No repositório, a jornada do **paciente** foi desenhada para refletir quem inicia o pedido **fora da unidade** (ex.: cidade vizinha) e só entra na **fila operacional da enfermagem** após confirmação física na unidade:
+
+1. **Pré-atendimento (tela de pré-cadastro)** — O paciente autenticado informa queixa principal, nível de dor, sintomas (tags), dados complementares e a **unidade** de destino (alinhada ao `unitId` do episódio). A API persiste um **atendimento** com status **`onTheWay` (a caminho)**, com histórico inicial em `changesHistory`. Os dados clínicos declarados pelo paciente ficam em **campos próprios na raiz** do documento de atendimento (`painLevel`, `selfMedicated`, `symptomStartDate`, `symptoms`, `conditions`, `allergies`, `generalObservation`, etc.), enquanto **`complaint`** guarda apenas o texto da **queixa principal** (evita monolito textual único).
+2. **Dashboard do paciente** — Enquanto existir um atendimento **“a caminho”** do próprio usuário, a interface oferece a ação **“Confirmar chegada ao hospital”**. Ao confirmar, a API valida titularidade e status e promove o episódio para **`waitingTriage` (aguardando triagem)**; a partir daí o caso entra na **fila de triagem** daquela unidade.
+3. **Fila da enfermeira (dashboard)** — Lista atendimentos da **mesma `unitId`** da enfermeira, em **`waitingTriage`**, ainda **sem `nurseId`** (pool compartilhado até alguém assumir). A ação **“Iniciar triagem”** chama uma rota que faz **atribuição atômica** (`nurseId` + status **`inTriage`**), evitando dupla captura.
+4. **Conclusão da triagem** — A enfermeira responsável encerra a etapa via API; o status passa a **`waitingAttendance`**, liberando o episódio para a **fila médica** (mesmo critério: mesma unidade, sem `doctorId`).
+5. **Fila do médico** — Lista **`waitingAttendance`** sem `doctorId`. **“Iniciar atendimento”** atribui **`doctorId`** e **`inAttendance`** de forma atômica.
+
+Rotas de referência no backend: criação e chegada sob **`/auth/patients/...`**; captura de triagem / conclusão de triagem / captura médica sob **`/auth/attendances/...`**. Os contadores do dashboard (ex.: pacientes aguardando triagem ou médico) consideram apenas os itens **ainda não atribuídos** ao profissional, quando aplicável.
+
 ---
 
 ## 6. Arquitetura e stack
@@ -182,18 +195,30 @@ O modelo de **atendimento** (`IAttendance` / `AttendanceSchema`) centraliza o fl
 - **Relacionamentos**: paciente, unidade, enfermeiro(a), médico(a), medicamentos vinculados, referência opcional a condição sugerida pela IA (`iaConditionId`).
 - **Sinais vitais** embutidos como subdocumento.
 - **Histórico de mudanças de status** em `changesHistory`.
+- **Dados do pré-atendimento pelo paciente** (opcionais quando o episódio não passou por essa etapa): campos na **raiz** do documento — por exemplo `painLevel`, `selfMedicated`, `symptomStartDate`, `symptoms[]`, `conditions[]`, `allergies[]`, `generalObservation` — complementam o texto curto da **`complaint`** (queixa principal).
 
-**Status possíveis** (ordem lógica do fluxo): a caminho → aguardando triagem → em triagem → triagem concluída → aguardando atendimento → em atendimento → atendimento concluído / concluído / cancelado (valores exatos nos enums em `backend/src/interfaces/IAttendance.ts`).
+**Status possíveis** (ordem lógica do fluxo): a caminho → aguardando triagem → em triagem → triagem concluída → aguardando atendimento → em atendimento → atendimento concluído / concluído / cancelado (valores exatos nos enums em `backend/src/interfaces/IAttendance.ts` e espelhados no frontend).
 
-Fluxo simplificado:
+**Transições implementadas no protótipo** entre estados chave:
+
+| Etapa | Status (enum) | Quem dispara |
+|--------|----------------|--------------|
+| Paciente cria pedido à distância | `onTheWay` | API de pré-atendimento do paciente |
+| Paciente confirma chegada na unidade | `waitingTriage` | API de confirmação de chegada (paciente titular) |
+| Enfermeira assume o caso | `inTriage` (+ `nurseId`) | API de “claim” da triagem |
+| Enfermeira libera para o médico | `waitingAttendance` | API de conclusão da triagem |
+| Médico assume o caso | `inAttendance` (+ `doctorId`) | API de “claim” da consulta |
+
+Fluxo simplificado (alinhado ao código atual):
 
 ```mermaid
 flowchart LR
-  A[Entrada / pré-cadastro] --> B[Aguardando triagem]
-  B --> C[Triagem]
-  C --> D[Aguardando médico]
-  D --> E[Atendimento médico]
-  E --> F[Concluído]
+  A[Pré-atendimento a caminho] --> B[Chegada confirmada]
+  B --> C[Aguardando triagem pool]
+  C --> D[Em triagem com enfermeira]
+  D --> E[Aguardando médico pool]
+  E --> F[Em atendimento com médico]
+  F --> G[Concluído]
 ```
 
 ---
@@ -259,6 +284,14 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 - Frontend com áreas: autenticação, dashboard, pacientes, enfermeiros, médicos, unidades, medicamentos, atendimentos, triagens, pré-cadastro (`PreRegistration`), detalhes de atendimento.
 - Modelos Mongoose alinhados ao domínio (atendimento com status, risco, vitais, vínculos).
 - Base extensa de **doenças × sintomas** para experimentação do mecanismo de regras (seed no backend).
+
+**Fluxo paciente ⇄ unidade ⇄ triagem ⇄ médico (implementado no código)**
+
+- **Pré-atendimento:** o paciente cria um atendimento via API autenticada (`POST /auth/patients/attendances`), com validação de unidade, atualização opcional de dados cadastrais do paciente e persistência de **queixa** (`complaint`) e **campos estruturados** na raiz do atendimento (dor, sintomas selecionados, automedicação, datas, etc.). O episódio nasce em **`onTheWay`** com registro em `changesHistory`.
+- **Chegada na unidade:** `POST /auth/patients/attendances/:attendanceId/confirm-arrival` — apenas o **titular** do atendimento, apenas a partir de **`onTheWay`** → **`waitingTriage`** (+ histórico). No dashboard do paciente, botão dedicado quando há episódio “a caminho”.
+- **Filas no dashboard (por `unitId`):** agregações e contadores consideram, para enfermagem, **`waitingTriage` sem `nurseId`**; para o médico, **`waitingAttendance` sem `doctorId`** — ou seja, **pool compartilhado na unidade** até alguém assumir.
+- **Vínculo profissional atômico:** `POST /auth/attendances/:id/claim-triage` (enfermeira, mesma unidade), `POST /auth/attendances/:id/complete-triage` (enfermeira dona do caso em `inTriage`), `POST /auth/attendances/:id/claim-consultation` (médico, mesma unidade). Respostas **409** quando o estado já não permite a operação (ex.: outro profissional assumiu primeiro). A UI da fila chama essas rotas antes de navegar ao detalhe do atendimento (enfermeira/médico).
+- **Projeções de listagem** de atendimentos (paciente, médico, enfermeiro) passam a incluir os **campos de pré-atendimento** na raiz, para exibição e evolução futura da triagem.
 
 **Em evolução / parcial**
 
