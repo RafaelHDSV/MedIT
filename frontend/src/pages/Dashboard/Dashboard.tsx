@@ -219,9 +219,6 @@ function Dashboard() {
       case UserLevels.PATIENT:
         return (
           <Flex vertical gap={12} align='flex-start'>
-            <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
-              Clique para iniciar uma nova consulta
-            </Button>
             {onTheWayAttendance?._id ? (
               <Button
                 type='primary'
@@ -249,7 +246,12 @@ function Dashboard() {
               >
                 Confirmar chegada ao hospital
               </Button>
-            ) : null}
+            ) : (
+              // VIEIRA: Enquanto houver atendimento ativo, ele não pode criar outro
+              <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
+                Clique para iniciar uma nova consulta
+              </Button>
+            )}
           </Flex>
         )
       default:
