@@ -88,6 +88,7 @@ Desenvolver uma plataforma digital web para organização do fluxo hospitalar e 
 - Disponibilizar consulta de medicamentos por unidade e gestão de estoque (perfil administrativo).
 - Criar dashboard administrativo para indicadores operacionais.
 - Garantir autenticação, autorização por nível e boas práticas de segurança em API e cliente.
+- Evoluir para **nível MedIT** (acima do administrador de unidade), criação de unidades e administradores, e **isolamento de dados** por unidade e por profissional/paciente.
 
 ---
 
@@ -97,10 +98,11 @@ Desenvolver uma plataforma digital web para organização do fluxo hospitalar e 
 
 A plataforma é um **sistema web responsivo** acessível por navegador, com módulos e rotas condicionadas ao **nível de acesso**:
 
+- **Nível MedIT** (planejado) — perfil operacional da **plataforma**, acima do administrador de unidade: cria **unidades** e os **administradores** vinculados a cada unidade. Hoje, no protótipo, o administrador costuma ser criado **diretamente no banco de dados**; a evolução é expor esse fluxo pela aplicação com o nível MedIT.
 - **Paciente** — cadastro e jornada de pré-atendimento / acompanhamento.
 - **Enfermeiro(a) (triagem)** — sintomas, sinais vitais, classificação de risco, observações.
 - **Médico(a)** — histórico, análise de sugestões, diagnóstico, prescrições e orientações (conforme evolução do produto).
-- **Administrador(a) / gerência** — unidades, medicamentos, dashboard.
+- **Administrador(a) de unidade** — gestão operacional e cadastros **somente da sua unidade** (detalhes nas secções 5.7 e 5.8).
 
 O fluxo conceitual prevê **cadastro presencial na unidade** (por exemplo, validação via QR Code) antes de inserção definitiva no fluxo interno; no protótipo, a jornada pode ser exercida com **dados simulados** ou cadastros de teste.
 
@@ -127,10 +129,27 @@ No repositório, a classificação segue **cinco níveis** compatíveis com uma 
 - Disponibilidade por unidade;
 - Atualização de estoque pelo painel administrativo;
 - Consulta informativa conforme permissões.
+- A listagem **parte da própria unidade** do usuário (estoque e cadastro locais).
+- Quando um item **não está disponível** na unidade atual, o sistema permite consultar **unidades parceiras** para localizar o medicamento em outro ponto da rede (apenas consulta / encaminhamento informativo, conforme regras de negócio e privacidade).
 
 ### 5.6 Dashboard gerencial
 
 Indicadores como tempo de permanência/fila, volume por classificação de risco, estatísticas agregadas e métricas operacionais (detalhes dependem dos endpoints em `dashboard` e dos componentes em `frontend/src/pages/Dashboard`).
+
+### 5.7 Nível MedIT e administrador de unidade
+
+- **Situação atual (protótipo):** perfis com nível administrativo podem existir sem fluxo completo na UI; em muitos cenários de teste o **administrador é criado diretamente no banco de dados**.
+- **Situação desejada:** existe um nível **MedIT** (superior ao administrador de unidade), responsável por:
+  - cadastrar e manter **unidades**;
+  - criar e associar **administradores** a uma unidade específica.
+- **Administrador de unidade:** está ligado a **uma** unidade. Enxerga e gerencia **apenas** o que pertence a essa unidade: atendimentos, médicos, enfermeiros, pacientes no contexto da unidade, medicamentos, dashboard e demais dados operacionais **sem visibilidade cruzada** para outras unidades.
+
+### 5.8 Visibilidade de atendimentos por perfil
+
+- **Administrador de unidade:** acesso a atendimentos e recursos **da sua unidade** (não há escopo global entre unidades).
+- **Médico, enfermeiro e paciente:** cada um visualiza **somente os atendimentos em que participa** (vínculo ao próprio usuário / registro profissional). Por exemplo, o **médico A** não pode autenticar-se e listar ou abrir atendimentos atribuídos ao **médico B**; o mesmo princípio vale para enfermeiros e pacientes em relação aos **seus** episódios de cuidado.
+
+Essas regras devem ser aplicadas de forma consistente na **API** (filtros por `unitId`, `doctorId`, `nurseId`, `patientId`, etc.) e na **interface**, evitando vazamento de dados entre unidades ou entre profissionais.
 
 ---
 
@@ -200,8 +219,11 @@ flowchart LR
 6. Armazenamento de histórico clínico e de episódios de atendimento.
 7. Emissão ou registro de orientações e receitas (escopo de produto; implementação progressiva).
 8. Consulta e gestão de medicamentos por unidade.
-9. Dashboard administrativo.
-10. Controle de acesso por nível de permissão (admin, médico, enfermeiro, paciente).
+9. Dashboard administrativo (preferencialmente **escopado à unidade** do administrador).
+10. Controle de acesso por nível de permissão, incluindo o nível **MedIT** (criação de unidades e administradores) quando implementado.
+11. Garantir que **administrador de unidade** só acesse dados da **sua** unidade.
+12. Garantir que **médico**, **enfermeiro** e **paciente** só acessem **os próprios** atendimentos (sem leitura entre pares do mesmo nível).
+13. Listar medicamentos da **unidade corrente** e permitir consulta a **unidades parceiras** para itens indisponíveis localmente.
 
 ---
 
@@ -242,6 +264,7 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 
 - Algumas telas ainda exibem **dados estáticos** ou mocks enquanto a integração completa com a API é finalizada (ex.: sugestões de condições na UI de detalhes do atendimento podem não refletir ainda o cálculo em tempo real no backend).
 - Campos adicionais da triagem (escala de dor, frequência respiratória, etc.) podem ser expandidos além do subdocumento mínimo atual de sinais vitais.
+- **Governança multi-unidade:** hoje o administrador pode ser criado **manualmente no banco**; o nível **MedIT**, o vínculo estrito **admin ↔ uma unidade**, o **isolamento de atendimentos** (médico/enfermeiro/paciente só os seus) e a **busca em unidades parceiras** para medicamentos descrevem a **direção do produto** e devem ser reforçados nos middlewares e consultas da API.
 
 Para lista resumida do que o README declara como implementado, ver seção “Funcionalidades” em [`README.md`](README.md).
 
