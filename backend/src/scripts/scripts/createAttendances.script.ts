@@ -17,8 +17,6 @@ const DAYS_BACK = 364
 const MIN_COMPLETED_PER_PATIENT = 5
 const MIN_COMPLETED_PER_DOCTOR = 5
 const MIN_COMPLETED_PER_NURSE = 5
-const MIN_ACTIVE_PER_DOCTOR = 2
-const MIN_ACTIVE_PER_NURSE = 2
 
 /** Ocupação = ativos / maxOccupancy (reduzida para não dominar o gráfico por dia). */
 const OCCUPANCY_TARGET_MIN = 0.45
@@ -27,11 +25,17 @@ const OCCUPANCY_TARGET_MAX = 0.68
 /** Lotes pequenos para Atlas free / memória estável. */
 const INSERT_BATCH_SIZE = 400
 
-/** Extras aleatórios por unidade (fase 5), além dos mínimos e da série diária. */
-const MAX_RANDOM_EXTRA_PER_UNIT = 2200
+/** Regra suprema: máximo de documentos com o mesmo dia civil de `date` (por unidade). */
+const MAX_ATTENDANCES_PER_CALENDAR_DAY = 30
 
-/** Meta mínima global (após série diária ainda pode haver top-up em lotes). */
-const TARGET_MIN_TOTAL_ATTENDANCES = 37_500
+/** Meta diária mínima (equalização; sorteio fica entre min e max). */
+const MIN_ATTENDANCES_PER_CALENDAR_DAY = 15
+
+/**
+ * Meta global para top-up em lotes (0 = desligado: top-up quebraria o teto diário
+ * da regra suprema em createAttendances.md).
+ */
+const TARGET_MIN_TOTAL_ATTENDANCES = 0
 
 /** Teto de segurança para não estourar cluster free acidentalmente. */
 const ABSOLUTE_MAX_TOTAL_ATTENDANCES = 180_000
@@ -215,25 +219,6 @@ function windowBounds(now: Date): { start: Date; end: Date } {
   return { start, end: end }
 }
 
-/** Início do atendimento concluído: cabe o fluxo inteiro antes de `min(end, agora)`. */
-function randomCompletedStartInWindow(
-  windowStart: Date,
-  windowEnd: Date,
-  risk: AttendanceRisk
-): Date {
-  const stepMs = riskStepMinutes(risk) * 60_000
-  const flowSpan = (FULL_FLOW.length - 1) * stepMs
-  const endCap =
-    Math.min(windowEnd.getTime(), Date.now()) - flowSpan - 5 * 60_000
-  const startMs = windowStart.getTime()
-  if (endCap <= startMs) {
-    return new Date(startMs + 60_000)
-  }
-  return new Date(
-    faker.number.int({ min: Math.floor(startMs), max: Math.floor(endCap) })
-  )
-}
-
 /** Concluído com `date` caindo no dia civil `dayStart` (00h local). */
 function randomCompletedStartOnCalendarDay(
   dayStart: Date,
@@ -261,12 +246,6 @@ function startOfLocalDay(d: Date): Date {
   const x = new Date(d)
   x.setHours(0, 0, 0, 0)
   return x
-}
-
-function countInclusiveCalendarDays(startDay: Date, endDay: Date): number {
-  const s = startOfLocalDay(startDay).getTime()
-  const e = startOfLocalDay(endDay).getTime()
-  return Math.floor((e - s) / 86_400_000) + 1
 }
 
 /**
@@ -359,9 +338,11 @@ function maybeClinicalExtras(): Pick<
   }
 }
 
-/** Status onde o médico já está vinculado (≠ waitingTriage no seed). */
+/** Prefixos do fluxo real (inclui a caminho e aguardando triagem). */
 function pickActiveTargetStatus(): AttendanceStatus {
   return faker.helpers.arrayElement([
+    AttendanceStatus.ON_THE_WAY,
+    AttendanceStatus.WAITING_TRIAGE,
     AttendanceStatus.IN_TRIAGE,
     AttendanceStatus.TRIAGE_COMPLETED,
     AttendanceStatus.WAITING_ATTENDANCE,
@@ -440,7 +421,7 @@ function seedCompleted(
 const createAttendances = {
   name: 'create-attendances',
   description:
-    'Ano rolante: mínimos + série diária + ocupação moderada (ativos no tempo) + top-up; lotes',
+    'Ano rolante: equalização 15–30/dia (teto 30), fluxo completo; ativos só no dia atual; lotes',
   async run() {
     console.log('❌ Removendo atendimentos existentes…')
     const deleted = await Attendance.deleteMany()
@@ -503,13 +484,11 @@ const createAttendances = {
 
     for (const pool of unitPools) {
       console.log(`🏥 Unidade ${pool.unitId}`)
-      const unitDocs: AttendanceSeed[] = []
 
       const D = pool.doctors.length
       const N = pool.nurses.length
       const P = pool.patients.length
 
-      /** Ocupação alvo em fração de maxOccupancy (ativos repartidos por dia civil). */
       const occLow = Math.max(
         1,
         Math.ceil(pool.maxOccupancy * OCCUPANCY_TARGET_MIN)
@@ -518,251 +497,71 @@ const createAttendances = {
         occLow,
         Math.floor(pool.maxOccupancy * OCCUPANCY_TARGET_MAX)
       )
-      const desiredActive = Math.max(
-        MIN_ACTIVE_PER_DOCTOR * D,
-        MIN_ACTIVE_PER_NURSE * N
-      )
-      const activeRowsNeeded = faker.number.int({ min: occLow, max: occHigh })
-      if (desiredActive > occHigh) {
-        console.log(
-          `   ℹ️  ${pool.unitName || pool.unitId}: ativos por regra 2×staff seriam ${desiredActive}; usando ${activeRowsNeeded} (${occLow}–${occHigh}, ~${Math.round((activeRowsNeeded / pool.maxOccupancy) * 100)}% ocup.)`
-        )
-      }
-      const minPatientsForActive = activeRowsNeeded
-      if (P < minPatientsForActive) {
-        console.log(
-          `   Ajustando pool de pacientes (${P} → ≥${minPatientsForActive} para ativos distintos)`
-        )
-        await ensurePatients(pool, minPatientsForActive)
-      }
 
       const pickDoctor = () =>
         faker.helpers.arrayElement(pool.doctors) as Types.ObjectId
       const pickNurse = () =>
         faker.helpers.arrayElement(pool.nurses) as Types.ObjectId
 
-      // --- Fase 1: ≥5 concluídos por paciente ---
-      for (const patientId of pool.patients) {
-        for (let k = 0; k < MIN_COMPLETED_PER_PATIENT; k++) {
-          const risk = faker.helpers.arrayElement(riskDistribution)
-          const date = randomCompletedStartInWindow(windowStart, windowEnd, risk)
-          const nurseId = pickNurse()
-          const doctorId = pickDoctor()
-          const { status, history } = buildCompletedFlow(date, risk)
-          unitDocs.push(
-            seedCompleted({
-              number: attendanceNumber++,
-              complaint: faker.helpers.arrayElement(complaints),
-              diagnosis: faker.helpers.arrayElement(diagnoses),
-              date,
-              risk,
-              status,
-              unitId: pool.unitId,
-              patientId,
-              nurseId,
-              doctorId,
-              changesHistory: history,
-              vitalSigns: randomVitalSigns(),
-              createdAt: date,
-              updatedAt: date
-            })
-          )
+      const dayKey = (d: Date) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+      const todayStart = startOfLocalDay(now)
+      const calendarDays: Date[] = []
+      {
+        const c = new Date(windowStart)
+        c.setHours(0, 0, 0, 0)
+        const last = startOfLocalDay(now)
+        while (c.getTime() <= last.getTime()) {
+          calendarDays.push(new Date(c))
+          c.setDate(c.getDate() + 1)
         }
       }
 
-      const countCompletedForDoctor = (id: Types.ObjectId) =>
-        unitDocs.filter(
-          (a) =>
-            a.doctorId?.toString() === id.toString() &&
-            COMPLETED_STATUSES.includes(a.status)
-        ).length
+      const countByDay = new Map<string, number>()
+      for (const d of calendarDays) countByDay.set(dayKey(d), 0)
 
-      const countCompletedForNurse = (id: Types.ObjectId) =>
-        unitDocs.filter(
-          (a) =>
-            a.nurseId?.toString() === id.toString() &&
-            COMPLETED_STATUSES.includes(a.status)
-        ).length
+      const roomOn = (d: Date) =>
+        MAX_ATTENDANCES_PER_CALENDAR_DAY - (countByDay.get(dayKey(d)) ?? 0)
 
-      // --- Fase 2: médicos com ≥5 concluídos ---
-      for (const doctorId of pool.doctors) {
-        while (
-          countCompletedForDoctor(doctorId) < MIN_COMPLETED_PER_DOCTOR
-        ) {
-          const risk = faker.helpers.arrayElement(riskDistribution)
-          const date = randomCompletedStartInWindow(
-            windowStart,
-            windowEnd,
-            risk
-          )
-          const patientId = faker.helpers.arrayElement(pool.patients)
-          const nurseId = pickNurse()
-          const { status, history } = buildCompletedFlow(date, risk)
-          unitDocs.push(
-            seedCompleted({
-              number: attendanceNumber++,
-              complaint: faker.helpers.arrayElement(complaints),
-              diagnosis: faker.helpers.arrayElement(diagnoses),
-              date,
-              risk,
-              status,
-              unitId: pool.unitId,
-              patientId,
-              nurseId,
-              doctorId,
-              changesHistory: history,
-              vitalSigns: randomVitalSigns(),
-              createdAt: date,
-              updatedAt: date
-            })
-          )
+      const unitDocs: AttendanceSeed[] = []
+
+      const pickDayWithLeastLoad = (): Date | null => {
+        let best: Date | null = null
+        let bestCount = Infinity
+        for (const d of calendarDays) {
+          const c = countByDay.get(dayKey(d)) ?? 0
+          if (c >= MAX_ATTENDANCES_PER_CALENDAR_DAY) continue
+          if (c < bestCount) {
+            bestCount = c
+            best = d
+          }
         }
+        return best
       }
 
-      // --- Fase 3: enfermeiros com ≥5 concluídos ---
-      for (const nurseId of pool.nurses) {
-        while (countCompletedForNurse(nurseId) < MIN_COMPLETED_PER_NURSE) {
-          const risk = faker.helpers.arrayElement(riskDistribution)
-          const date = randomCompletedStartInWindow(
-            windowStart,
-            windowEnd,
-            risk
-          )
-          const patientId = faker.helpers.arrayElement(pool.patients)
-          const doctorId = pickDoctor()
-          const { status, history } = buildCompletedFlow(date, risk)
-          unitDocs.push(
-            seedCompleted({
-              number: attendanceNumber++,
-              complaint: faker.helpers.arrayElement(complaints),
-              diagnosis: faker.helpers.arrayElement(diagnoses),
-              date,
-              risk,
-              status,
-              unitId: pool.unitId,
-              patientId,
-              nurseId,
-              doctorId,
-              changesHistory: history,
-              vitalSigns: randomVitalSigns(),
-              createdAt: date,
-              updatedAt: date
-            })
-          )
+      const pushCompletedOnDay = (
+        dayStart: Date,
+        opts?: {
+          patientId?: Types.ObjectId
+          nurseId?: Types.ObjectId
+          doctorId?: Types.ObjectId
         }
-      }
-
-      // --- Fase 4: ativos (≥2 por médico e ≥2 por enfermeiro), pacientes distintos ---
-      const usedPatients = new Set<string>()
-      let row = 0
-      while (row < activeRowsNeeded) {
-        const patient = pool.patients.find((p) => !usedPatients.has(p.toString()))
-        if (!patient) {
-          await ensurePatients(pool, pool.patients.length + activeRowsNeeded)
-          continue
+      ): boolean => {
+        const k = dayKey(dayStart)
+        if ((countByDay.get(k) ?? 0) >= MAX_ATTENDANCES_PER_CALENDAR_DAY) {
+          return false
         }
-        usedPatients.add(patient.toString())
-
-        const doctorId = pool.doctors[row % D]
-        const nurseId = pool.nurses[row % N]
         const risk = faker.helpers.arrayElement(riskDistribution)
-        const target = pickActiveTargetStatus()
-
-        let status: AttendanceStatus = AttendanceStatus.IN_TRIAGE
-        let history: { status: AttendanceStatus; changedAt: Date }[] = []
-        let date: Date = new Date(windowStart.getTime() + 60_000)
-        let lastAt: Date = new Date(now)
-        let ok = false
-        for (let attempt = 0; attempt < 50 && !ok; attempt++) {
-          const dayPick = startOfLocalDay(
-            randomCalendarDayStartInWindow(windowStart, now)
-          )
-          const endTime = randomActiveEndTimeOnCalendarDay(
-            dayPick,
-            windowStart,
-            now,
-            risk,
-            target
-          )
-          if (!endTime) continue
-          const built = buildActiveFlowAnchored(endTime, risk, target)
-          if (built.date.getTime() >= windowStart.getTime()) {
-            status = built.status
-            history = built.history
-            date = built.date
-            lastAt = history[history.length - 1]?.changedAt ?? endTime
-            ok = true
-          }
-        }
-        if (!ok) {
-          const fbRisk = AttendanceRisk.NOT_URGENT
-          const fbTarget = AttendanceStatus.IN_ATTENDANCE
-          for (let attempt = 0; attempt < 80 && !ok; attempt++) {
-            const dayPick = startOfLocalDay(
-              randomCalendarDayStartInWindow(windowStart, now)
-            )
-            const endTime = randomActiveEndTimeOnCalendarDay(
-              dayPick,
-              windowStart,
-              now,
-              fbRisk,
-              fbTarget
-            )
-            if (!endTime) continue
-            const built = buildActiveFlowAnchored(endTime, fbRisk, fbTarget)
-            if (built.date.getTime() >= windowStart.getTime()) {
-              status = built.status
-              history = built.history
-              date = built.date
-              lastAt = history[history.length - 1]?.changedAt ?? endTime
-              ok = true
-            }
-          }
-        }
-        if (!ok) {
-          const endTime = new Date(now.getTime() - 45 * 60_000)
-          const built = buildActiveFlowAnchored(endTime, risk, target)
-          status = built.status
-          history = built.history
-          date = built.date
-          lastAt = history[history.length - 1]?.changedAt ?? endTime
-        }
-
-        unitDocs.push(
-          seedDoc({
-            number: attendanceNumber++,
-            complaint: faker.helpers.arrayElement(complaints),
-            diagnosis: undefined,
-            date,
-            risk,
-            status,
-            unitId: pool.unitId,
-            patientId: patient,
-            nurseId,
-            doctorId:
-              status !== AttendanceStatus.WAITING_TRIAGE
-                ? doctorId
-                : undefined,
-            changesHistory: history,
-            vitalSigns: randomVitalSigns(),
-            createdAt: date,
-            updatedAt: lastAt
-          })
+        const date = randomCompletedStartOnCalendarDay(
+          dayStart,
+          windowEnd,
+          risk
         )
-        row++
-      }
-
-      // --- Fase 5: extras aleatórios (camada irregular no ano) ---
-      const extraCount = Math.min(
-        MAX_RANDOM_EXTRA_PER_UNIT,
-        faker.number.int({ min: 500, max: MAX_RANDOM_EXTRA_PER_UNIT })
-      )
-      for (let e = 0; e < extraCount; e++) {
-        const risk = faker.helpers.arrayElement(riskDistribution)
-        const date = randomCompletedStartInWindow(windowStart, windowEnd, risk)
-        const patientId = faker.helpers.arrayElement(pool.patients)
-        const nurseId = pickNurse()
-        const doctorId = pickDoctor()
+        const nurseId = opts?.nurseId ?? pickNurse()
+        const doctorId = opts?.doctorId ?? pickDoctor()
+        const patientId =
+          opts?.patientId ?? faker.helpers.arrayElement(pool.patients)
         const { status, history } = buildCompletedFlow(date, risk)
         unitDocs.push(
           seedCompleted({
@@ -782,106 +581,244 @@ const createAttendances = {
             updatedAt: date
           })
         )
+        countByDay.set(k, (countByDay.get(k) ?? 0) + 1)
+        return true
+      }
+
+      const dailyTarget = faker.number.int({
+        min: MIN_ATTENDANCES_PER_CALENDAR_DAY,
+        max: MAX_ATTENDANCES_PER_CALENDAR_DAY
+      })
+
+      for (const dayStart of calendarDays) {
+        if (isSameCalendarDay(dayStart, now)) {
+          const capToday = Math.max(
+            4,
+            Math.ceil(dailyTarget * elapsedDayFraction(now))
+          )
+          const nToday = Math.min(dailyTarget, capToday, roomOn(dayStart))
+          for (let i = 0; i < nToday; i++) {
+            if (!pushCompletedOnDay(dayStart)) break
+          }
+          continue
+        }
+
+        let added = 0
+        while (added < dailyTarget && roomOn(dayStart) > 0) {
+          if (!pushCompletedOnDay(dayStart)) break
+          added++
+        }
+      }
+
+      let activeGoal = faker.number.int({ min: occLow, max: occHigh })
+      activeGoal = Math.min(activeGoal, Math.max(0, roomOn(todayStart)))
+      if (pool.patients.length < activeGoal) {
+        console.log(
+          `   Ajustando pool de pacientes (${P} → ≥${activeGoal} para ativos do dia)`
+        )
+        await ensurePatients(pool, activeGoal)
+      }
+
+      const usedPatients = new Set<string>()
+      let row = 0
+      while (row < activeGoal) {
+        const patient = pool.patients.find(
+          (p) => !usedPatients.has(p.toString())
+        )
+        if (!patient) {
+          await ensurePatients(pool, pool.patients.length + activeGoal)
+          continue
+        }
+        usedPatients.add(patient.toString())
+
+        const doctorId = pool.doctors[row % D]
+        const nurseId = pool.nurses[row % N]
+        const risk = faker.helpers.arrayElement(riskDistribution)
+        const target = pickActiveTargetStatus()
+
+        let status: AttendanceStatus = AttendanceStatus.IN_TRIAGE
+        let history: { status: AttendanceStatus; changedAt: Date }[] = []
+        let date: Date = new Date(todayStart.getTime() + 60_000)
+        let lastAt: Date = new Date(now)
+        let ok = false
+        for (let attempt = 0; attempt < 50 && !ok; attempt++) {
+          const endTime = randomActiveEndTimeOnCalendarDay(
+            todayStart,
+            windowStart,
+            now,
+            risk,
+            target
+          )
+          if (!endTime) continue
+          const built = buildActiveFlowAnchored(endTime, risk, target)
+          if (
+            built.date.getTime() >= todayStart.getTime() &&
+            built.date.getTime() < todayStart.getTime() + 86_400_000
+          ) {
+            status = built.status
+            history = built.history
+            date = built.date
+            lastAt = history[history.length - 1]?.changedAt ?? endTime
+            ok = true
+          }
+        }
+        if (!ok) {
+          const fbRisk = AttendanceRisk.NOT_URGENT
+          const fbTarget = AttendanceStatus.IN_ATTENDANCE
+          for (let attempt = 0; attempt < 80 && !ok; attempt++) {
+            const endTime = randomActiveEndTimeOnCalendarDay(
+              todayStart,
+              windowStart,
+              now,
+              fbRisk,
+              fbTarget
+            )
+            if (!endTime) continue
+            const built = buildActiveFlowAnchored(endTime, fbRisk, fbTarget)
+            if (
+              built.date.getTime() >= todayStart.getTime() &&
+              built.date.getTime() < todayStart.getTime() + 86_400_000
+            ) {
+              status = built.status
+              history = built.history
+              date = built.date
+              lastAt = history[history.length - 1]?.changedAt ?? endTime
+              ok = true
+            }
+          }
+        }
+        if (!ok) {
+          const endTime = new Date(
+            now.getTime() - faker.number.int({ min: 15, max: 120 }) * 60_000
+          )
+          const built = buildActiveFlowAnchored(endTime, risk, target)
+          status = built.status
+          history = built.history
+          date = built.date
+          lastAt = history[history.length - 1]?.changedAt ?? endTime
+        }
+
+        if (roomOn(todayStart) <= 0) break
+
+        const needsDoctor =
+          status !== AttendanceStatus.WAITING_TRIAGE &&
+          status !== AttendanceStatus.ON_THE_WAY
+
+        unitDocs.push(
+          seedDoc({
+            number: attendanceNumber++,
+            complaint: faker.helpers.arrayElement(complaints),
+            diagnosis: undefined,
+            date,
+            risk,
+            status,
+            unitId: pool.unitId,
+            patientId: patient,
+            nurseId,
+            doctorId: needsDoctor ? doctorId : undefined,
+            changesHistory: history,
+            vitalSigns: randomVitalSigns(),
+            createdAt: date,
+            updatedAt: lastAt
+          })
+        )
+        countByDay.set(
+          dayKey(todayStart),
+          (countByDay.get(dayKey(todayStart)) ?? 0) + 1
+        )
+        row++
+      }
+
+      const countCompletedForPatient = (id: Types.ObjectId) =>
+        unitDocs.filter(
+          (a) =>
+            a.patientId.toString() === id.toString() &&
+            COMPLETED_STATUSES.includes(a.status)
+        ).length
+
+      const countCompletedForDoctor = (id: Types.ObjectId) =>
+        unitDocs.filter(
+          (a) =>
+            a.doctorId?.toString() === id.toString() &&
+            COMPLETED_STATUSES.includes(a.status)
+        ).length
+
+      const countCompletedForNurse = (id: Types.ObjectId) =>
+        unitDocs.filter(
+          (a) =>
+            a.nurseId?.toString() === id.toString() &&
+            COMPLETED_STATUSES.includes(a.status)
+        ).length
+
+      // --- Mínimos por paciente / médico / enfermeiro (respeitando teto diário) ---
+      for (const patientId of pool.patients) {
+        while (countCompletedForPatient(patientId) < MIN_COMPLETED_PER_PATIENT) {
+          const dayPick = pickDayWithLeastLoad()
+          if (!dayPick) {
+            console.warn(
+              `   ⚠️  Teto ${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia: não coube o mínimo por paciente (${patientId}).`
+            )
+            break
+          }
+          if (
+            !pushCompletedOnDay(dayPick, {
+              patientId,
+              nurseId: pickNurse(),
+              doctorId: pickDoctor()
+            })
+          ) {
+            break
+          }
+        }
+      }
+
+      for (const doctorId of pool.doctors) {
+        while (countCompletedForDoctor(doctorId) < MIN_COMPLETED_PER_DOCTOR) {
+          const dayPick = pickDayWithLeastLoad()
+          if (!dayPick) {
+            console.warn(
+              `   ⚠️  Teto ${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia: não coube o mínimo por médico (${doctorId}).`
+            )
+            break
+          }
+          if (
+            !pushCompletedOnDay(dayPick, {
+              doctorId,
+              patientId: faker.helpers.arrayElement(pool.patients),
+              nurseId: pickNurse()
+            })
+          ) {
+            break
+          }
+        }
+      }
+
+      for (const nurseId of pool.nurses) {
+        while (countCompletedForNurse(nurseId) < MIN_COMPLETED_PER_NURSE) {
+          const dayPick = pickDayWithLeastLoad()
+          if (!dayPick) {
+            console.warn(
+              `   ⚠️  Teto ${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia: não coube o mínimo por enfermeiro (${nurseId}).`
+            )
+            break
+          }
+          if (
+            !pushCompletedOnDay(dayPick, {
+              nurseId,
+              patientId: faker.helpers.arrayElement(pool.patients),
+              doctorId: pickDoctor()
+            })
+          ) {
+            break
+          }
+        }
       }
 
       const baseCount = unitDocs.length
       console.log(
-        `   → Base (fases 1–5): ${baseCount} atendimento(s) — inserindo…`
+        `   → Unidade: ${baseCount} atendimento(s) (≤${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia, meta diária ${dailyTarget}) — inserindo…`
       )
       await insertBatched(unitDocs)
-
-      // --- Fase 6: série diária (concluídos distribuídos por dia civil) ---
-      const streamBuf: AttendanceSeed[] = []
-      let dailyGenerated = 0
-
-      const appendStream = async (doc: AttendanceSeed) => {
-        streamBuf.push(doc)
-        if (streamBuf.length >= INSERT_BATCH_SIZE) {
-          await insertBatched(streamBuf.splice(0, INSERT_BATCH_SIZE))
-        }
-      }
-
-      const dayCursor = new Date(windowStart)
-      dayCursor.setHours(0, 0, 0, 0)
-      const lastCalendarDay = new Date(now)
-      lastCalendarDay.setHours(0, 0, 0, 0)
-
-      const inclusiveDays = countInclusiveCalendarDays(
-        windowStart,
-        lastCalendarDay
-      )
-      const perDayMean = faker.number.int({ min: 14, max: 18 })
-      const phase6Total = inclusiveDays * perDayMean
-      const basePerDay = Math.floor(phase6Total / inclusiveDays)
-      const extraDistributedDays = phase6Total % inclusiveDays
-      const dayIndicesWithExtra = new Set<number>()
-      if (extraDistributedDays > 0) {
-        const shuffled = faker.helpers.shuffle(
-          Array.from({ length: inclusiveDays }, (_, i) => i)
-        )
-        for (let i = 0; i < extraDistributedDays; i++) {
-          dayIndicesWithExtra.add(shuffled[i])
-        }
-      }
-
-      let dayIndex = 0
-      while (dayCursor.getTime() <= lastCalendarDay.getTime()) {
-        const dayStart = new Date(dayCursor)
-        const nominal =
-          basePerDay + (dayIndicesWithExtra.has(dayIndex) ? 1 : 0)
-        let n = nominal + faker.number.int({ min: -1, max: 1 })
-        n = Math.max(0, n)
-
-        if (isSameCalendarDay(dayStart, now)) {
-          const cap = Math.max(
-            4,
-            Math.ceil(nominal * elapsedDayFraction(now))
-          )
-          n = Math.min(n, cap)
-        }
-
-        for (let i = 0; i < n; i++) {
-          const risk = faker.helpers.arrayElement(riskDistribution)
-          const date = randomCompletedStartOnCalendarDay(
-            dayStart,
-            windowEnd,
-            risk
-          )
-          const patientId = faker.helpers.arrayElement(pool.patients)
-          const nurseId = pickNurse()
-          const doctorId = pickDoctor()
-          const { status, history } = buildCompletedFlow(date, risk)
-          await appendStream(
-            seedCompleted({
-              number: attendanceNumber++,
-              complaint: faker.helpers.arrayElement(complaints),
-              diagnosis: faker.helpers.arrayElement(diagnoses),
-              date,
-              risk,
-              status,
-              unitId: pool.unitId,
-              patientId,
-              nurseId,
-              doctorId,
-              changesHistory: history,
-              vitalSigns: randomVitalSigns(),
-              createdAt: date,
-              updatedAt: date
-            })
-          )
-          dailyGenerated++
-        }
-        dayIndex++
-        dayCursor.setDate(dayCursor.getDate() + 1)
-      }
-
-      if (streamBuf.length) {
-        await insertBatched(streamBuf)
-      }
-
-      console.log(
-        `   → Série diária (fase 6): +${dailyGenerated} | subtotal unidade ≈ ${baseCount + dailyGenerated}`
-      )
     }
 
     let total = await Attendance.countDocuments()
