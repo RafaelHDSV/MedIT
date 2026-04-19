@@ -20,9 +20,9 @@ const MIN_COMPLETED_PER_NURSE = 5
 const MIN_ACTIVE_PER_DOCTOR = 2
 const MIN_ACTIVE_PER_NURSE = 2
 
-/** Ocupação = ativos / maxOccupancy; manter sempre nesta faixa (nunca 100%). */
-const OCCUPANCY_TARGET_MIN = 0.7
-const OCCUPANCY_TARGET_MAX = 0.95
+/** Ocupação = ativos / maxOccupancy (reduzida para não dominar o gráfico por dia). */
+const OCCUPANCY_TARGET_MIN = 0.45
+const OCCUPANCY_TARGET_MAX = 0.68
 
 /** Lotes pequenos para Atlas free / memória estável. */
 const INSERT_BATCH_SIZE = 400
@@ -289,6 +289,36 @@ function randomCalendarDayStartInWindow(windowStart: Date, now: Date): Date {
   return d
 }
 
+/**
+ * Última transição do fluxo ativo dentro do dia `dayStart`, com início (`date`)
+ * no mesmo dia civil — reparte ativos no eixo temporal do dashboard.
+ */
+function randomActiveEndTimeOnCalendarDay(
+  dayStart: Date,
+  windowStart: Date,
+  now: Date,
+  risk: AttendanceRisk,
+  targetStatus: AttendanceStatus
+): Date | null {
+  const idx = FULL_FLOW.indexOf(targetStatus)
+  const lastIdx =
+    idx >= 0 ? idx : FULL_FLOW.indexOf(AttendanceStatus.IN_ATTENDANCE)
+  const stepMs = riskStepMinutes(risk) * 60_000
+  const flowMs = lastIdx * stepMs
+
+  const dayEnd = new Date(dayStart)
+  dayEnd.setDate(dayEnd.getDate() + 1)
+
+  const day0 = startOfLocalDay(dayStart).getTime()
+  const ws0 = startOfLocalDay(windowStart).getTime()
+  const endMin = Math.max(day0, ws0) + flowMs + 60_000
+  const endMax = Math.min(dayEnd.getTime(), now.getTime()) - 2 * 60_000
+  if (endMax <= endMin) return null
+  return new Date(
+    faker.number.int({ min: Math.floor(endMin), max: Math.floor(endMax) })
+  )
+}
+
 function isSameCalendarDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -410,7 +440,7 @@ function seedCompleted(
 const createAttendances = {
   name: 'create-attendances',
   description:
-    'Ano rolante: mínimos + série diária + ocupação 70–95% + top-up; lotes',
+    'Ano rolante: mínimos + série diária + ocupação moderada (ativos no tempo) + top-up; lotes',
   async run() {
     console.log('❌ Removendo atendimentos existentes…')
     const deleted = await Attendance.deleteMany()
@@ -479,7 +509,7 @@ const createAttendances = {
       const N = pool.nurses.length
       const P = pool.patients.length
 
-      /** Ocupação alvo no intervalo [70%, 95%] de maxOccupancy (nunca 100%). */
+      /** Ocupação alvo em fração de maxOccupancy (ativos repartidos por dia civil). */
       const occLow = Math.max(
         1,
         Math.ceil(pool.maxOccupancy * OCCUPANCY_TARGET_MIN)
@@ -643,10 +673,18 @@ const createAttendances = {
         let date: Date = new Date(windowStart.getTime() + 60_000)
         let lastAt: Date = new Date(now)
         let ok = false
-        for (let attempt = 0; attempt < 25 && !ok; attempt++) {
-          const endTime = new Date(
-            now.getTime() - faker.number.int({ min: 8, max: 200 }) * 60_000
+        for (let attempt = 0; attempt < 50 && !ok; attempt++) {
+          const dayPick = startOfLocalDay(
+            randomCalendarDayStartInWindow(windowStart, now)
           )
+          const endTime = randomActiveEndTimeOnCalendarDay(
+            dayPick,
+            windowStart,
+            now,
+            risk,
+            target
+          )
+          if (!endTime) continue
           const built = buildActiveFlowAnchored(endTime, risk, target)
           if (built.date.getTime() >= windowStart.getTime()) {
             status = built.status
@@ -654,6 +692,31 @@ const createAttendances = {
             date = built.date
             lastAt = history[history.length - 1]?.changedAt ?? endTime
             ok = true
+          }
+        }
+        if (!ok) {
+          const fbRisk = AttendanceRisk.NOT_URGENT
+          const fbTarget = AttendanceStatus.IN_ATTENDANCE
+          for (let attempt = 0; attempt < 80 && !ok; attempt++) {
+            const dayPick = startOfLocalDay(
+              randomCalendarDayStartInWindow(windowStart, now)
+            )
+            const endTime = randomActiveEndTimeOnCalendarDay(
+              dayPick,
+              windowStart,
+              now,
+              fbRisk,
+              fbTarget
+            )
+            if (!endTime) continue
+            const built = buildActiveFlowAnchored(endTime, fbRisk, fbTarget)
+            if (built.date.getTime() >= windowStart.getTime()) {
+              status = built.status
+              history = built.history
+              date = built.date
+              lastAt = history[history.length - 1]?.changedAt ?? endTime
+              ok = true
+            }
           }
         }
         if (!ok) {

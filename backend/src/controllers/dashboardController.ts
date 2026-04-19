@@ -48,7 +48,9 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
           referenceDate: ref
         }),
         getInAttendance({
-          unitId: String(unitId)
+          unitId: String(unitId),
+          period: String(period),
+          referenceDate: ref
         }),
         getAttended({
           unitId: String(unitId),
@@ -57,7 +59,9 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         }),
         getAttendanceOcuppation({
           unitId: String(unitId),
-          maxOccupancy: Number(unit.data?.maxOccupancy)
+          maxOccupancy: Number(unit.data?.maxOccupancy),
+          period: String(period),
+          referenceDate: ref
         }),
         getAverageTime({
           unitId: String(unitId),
@@ -235,11 +239,17 @@ export const getDashboardAttendanceQueue = async (
   res: Response
 ) => {
   try {
-    const { unitId, level } = req.query
+    const { unitId, level, period, referenceDate } = req.query
+    const ref =
+      typeof referenceDate === 'string' && referenceDate.length > 0
+        ? referenceDate
+        : undefined
 
     const data = await getAttendanceQueue({
       unitId: String(unitId),
-      level: level ? (level as UserLevels) : undefined
+      level: level ? (level as UserLevels) : undefined,
+      period: typeof period === 'string' ? period : undefined,
+      referenceDate: ref
     })
 
     res.json({

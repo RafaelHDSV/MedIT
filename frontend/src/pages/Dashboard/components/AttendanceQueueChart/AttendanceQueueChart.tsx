@@ -1,6 +1,7 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
+import type { Periods } from '@/interfaces/globals'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
@@ -32,9 +33,15 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
 
 interface IAttendanceQueueChartProps {
   reload: boolean
+  selectedPeriod?: Periods
+  referenceDate?: string
 }
 
-function AttendanceQueueChart({ reload }: IAttendanceQueueChartProps) {
+function AttendanceQueueChart({
+  reload,
+  selectedPeriod,
+  referenceDate
+}: IAttendanceQueueChartProps) {
   const { user } = useAuth()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -47,7 +54,9 @@ function AttendanceQueueChart({ reload }: IAttendanceQueueChartProps) {
         const response = await DashboardRepository.getAttendanceQueue({
           params: {
             unitId: user?.unitId,
-            level: user?.level
+            level: user?.level,
+            period: selectedPeriod,
+            referenceDate
           }
         })
         const data = response.data
@@ -63,7 +72,7 @@ function AttendanceQueueChart({ reload }: IAttendanceQueueChartProps) {
     }
 
     fetchData()
-  }, [user?.unitId, user?.level, reload])
+  }, [user?.unitId, user?.level, reload, selectedPeriod, referenceDate])
 
   const cardConfig = useMemo(() => {
     switch (user?.level) {
