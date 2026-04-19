@@ -70,6 +70,10 @@ function AppRoutes() {
             path={ROUTES.TRIAGES_DETAILS.path}
             element={<pages.AttendanceDetails />}
           />
+            <Route
+            path={ROUTES.SCREENING_DETAILS.path}
+            element={<pages.ScreeningDetails />}
+          />
           <Route
             path={ROUTES.PRE_REGISTRATION.path}
             element={<pages.PreRegistration />}

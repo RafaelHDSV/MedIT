@@ -79,6 +79,11 @@ export const ROUTES = {
     description: 'Visualize um resumo geral do atendimento até o momento',
     path: '/auth/attendance/:attendanceId'
   },
+  SCREENING_DETAILS: {
+    name: 'Triagem',
+    description: 'Inicio do atendimento na parte de triagem',
+    path: '/auth/ScreeningDetail'
+  },
   TRIAGES: {
     name: 'Histórico de triagens',
     description: 'Consulte o histórico de triagens registradas.',
