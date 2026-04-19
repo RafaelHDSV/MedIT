@@ -15,27 +15,26 @@ interface IRiskColors {
 function RiskTag({ risk, className }: IRiskTagProps) {
   if (!risk) return
 
-  // VIEIRA: Centralizar cores no variables
   const colors: Record<AttendanceRisk, IRiskColors> = {
     [AttendanceRisk.EMERGENCY]: {
-      color: '#E74C64',
-      bgColor: '#E74C6433'
+      color: 'var(--attendance-risk-emergency-color)',
+      bgColor: 'var(--attendance-risk-emergency-bg)'
     },
     [AttendanceRisk.VERY_URGENT]: {
-      color: '#E78F4C',
-      bgColor: '#E78F4C33'
+      color: 'var(--attendance-risk-very-urgent-color)',
+      bgColor: 'var(--attendance-risk-very-urgent-bg)'
     },
     [AttendanceRisk.URGENT]: {
-      color: '#B3A800',
-      bgColor: '#F0F33266'
+      color: 'var(--attendance-risk-urgent-color)',
+      bgColor: 'var(--attendance-risk-urgent-bg)'
     },
     [AttendanceRisk.LESS_URGENT]: {
-      color: '#2ECC71',
-      bgColor: '#2ECC7133'
+      color: 'var(--attendance-risk-less-urgent-color)',
+      bgColor: 'var(--attendance-risk-less-urgent-bg)'
     },
     [AttendanceRisk.NOT_URGENT]: {
-      color: '#2E8FCC',
-      bgColor: '#2E8FCC33'
+      color: 'var(--attendance-risk-not-urgent-color)',
+      bgColor: 'var(--attendance-risk-not-urgent-bg)'
     }
   }
 
