@@ -1,6 +1,9 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
-import { InputSelect } from '@/components/FormComponents/FormComponents'
+import {
+  InputDashboardPeriodDate,
+  InputSelect
+} from '@/components/FormComponents/FormComponents'
 import ReloadButton from '@/components/ReloadButton/ReloadButton'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
@@ -23,6 +26,7 @@ import {
   UsersThreeIcon
 } from '@phosphor-icons/react'
 import { Flex, message } from 'antd'
+import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
@@ -37,6 +41,7 @@ function Dashboard() {
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
+  const [referenceDayjs, setReferenceDayjs] = useState(() => dayjs())
   const [reload, setReload] = useState(false)
   const [onTheWayAttendance, setOnTheWayAttendance] =
     useState<IAttendance | null>(null)
@@ -52,7 +57,8 @@ function Dashboard() {
           userId: user?._id,
           unitId: user?.unitId,
           level: user?.level,
-          period: selectedPeriod
+          period: selectedPeriod,
+          referenceDate: referenceDayjs.format('YYYY-MM-DD')
         }
       })
       const data = response.data
@@ -65,7 +71,7 @@ function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }, [selectedPeriod, user])
+  }, [selectedPeriod, referenceDayjs, user])
 
   useEffect(() => {
     fetchDashboardStatus()
@@ -207,6 +213,7 @@ function Dashboard() {
           <>
             <AttendanceByTimeChart
               selectedPeriod={selectedPeriod}
+              referenceDate={referenceDayjs.format('YYYY-MM-DD')}
               reload={reload}
             />
             <AttendanceQueueChart reload={reload} />
@@ -261,6 +268,7 @@ function Dashboard() {
     user?.level,
     navigate,
     selectedPeriod,
+    referenceDayjs,
     reload,
     onTheWayAttendance,
     arrivalLoading,
@@ -271,19 +279,36 @@ function Dashboard() {
     <>
       <AuthLayoutHeader
         actionComponent={
-          <Flex align='center' gap={8}>
+          <Flex
+            align='center'
+            gap={8}
+            wrap='wrap'
+            className='dashboard__filters--date'
+          >
             {shouldShowPeriodSelect && (
-              <InputSelect
-                className={styles.periodSelect}
-                placeholder='Período'
-                options={Object.entries(PeriodsLabels).map(([key, value]) => ({
-                  label: value,
-                  value: key
-                }))}
-                inputHeight='2rem'
-                value={selectedPeriod}
-                onChange={setSelectedPeriod}
-              />
+              <>
+                <InputSelect
+                  className={styles.periodSelect}
+                  placeholder='Período'
+                  options={Object.entries(PeriodsLabels).map(([key, value]) => ({
+                    label: value,
+                    value: key
+                  }))}
+                  inputHeight='2rem'
+                  value={selectedPeriod}
+                  onChange={(value) => {
+                    setSelectedPeriod(value as Periods)
+                    setReferenceDayjs(dayjs())
+                  }}
+                />
+                <InputDashboardPeriodDate
+                  className={styles.periodDatePicker}
+                  period={selectedPeriod}
+                  value={referenceDayjs}
+                  onChange={setReferenceDayjs}
+                  inputHeight='2rem'
+                />
+              </>
             )}
             <ReloadButton onReload={onReload} />
           </Flex>

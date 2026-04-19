@@ -10,13 +10,15 @@ import { Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
 import styles from './AttendanceByTimeChart.module.scss'
 
-interface IAttendanceByTimeChartProps {
+export interface IAttendanceByTimeChartProps {
   selectedPeriod: Periods
+  referenceDate: string
   reload: boolean
 }
 
 function AttendanceByTimeChart({
   selectedPeriod,
+  referenceDate,
   reload
 }: IAttendanceByTimeChartProps) {
   const { user } = useAuth()
@@ -35,7 +37,8 @@ function AttendanceByTimeChart({
         const response = await DashboardRepository.getAttendanceByTime({
           params: {
             unitId: user?.unitId,
-            period: selectedPeriod
+            period: selectedPeriod,
+            referenceDate
           }
         })
         const data = response.data
@@ -51,7 +54,7 @@ function AttendanceByTimeChart({
     }
 
     fetchAttendanceByTime()
-  }, [selectedPeriod, user?.unitId, reload])
+  }, [selectedPeriod, referenceDate, user?.unitId, reload])
 
   function getPeriodConfig(period: string) {
     switch (period) {

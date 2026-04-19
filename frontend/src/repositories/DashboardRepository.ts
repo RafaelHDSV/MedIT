@@ -13,6 +13,7 @@ class AuthRepository extends Repository {
       unitId: ObjectId | string | undefined
       level: UserLevels | undefined
       period: Periods
+      referenceDate?: string
     }
   }) {
     return this.handle(() => {
@@ -28,6 +29,7 @@ class AuthRepository extends Repository {
     params: {
       unitId: ObjectId | string | undefined
       period: Periods
+      referenceDate?: string
     }
   }) {
     return this.handle(() => {

@@ -15,13 +15,15 @@ const ACTIVE_STATUSES = [
 // ADMIN
 export const getEntries = async ({
   unitId,
-  period
+  period,
+  referenceDate
 }: {
   unitId: string
   period: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     return await Attendance.countDocuments({
       unitId,
@@ -46,14 +48,16 @@ export const getInAttendance = async ({ unitId }: { unitId: string }) => {
 export const getAttended = async ({
   unitId,
   period,
-  doctorId
+  doctorId,
+  referenceDate
 }: {
   unitId: string
   period: string
   doctorId?: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     return await Attendance.countDocuments({
       unitId,
@@ -93,13 +97,15 @@ export const getAttendanceOcuppation = async ({
 
 export const getAverageTime = async ({
   unitId,
-  period
+  period,
+  referenceDate
 }: {
   unitId: string
   period: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     const result = await Attendance.aggregate([
       {
@@ -153,13 +159,15 @@ export const getAverageTime = async ({
 
 export const getHighRisk = async ({
   unitId,
-  period
+  period,
+  referenceDate
 }: {
   unitId: string
   period: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     const highRiskAttendances = await Attendance.countDocuments({
       unitId: unitId,
@@ -193,14 +201,16 @@ export const getWaitingForDoctor = async ({ unitId }: { unitId: string }) => {
 export const getDoctorAverageTime = async ({
   unitId,
   period,
-  doctorId
+  doctorId,
+  referenceDate
 }: {
   unitId: string
   period: string
   doctorId: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     const result = await Attendance.aggregate([
       {
@@ -299,14 +309,16 @@ export const getWaitingForTriage = async ({ unitId }: { unitId: string }) => {
 export const getTriaged = async ({
   unitId,
   period,
-  nurseId
+  nurseId,
+  referenceDate
 }: {
   unitId: string
   period: string
   nurseId: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     return await Attendance.countDocuments({
       unitId,
@@ -330,14 +342,16 @@ export const getTriaged = async ({
 export const getTriageAverageTime = async ({
   unitId,
   period,
-  nurseId
+  nurseId,
+  referenceDate
 }: {
   unitId: string
   period: string
   nurseId: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     const result = await Attendance.aggregate([
       {
@@ -417,13 +431,15 @@ export const getTriageAverageTime = async ({
 // getDashboardAttendanceByTime
 export const getAttendanceByTime = async ({
   unitId,
-  period
+  period,
+  referenceDate
 }: {
   unitId: string
   period: string
+  referenceDate?: string
 }) => {
   try {
-    const { start, end } = getPeriodDateRange(period)
+    const { start, end } = getPeriodDateRange(period, referenceDate)
 
     const groupBy =
       period === 'day'

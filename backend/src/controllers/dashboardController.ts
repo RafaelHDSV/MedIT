@@ -24,7 +24,11 @@ import {
 import { getUnitService } from '../services/unitService.js'
 
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
-  const { unitId, userId, level, period } = req.query
+  const { unitId, userId, level, period, referenceDate } = req.query
+  const ref =
+    typeof referenceDate === 'string' && referenceDate.length > 0
+      ? referenceDate
+      : undefined
 
   const unit = await getUnitService({ unitId: String(unitId) })
 
@@ -40,14 +44,16 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
       ] = await Promise.all([
         getEntries({
           unitId: String(unitId),
-          period: String(period)
+          period: String(period),
+          referenceDate: ref
         }),
         getInAttendance({
           unitId: String(unitId)
         }),
         getAttended({
           unitId: String(unitId),
-          period: String(period)
+          period: String(period),
+          referenceDate: ref
         }),
         getAttendanceOcuppation({
           unitId: String(unitId),
@@ -55,11 +61,13 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         }),
         getAverageTime({
           unitId: String(unitId),
-          period: String(period)
+          period: String(period),
+          referenceDate: ref
         }),
         getHighRisk({
           unitId: String(unitId),
-          period: String(period)
+          period: String(period),
+          referenceDate: ref
         })
       ])
 
@@ -96,12 +104,14 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         getAttended({
           unitId: String(unitId),
           period: String(period),
-          doctorId: String(userId)
+          doctorId: String(userId),
+          referenceDate: ref
         }),
         getDoctorAverageTime({
           unitId: String(unitId),
           period: String(period),
-          doctorId: String(userId)
+          doctorId: String(userId),
+          referenceDate: ref
         })
       ])
 
@@ -135,12 +145,14 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
           getTriaged({
             unitId: String(unitId),
             period: String(period),
-            nurseId: String(userId)
+            nurseId: String(userId),
+            referenceDate: ref
           }),
           getTriageAverageTime({
             unitId: String(unitId),
             period: String(period),
-            nurseId: String(userId)
+            nurseId: String(userId),
+            referenceDate: ref
           })
         ]
       )
@@ -194,11 +206,16 @@ export const getDashboardAttendanceByTime = async (
   res: Response
 ) => {
   try {
-    const { unitId, period } = req.query
+    const { unitId, period, referenceDate } = req.query
+    const ref =
+      typeof referenceDate === 'string' && referenceDate.length > 0
+        ? referenceDate
+        : undefined
 
     const data = await getAttendanceByTime({
       unitId: String(unitId),
-      period: String(period)
+      period: String(period),
+      referenceDate: ref
     })
 
     res.json({

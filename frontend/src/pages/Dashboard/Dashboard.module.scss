@@ -12,6 +12,11 @@
   width: 6rem;
 }
 
+.periodDatePicker {
+  width: 12rem;
+  min-width: 10rem;
+}
+
 .admin {
   grid-template-areas:
     'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'

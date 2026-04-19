@@ -1,3 +1,4 @@
+import { Periods } from '@/interfaces/globals'
 import type { MaskEnum } from '@/utils/masks'
 import masks from '@/utils/masks'
 import {
@@ -19,6 +20,7 @@ import {
   type DayjsValue,
   type RangeValue
 } from '../MultiDatepicker/types'
+import type { Dayjs } from 'dayjs'
 import styles from './FormComponents.module.scss'
 
 interface IFormItemProps extends FormItemProps {
@@ -100,6 +102,55 @@ interface IInputDateProps {
   onChange?: (date: DayjsValue) => void
 }
 
+function periodToDayjsType(period: Periods): DayjsType {
+  switch (period) {
+    case Periods.DAY:
+      return DayjsType.date
+    case Periods.WEEK:
+      return DayjsType.week
+    case Periods.MONTH:
+      return DayjsType.month
+    case Periods.YEAR:
+      return DayjsType.year
+    default:
+      return DayjsType.date
+  }
+}
+
+interface IInputDashboardPeriodDateProps {
+  period: Periods
+  value: Dayjs
+  onChange: (value: Dayjs) => void
+  inputHeight?: string
+  className?: string
+}
+
+function InputDashboardPeriodDate({
+  period,
+  value,
+  onChange,
+  inputHeight = '2rem',
+  className
+}: IInputDashboardPeriodDateProps) {
+  const pickerType = periodToDayjsType(period)
+
+  return (
+    <MultiDatepicker
+      key={period}
+      className={`${styles.multiDatepicker} ${className ?? ''}`}
+      style={{ '--input-height': inputHeight } as React.CSSProperties}
+      type={pickerType}
+      defaultPickerType={pickerType}
+      options={[pickerType]}
+      value={value as DateValue}
+      onDateChange={(date: DayjsValue) => {
+        if (!date || Array.isArray(date)) return
+        onChange(date)
+      }}
+    />
+  )
+}
+
 function InputDate({
   value: initialValue,
   inputHeight = '3rem',
@@ -145,4 +196,10 @@ function InputDate({
   )
 }
 
-export { FormItem, InputDate, InputSelect, InputText }
+export {
+  FormItem,
+  InputDashboardPeriodDate,
+  InputDate,
+  InputSelect,
+  InputText
+}
