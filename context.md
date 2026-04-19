@@ -10,6 +10,7 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
 - [3. Objetivo geral](#3-objetivo-geral)
 - [4. Objetivos específicos](#4-objetivos-específicos)
 - [5. Descrição do sistema](#5-descrição-do-sistema)
+  - [5.6 Dashboard, período, ocupação e gráficos](#56-dashboard-período-ocupação-e-gráficos)
   - [5.9 Jornada do paciente: pré-atendimento remoto, chegada e filas](#59-jornada-do-paciente-pré-atendimento-remoto-chegada-e-filas)
 - [6. Arquitetura e stack](#6-arquitetura-e-stack)
 - [7. Modelo de atendimento no código](#7-modelo-de-atendimento-no-código)
@@ -133,9 +134,29 @@ No repositório, a classificação segue **cinco níveis** compatíveis com uma 
 - A listagem **parte da própria unidade** do usuário (estoque e cadastro locais).
 - Quando um item **não está disponível** na unidade atual, o sistema permite consultar **unidades parceiras** para localizar o medicamento em outro ponto da rede (apenas consulta / encaminhamento informativo, conforme regras de negócio e privacidade).
 
-### 5.6 Dashboard gerencial
+### 5.6 Dashboard, período, ocupação e gráficos
 
-Indicadores como tempo de permanência/fila, volume por classificação de risco, estatísticas agregadas e métricas operacionais (detalhes dependem dos endpoints em `dashboard` e dos componentes em `frontend/src/pages/Dashboard`).
+O **dashboard administrativo** (`frontend/src/pages/Dashboard`, API em `backend/src/controllers/dashboardController.ts` e serviços em `backend/src/services/attendanceService.ts`) consolida indicadores por **unidade** e período.
+
+**Filtro de período e âncora de data**
+
+- O administrador escolhe a **granularidade** (dia, semana, mês, ano) e um **datepicker** que define a **data de referência** (`referenceDate` em `YYYY-MM-DD`), enviada à API junto com `period`.
+- O backend usa `getPeriodDateRange(period, referenceDate?)` (`backend/src/utils/getPeriodDateRange.ts`): sem `referenceDate`, o intervalo é o período civil **atual** em `America/Sao_Paulo`; com `referenceDate`, o intervalo é o dia/semana/mês/ano civil que contém essa data. Assim é possível consultar, por exemplo, **semanas anteriores**, não só a semana corrente.
+
+**“Em atendimento”, fila e ocupação (administrador)**
+
+- No código, **`ACTIVE_STATUSES`** agrupa: `waitingTriage`, `inTriage`, `triageCompleted`, `waitingAttendance`, `inAttendance` (não inclui `onTheWay`).
+- O cartão **“Em atendimento”** e a **fila** do admin contam documentos nesses **mesmos** status na unidade — o rótulo “Em atendimento” resume **todo o pipeline ativo** (triagem + espera de médico + consulta), não só o status enum `inAttendance`.
+- A **ocupação** é `round((ocupados / maxOccupancy) * 100)`, com `ocupados` igual à mesma contagem de `ACTIVE_STATUSES` e `maxOccupancy` vindo da unidade (`IUnit`). Valores **acima de 100%** indicam mais episódios no pipeline do que a capacidade nominal de leitos/vagas — possível em crise, mas em **dados de demonstração** costuma ser artefato de seed; o script `createAttendances` foi calibrado para manter a ocupação seedada **entre 70% e 95%** e **nunca 100%**.
+
+**Gráfico “Atendimentos por tempo” (`attendance-by-time`)**
+
+- Agrega por `$hour` (dia), `$dayOfWeek` (semana), `$dayOfMonth` (mês) ou `$month` (ano) sobre o campo **`date`** do atendimento no intervalo `[start, end]` retornado por `getPeriodDateRange`.
+- Na visão **mês**, o eixo lista os dias **1 … último dia do mês** da âncora; dias **após a data atual** dentro desse mês aparecem com **total 0** porque ainda não existem atendimentos — o intervalo de consulta vai até o fim do mês, mas os dados reais só existem até hoje. Ajuste fino disso seria no backend (cortar `end` em `min(fimDoMês, agora)`); o documento registra o comportamento atual.
+
+**Triagem (cor do risco na UI)**
+
+- As cores dos níveis de risco do componente **RiskTag** estão centralizadas em variáveis CSS em `frontend/src/styles/abstract/variables.scss` (prefixo `--attendance-risk-…`), consumidas pelo `RiskTag` via `var(...)`.
 
 ### 5.7 Nível MedIT e administrador de unidade
 
@@ -292,6 +313,18 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 - **Filas no dashboard (por `unitId`):** agregações e contadores consideram, para enfermagem, **`waitingTriage` sem `nurseId`**; para o médico, **`waitingAttendance` sem `doctorId`** — ou seja, **pool compartilhado na unidade** até alguém assumir.
 - **Vínculo profissional atômico:** `POST /auth/attendances/:id/claim-triage` (enfermeira, mesma unidade), `POST /auth/attendances/:id/complete-triage` (enfermeira dona do caso em `inTriage`), `POST /auth/attendances/:id/claim-consultation` (médico, mesma unidade). Respostas **409** quando o estado já não permite a operação (ex.: outro profissional assumiu primeiro). A UI da fila chama essas rotas antes de navegar ao detalhe do atendimento (enfermeira/médico).
 - **Projeções de listagem** de atendimentos (paciente, médico, enfermeiro) passam a incluir os **campos de pré-atendimento** na raiz, para exibição e evolução futura da triagem.
+
+**Dashboard (API + front)**
+
+- Repositório `DashboardRepository`: `getStatusCards` e `getAttendanceByTime` enviam `period` e opcionalmente `referenceDate`.
+- Cartões de status e gráfico “Atendimentos por tempo” respeitam a âncora descrita em [§5.6](#56-dashboard-período-ocupação-e-gráficos).
+
+**Script de seed `create-attendances` (`backend/src/scripts/scripts/createAttendances.script.ts`)**
+
+- Gera atendimentos para **demonstração** (janela rolante de ~365 dias até hoje), com **inserção em lotes** para uso em MongoDB gratuito/tier limitado.
+- **Garantias mínimas por unidade:** cada paciente com vários concluídos; médicos e enfermeiros com mínimos de concluídos e de episódios ativos no pipeline, respeitando **`maxOccupancy`**: quantidade de ativos limitada a uma faixa aleatória entre **70% e 95%** da capacidade nominal (**nunca 100%**).
+- **Fases resumidas:** (1–3) mínimos por paciente/médico/enfermeiro; (4) ativos com histórico ancorado no **fim** do fluxo para que o campo **`date`** (entrada) se espalhe nos últimos dias — evita concentrar todos os ativos no “dia atual” nos gráficos; (5) extras; (6) volume diário de **concluídos** com orçamento **repartido igualmente** entre os dias da janela (resto da divisão sorteado entre dias), com teto proporcional para o **dia parcial atual**; **top-up** até meta global com datas escolhidas **por dia civil** aleatório, para não polarizar um único dia.
+- **Detalhe de produto:** na visão mês do gráfico, zeros nos últimos dias do mês corrente podem ser esperados (ver [§5.6](#56-dashboard-período-ocupação-e-gráficos)).
 
 **Em evolução / parcial**
 
