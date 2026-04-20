@@ -229,11 +229,19 @@ function ConfigBaseContent() {
   )
 }
 
-function ConfigContent() {
+function ConfigContent({
+  validDevelopmerEmail,
+  devClicked
+}: {
+  validDevelopmerEmail: string[]
+  devClicked: number
+}) {
   const { user } = useAuth()
-  const validDevelopmerEmail = ['vieira', 'rafa', 'take']
 
-  if (validDevelopmerEmail.some((email) => user?.email?.includes(email))) {
+  if (
+    validDevelopmerEmail.some((email) => user?.email?.includes(email)) &&
+    devClicked > 0
+  ) {
     return <ConfigDevContent />
   }
 
@@ -247,6 +255,8 @@ interface IConfigModalProps {
 
 function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   const { user } = useAuth()
+  const [devClicked, setDevClicked] = useState(5)
+  const validDevelopmerEmail = ['vieira', 'rafa', 'take']
   const isBiggerModal = user?.level !== UserLevels.ADMIN
 
   function closeModal() {
@@ -262,7 +272,17 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
     <Modal
       title={
         <div>
-          <Typography.Title level={3}>{title}</Typography.Title>
+          <Typography.Title
+            level={3}
+            onClick={() => setDevClicked((prev) => (prev > 0 ? prev - 1 : 5))}
+          >
+            {title}{' '}
+            {validDevelopmerEmail.some((email) =>
+              user?.email?.includes(email)
+            ) && devClicked > 0
+              ? devClicked
+              : ''}
+          </Typography.Title>
           <Typography.Paragraph>
             Aqui você pode ajustar suas preferências e configurações de conta.
           </Typography.Paragraph>
@@ -274,7 +294,10 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
       centered
       width={isBiggerModal ? 720 : 460}
     >
-      <ConfigContent />
+      <ConfigContent
+        validDevelopmerEmail={validDevelopmerEmail}
+        devClicked={devClicked}
+      />
     </Modal>
   )
 }
