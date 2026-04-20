@@ -23,6 +23,13 @@ const UNIT_IDS = [
 
 type UnitProfile = 'ubs' | 'upa' | 'hospital' | 'especialidades'
 
+interface MedicationTemplate {
+  name: string
+  category: MedicationCategories
+  description: string
+  requiresPrescription: boolean
+}
+
 const UNIT_PROFILE: Record<string, UnitProfile> = {
   '69d2981909395bf057e050e6': 'ubs',
   '69d2981909395bf057e050ee': 'ubs',
@@ -45,7 +52,123 @@ const STOCK_RANGE: Record<UnitProfile, { min: number; max: number }> = {
   especialidades: { min: 0, max: 500 }
 }
 
+/** Fração do catálogo permitido (por perfil); cada unidade sorteia dentro da faixa. */
+const PROFILE_CATALOG_RATIO: Record<UnitProfile, { min: number; max: number }> =
+  {
+    ubs: { min: 0.4, max: 0.7 },
+    upa: { min: 0.62, max: 0.85 },
+    hospital: { min: 0.82, max: 1 },
+    especialidades: { min: 0.45, max: 0.72 }
+  }
+
+/** Piso de itens no catálogo após o recorte (evita unidade vazia demais). */
+const MIN_MEDS_PER_UNIT = 22
+
 const FORCED_UNAVAILABLE_COUNT = 5
+
+/** Medicamentos exclusivos do perfil (não entram no catálogo comum). */
+const PROFILE_EXTRA_MEDICATIONS: Partial<
+  Record<UnitProfile, MedicationTemplate[]>
+> = {
+  ubs: [
+    {
+      name: 'Vitamina C 500mg efervescente',
+      category: MedicationCategories.OTHER,
+      description: 'Suplementação vitamínica oral.',
+      requiresPrescription: false
+    },
+    {
+      name: 'Soro Fisiológico 0,9% 250mL frasco',
+      category: MedicationCategories.OTHER,
+      description: 'Reidratação e diluição de medicamentos IV.',
+      requiresPrescription: false
+    },
+    {
+      name: 'Benzilpenicilina Potássica 600.000 UI pó injetável',
+      category: MedicationCategories.ANTIBIOTICS,
+      description: 'Penicilina G para infecções estreptocócicas sensíveis.',
+      requiresPrescription: true
+    }
+  ],
+  upa: [
+    {
+      name: 'Adrenalina 1mg/mL solução injetável (ampola)',
+      category: MedicationCategories.OTHER,
+      description: 'Urgência: anafilaxia, parada cardiorrespiratória.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Noradrenalina 2mg/1mL ampola',
+      category: MedicationCategories.OTHER,
+      description: 'Vasopressor para choque séptico e hipotensão grave.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Midazolam 5mg/mL solução injetável',
+      category: MedicationCategories.OTHER,
+      description: 'Sedação procedural e crise convulsiva em urgência.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Cloreto de Potássio 10% frasco-ampola',
+      category: MedicationCategories.OTHER,
+      description: 'Reposição eletrolítica com monitorização.',
+      requiresPrescription: true
+    }
+  ],
+  hospital: [
+    {
+      name: 'Meropeném 1g pó para solução injetável',
+      category: MedicationCategories.ANTIBIOTICS,
+      description: 'Carbapenêm para sepse e infecções hospitalares graves.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Vancomicina 500mg pó para solução injetável',
+      category: MedicationCategories.ANTIBIOTICS,
+      description: 'Glicopeptídeo para MRSA e gram-positivos resistentes.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Fentanila 50mcg/mL ampola',
+      category: MedicationCategories.ANALGESICS,
+      description: 'Opioide IV para dor intensa e sedação em UTI.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Rocurônio 10mg/mL solução injetável',
+      category: MedicationCategories.OTHER,
+      description: 'Bloqueador neuromuscular para intubação e cirurgia.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Albumina Humana 20% frasco',
+      category: MedicationCategories.OTHER,
+      description: 'Volume expansor em hipoproteinemia e ascite.',
+      requiresPrescription: true
+    }
+  ],
+  especialidades: [
+    {
+      name: 'Metotrexato 2,5mg comprimido',
+      category: MedicationCategories.OTHER,
+      description: 'Imunossupressor em artrite reumatoide e psoríase.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Adalimumabe 40mg/0,8mL seringa preenchida',
+      category: MedicationCategories.OTHER,
+      description: 'Anti-TNF para doenças imunomediadas.',
+      requiresPrescription: true
+    },
+    {
+      name: 'Levetiracetam 500mg comprimido',
+      category: MedicationCategories.ANTICONVULSANTS,
+      description: 'Antiepiléptico de segunda linha.',
+      requiresPrescription: true
+    }
+  ]
+}
 
 // Categorias restritas por perfil de unidade
 // Medicamentos não listados aqui ficam disponíveis em todos os perfis
@@ -106,7 +229,8 @@ function unavailableIndexes(
   count: number,
   offset: number
 ): Set<number> {
-  const step = Math.floor(total / count)
+  if (count <= 0 || total <= 0) return new Set()
+  const step = Math.max(1, Math.floor(total / count))
   const indexes = new Set<number>()
   for (let i = 0; i < count; i++) {
     indexes.add((i * step + offset) % total)
@@ -114,11 +238,74 @@ function unavailableIndexes(
   return indexes
 }
 
-interface MedicationTemplate {
-  name: string
-  category: MedicationCategories
-  description: string
-  requiresPrescription: boolean
+function hashUnitSeed(unitId: string, salt = 0): number {
+  let h = (salt >>> 0) ^ 0x811c9dc5
+  for (let i = 0; i < unitId.length; i++) {
+    h = (Math.imul(31, h) + unitId.charCodeAt(i)) >>> 0
+  }
+  return h === 0 ? 0x9e3779b9 : h
+}
+
+function mulberry32(seed: number): () => number {
+  return () => {
+    let t = (seed += 0x6d2b79f5)
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+function shuffleWithSeed<T>(items: T[], unitId: string): T[] {
+  const rng = mulberry32(hashUnitSeed(unitId, 1))
+  const a = [...items]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1))
+    const t = a[i]!
+    a[i] = a[j]!
+    a[j] = t
+  }
+  return a
+}
+
+/** Catálogo por unidade: recorte aleatório estável + extras do perfil. */
+function buildCatalogForUnit(
+  unitId: string,
+  profile: UnitProfile,
+  allowedMeds: MedicationTemplate[]
+): MedicationTemplate[] {
+  const { min: rMin, max: rMax } = PROFILE_CATALOG_RATIO[profile]
+  const h0 = hashUnitSeed(unitId, 0)
+  const t = (h0 % 1000) / 1000
+  const ratio = rMin + t * (rMax - rMin)
+  let take = Math.floor(allowedMeds.length * ratio)
+  take = Math.min(allowedMeds.length, Math.max(MIN_MEDS_PER_UNIT, take))
+
+  const shuffled = shuffleWithSeed(allowedMeds, unitId)
+  const picked = shuffled.slice(0, take)
+
+  const extras = PROFILE_EXTRA_MEDICATIONS[profile] ?? []
+  const names = new Set(picked.map((m) => m.name))
+  const merged: MedicationTemplate[] = [...picked]
+  for (const e of extras) {
+    if (!names.has(e.name)) {
+      merged.push(e)
+      names.add(e.name)
+    }
+  }
+  return merged
+}
+
+/** Teto de estoque efetivo varia por `unitId` (mesmo perfil → volumes diferentes). */
+function effectiveStockRange(
+  unitId: string,
+  profile: UnitProfile
+): { min: number; max: number } {
+  const { min, max } = STOCK_RANGE[profile]
+  const h = hashUnitSeed(unitId, 4)
+  const mult = 0.42 + ((h % 770) / 1000) * (1.18 - 0.42)
+  const rawMax = Math.floor(max * mult)
+  const scaledMax = Math.max(40, Math.min(Math.floor(max * 1.22), rawMax))
+  return { min, max: scaledMax }
 }
 
 const MEDICATIONS: MedicationTemplate[] = [
@@ -503,14 +690,14 @@ const MEDICATIONS: MedicationTemplate[] = [
 const seedMedications: Script = {
   name: 'create-medications',
   description:
-    'Insere medicamentos reais em cada unidade com catálogo e disponibilidade variados por perfil',
+    'Medicamentos por unidade: catálogo recortado + exclusivos do perfil; estoques com teto variável por unidade',
   async run() {
     console.log('Deletando os medicamentos já existentes')
     const removed = await MedicationModel.deleteMany({})
     console.log(`Foram deletados ${removed.deletedCount} medicamentos\n`)
 
     console.log(
-      `Iniciando seed de ${MEDICATIONS.length} medicamentos em ${UNIT_IDS.length} unidades...\n`
+      `Seed: pool global ${MEDICATIONS.length} itens → cada unidade recebe subconjunto + extras do perfil (${UNIT_IDS.length} unidades).\n`
     )
 
     let totalInserted = 0
@@ -519,27 +706,33 @@ const seedMedications: Script = {
     for (let u = 0; u < UNIT_IDS.length; u++) {
       const unitId = UNIT_IDS[u]
       const profile = UNIT_PROFILE[unitId]
-      const { min, max } = STOCK_RANGE[profile]
+      const { min: rangeMin, max: rangeMax } = effectiveStockRange(
+        unitId,
+        profile
+      )
 
-      // Filtra medicamentos permitidos para este perfil de unidade
       const allowedMeds = MEDICATIONS.filter((m) =>
         isAllowedForProfile(m, profile)
       )
 
-      // Índices zerados rotacionados pelo índice da unidade → cada unidade
-      // tem medicamentos indisponíveis em posições distintas do catálogo
-      const forcedUnavailable = unavailableIndexes(
-        allowedMeds.length,
+      const unitCatalog = buildCatalogForUnit(unitId, profile, allowedMeds)
+
+      const unavailableSlots = Math.min(
         FORCED_UNAVAILABLE_COUNT,
-        u
+        Math.max(2, Math.floor(unitCatalog.length * 0.07))
+      )
+      const forcedUnavailable = unavailableIndexes(
+        unitCatalog.length,
+        unavailableSlots,
+        hashUnitSeed(unitId, 5) % Math.max(1, unitCatalog.length)
       )
 
       console.log(
-        `Unidade ${unitId} [${profile}] — ${allowedMeds.length} medicamentos, indisponíveis nos índices: [${[...forcedUnavailable].sort((a, b) => a - b).join(', ')}]`
+        `Unidade ${unitId} [${profile}] — ${unitCatalog.length} itens no catálogo (permitidos no pool: ${allowedMeds.length}), estoque 0..${rangeMax}, zerados: [${[...forcedUnavailable].sort((a, b) => a - b).join(', ')}]`
       )
 
-      for (let i = 0; i < allowedMeds.length; i++) {
-        const template = allowedMeds[i]
+      for (let i = 0; i < unitCatalog.length; i++) {
+        const template = unitCatalog[i]
 
         try {
           let stockQuantity: number
@@ -549,16 +742,22 @@ const seedMedications: Script = {
           } else {
             const isControlled =
               template.category === MedicationCategories.ANTIVENOMS ||
-              template.name.toLowerCase().includes('morfina')
+              template.name.toLowerCase().includes('morfina') ||
+              template.name.toLowerCase().includes('fentanila')
 
             const stockMin = isControlled
-              ? Math.max(1, Math.floor(min / 10))
-              : min
+              ? Math.max(1, Math.floor(rangeMin / 10))
+              : rangeMin
             const stockMax = isControlled
-              ? Math.max(5, Math.floor(max / 10))
-              : max
+              ? Math.max(5, Math.floor(rangeMax / 10))
+              : rangeMax
 
-            stockQuantity = Math.max(1, randomInt(stockMin, stockMax))
+            const base = randomInt(stockMin, stockMax)
+            const jitter = 0.85 + Math.random() * 0.28
+            stockQuantity = Math.min(
+              stockMax,
+              Math.max(1, Math.floor(base * jitter))
+            )
           }
 
           const availabilityStatus = resolveStatus(stockQuantity)
