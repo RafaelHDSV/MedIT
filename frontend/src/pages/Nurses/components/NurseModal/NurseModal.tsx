@@ -25,6 +25,29 @@ import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
 import styles from './NurseModal.module.scss'
 
+function formatCorenForApi(values: NurseFormValues): string {
+  const digits = values.coren.replace(/\D/g, '').slice(0, 9)
+  return `${digits}/${values.corenUf}-${values.corenType}`
+}
+
+function parseStoredCoren(
+  coren?: string
+): Pick<NurseFormValues, 'corenUf' | 'coren' | 'corenType'> | null {
+  const raw = coren?.trim()
+  if (!raw) return null
+
+  const slash = raw.match(/^(\d{4,9})\/([A-Za-z]{2})-([A-Za-z0-9]+)$/)
+  if (slash) {
+    return {
+      corenUf: slash[2].toUpperCase(),
+      coren: slash[1],
+      corenType: slash[3].toUpperCase() as NurseCorenType
+    }
+  }
+
+  return null
+}
+
 function ModalContent({
   nurse,
   isModalOpen,
@@ -64,7 +87,7 @@ function ModalContent({
           nurseId: nurse?._id || params.id,
           body: {
             ...values,
-            coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+            coren: formatCorenForApi(values)
           }
         })
 
@@ -77,7 +100,7 @@ function ModalContent({
         await NursesRepository.createNurse({
           body: {
             ...values,
-            coren: `COREN-${values.corenUf} ${values.coren}-${values.corenType as NurseCorenType}`
+            coren: formatCorenForApi(values)
           }
         })
         fetchNurses?.()
@@ -100,11 +123,10 @@ function ModalContent({
 
   useEffect(() => {
     if (isModalOpen && nurse) {
+      const parsed = parseStoredCoren(nurse.coren)
       form.setFieldsValue({
         ...nurse,
-        corenUf: nurse.coren.split(' ')[0].split('-')[1],
-        coren: nurse.coren.split(' ')[1].split('-')[0],
-        corenType: nurse.coren.split(' ')[1].split('-')[1]
+        ...(parsed ?? {})
       })
     }
   }, [nurse, form, isModalOpen])
