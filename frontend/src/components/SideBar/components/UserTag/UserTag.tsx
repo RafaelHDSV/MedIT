@@ -21,7 +21,7 @@ function UserTag({ isCompact }: IUserTagProps) {
   return (
     <button
       className={`${styles.user} ${isCompact ? styles.compact : ''}`}
-      onClick={logout}
+      onClick={() => logout()}
     >
       {!isCompact ? (
         <div className={styles.userContent}>
