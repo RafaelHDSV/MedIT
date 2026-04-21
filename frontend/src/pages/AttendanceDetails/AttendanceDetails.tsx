@@ -1,26 +1,31 @@
-import { AttendanceRisk } from '@/interfaces/IAttendance'
-import { UserLevels } from '@/interfaces/IUser'
-import { useAuth } from '@/hooks/useAuth'
-import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import RiskTag from '@/components/RiskTag/RiskTag'
 import SymptomTag from '@/components/SymptomTag/SymptomTag'
-import styles from './AttendanceDetails.module.scss'
-import VitalCard from './components/VitalCard/VitalCard'
-import ConditionsCard from './components/ConditionsCard/ConditionsCard'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
+import { AttendanceRisk } from '@/interfaces/IAttendance'
+import { UserLevels } from '@/interfaces/IUser'
 import AttendancesFlowRepository from '@/repositories/AttendancesFlowRepository'
 import { ROUTES } from '@/routes/constants'
 import { Flex, message } from 'antd'
+import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import RiskSelector from '../PreRegistration/components/RiskSelector/RiskSelector'
+import styles from './AttendanceDetails.module.scss'
+import ConditionsCard from './components/ConditionsCard/ConditionsCard'
+import VitalCard from './components/VitalCard/VitalCard'
 
 function AttendanceDetails() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { attendanceId } = useParams<{ attendanceId: string }>()
+
   const [triageLoading, setTriageLoading] = useState(false)
+  const [selectedRisk, setSelectedRisk] = useState<AttendanceRisk>()
+  const [observation, setObservation] = useState('')
+
   const isNurse = user?.level === UserLevels.NURSE
   const isDoctor = user?.level === UserLevels.DOCTOR
 
@@ -45,6 +50,7 @@ function AttendanceDetails() {
     painScale: 7
   }
 
+  // VIEIRA: Adicionar todas os sintomas possíveis
   const symptoms = [
     'Febre',
     'Dor de cabeça',
@@ -62,6 +68,7 @@ function AttendanceDetails() {
     )
   }
 
+  // VIEIRA: Adicionar back
   const suggestedConditions = [
     { name: 'Dengue', compatibility: 87 },
     { name: 'Gripe (Influenza)', compatibility: 72 },
@@ -105,13 +112,15 @@ function AttendanceDetails() {
 
   return (
     <section>
+      {/* VIEIRA: Adicionar Triagem e Atendimento no nome e descrição */}
       <AuthLayoutHeader
-        actionComponent={
-          isNurse || isDoctor ? headerActions : undefined
-        }
+        actionComponent={isNurse || isDoctor ? headerActions : undefined}
       />
 
-      <div className={styles.page}>
+      <div
+        className={styles.page}
+        style={{ gridTemplateColumns: isNurse ? '1fr' : '1fr 20rem' }}
+      >
         <div className={styles.mainContent}>
           <section>
             <h3 className={styles.title}>Informações do Paciente</h3>
@@ -126,10 +135,12 @@ function AttendanceDetails() {
                 value={patient.mainComplaint}
               />
               <DetailsLine label='Chegada' value={patient.arrivalTime} />
-              <DetailsLine
-                label='Risco'
-                value={<RiskTag risk={patient.risk} />}
-              />
+              {!isNurse && (
+                <DetailsLine
+                  label='Risco'
+                  value={<RiskTag risk={patient.risk} />}
+                />
+              )}
               <DetailsLine label='Condições' value={patient.conditions} />
             </div>
           </section>
@@ -187,17 +198,43 @@ function AttendanceDetails() {
           </section>
         </div>
 
-        <div className={styles.sidebar}>
-          <h3 className={styles.title}>Condições sugeridas</h3>
+        {!isNurse && (
+          <div className={styles.sidebar}>
+            <h3 className={styles.title}>Condições sugeridas</h3>
 
-          {suggestedConditions.map((condition) => (
-            <ConditionsCard
-              key={`${condition.name}_${condition.compatibility}`}
-              name={condition.name}
-              compatibility={condition.compatibility}
-            />
-          ))}
-        </div>
+            {suggestedConditions.map((condition) => (
+              <ConditionsCard
+                key={`${condition.name}_${condition.compatibility}`}
+                name={condition.name}
+                compatibility={condition.compatibility}
+              />
+            ))}
+          </div>
+        )}
+
+        {isNurse && (
+          <>
+            <section>
+              <h3 className={styles.title}>Classificação de Risco</h3>
+              <RiskSelector
+                selected={selectedRisk}
+                onChange={setSelectedRisk}
+                disabled={!isNurse}
+              />
+            </section>
+
+            <section>
+              <h3 className={styles.title}>Observação geral</h3>
+              <textarea
+                className={styles.textarea}
+                value={observation}
+                onChange={(e) => setObservation(e.target.value)}
+                disabled={!isNurse}
+                rows={4}
+              />
+            </section>
+          </>
+        )}
       </div>
     </section>
   )

@@ -16,6 +16,7 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  width: 100%;
 
   .grid {
     display: grid;
@@ -23,8 +24,12 @@
     column-gap: 2rem;
     row-gap: 1rem;
 
-    @include max-md {
+    @include max-lg {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include max-md {
+      grid-template-columns: 1fr;
     }
   }
 }
@@ -39,6 +44,30 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+.textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  background: var(--white);
+  box-sizing: border-box;
+  min-height: 100px;
+
+  &:focus {
+    border-color: var(--primary-color);
+  }
+
+  &:disabled {
+    background: var(--background);
+    cursor: not-allowed;
+  }
 }
 
 .sidebar {
