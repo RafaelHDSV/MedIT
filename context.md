@@ -16,6 +16,7 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
   - [5.9 Jornada do paciente: pré-atendimento remoto, chegada e filas](#59-jornada-do-paciente-pré-atendimento-remoto-chegada-e-filas)
   - [5.10 Seeds de demonstração (atendimentos e medicamentos)](#510-seeds-de-demonstração-atendimentos-e-medicamentos)
 - [6. Arquitetura e stack](#6-arquitetura-e-stack)
+  - [6.1 Mapa do repositório (pastas, rotas e cliente)](#61-mapa-do-repositório-pastas-rotas-e-cliente)
 - [7. Modelo de atendimento no código](#7-modelo-de-atendimento-no-código)
 - [8. Mecanismo inteligente (regras)](#8-mecanismo-inteligente-regras)
 - [9. Requisitos funcionais](#9-requisitos-funcionais)
@@ -34,13 +35,14 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
 
 | Camada | Pasta / tecnologia |
 |--------|---------------------|
-| Apresentação | `frontend/` — React (Vite), TypeScript, Ant Design, Sass, React Router |
-| Aplicação e API | `backend/` — Node.js, Express, TypeScript |
-| Persistência | MongoDB via Mongoose; modelos em `backend/src/models` e schemas em `backend/src/schema` |
-| Segurança | JWT, bcrypt; rotas sob prefixo `/auth/...` |
+| Apresentação | `frontend/` — React **19**, Vite **7**, TypeScript, Ant Design **6**, Sass, React Router **7**, Axios, ícones **Phosphor** (`@phosphor-icons/react`); `@vercel/analytics` opcional |
+| Cliente HTTP | `frontend/src/repositories/` — classes que estendem `Repository` (`Repository.ts`) e consomem a instância Axios `api` (`frontend/src/api/api.ts`, base `VITE_BACKEND_URL`, Bearer + fluxo de **refresh** em interceptor) |
+| Aplicação e API | `backend/` — Node.js, **Express 5**, TypeScript, execução dev com **tsx** (`tsx watch src/server.ts`) |
+| Persistência | MongoDB via **Mongoose 9**; modelos em `backend/src/models` e schemas em `backend/src/schema`; interfaces em `backend/src/interfaces` |
+| Segurança | JWT (access + refresh), bcrypt; rotas de negócio montadas sob prefixo `/auth/...` (ver [§6.1](#61-mapa-do-repositório-pastas-rotas-e-cliente)) |
 | Dados sintoma–doença | Coleção `SymptomsDisease`; carga via script em `backend/src/scripts/scripts/createSymptomsDiaseases.script.ts` |
 
-Monorepo na raiz: scripts `yarn dev` (frontend e backend em paralelo), conforme `package.json` da raiz.
+Monorepo na raiz: `package.json` usa **Yarn** e **concurrently** — `yarn dev` instala/atualiza dependências (`yarn base`) e sobe frontend e backend em paralelo (`yarn dev:frontend` / `yarn dev:backend`). Testes de tipo: `yarn test` → `tsc` em cada pacote. Scripts de banco/dados: `yarn scripts` na raiz (delega a `cd backend && yarn scripts`).
 
 ---
 
@@ -143,6 +145,7 @@ O **dashboard administrativo** (`frontend/src/pages/Dashboard`, API em `backend/
 
 **Filtro de período e âncora de data**
 
+- No header do dashboard (`AuthLayoutHeader`), perfis que não são paciente usam um **único bloco visual** de filtro: `InputSelect` (rótulos em `PeriodsLabels` / valores em `Periods` em `frontend/src/interfaces/globals.ts`) + `InputDashboardPeriodDate` (wrapper em `frontend/src/components/FormComponents/FormComponents.tsx` sobre `MultiDatepicker`). O agrupamento (`periodFilterGroup` em `frontend/src/pages/Dashboard/Dashboard.module.scss`) remove o raio da junção e alinha bordas para parecer **um controle com prefixo de período**; foco no grupo destaca as duas bordas. O `MultiDatepicker` fixa locale/timezone **America/Sao_Paulo** em `dayjs` e usa `getPopupContainer` apontando para `.dashboard__filters--date` para o calendário não ser cortado pelo layout.
 - O administrador escolhe a **granularidade** (dia, semana, mês, ano) e um **datepicker** que define a **data de referência** (`referenceDate` em `YYYY-MM-DD`), enviada à API junto com `period`.
 - O backend usa `getPeriodDateRange(period, referenceDate?)` (`backend/src/utils/getPeriodDateRange.ts`): sem `referenceDate`, o intervalo é o período civil **atual** em `America/Sao_Paulo`; com `referenceDate`, o intervalo é o dia/semana/mês/ano civil que contém essa data. Assim é possível consultar, por exemplo, **semanas anteriores**, não só a semana corrente.
 
@@ -232,6 +235,41 @@ MongoDB (Mongoose)
 - **Persistência** — schemas e models Mongoose; dados de sintomas/doenças carregados por scripts.
 - **Segurança** — JWT nas requisições autenticadas; hash de senha com bcrypt.
 - **Inteligência (regras)** — base estruturada `disease` + mapa `symptoms` (pesos 0/1); cálculo de compatibilidade previsto no desenho (integração ponta a ponta com todas as telas em evolução — ver [§12](#12-estado-de-implementação-no-repositório)).
+
+### 6.1 Mapa do repositório (pastas, rotas e cliente)
+
+**Backend — `backend/src/`**
+
+- **`server.ts`** — sobe Express após `connectDatabase()`; `cors()` + `express.json()`; montagem de rotas (todas abaixo partindo da raiz configurada no cliente).
+- **Rotas HTTP** (arquivos em `routes/`, importados em `server.ts`):
+  - `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`; `GET /auth/signup/units` (lista de unidades para cadastro) — `authRoutes`.
+  - `/auth/users` — `usersRoutes`; `/auth/doctors` — `doctorsRoutes`; `/auth/nurses` — `nursesRoutes`; `/auth/patients` — `patientsRoutes` (`POST /` cria paciente **sem** JWT; rotas autenticadas: pré-atendimento, chegada, listagens, etc.); `/auth/units` — `unitsRoutes`; `/auth/dashboard` — `dashboardRoutes` (cards, fila, gráfico por tempo); `/auth/attendances` — `attendancesRoutes` (claim triagem/consulta, conclusão de triagem, etc.); `/auth/medications` — `medicationRoutes`.
+- **`controllers/`** — handlers finos que chamam serviços ou modelos.
+- **`services/`** — regras e agregações mais pesadas (ex.: `attendanceService.ts` para contagens do dashboard, filas e recortes por período).
+- **`middlewares/authMiddleware.ts`** — validação JWT na maioria dos handlers sob `/auth/...`; **sem** middleware em `login`, `refresh`, `logout` e `GET /auth/signup/units` (rotas públicas definidas em `authRoutes`).
+- **`models/` + `schema/`** — definição Mongoose; **`interfaces/`** — tipos compartilhados com o domínio.
+- **`utils/`** — utilitários (`getPeriodDateRange.ts` devolve intervalos em **`Date` UTC** para consultas; âncora opcional `YYYY-MM-DD` com parsing via meio-dia UTC para estabilizar o dia da semana).
+- **`config/database.ts`** — conexão MongoDB (`MONGO_URL` em `.env`).
+- **`globals/Config.ts`** — `PORT`, `MONGO_URL`, segredos JWT a partir de `process.env`.
+- **`scripts/`** — `runner.ts` descobre automaticamente todos os `*.script.ts` / `*.script.js` em `scripts/scripts/`, exportados como `default` com metadados (`Script` em `scripts/types.ts`). Execução: `yarn scripts` no backend (ou via raiz); argumento CLI executa script por nome; sem argumento, menu interativo (**Inquirer**).
+
+**Frontend — `frontend/src/`**
+
+- **`main.tsx`** — monta a árvore React, providers (Ant Design, auth).
+- **`routes/AppRoutes.tsx`** — **React Router**; rotas públicas em `/` (SignIn/SignUp com `UnauthRoute`) vs área autenticada em `/auth` com `AuthRoute` e `AuthLayout`; `pages/routerPages` centraliza exports das páginas.
+- **`routes/constants.ts`** — objeto `ROUTES` (paths) usado na navegação e no menu.
+- **`repositories/`** — um arquivo por agregado (`AuthRepository`, `DashboardRepository`, `PatientsRepository`, `AttendancesFlowRepository`, `MedicationsRepository`, `UnitsRepository`, `DoctorsRepository`, `NursesRepository`, `UserRepository`); padrão `extends Repository` + método `handle()` para extrair `data` da resposta Axios.
+- **`api/api.ts`** — instância Axios, interceptors de **Authorization** e **renovação de token** em `401` (refresh + retry; falha redireciona para `/`).
+- **`contexts/`** — `AuthProvider` / `useAuth` (token, usuário, nível `UserLevels`); config global do Ant Design.
+- **`hooks/`** — hooks reutilizáveis (`useAuth`, colunas de tabelas por página em `pages/.../hooks`).
+- **`pages/`** — telas por domínio (`Dashboard` com `AttendanceByTimeChart`, `AttendanceQueueChart` e variantes admin/médico/enfermeiro; `PreRegistration`; `AttendanceDetails` compartilhado com triagens; CRUDs de médicos, enfermeiros, pacientes, unidades, medicamentos; listagens de atendimentos).
+- **`components/`** — UI transversal (`FormComponents`, `MultiDatepicker`, `ListTable`, `SideBar`, `AuthLayoutHeader`, `RiskTag` / constantes de risco, etc.).
+- **`helpers/handleApiError.ts`** — tratamento uniforme de erros de API (mensagens ao utilizador).
+- **`interfaces/`** — tipos alinhados ao backend (`IAttendance`, `IUser`, `IDashboard`, `Periods`, etc.).
+
+**Gráfico de fila no dashboard**
+
+- `AttendanceQueueChart.tsx` orquestra subcomponentes em `AttendanceQueueChart/components/` — **Admin**, **Doctor**, **Nurse** — com estilos em `AttendanceQueueChart.module.scss`; o admin consome a API com `period` + `referenceDate` alinhados aos cartões (ver [§5.6](#56-dashboard-período-ocupação-e-gráficos)).
 
 ---
 
@@ -323,7 +361,7 @@ flowchart LR
 
 ## 12. Estado de implementação no repositório
 
-Esta secção amarra a visão do documento ao que já existe no código (ponto em abril de 2026; evolui com o repositório).
+Esta secção amarra a visão do documento ao que já existe no código (ponto em **abril de 2026**; evolui com o repositório). Para árvore de ficheiros e rotas HTTP, ver também [§6.1](#61-mapa-do-repositório-pastas-rotas-e-cliente).
 
 **Já presente de forma substantiva**
 
@@ -344,6 +382,7 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 
 - Repositório `DashboardRepository`: `getStatusCards` e `getAttendanceByTime` enviam `period` e opcionalmente `referenceDate`; **`getAttendanceQueue`** também envia esses parâmetros para o admin alinhar fila ao período (ver [§5.6](#56-dashboard-período-ocupação-e-gráficos)).
 - Cartões de status e gráfico “Atendimentos por tempo” respeitam a âncora descrita em [§5.6](#56-dashboard-período-ocupação-e-gráficos).
+- UI do filtro: grupo compacto período + data no header (ver bullet inicial de [§5.6](#56-dashboard-período-ocupação-e-gráficos)); botão `ReloadButton` ao lado dispara revalidação manual dos dados exibidos.
 
 **Scripts de seed (`backend/src/scripts/scripts/`)**
 
