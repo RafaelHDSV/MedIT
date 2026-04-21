@@ -38,7 +38,9 @@ const normalizeNursesCoren: Script = {
     for (const n of nurses) {
       const next = normalizeCorenString(n.coren)
       if (!next) {
-        console.warn(`⚠️  Ignorado (formato não reconhecido): ${n.name} — "${n.coren}"`)
+        console.warn(
+          `⚠️  Ignorado (formato não reconhecido): ${n.name} — "${n.coren}"`
+        )
         failed++
         continue
       }

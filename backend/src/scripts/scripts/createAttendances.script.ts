@@ -170,7 +170,10 @@ function riskStepMinutes(risk: AttendanceRisk): number {
 function buildCompletedFlow(
   startedAt: Date,
   risk: AttendanceRisk
-): { status: AttendanceStatus; history: { status: AttendanceStatus; changedAt: Date }[] } {
+): {
+  status: AttendanceStatus
+  history: { status: AttendanceStatus; changedAt: Date }[]
+} {
   const stepMs = riskStepMinutes(risk) * 60_000
   return {
     status: AttendanceStatus.COMPLETED,
@@ -357,10 +360,7 @@ async function insertBatched(docs: AttendanceSeed[]) {
   }
 }
 
-async function ensurePatients(
-  pool: UnitPool,
-  minCount: number
-): Promise<void> {
+async function ensurePatients(pool: UnitPool, minCount: number): Promise<void> {
   while (pool.patients.length < minCount) {
     const firstName = faker.person.firstName()
     const lastName = faker.person.lastName()
@@ -396,11 +396,11 @@ function seedDoc(
     medicationsIds?: Types.ObjectId[]
     iaConditionId?: Types.ObjectId
   } & Partial<
-    Pick<
-      AttendanceSeed,
-      'painLevel' | 'selfMedicated' | 'symptoms' | 'generalObservation'
+      Pick<
+        AttendanceSeed,
+        'painLevel' | 'selfMedicated' | 'symptoms' | 'generalObservation'
+      >
     >
-  >
 ): AttendanceSeed {
   return {
     ...args,
@@ -752,7 +752,9 @@ const createAttendances = {
 
       // --- Mínimos por paciente / médico / enfermeiro (respeitando teto diário) ---
       for (const patientId of pool.patients) {
-        while (countCompletedForPatient(patientId) < MIN_COMPLETED_PER_PATIENT) {
+        while (
+          countCompletedForPatient(patientId) < MIN_COMPLETED_PER_PATIENT
+        ) {
           const dayPick = pickDayWithLeastLoad()
           if (!dayPick) {
             console.warn(
@@ -883,7 +885,9 @@ const createAttendances = {
     console.log(`\n✅ Total no banco: ${total} atendimento(s)`)
 
     for (const pool of unitPools) {
-      const unit = units.find((u) => u._id.toString() === pool.unitId.toString())
+      const unit = units.find(
+        (u) => u._id.toString() === pool.unitId.toString()
+      )
       const n = await Attendance.countDocuments({ unitId: pool.unitId })
       console.log(`   ${unit?.name ?? pool.unitId}: ${n}`)
     }

@@ -49,7 +49,11 @@ function isMissingPositiveNumber(value: unknown): boolean {
 }
 
 function ageFromBirthDate(birthDate?: Date | null): number | null {
-  if (!birthDate || !(birthDate instanceof Date) || Number.isNaN(birthDate.getTime())) {
+  if (
+    !birthDate ||
+    !(birthDate instanceof Date) ||
+    Number.isNaN(birthDate.getTime())
+  ) {
     return null
   }
   const diff = Date.now() - birthDate.getTime()
@@ -59,22 +63,35 @@ function ageFromBirthDate(birthDate?: Date | null): number | null {
 
 function generateHeightWeightPair(seed: number, birthDate?: Date | null) {
   faker.seed(seed)
-  const age = ageFromBirthDate(birthDate) ?? faker.number.int({ min: 18, max: 85 })
+  const age =
+    ageFromBirthDate(birthDate) ?? faker.number.int({ min: 18, max: 85 })
 
   if (age < 2) {
-    const height = faker.number.float({ min: 0.62, max: 0.98, fractionDigits: 2 })
+    const height = faker.number.float({
+      min: 0.62,
+      max: 0.98,
+      fractionDigits: 2
+    })
     const weight = faker.number.float({ min: 6, max: 16, fractionDigits: 1 })
     return { height, weight }
   }
 
   if (age < 10) {
-    const height = faker.number.float({ min: 0.95, max: 1.45, fractionDigits: 2 })
+    const height = faker.number.float({
+      min: 0.95,
+      max: 1.45,
+      fractionDigits: 2
+    })
     const weight = faker.number.float({ min: 14, max: 42, fractionDigits: 1 })
     return { height, weight }
   }
 
   if (age < 18) {
-    const height = faker.number.float({ min: 1.35, max: 1.88, fractionDigits: 2 })
+    const height = faker.number.float({
+      min: 1.35,
+      max: 1.88,
+      fractionDigits: 2
+    })
     const bmi = faker.number.float({ min: 16, max: 30, fractionDigits: 1 })
     const weight = Math.round(bmi * height * height * 10) / 10
     return { height, weight: Math.min(95, Math.max(32, weight)) }
@@ -103,14 +120,24 @@ function fillAnthropometry(
 
   faker.seed(seed + 7)
 
-  if (!needH && needW && typeof existingHeight === 'number' && existingHeight > 0) {
+  if (
+    !needH &&
+    needW &&
+    typeof existingHeight === 'number' &&
+    existingHeight > 0
+  ) {
     const bmi = faker.number.float({ min: 18.5, max: 34, fractionDigits: 1 })
     let w = Math.round(bmi * existingHeight * existingHeight * 10) / 10
     w = Math.min(160, Math.max(12, w))
     return { weight: w }
   }
 
-  if (needH && !needW && typeof existingWeight === 'number' && existingWeight > 0) {
+  if (
+    needH &&
+    !needW &&
+    typeof existingWeight === 'number' &&
+    existingWeight > 0
+  ) {
     const bmi = faker.number.float({ min: 19, max: 32, fractionDigits: 1 })
     let h = Math.sqrt(existingWeight / bmi)
     h = Math.min(2.1, Math.max(0.55, h))
@@ -120,7 +147,10 @@ function fillAnthropometry(
   return generateHeightWeightPair(seed, birthDate)
 }
 
-function arraysBothEmpty(conditions?: string[] | null, allergies?: string[] | null) {
+function arraysBothEmpty(
+  conditions?: string[] | null,
+  allergies?: string[] | null
+) {
   const c = conditions?.filter(Boolean) ?? []
   const a = allergies?.filter(Boolean) ?? []
   return c.length === 0 && a.length === 0

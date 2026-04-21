@@ -196,10 +196,4 @@ function InputDate({
   )
 }
 
-export {
-  FormItem,
-  InputDashboardPeriodDate,
-  InputDate,
-  InputSelect,
-  InputText
-}
+export { FormItem, InputDashboardPeriodDate, InputDate, InputSelect, InputText }

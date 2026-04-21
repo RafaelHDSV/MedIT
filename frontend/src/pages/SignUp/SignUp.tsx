@@ -31,9 +31,9 @@ function SignUp() {
   const [fieldErrors, setFieldErrors] = useState<ISignUpFormErrors>({})
   const [loading, setLoading] = useState(false)
   const [unitsLoading, setUnitsLoading] = useState(true)
-  const [unitOptions, setUnitOptions] = useState<{ label: string; value: string }[]>(
-    []
-  )
+  const [unitOptions, setUnitOptions] = useState<
+    { label: string; value: string }[]
+  >([])
 
   useEffect(() => {
     let cancelled = false

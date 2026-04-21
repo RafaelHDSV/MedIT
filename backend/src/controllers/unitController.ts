@@ -65,10 +65,7 @@ export const getUnit = async (req: Request, res: Response) => {
 
 export const getSignupUnitsList = async (_req: Request, res: Response) => {
   try {
-    const units = await Unit.find()
-      .select('_id name')
-      .sort({ name: 1 })
-      .lean()
+    const units = await Unit.find().select('_id name').sort({ name: 1 }).lean()
 
     return res.status(200).json({
       message: 'Unidades encontradas com sucesso!',

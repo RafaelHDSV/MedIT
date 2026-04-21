@@ -1,9 +1,6 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import {
-  AttendanceRisk,
-  AttendanceStatus
-} from '../interfaces/IAttendance.js'
+import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserGender, UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { Patient } from '../models/PatientModel.js'
@@ -43,7 +40,13 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const createPatient = async (req: Request, res: Response) => {
   try {
-    const { name, cpf, email, password, unitId: bodyUnitId } = req.body as {
+    const {
+      name,
+      cpf,
+      email,
+      password,
+      unitId: bodyUnitId
+    } = req.body as {
       name?: string
       cpf?: string
       email?: string
@@ -58,8 +61,7 @@ export const createPatient = async (req: Request, res: Response) => {
     if (!email) errors.email = 'Campo obrigatório'
     if (!password) errors.password = 'Campo obrigatório'
 
-    const unitIdStr =
-      typeof bodyUnitId === 'string' ? bodyUnitId.trim() : ''
+    const unitIdStr = typeof bodyUnitId === 'string' ? bodyUnitId.trim() : ''
     if (!unitIdStr) {
       errors.unitId = 'Selecione a unidade de saúde.'
     } else if (!Types.ObjectId.isValid(unitIdStr)) {
@@ -413,7 +415,11 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
     if (!mainComplaint?.trim()) {
       errors.mainComplaint = 'Informe sua queixa principal'
     }
-    if (painLevel === undefined || painLevel === null || Number.isNaN(painLevel)) {
+    if (
+      painLevel === undefined ||
+      painLevel === null ||
+      Number.isNaN(painLevel)
+    ) {
       errors.painLevel = 'Informe seu nível de dor'
     }
     if (selfMedicated === undefined || selfMedicated === null) {
@@ -428,7 +434,8 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
       (patient.unitId ? String(patient.unitId) : '')
 
     if (!unitIdStr || !Types.ObjectId.isValid(unitIdStr)) {
-      errors.unitId = 'Selecione a unidade de saúde onde deseja ser atendido(a).'
+      errors.unitId =
+        'Selecione a unidade de saúde onde deseja ser atendido(a).'
     }
 
     if (Object.keys(errors).length > 0) {

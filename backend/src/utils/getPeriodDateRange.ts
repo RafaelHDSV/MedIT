@@ -5,10 +5,7 @@ const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/
  * `referenceDate` opcional (YYYY-MM-DD): ancoragem do dia/semana/mês/ano
  * escolhidos no dashboard; sem valor, usa a data atual em America/Sao_Paulo.
  */
-export const getPeriodDateRange = (
-  period: string,
-  referenceDate?: string
-) => {
+export const getPeriodDateRange = (period: string, referenceDate?: string) => {
   let year: number
   let month: number
   let date: number

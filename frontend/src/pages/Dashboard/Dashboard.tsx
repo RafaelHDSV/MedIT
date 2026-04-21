@@ -306,10 +306,12 @@ function Dashboard() {
                 <InputSelect
                   className={styles.periodSelect}
                   placeholder='Período'
-                  options={Object.entries(PeriodsLabels).map(([key, value]) => ({
-                    label: value,
-                    value: key
-                  }))}
+                  options={Object.entries(PeriodsLabels).map(
+                    ([key, value]) => ({
+                      label: value,
+                      value: key
+                    })
+                  )}
                   inputHeight='2rem'
                   value={selectedPeriod}
                   onChange={(value) => {

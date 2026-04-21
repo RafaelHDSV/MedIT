@@ -1,5 +1,8 @@
 import { api } from '@/api/api'
-import type { PatientFormValues, PatientSignupBody } from '@/interfaces/IPatient'
+import type {
+  PatientFormValues,
+  PatientSignupBody
+} from '@/interfaces/IPatient'
 import type { PreRegistrationFormValues } from '@/pages/PreRegistration/IPreRegistration'
 import type { ObjectId } from 'mongoose'
 import { Repository } from './Repository'
@@ -55,9 +58,7 @@ class PatientsRepositoy extends Repository {
 
   async confirmPatientArrival({ attendanceId }: { attendanceId: string }) {
     return this.handle(() =>
-      this.api.post(
-        `${this.path}/attendances/${attendanceId}/confirm-arrival`
-      )
+      this.api.post(`${this.path}/attendances/${attendanceId}/confirm-arrival`)
     )
   }
 }

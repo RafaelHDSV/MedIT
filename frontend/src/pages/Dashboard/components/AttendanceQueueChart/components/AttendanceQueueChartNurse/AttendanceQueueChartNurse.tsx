@@ -81,7 +81,8 @@ function AttendanceQueueChartNurse({ item, loading }: IAttendanceItemProps) {
           } catch (err) {
             handleApiError({
               err,
-              defaultMessage: 'Não foi possível assumir este paciente na triagem.'
+              defaultMessage:
+                'Não foi possível assumir este paciente na triagem.'
             })
           } finally {
             setClaiming(false)

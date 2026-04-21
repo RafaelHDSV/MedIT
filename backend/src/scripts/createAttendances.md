@@ -6,43 +6,43 @@ Este documento descreve **como o script de seed funciona** (`createAttendances.s
 
 ## Visão geral
 
-| Item | Comportamento |
-|------|----------------|
-| **Nome do script** | `create-attendances` |
-| **Antes de inserir** | `Attendance.deleteMany()` — remove **todos** os atendimentos. |
-| **Unidades** | Carrega todas as `Unit`; para cada uma monta um *pool* de pacientes, enfermeiros e médicos da mesma unidade. Unidades sem algum dos três são **ignoradas**. |
-| **Janela temporal** | `windowStart` = meia-noite local do dia `(hoje − 364)`; `windowEnd` = instante `now` da execução. Ou seja, ~**365 dias** de histórico rolante até “agora”. |
+| Item                       | Comportamento                                                                                                                                                                                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nome do script**         | `create-attendances`                                                                                                                                                                                                                                                             |
+| **Antes de inserir**       | `Attendance.deleteMany()` — remove **todos** os atendimentos.                                                                                                                                                                                                                    |
+| **Unidades**               | Carrega todas as `Unit`; para cada uma monta um _pool_ de pacientes, enfermeiros e médicos da mesma unidade. Unidades sem algum dos três são **ignoradas**.                                                                                                                      |
+| **Janela temporal**        | `windowStart` = meia-noite local do dia `(hoje − 364)`; `windowEnd` = instante `now` da execução. Ou seja, ~**365 dias** de histórico rolante até “agora”.                                                                                                                       |
 | **Granularidade de datas** | A maior parte da lógica usa **meia-noite e aritmética em horário local** (`setHours`, `setDate`). O dashboard agrega com **UTC** em `getPeriodDateRange` — pode haver pequeno desvio de bucket dia/semana em bordas de fuso; hoje script e API não estão unificados nesse ponto. |
-| **Inserção** | Lotes de `INSERT_BATCH_SIZE` (400) com `insertMany(..., { ordered: false, timestamps: false })` — `createdAt` / `updatedAt` vêm explícitos do seed. |
+| **Inserção**               | Lotes de `INSERT_BATCH_SIZE` (400) com `insertMany(..., { ordered: false, timestamps: false })` — `createdAt` / `updatedAt` vêm explícitos do seed.                                                                                                                              |
 
 ---
 
 ## Modelo mental dos campos principais
 
-| Campo | Uso no seed |
-|--------|-------------|
-| **`date`** | Início do atendimento (entrada no fluxo). Usado no dashboard em agregações “por dia / hora” (`getAttendanceByTime`, `getEntries`, etc.). |
-| **`status`** | Estado atual do documento. |
-| **`changesHistory`** | Lista `{ status, changedAt }` do fluxo até o estado atual (concluído = fluxo completo; ativo = prefixo do fluxo até um status “ativo”). |
-| **`createdAt`** | Em geral igual a `date` no seed. |
-| **`updatedAt`** | Concluídos: costuma ser igual a `date` (fim lógico colapsado no seed). Ativos: último `changedAt` do histórico (última transição “simulada”). |
-| **`diagnosis`** | Preenchido em concluídos; **omitido** (`undefined`) nos ativos do dia atual. |
+| Campo                | Uso no seed                                                                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`date`**           | Início do atendimento (entrada no fluxo). Usado no dashboard em agregações “por dia / hora” (`getAttendanceByTime`, `getEntries`, etc.).      |
+| **`status`**         | Estado atual do documento.                                                                                                                    |
+| **`changesHistory`** | Lista `{ status, changedAt }` do fluxo até o estado atual (concluído = fluxo completo; ativo = prefixo do fluxo até um status “ativo”).       |
+| **`createdAt`**      | Em geral igual a `date` no seed.                                                                                                              |
+| **`updatedAt`**      | Concluídos: costuma ser igual a `date` (fim lógico colapsado no seed). Ativos: último `changedAt` do histórico (última transição “simulada”). |
+| **`diagnosis`**      | Preenchido em concluídos; **omitido** (`undefined`) nos ativos do dia atual.                                                                  |
 
 ---
 
 ## Constantes (valores atuais no código)
 
-| Constante | Valor (referência) | Papel |
-|-----------|-------------------|--------|
-| `DAYS_BACK` | 364 | Largura da janela para trás a partir de hoje 00h. |
-| `MIN_COMPLETED_PER_PATIENT` / `DOCTOR` / `NURSE` | 5 | Mínimos de **concluídos** (após baseline), respeitando o teto diário. |
-| `MAX_ATTENDANCES_PER_CALENDAR_DAY` | 30 | **Regra suprema:** nunca mais que isto de documentos com o mesmo dia civil de `date` (por unidade). |
-| `MIN_ATTENDANCES_PER_CALENDAR_DAY` | 15 | Limite inferior do sorteio da meta diária `dailyTarget`. |
-| `OCCUPANCY_TARGET_MIN` / `MAX` | 0.45 / 0.68 | Fração de `maxOccupancy`: define faixa do número de **ativos só no dia atual**. |
-| `INSERT_BATCH_SIZE` | 400 | Tamanho do lote de insert. |
-| `TARGET_MIN_TOTAL_ATTENDANCES` | 0 | Top-up **desligado** (evitar quebrar o teto diário). |
-| `ABSOLUTE_MAX_TOTAL_ATTENDANCES` | 180_000 | Teto de segurança (mantido no código). |
-| `MAX_TOP_UP_BATCHES` | 450 | Limite de lotes se o top-up for reativado. |
+| Constante                                        | Valor (referência) | Papel                                                                                               |
+| ------------------------------------------------ | ------------------ | --------------------------------------------------------------------------------------------------- |
+| `DAYS_BACK`                                      | 364                | Largura da janela para trás a partir de hoje 00h.                                                   |
+| `MIN_COMPLETED_PER_PATIENT` / `DOCTOR` / `NURSE` | 5                  | Mínimos de **concluídos** (após baseline), respeitando o teto diário.                               |
+| `MAX_ATTENDANCES_PER_CALENDAR_DAY`               | 30                 | **Regra suprema:** nunca mais que isto de documentos com o mesmo dia civil de `date` (por unidade). |
+| `MIN_ATTENDANCES_PER_CALENDAR_DAY`               | 15                 | Limite inferior do sorteio da meta diária `dailyTarget`.                                            |
+| `OCCUPANCY_TARGET_MIN` / `MAX`                   | 0.45 / 0.68        | Fração de `maxOccupancy`: define faixa do número de **ativos só no dia atual**.                     |
+| `INSERT_BATCH_SIZE`                              | 400                | Tamanho do lote de insert.                                                                          |
+| `TARGET_MIN_TOTAL_ATTENDANCES`                   | 0                  | Top-up **desligado** (evitar quebrar o teto diário).                                                |
+| `ABSOLUTE_MAX_TOTAL_ATTENDANCES`                 | 180_000            | Teto de segurança (mantido no código).                                                              |
+| `MAX_TOP_UP_BATCHES`                             | 450                | Limite de lotes se o top-up for reativado.                                                          |
 
 `maxOccupancy` por unidade vem do documento `Unit` (fallback **50** se ausente/ inválido).
 
@@ -110,7 +110,7 @@ Tudo roda **por unidade**; em seguida o bloco de top-up global **não executa** 
 
 ## Como rodar
 
-- Pelo runner de scripts do backend (`npm run scripts` / fluxo do projeto) escolhendo `create-attendances`.  
+- Pelo runner de scripts do backend (`npm run scripts` / fluxo do projeto) escolhendo `create-attendances`.
 - (Detalhe exato do comando depende do `runner` do repositório.)
 
 ---
