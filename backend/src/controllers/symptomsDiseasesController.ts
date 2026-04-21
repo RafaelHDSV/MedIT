@@ -1,9 +1,17 @@
 import { Request, Response } from 'express'
+import {
+  DiseaseSymptomKey,
+  SYMPTOM_LABEL_PT
+} from '../interfaces/ISymptomsDiseases.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
 import { diseaseSymptomsToRecord } from '../services/symptomsDiseaseSuggestionService.js'
-import { symptomLabelPt } from '../utils/symptomLabelsPt.js'
 
 export const getSymptomOptions = async (_req: Request, res: Response) => {
+  function symptomLabelPt(key: string): string {
+    const diseaseKey = key as DiseaseSymptomKey
+    return SYMPTOM_LABEL_PT[diseaseKey] ?? key
+  }
+
   try {
     const rows = await SymptomsDiseasesModel.find().select('symptoms').lean()
 
