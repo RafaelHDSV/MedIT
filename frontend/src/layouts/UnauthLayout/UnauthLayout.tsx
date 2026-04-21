@@ -22,7 +22,6 @@ export default function UnauthLayout() {
     'Melhore a eficiência e a qualidade do atendimento',
     'Facilite a comunicação entre equipes de saúde',
     'Acesse todas as informações clínicas em tempo real',
-    'Reduza o tempo de espera e melhore a experiência',
     'Aumente a segurança do paciente com alertas inteligentes'
   ]
 
@@ -33,7 +32,6 @@ export default function UnauthLayout() {
       '/image3.png',
       '/image4.png',
       '/image5.png',
-      '/image6.png',
       '/image7.svg'
     ],
     []
