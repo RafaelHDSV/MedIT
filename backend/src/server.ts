@@ -9,6 +9,7 @@ import doctorsRoutes from './routes/doctorsRoutes.js'
 import medicationRoutes from './routes/medicationRoutes.js'
 import nursesRoutes from './routes/nursesRoutes.js'
 import patientsRoutes from './routes/patientsRoutes.js'
+import symptomsDiseasesRoutes from './routes/symptomsDiseasesRoutes.js'
 import unitsRoutes from './routes/unitsRoutes.js'
 import usersRoutes from './routes/usersRoutes.js'
 
@@ -23,15 +24,18 @@ app.get('/', (_req, res) => {
   res.send('Back-end funcionando com sucesso!')
 })
 
-app.use('/auth', authRoutes)
-app.use('/auth/users', usersRoutes)
-app.use('/auth/doctors', doctorsRoutes)
-app.use('/auth/nurses', nursesRoutes)
-app.use('/auth/patients', patientsRoutes)
-app.use('/auth/units', unitsRoutes)
-app.use('/auth/dashboard', dashboardRoutes)
-app.use('/auth/attendances', attendancesRoutes)
-app.use('/auth/medications', medicationRoutes)
+const path = '/auth'
+
+app.use(`${path}`, authRoutes)
+app.use(`${path}/users`, usersRoutes)
+app.use(`${path}/doctors`, doctorsRoutes)
+app.use(`${path}/nurses`, nursesRoutes)
+app.use(`${path}/patients`, patientsRoutes)
+app.use(`${path}/units`, unitsRoutes)
+app.use(`${path}/dashboard`, dashboardRoutes)
+app.use(`${path}/attendances`, attendancesRoutes)
+app.use(`${path}/medications`, medicationRoutes)
+app.use(`${path}/symptoms-diseases`, symptomsDiseasesRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando! ${PORT}`)
