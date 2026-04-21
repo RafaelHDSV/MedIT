@@ -8,7 +8,9 @@ const SymptomsDiseaseSchema = new mongoose.Schema<ISymptomsDiseases>(
       required: true,
       unique: true
     },
-    symptoms: { type: Map, of: Number, required: true }
+    symptoms: { type: Map, of: Number, required: true },
+    medications: { type: [String], default: [] },
+    exams: { type: [String], default: [] }
   },
   { timestamps: true }
 )

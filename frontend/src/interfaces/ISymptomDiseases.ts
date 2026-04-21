@@ -20,4 +20,6 @@ export interface ISuggestionDetails extends ISuggestedDiseases {
   referenceSymptomKeys: string[]
   matchedReferenceCount: number
   referenceSymptomCount: number
+  medications: string[]
+  exams: string[]
 }

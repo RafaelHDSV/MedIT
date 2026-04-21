@@ -3,6 +3,8 @@ import { IBaseInterface } from './IBaseInterface.js'
 export interface ISymptomsDiseases extends IBaseInterface {
   disease: string
   symptoms: Record<string, number>
+  medications?: string[]
+  exams?: string[]
 }
 
 export interface ISymptomOption {
@@ -13,6 +15,8 @@ export interface ISymptomOption {
 export interface ISuggestedDiseases {
   disease: string
   compatibility: number
+  medications?: string[]
+  exams?: string[]
 }
 
 export interface ISuggestedDiseasesPayload {
@@ -176,23 +180,24 @@ export const SYMPTOM_LABEL_PT: Record<DiseaseSymptomKey, string> = {
 }
 
 /** Rótulos exatos usados na UI de pré-atendimento (mantêm capitalização) */
-export const EXACT_UI_LABEL_TO_DISEASE_KEY: Record<string, DiseaseSymptomKey> = {
-  Febre: 'fever',
-  'Dor de cabeça': 'headache',
-  'Dor no corpo': 'musclePain',
-  Tosse: 'dryCough',
-  Náusea: 'nauseaVomiting',
-  Fadiga: 'fatigue',
-  'Dor de garganta': 'soreThroat',
-  Calafrios: 'chills',
-  'Falta de ar': 'shortnessOfBreath',
-  'Dor abdominal': 'abdominalPain',
-  Diarreia: 'diarrhea',
-  Vômito: 'nauseaVomiting',
-  'Náusea ou vômito': 'nauseaVomiting',
-  'Tosse seca': 'dryCough',
-  'Confusão mental': 'mentalConfusion',
-  'Perda de olfato/paladar': 'lossOfTasteSmell',
-  'Erupção cutânea': 'skinRash',
-  Inchaço: 'jointSwelling'
-}
+export const EXACT_UI_LABEL_TO_DISEASE_KEY: Record<string, DiseaseSymptomKey> =
+  {
+    Febre: 'fever',
+    'Dor de cabeça': 'headache',
+    'Dor no corpo': 'musclePain',
+    Tosse: 'dryCough',
+    Náusea: 'nauseaVomiting',
+    Fadiga: 'fatigue',
+    'Dor de garganta': 'soreThroat',
+    Calafrios: 'chills',
+    'Falta de ar': 'shortnessOfBreath',
+    'Dor abdominal': 'abdominalPain',
+    Diarreia: 'diarrhea',
+    Vômito: 'nauseaVomiting',
+    'Náusea ou vômito': 'nauseaVomiting',
+    'Tosse seca': 'dryCough',
+    'Confusão mental': 'mentalConfusion',
+    'Perda de olfato/paladar': 'lossOfTasteSmell',
+    'Erupção cutânea': 'skinRash',
+    Inchaço: 'jointSwelling'
+  }
