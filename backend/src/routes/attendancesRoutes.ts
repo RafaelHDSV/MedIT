@@ -2,7 +2,10 @@ import express from 'express'
 import {
   claimDoctorConsult,
   claimTriage,
-  completeTriage
+  completeTriage,
+  getStaffAttendanceDetails,
+  getSuggestedDiseases,
+  getSuggestionDetail
 } from '../controllers/attendanceController.js'
 import { authMiddleware } from '../middlewares/authMiddleware.js'
 
@@ -15,5 +18,16 @@ router.post(
   authMiddleware,
   claimDoctorConsult
 )
+router.get(
+  '/:attendanceId/suggested-diseases',
+  authMiddleware,
+  getSuggestedDiseases
+)
+router.get(
+  '/:attendanceId/suggestion-detail',
+  authMiddleware,
+  getSuggestionDetail
+)
+router.get('/:attendanceId', authMiddleware, getStaffAttendanceDetails)
 
 export default router
