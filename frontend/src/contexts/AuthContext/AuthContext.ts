@@ -5,7 +5,7 @@ import { createContext } from 'react'
 export interface AuthContextType {
   user: IAuthUser | null
   login: (payload: LoginPayload) => void
-  logout: () => void
+  logout: (options?: { skipConfirm?: boolean }) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null)

@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button'
+import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import { useAuth } from '@/hooks/useAuth'
 import { useDevTasks } from '@/hooks/useDevTasks'
@@ -163,10 +164,12 @@ function ConfigBaseContent() {
             value={`${dayjs(user.birthDate).format('DD/MM/YYYY')} (${getAgeByBirthDate(user.birthDate)} anos)`}
           />
         )}
-        <DetailsLine
-          label='Telefone'
-          value={masks(user.cellphone, 'cellphone')}
-        />
+        {user.cellphone && (
+          <DetailsLine
+            label='Telefone'
+            value={masks(user.cellphone, 'cellphone')}
+          />
+        )}
         {user?.bloodType && (
           <DetailsLine label='Tipo sanguíneo' value={user?.bloodType} />
         )}
@@ -216,15 +219,14 @@ function ConfigBaseContent() {
         </div>
       </div> */}
 
-      {/* VIEIRA: Adicionar funcionadalide de deletar */}
-      {/* <div className={styles.deleteArea}>
+      <div className={styles.deleteArea}>
         <DeleteModal
           user={user}
           label='usuário'
-          apiName='users'
+          apiName='auth/users'
           buttonText='Deletar conta'
         />
-      </div> */}
+      </div>
     </div>
   )
 }

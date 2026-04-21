@@ -71,7 +71,8 @@ function DeleteModal({ user, label, apiName, buttonText }: IDeleteModalProps) {
           )
 
           if (isDeleteUserLogged) {
-            logout()
+            await logout({ skipConfirm: true })
+            navigate(ROUTES.SIGNIN.path)
           } else {
             const routeKey = apiName.toUpperCase() as keyof typeof ROUTES
             navigate(ROUTES[routeKey].path)
