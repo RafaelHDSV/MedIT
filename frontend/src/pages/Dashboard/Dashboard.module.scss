@@ -8,13 +8,40 @@
   height: 100%;
 }
 
-.periodSelect {
+.periodFilterGroup {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 100%;
+}
+
+.periodSelectPrefix {
   width: 6rem;
+  flex-shrink: 0;
+
+  :global(.ant-select-selector) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
 }
 
 .periodDatePicker {
-  width: 12rem;
+  flex: 1;
   min-width: 10rem;
+  width: 12rem;
+
+  :global(.ant-picker) {
+    width: 100% !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-left: none !important;
+  }
+}
+
+.periodFilterGroup:focus-within {
+  .periodSelectPrefix :global(.ant-select-selector),
+  .periodDatePicker :global(.ant-picker) {
+    border-color: var(--primary-color);
+  }
 }
 
 .admin {

@@ -302,9 +302,9 @@ function Dashboard() {
             className='dashboard__filters--date'
           >
             {shouldShowPeriodSelect && (
-              <>
+              <div className={styles.periodFilterGroup}>
                 <InputSelect
-                  className={styles.periodSelect}
+                  className={styles.periodSelectPrefix}
                   placeholder='Período'
                   options={Object.entries(PeriodsLabels).map(
                     ([key, value]) => ({
@@ -326,7 +326,7 @@ function Dashboard() {
                   onChange={setReferenceDayjs}
                   inputHeight='2rem'
                 />
-              </>
+              </div>
             )}
             <ReloadButton onReload={onReload} />
           </Flex>
