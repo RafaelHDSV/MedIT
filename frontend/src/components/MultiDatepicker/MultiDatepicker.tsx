@@ -151,7 +151,8 @@ export default function MultiDatepicker({
       (document.querySelector('.dashboard__filters--date') as HTMLElement) ||
       document.body,
     allowClear,
-    disabledDate: (current: Dayjs) => current.isBefore('2025-01-01') || current.isAfter(dayjs())
+    disabledDate: (current: Dayjs) =>
+      current.isBefore('2025-01-01') || current.isAfter(dayjs())
   }
 
   return (
