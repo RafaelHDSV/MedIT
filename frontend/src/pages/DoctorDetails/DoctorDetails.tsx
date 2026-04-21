@@ -1,6 +1,6 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import DeleteModal from '@/components/DeleteModal/DeleteModal'
-import RiskTag from '@/components/RiskTag/RiskTag'
+import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
