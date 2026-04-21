@@ -9,7 +9,8 @@
     "format:backend": "cd backend && yarn format",
     "test": "yarn base && concurrently \"yarn test:frontend\" \"yarn test:backend\"",
     "test:frontend": "cd frontend && yarn tsc",
-    "test:backend": "cd backend && yarn tsc"
+    "test:backend": "cd backend && yarn tsc",
+    "scripts": "cd backend && yarn scripts"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
