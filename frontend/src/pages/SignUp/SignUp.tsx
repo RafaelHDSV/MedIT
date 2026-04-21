@@ -1,13 +1,18 @@
 import Button from '@/components/Button/Button'
-import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
+import {
+  FormItem,
+  InputSelect,
+  InputText
+} from '@/components/FormComponents/FormComponents'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
+import AuthRepository from '@/repositories/AuthRepository'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from '../../components/FormComponents/FormComponents.module.scss'
 
@@ -16,6 +21,7 @@ interface ISignUpFormErrors {
   cpf?: string
   email?: string
   password?: string
+  unitId?: string
 }
 
 function SignUp() {
@@ -24,6 +30,39 @@ function SignUp() {
   const navigate = useNavigate()
   const [fieldErrors, setFieldErrors] = useState<ISignUpFormErrors>({})
   const [loading, setLoading] = useState(false)
+  const [unitsLoading, setUnitsLoading] = useState(true)
+  const [unitOptions, setUnitOptions] = useState<{ label: string; value: string }[]>(
+    []
+  )
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadUnits() {
+      setUnitsLoading(true)
+      try {
+        const { data } = await AuthRepository.getSignupUnits()
+        if (cancelled) return
+        setUnitOptions(
+          (data ?? []).map((u) => ({
+            label: u.name,
+            value: u._id
+          }))
+        )
+      } catch {
+        if (!cancelled) {
+          setUnitOptions([])
+        }
+      } finally {
+        if (!cancelled) setUnitsLoading(false)
+      }
+    }
+
+    void loadUnits()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handleRegister = async () => {
     setFieldErrors({})
@@ -35,7 +74,8 @@ function SignUp() {
       await PatientsRepository.createPatient({
         body: {
           ...values,
-          cpf: values.cpf.replace(/\D/g, '')
+          cpf: values.cpf.replace(/\D/g, ''),
+          unitId: values.unitId
         }
       })
 
@@ -95,6 +135,23 @@ function SignUp() {
         ]}
       >
         <InputText mask='cpf' placeholder='Digite seu CPF' />
+      </FormItem>
+
+      <FormItem
+        label='Unidade de saúde'
+        name='unitId'
+        className={styles.input}
+        validateStatus={fieldErrors.unitId ? 'error' : ''}
+        help={fieldErrors.unitId}
+        rules={[{ required: true, message: 'Selecione a unidade' }]}
+      >
+        <InputSelect
+          placeholder={
+            unitsLoading ? 'Carregando unidades...' : 'Selecione a unidade'
+          }
+          options={unitOptions}
+          disabled={unitsLoading || unitOptions.length === 0}
+        />
       </FormItem>
 
       <FormItem

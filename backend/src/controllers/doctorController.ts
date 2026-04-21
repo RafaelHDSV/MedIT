@@ -94,6 +94,18 @@ export const createDoctor = async (req: Request, res: Response) => {
         .json({ message: 'Erro de validações na criação do médico(a)', errors })
     }
 
+    const creator = await User.findById(req.userId).select('unitId')
+    const creatorUnitId = creator?.unitId
+    if (!creatorUnitId) {
+      return res.status(400).json({
+        message: 'Erro de validações na criação do médico(a)',
+        errors: {
+          unitId:
+            'Seu usuário não está vinculado a uma unidade; não é possível cadastrar médico(a).'
+        }
+      })
+    }
+
     const cleanCpf = cpf.replace(/\D/g, '')
     const cleanEmail = email.trim().toLowerCase()
     const cleanCellphone = cellphone?.replace(/\D/g, '')
@@ -108,7 +120,8 @@ export const createDoctor = async (req: Request, res: Response) => {
       birthDate,
       crm,
       specialization: finalSpecialization,
-      level: UserLevels.DOCTOR
+      level: UserLevels.DOCTOR,
+      unitId: creatorUnitId
     })
 
     await doctor.save()

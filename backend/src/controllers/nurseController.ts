@@ -82,6 +82,18 @@ export const createNurse = async (req: Request, res: Response) => {
       })
     }
 
+    const creator = await User.findById(req.userId).select('unitId')
+    const creatorUnitId = creator?.unitId
+    if (!creatorUnitId) {
+      return res.status(400).json({
+        message: 'Erro de validação na criação do enfermeiro(a)',
+        errors: {
+          unitId:
+            'Seu usuário não está vinculado a uma unidade; não é possível cadastrar enfermeiro(a).'
+        }
+      })
+    }
+
     const cleanCpf = cpf.replace(/\D/g, '')
     const cleanEmail = email.trim().toLowerCase()
     const cleanCellphone = Number(String(cellphone)?.replace(/\D/g, ''))
@@ -96,7 +108,8 @@ export const createNurse = async (req: Request, res: Response) => {
       birthDate,
       coren,
       shift,
-      level: UserLevels.NURSE
+      level: UserLevels.NURSE,
+      unitId: creatorUnitId
     })
 
     await nurse.save()
