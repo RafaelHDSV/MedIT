@@ -63,6 +63,25 @@ export const getUnit = async (req: Request, res: Response) => {
   }
 }
 
+export const getSignupUnitsList = async (_req: Request, res: Response) => {
+  try {
+    const units = await Unit.find()
+      .select('_id name')
+      .sort({ name: 1 })
+      .lean()
+
+    return res.status(200).json({
+      message: 'Unidades encontradas com sucesso!',
+      data: units
+    })
+  } catch (errors) {
+    console.error(errors)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao buscar unidades de saúde', errors })
+  }
+}
+
 export const createUnit = async (req: Request, res: Response) => {
   try {
     const unit = new Unit(req.body)

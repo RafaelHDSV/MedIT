@@ -35,7 +35,34 @@ export function AuthProvider({ children }: Props) {
     return true
   }
 
-  async function logout() {
+  function clearLocalSession() {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('user')
+    setUser(null)
+  }
+
+  async function finalizeLogout(options?: { silentApiError?: boolean }) {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken')
+      await AuthRepository.logout({ refreshToken })
+      clearLocalSession()
+    } catch (err) {
+      console.error('Erro no logout', err)
+      if (options?.silentApiError) {
+        clearLocalSession()
+      } else {
+        message.error('Erro ao encerrar sessão')
+      }
+    }
+  }
+
+  async function logout(options?: { skipConfirm?: boolean }) {
+    if (options?.skipConfirm) {
+      await finalizeLogout({ silentApiError: true })
+      return
+    }
+
     const modal = Modal.confirm({
       title: 'Encerrar sessão',
       content: 'Você está prestes a sair da sua conta.',
@@ -63,18 +90,8 @@ export function AuthProvider({ children }: Props) {
         })
 
         try {
-          const refreshToken = localStorage.getItem('refreshToken')
-
-          await AuthRepository.logout({ refreshToken })
-
-          localStorage.removeItem('accessToken')
-          localStorage.removeItem('refreshToken')
-          localStorage.removeItem('user')
-
-          setUser(null)
-        } catch (err) {
-          console.error('Erro no logout', err)
-          message.error('Erro ao encerrar sessão')
+          await finalizeLogout()
+        } finally {
           modal.update({
             okButtonProps: {
               loading: false,

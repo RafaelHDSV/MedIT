@@ -34,12 +34,25 @@ export const getEntries = async ({
   }
 }
 
-export const getInAttendance = async ({ unitId }: { unitId: string }) => {
+export const getInAttendance = async ({
+  unitId,
+  period,
+  referenceDate
+}: {
+  unitId: string
+  period?: string
+  referenceDate?: string
+}) => {
   try {
-    return await Attendance.countDocuments({
+    const match: Record<string, unknown> = {
       unitId,
       status: { $in: ACTIVE_STATUSES }
-    })
+    }
+    if (period) {
+      const { start, end } = getPeriodDateRange(period, referenceDate)
+      match.date = { $gte: start, $lte: end }
+    }
+    return await Attendance.countDocuments(match)
   } catch (err) {
     console.error(err)
   }
@@ -74,20 +87,30 @@ export const getAttended = async ({
 
 export const getAttendanceOcuppation = async ({
   unitId,
-  maxOccupancy
+  maxOccupancy,
+  period,
+  referenceDate
 }: {
   unitId: string
   maxOccupancy: number
+  period?: string
+  referenceDate?: string
 }) => {
   try {
     if (!maxOccupancy) return 0
 
-    const occupied = await Attendance.countDocuments({
+    const match: Record<string, unknown> = {
       unitId,
       status: {
         $in: ACTIVE_STATUSES
       }
-    })
+    }
+    if (period) {
+      const { start, end } = getPeriodDateRange(period, referenceDate)
+      match.date = { $gte: start, $lte: end }
+    }
+
+    const occupied = await Attendance.countDocuments(match)
 
     return Math.round((occupied / maxOccupancy) * 100)
   } catch (err) {
@@ -528,10 +551,14 @@ export const getAttendanceByTime = async ({
 
 export const getAttendanceQueue = async ({
   unitId,
-  level
+  level,
+  period,
+  referenceDate
 }: {
   unitId: string
   level?: UserLevels
+  period?: string
+  referenceDate?: string
 }) => {
   const status = () => {
     switch (level) {
@@ -552,6 +579,11 @@ export const getAttendanceQueue = async ({
     const poolMatch: Record<string, unknown> = {
       unitId: new Types.ObjectId(unitId),
       status: { $in: status() }
+    }
+
+    if (level === UserLevels.ADMIN && period) {
+      const { start, end } = getPeriodDateRange(period, referenceDate)
+      poolMatch.date = { $gte: start, $lte: end }
     }
 
     if (level === UserLevels.NURSE) {

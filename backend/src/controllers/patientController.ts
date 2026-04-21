@@ -43,7 +43,13 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const createPatient = async (req: Request, res: Response) => {
   try {
-    const { name, cpf, email, password } = req.body
+    const { name, cpf, email, password, unitId: bodyUnitId } = req.body as {
+      name?: string
+      cpf?: string
+      email?: string
+      password?: string
+      unitId?: string
+    }
 
     const errors: Record<string, string> = {}
 
@@ -51,6 +57,14 @@ export const createPatient = async (req: Request, res: Response) => {
     if (!cpf) errors.cpf = 'Campo obrigatório'
     if (!email) errors.email = 'Campo obrigatório'
     if (!password) errors.password = 'Campo obrigatório'
+
+    const unitIdStr =
+      typeof bodyUnitId === 'string' ? bodyUnitId.trim() : ''
+    if (!unitIdStr) {
+      errors.unitId = 'Selecione a unidade de saúde.'
+    } else if (!Types.ObjectId.isValid(unitIdStr)) {
+      errors.unitId = 'Unidade inválida.'
+    }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {
       errors.name = 'Nome deve conter pelo menos 3 caracteres e sobrenome'
@@ -73,15 +87,24 @@ export const createPatient = async (req: Request, res: Response) => {
       })
     }
 
-    const cleanCpf = cpf.replace(/\D/g, '')
-    const cleanEmail = email.trim().toLowerCase()
+    const unit = await Unit.findById(unitIdStr)
+    if (!unit) {
+      return res.status(400).json({
+        message: 'Erro de validação na criação do paciente',
+        errors: { unitId: 'Unidade não encontrada.' }
+      })
+    }
+
+    const cleanCpf = cpf?.replace(/\D/g, '')
+    const cleanEmail = email?.trim().toLowerCase()
 
     const patient = new Patient({
       name,
       cpf: cleanCpf,
       email: cleanEmail,
       password,
-      level: UserLevels.PATIENT
+      level: UserLevels.PATIENT,
+      unitId: new Types.ObjectId(unitIdStr)
     })
 
     await patient.save()

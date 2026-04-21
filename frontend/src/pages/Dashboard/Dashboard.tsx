@@ -216,13 +216,29 @@ function Dashboard() {
               referenceDate={referenceDayjs.format('YYYY-MM-DD')}
               reload={reload}
             />
-            <AttendanceQueueChart reload={reload} />
+            <AttendanceQueueChart
+              reload={reload}
+              selectedPeriod={selectedPeriod}
+              referenceDate={referenceDayjs.format('YYYY-MM-DD')}
+            />
           </>
         )
       case UserLevels.DOCTOR:
-        return <AttendanceQueueChart reload={reload} />
+        return (
+          <AttendanceQueueChart
+            reload={reload}
+            selectedPeriod={selectedPeriod}
+            referenceDate={referenceDayjs.format('YYYY-MM-DD')}
+          />
+        )
       case UserLevels.NURSE:
-        return <AttendanceQueueChart reload={reload} />
+        return (
+          <AttendanceQueueChart
+            reload={reload}
+            selectedPeriod={selectedPeriod}
+            referenceDate={referenceDayjs.format('YYYY-MM-DD')}
+          />
+        )
       case UserLevels.PATIENT:
         return (
           <Flex vertical gap={12} align='flex-start'>

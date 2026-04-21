@@ -2,6 +2,15 @@ import { api } from '@/api/api'
 import { Repository } from './Repository'
 
 class AuthRepository extends Repository {
+  async getSignupUnits() {
+    return this.handle<{
+      message: string
+      data: { _id: string; name: string }[]
+    }>(() => {
+      return this.api.get(`${this.path}/signup/units`)
+    })
+  }
+
   async login({
     body
   }: {

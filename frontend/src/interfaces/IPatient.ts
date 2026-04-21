@@ -21,6 +21,14 @@ export interface IPatient extends IBaseUser {
   allergies?: string[]
 }
 
+export interface PatientSignupBody {
+  name: string
+  cpf: string
+  email: string
+  password: string
+  unitId: string
+}
+
 export interface PatientFormValues {
   name: string
   cpf: string
