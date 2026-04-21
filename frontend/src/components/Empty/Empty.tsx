@@ -1,11 +1,15 @@
-import { Flex } from 'antd'
+import styles from './Empty.module.scss'
 
-function Empty() {
+function Empty({
+  message = 'Nenhuma informação encontrada para essa consulta'
+}: {
+  message?: string
+}) {
   return (
-    <Flex vertical align='center' justify='center' gap={16}>
-      <img src='/no-data.svg' alt='No data' className='noDataImage' />
-      <span>Nenhuma informação encontrada para essa consulta</span>
-    </Flex>
+    <div className={styles.container}>
+      <img src='/no-data.svg' alt='No data' className={styles.image} />
+      <span>{message}</span>
+    </div>
   )
 }
 

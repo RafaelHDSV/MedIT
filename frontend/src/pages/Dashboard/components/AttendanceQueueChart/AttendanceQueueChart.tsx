@@ -1,8 +1,10 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
+import Empty from '@/components/Empty/Empty'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { Periods } from '@/interfaces/globals'
 import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
+import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
@@ -89,6 +91,27 @@ function AttendanceQueueChart({
     }
   }, [user?.level, data?.length])
 
+  const content = useMemo(() => {
+    const isNurse = user?.level === UserLevels.NURSE
+
+    if (loading) {
+      return Array.from({ length: 8 }).map((_, i) => (
+        <AttendanceItem key={i} loading={loading} />
+      ))
+    }
+
+    if (data.length === 0)
+      return (
+        <Empty
+          message={`Nenhum(a) ${isNurse ? 'triagem' : 'atendimento'} encontrado(a)`}
+        />
+      )
+
+    return data.map((item) => (
+      <AttendanceItem key={String(item._id)} item={item} />
+    ))
+  }, [loading, data, user?.level])
+
   return (
     <DashboardCard
       title={cardConfig.title}
@@ -96,15 +119,7 @@ function AttendanceQueueChart({
       asideText={`${data?.length} ${cardConfig.asideText}`}
       gridArea='attendanceQueueChart'
     >
-      <div className={styles.queueList}>
-        {loading
-          ? Array.from({ length: 8 }).map((_, i) => (
-              <AttendanceItem key={i} loading={loading} />
-            ))
-          : data.map((item) => (
-              <AttendanceItem key={String(item._id)} item={item} />
-            ))}
-      </div>
+      <div className={styles.queueList}>{content}</div>
     </DashboardCard>
   )
 }
