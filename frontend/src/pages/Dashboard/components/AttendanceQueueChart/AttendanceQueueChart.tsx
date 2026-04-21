@@ -79,15 +79,15 @@ function AttendanceQueueChart({
       case 'nurse':
         return {
           title: 'Fila de Triagem',
-          asideText: 'triagens'
+          asideText: data?.length > 1 ? 'triagens' : 'triagem'
         }
       default:
         return {
           title: 'Fila de Atendimento',
-          asideText: 'atendimentos'
+          asideText: data?.length > 1 ? 'atendimentos' : 'atendimento'
         }
     }
-  }, [user?.level])
+  }, [user?.level, data?.length])
 
   return (
     <DashboardCard

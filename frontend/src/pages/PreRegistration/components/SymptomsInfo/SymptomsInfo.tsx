@@ -1,5 +1,5 @@
-import { Flex } from 'antd'
 import SymptomTag from '@/components/SymptomTag/SymptomTag'
+import { Flex } from 'antd'
 import parentStyles from '../../PreRegistration.module.scss'
 
 interface ISymptomsInfoProps {
@@ -11,6 +11,7 @@ function SymptomsInfo({
   selectedSymptoms,
   setSelectedSymptoms
 }: ISymptomsInfoProps) {
+  // VIEIRA: Adicionar back
   const symptoms = [
     'Febre',
     'Dor de cabeça',

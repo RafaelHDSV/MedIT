@@ -1,5 +1,5 @@
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
-import RiskTag from '@/components/RiskTag/RiskTag'
+import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
 import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import type { IAttendanceItemProps } from '../../AttendanceQueueChart'

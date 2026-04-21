@@ -1,6 +1,6 @@
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
-import RiskTag from '@/components/RiskTag/RiskTag'
+import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
 import { ROUTES } from '@/routes/constants'
 import type { ColumnsType } from 'antd/es/table'
