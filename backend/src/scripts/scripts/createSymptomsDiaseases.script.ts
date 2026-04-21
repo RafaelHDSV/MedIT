@@ -4187,10 +4187,260 @@ const createSymptomsDiseases = {
       }
     ]
 
-    await SymptomsDiseasesModel.deleteMany()
-    await SymptomsDiseasesModel.insertMany(diseases)
+    /**
+     * Medicamentos e exames sugeridos por condição — usado apenas no seed
+     * `createSymptomsDiaseases` para persistir em `SymptomsDisease`.
+     * Chaves devem coincidir com o campo `disease` de cada documento.
+     */
+    const DISEASE_ADVICE_BY_NAME: Record<
+      string,
+      { medications: string[]; exams: string[] }
+    > = {
+      Influenza: {
+        medications: ['Dipirona', 'Paracetamol', 'Repouso e hidratação'],
+        exams: ['Teste rápido para vírus respiratórios', 'Hemograma']
+      },
+      'COVID-19': {
+        medications: ['Paracetamol', 'Hidratação', 'Monitorar saturação'],
+        exams: [
+          'Teste COVID-19',
+          'Hemograma',
+          'Radiografia de tórax (se indicado)'
+        ]
+      },
+      Pneumonia: {
+        medications: [
+          'Antibiótico (prescrição médica)',
+          'Antitérmico',
+          'Oxigenoterapia se necessário'
+        ],
+        exams: ['Radiografia de tórax', 'Hemograma', 'Gasometria']
+      },
+      'Acute Bronchitis': {
+        medications: [
+          'Antitérmico',
+          'Broncodilatador inalatório (se prescrito)',
+          'Hidratação'
+        ],
+        exams: ['Radiografia de tórax', 'Hemograma']
+      },
+      'Dengue Fever': {
+        medications: [
+          'Hidratação oral',
+          'Paracetamol (evitar AINEs sem orientação)'
+        ],
+        exams: ['Hemograma', 'Hematócrito', 'Ultrassom abdominal (se indicado)']
+      },
+      Chikungunya: {
+        medications: ['Paracetamol', 'Hidratação'],
+        exams: ['Hemograma', 'PCR sorológica (conforme protocolo)']
+      },
+      Sepsis: {
+        medications: [
+          'Antibioticoterapia empírica (hospital)',
+          'Expansão volêmica'
+        ],
+        exams: ['Hemograma', 'Procalcitonina', 'Hemoculturas', 'Função renal']
+      },
+      Meningitis: {
+        medications: ['Antibioticoterapia hospitalar urgente'],
+        exams: ['Punção lombar / liquor', 'Tomografia de crânio', 'Hemograma']
+      },
+      'Acute Myocardial Infarction': {
+        medications: ['Protocolo hospitalar de IAM'],
+        exams: ['Eletrocardiograma', 'Troponina', 'Ecocardiograma']
+      },
+      'Urinary Tract Infection (UTI)': {
+        medications: ['Antibiótico conforme cultura / protocolo', 'Hidratação'],
+        exams: ['Urina tipo I', 'Urocultura', 'Função renal']
+      },
+      Pyelonephritis: {
+        medications: ['Antibiótico (internação frequentemente indicada)'],
+        exams: ['Urina e urocultura', 'Ultrassom de rins', 'Hemograma']
+      },
+      Gastroenteritis: {
+        medications: ['Hidratação oral / venosa', 'Antiemético (se prescrito)'],
+        exams: ['Eletrólitos', 'Hemograma']
+      },
+      Tuberculosis: {
+        medications: ['Esquema ATB (serviço especializado)'],
+        exams: [
+          'Radiografia de tórax',
+          'Baciloscopia / cultura',
+          'Teste tuberculínico / IGRA'
+        ]
+      },
+      Asthma: {
+        medications: [
+          'Broncodilatador de resgate',
+          'Corticoide inalatório (manutenção)'
+        ],
+        exams: ['Espirometria', 'Oximetria']
+      },
+      Migraine: {
+        medications: [
+          'Analgésico comum',
+          'Triptano (se prescrito)',
+          'Repouso em ambiente escuro'
+        ],
+        exams: ['Avaliação clínica; neuroimagem se sinais de alarme']
+      },
+      Hypertension: {
+        medications: [
+          'Anti-hipertensivo conforme prescrição',
+          'Estilo de vida'
+        ],
+        exams: ['MAPA / PA domiciliar', 'Função renal', 'Eletrolítos']
+      },
+      'Food Poisoning': {
+        medications: ['Hidratação', 'Antiemético sob orientação'],
+        exams: ['Eletrólitos', 'Hemograma']
+      },
+      Anaphylaxis: {
+        medications: [
+          'Adrenalina IM',
+          'Antihistamínico',
+          'Corticosteroide (emergência)'
+        ],
+        exams: ['Observação em serviço de urgência']
+      },
+      Appendicitis: {
+        medications: ['Analgesia', 'Cirurgia quando indicada'],
+        exams: ['Hemograma', 'Ultrassom abdominal / TC']
+      },
+      'Stroke (Cerebrovascular Accident)': {
+        medications: ['Protocolo AVC (tempo-dependente)'],
+        exams: ['Tomografia de crânio', 'Angio-TC / RM']
+      },
+      'Common Cold': {
+        medications: ['Sintomáticos', 'Hidratação'],
+        exams: ['Não costuma ser necessário']
+      },
+      Pharyngitis: {
+        medications: [
+          'Analgésico',
+          'Antibiótico se estreptocóccico comprovado'
+        ],
+        exams: ['Teste rápido para estreptococo', 'Hemograma']
+      },
+      Sinusitis: {
+        medications: [
+          'Descongestionante',
+          'Analgésico',
+          'Antibiótico se bacteriana'
+        ],
+        exams: ['Exame clínico; imagem se complicação']
+      },
+      'Peptic Ulcer': {
+        medications: ['IBP', 'Erradicação H. pylori se indicada'],
+        exams: ['Endoscopia digestiva alta', 'Teste H. pylori']
+      },
+      Malaria: {
+        medications: ['Antimalárico específico (protocolo)'],
+        exams: ['Parasitológico espesso / gota espessa', 'Hemograma']
+      },
+      Leptospirosis: {
+        medications: ['Antibiótico (dose / fase conforme protocolo)'],
+        exams: ['Hemograma', 'Função renal', 'Sorologia']
+      },
+      'Chickenpox (Varicella)': {
+        medications: [
+          'Antitérmico',
+          'Antiviral em grupos de risco (prescrição)'
+        ],
+        exams: ['Avaliação clínica']
+      },
+      Measles: {
+        medications: [
+          'Suporte sintomático',
+          'Vitamina A (crianças, protocolo)'
+        ],
+        exams: ['Notificação / sorologia conforme vigilância']
+      },
+      'Zika Virus': {
+        medications: ['Paracetamol', 'Hidratação'],
+        exams: ['Sorologia / PCR conforme epidemiologia']
+      },
+      Mononucleosis: {
+        medications: [
+          'Repouso',
+          'Analgésico',
+          'Evitar esforço e contato esportivo'
+        ],
+        exams: [
+          'Hemograma com contagem diferencial',
+          'Teste heterófilo / sorologia'
+        ]
+      },
+      Pancreatitis: {
+        medications: ['Suporte hospitalar', 'Analgesia', 'Jejum'],
+        exams: ['Amilase / lipase', 'Tomografia de abdome']
+      },
+      'Kidney Stones (Nephrolithiasis)': {
+        medications: [
+          'Analgésico',
+          'Hidratação',
+          'Alfa-bloqueador (se prescrito)'
+        ],
+        exams: ['Tomografia de abdome sem contraste', 'Urina tipo I']
+      },
+      'Bone Fracture': {
+        medications: ['Analgésico', 'Imobilização'],
+        exams: ['Radiografia local', 'TC se indicado']
+      },
+      Conjunctivitis: {
+        medications: ['Colírio antibiótico / antialérgico (conforme causa)'],
+        exams: ['Avaliação oftalmológica']
+      },
+      'Atopic Dermatitis (Eczema)': {
+        medications: [
+          'Emoliente',
+          'Corticoide tópico (prescrição)',
+          'Antihistamínico oral'
+        ],
+        exams: ['Avaliação dermatológica']
+      },
+      Psoriasis: {
+        medications: [
+          'Corticoide tópico',
+          'Tratamento sistêmico (especialista)'
+        ],
+        exams: ['Avaliação dermatológica']
+      },
+      Fibromyalgia: {
+        medications: [
+          'Analgésico',
+          'Antidepressivo / neuromodulador (prescrição)'
+        ],
+        exams: ['Exclusão de outras causas (laboratorial conforme quadro)']
+      },
+      'Heart Failure': {
+        medications: [
+          'Diurético',
+          'IECA/BRA',
+          'Betabloqueador (ajuste por cardiologista)'
+        ],
+        exams: ['BNP / NT-proBNP', 'Ecocardiograma', 'Função renal']
+      },
+      'Pulmonary Embolism': {
+        medications: ['Anticoagulação (hospital)'],
+        exams: ['Angio-TC de tórax', 'D-dímero', 'Gasometria']
+      }
+    }
 
-    console.log(`✅ ${diseases.length} doenças inseridas com sucesso!`)
+    const enriched: ISymptomsDiseases[] = diseases.map((d) => {
+      const advice = DISEASE_ADVICE_BY_NAME[d.disease]
+      return {
+        ...d,
+        medications: advice?.medications ?? [],
+        exams: advice?.exams ?? []
+      }
+    })
+
+    await SymptomsDiseasesModel.deleteMany()
+    await SymptomsDiseasesModel.insertMany(enriched)
+
+    console.log(`✅ ${enriched.length} doenças inseridas com sucesso!`)
     process.exit()
   }
 }

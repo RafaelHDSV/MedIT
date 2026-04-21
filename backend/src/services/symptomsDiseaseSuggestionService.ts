@@ -83,12 +83,19 @@ export function computeSuggestionDetailForDisease(
     if (patientKeys.has(k as DiseaseSymptomKey)) matchedReferenceCount++
   }
 
+  const medications = Array.isArray(diseaseRow.medications)
+    ? diseaseRow.medications
+    : []
+  const exams = Array.isArray(diseaseRow.exams) ? diseaseRow.exams : []
+
   return {
     disease: diseaseRow.disease,
     compatibility: scoreDisease(diseaseRow, patientKeys),
     reportedSymptomKeys: [...getReportedSymptomsToDiseaseKeys(reported)],
     referenceSymptomKeys,
     matchedReferenceCount,
-    referenceSymptomCount: referenceSymptomKeys.length
+    referenceSymptomCount: referenceSymptomKeys.length,
+    medications,
+    exams
   }
 }
