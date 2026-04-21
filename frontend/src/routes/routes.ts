@@ -216,16 +216,6 @@ const preRegistration: IRoute = {
   }
 }
 
-const screeningDetails: IRoute = {
-  name: ROUTES.SCREENING_DETAILS.name,
-  description: ROUTES.SCREENING_DETAILS.description,
-  path: ROUTES.SCREENING_DETAILS.path,
-  meta: {
-    hidden: true,
-    levels: [UserLevels.NURSE],
-  }
-}
-
 const routes = [
   signIn,
   signUp,
@@ -233,7 +223,6 @@ const routes = [
   attendances,
   triages,
   triagesDetails,
-  screeningDetails,
   doctors,
   doctorDetails,
   nurses,
