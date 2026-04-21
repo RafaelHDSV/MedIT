@@ -3,7 +3,14 @@ import { Types } from 'mongoose'
 import { AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
+import { Patient } from '../models/PatientModel.js'
+import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
 import User from '../models/UserModel.js'
+import {
+  computeSuggestionDetailForDisease,
+  suggestDiseasesFromReportedSymptoms
+} from '../services/symptomsDiseaseSuggestionService.js'
+import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
 
 const historyEntry = (status: AttendanceStatus) => ({
   status,
@@ -170,5 +177,185 @@ export const claimDoctorConsult = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao assumir o atendimento.' })
+  }
+}
+
+const staffLevelsSuggest = new Set<UserLevels>([
+  UserLevels.DOCTOR,
+  UserLevels.NURSE
+])
+
+export const getStaffAttendanceDetails = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const attendanceId = paramId(req.params.attendanceId)
+    if (!Types.ObjectId.isValid(attendanceId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+
+    const user = await User.findById(req.userId)
+    if (!user || !staffLevelsSuggest.has(user.level as UserLevels)) {
+      return res.status(403).json({
+        message: 'Sem permissão para consultar este atendimento.'
+      })
+    }
+
+    if (!user.unitId) {
+      return res.status(400).json({ message: 'Usuário sem unidade vinculada.' })
+    }
+
+    const unitId = new Types.ObjectId(String(user.unitId))
+    const attendance = await Attendance.findOne({
+      _id: new Types.ObjectId(attendanceId),
+      unitId
+    } as any)
+      .populate({
+        path: 'patientId',
+        model: Patient,
+        select: 'name birthDate gender allergies conditions'
+      })
+      .lean()
+    if (!attendance) {
+      return res.status(404).json({ message: 'Atendimento não encontrado.' })
+    }
+
+    const att = { ...(attendance as unknown as Record<string, unknown>) }
+    const patient = att.patientId as {
+      name?: string
+      birthDate?: Date
+      gender?: string
+      allergies?: string[]
+      conditions?: string[]
+    } | null
+    delete att.patientId
+
+    return res.json({
+      message: 'Atendimento encontrado.',
+      data: {
+        ...att,
+        patient: patient ?? undefined
+      }
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao buscar o atendimento.' })
+  }
+}
+
+export const getSuggestedDiseases = async (req: Request, res: Response) => {
+  try {
+    const attendanceId = paramId(req.params.attendanceId)
+    if (!Types.ObjectId.isValid(attendanceId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+
+    const user = await User.findById(req.userId)
+    if (!user || !staffLevelsSuggest.has(user.level as UserLevels)) {
+      return res.status(403).json({
+        message: 'Sem permissão para consultar sugestões deste atendimento.'
+      })
+    }
+    if (!user.unitId) {
+      return res.status(400).json({ message: 'Usuário sem unidade vinculada.' })
+    }
+
+    const unitOid = new Types.ObjectId(String(user.unitId))
+    const attendance = await Attendance.findOne({
+      _id: new Types.ObjectId(attendanceId),
+      unitId: unitOid
+    } as never)
+      .select('symptoms unitId')
+      .lean()
+
+    if (!attendance) {
+      return res.status(404).json({ message: 'Atendimento não encontrado.' })
+    }
+
+    const reported = Array.isArray(attendance.symptoms)
+      ? attendance.symptoms.filter((s): s is string => typeof s === 'string')
+      : []
+
+    const normalizedKeys = getReportedSymptomsToDiseaseKeys(reported)
+    const suggestions = await suggestDiseasesFromReportedSymptoms(reported)
+
+    return res.json({
+      message:
+        'Sugestões calculadas (apoio à decisão; não constitui diagnóstico).',
+      data: {
+        suggestions,
+        normalizedSymptomKeys: normalizedKeys,
+        reportedSymptoms: reported
+      }
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao calcular sugestões.' })
+  }
+}
+
+export const getSuggestionDetail = async (req: Request, res: Response) => {
+  try {
+    const attendanceId = paramId(req.params.attendanceId)
+    const diseaseRaw = req.query.disease
+    const diseaseName = typeof diseaseRaw === 'string' ? diseaseRaw.trim() : ''
+
+    if (!Types.ObjectId.isValid(attendanceId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+    if (!diseaseName) {
+      return res
+        .status(400)
+        .json({ message: 'Informe o parâmetro de consulta disease.' })
+    }
+
+    const user = await User.findById(req.userId)
+    if (!user || !staffLevelsSuggest.has(user.level as UserLevels)) {
+      return res.status(403).json({
+        message: 'Sem permissão para consultar o detalhe desta sugestão.'
+      })
+    }
+    if (!user.unitId) {
+      return res.status(400).json({ message: 'Usuário sem unidade vinculada.' })
+    }
+
+    const unitOid = new Types.ObjectId(String(user.unitId))
+    const attendance = await Attendance.findOne({
+      _id: new Types.ObjectId(attendanceId),
+      unitId: unitOid
+    } as never)
+      .select('symptoms')
+      .lean()
+
+    if (!attendance) {
+      return res.status(404).json({ message: 'Atendimento não encontrado.' })
+    }
+
+    const reported = Array.isArray(attendance.symptoms)
+      ? attendance.symptoms.filter((s): s is string => typeof s === 'string')
+      : []
+
+    const diseaseRow = await SymptomsDiseasesModel.findOne({
+      disease: diseaseName
+    }).lean()
+
+    if (!diseaseRow) {
+      return res.status(404).json({
+        message: 'Doença não encontrada na base sintoma–doença.'
+      })
+    }
+
+    const data = computeSuggestionDetailForDisease(diseaseRow, reported)
+
+    return res.json({
+      message: 'Detalhe da sugestão (apoio à decisão).',
+      data
+    })
+  } catch (err) {
+    console.error(err)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao montar detalhe da sugestão.' })
   }
 }
