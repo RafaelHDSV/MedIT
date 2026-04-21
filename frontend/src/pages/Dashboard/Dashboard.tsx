@@ -101,10 +101,10 @@ function Dashboard() {
     void fetchPatientOnTheWay()
   }, [fetchPatientOnTheWay])
 
-  function onReload() {
+  const onReload = useCallback(() => {
     fetchDashboardStatus()
     setReload((prev) => !prev)
-  }
+  }, [fetchDashboardStatus])
 
   const cardsData = useMemo(() => {
     switch (user?.level) {

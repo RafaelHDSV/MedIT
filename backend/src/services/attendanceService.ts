@@ -5,6 +5,7 @@ import { Attendance } from '../models/AttendanceModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 
 const ACTIVE_STATUSES = [
+  AttendanceStatus.ON_THE_WAY,
   AttendanceStatus.WAITING_TRIAGE,
   AttendanceStatus.IN_TRIAGE,
   AttendanceStatus.TRIAGE_COMPLETED,
