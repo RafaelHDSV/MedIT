@@ -21,6 +21,9 @@ function Attendances({ userId, userType }: IAttendancesProps) {
   const { user } = useAuth()
   const [attendances, setAttendances] = useState<IAttendance[]>([])
   const [loading, setLoading] = useState(true)
+
+  const finalUserId = userId ? userId : user?._id
+  const finalUserType = userType ? userType : user?.level
   const canGoToDetails = !userId
 
   const fetchAttendances = useCallback(async () => {
@@ -28,22 +31,21 @@ function Attendances({ userId, userType }: IAttendancesProps) {
 
     try {
       let response
-      const userFullId = userId ? userId : user?._id
 
-      switch (userType) {
+      switch (finalUserType) {
         case 'doctor':
           response = await DoctorsRepository.getAttendances({
-            doctorId: userFullId
+            doctorId: finalUserId
           })
           break
         case 'nurse':
           response = await NursesRepository.getAttendances({
-            nurseId: userFullId
+            nurseId: finalUserId
           })
           break
         case 'patient':
           response = await PatientsRepository.getAttendances({
-            patientId: userFullId
+            patientId: finalUserId
           })
           break
         default:
@@ -59,7 +61,7 @@ function Attendances({ userId, userType }: IAttendancesProps) {
     } finally {
       setLoading(false)
     }
-  }, [user?._id, userId, userType])
+  }, [finalUserId, finalUserType])
 
   useEffect(() => {
     fetchAttendances()
