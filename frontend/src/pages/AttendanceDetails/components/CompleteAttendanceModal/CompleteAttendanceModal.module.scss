@@ -113,7 +113,9 @@
   color: var(--gray, #666);
   font-size: 0.875rem;
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
 
   &:hover {
     border-color: var(--primary-color);

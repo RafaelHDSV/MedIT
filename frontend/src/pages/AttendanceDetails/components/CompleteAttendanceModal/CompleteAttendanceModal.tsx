@@ -67,11 +67,10 @@ function CompleteAttendanceModal({
   const [disposition, setDisposition] = useState<
     PatientDisposition | undefined
   >(initialPatientDisposition)
-  const [medications, setMedications] = useState<IPrescribedMedication[]>(
-    () =>
-      initialPrescribedMedications?.length
-        ? initialPrescribedMedications.map((item) => ({ ...item }))
-        : [{ ...EMPTY_MEDICATION }]
+  const [medications, setMedications] = useState<IPrescribedMedication[]>(() =>
+    initialPrescribedMedications?.length
+      ? initialPrescribedMedications.map((item) => ({ ...item }))
+      : [{ ...EMPTY_MEDICATION }]
   )
   const [exams, setExams] = useState<string[]>(initialPrescribedExams ?? [])
 
@@ -251,11 +250,7 @@ function CompleteAttendanceModal({
                     placeholder='Ex.: Tomar após refeição'
                     value={medication.observation ?? ''}
                     onChange={(event) =>
-                      updateMedication(
-                        index,
-                        'observation',
-                        event.target.value
-                      )
+                      updateMedication(index, 'observation', event.target.value)
                     }
                   />
                 </div>
