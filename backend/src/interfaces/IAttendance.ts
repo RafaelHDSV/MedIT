@@ -52,7 +52,9 @@ export interface IVitalSigns {
 
 export interface IAttendance extends IBaseInterface {
   complaint: string
+  diagnosisKey?: string
   diagnosis?: string
+  diagnosisText?: string
   date: Date
   risk: AttendanceRisk
   status: AttendanceStatus

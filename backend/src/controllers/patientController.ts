@@ -3,6 +3,8 @@ import { Types } from 'mongoose'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserGender, UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
+import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
+import { toCanonicalDiseaseKey } from '../constants/diseaseLabelsPt.js'
 import { Patient } from '../models/PatientModel.js'
 import { Unit } from '../models/UnitModel.js'
 import User from '../models/UserModel.js'
@@ -262,7 +264,13 @@ export const getAttendances = async (req: Request, res: Response) => {
   const { id } = req.params
 
   try {
-    const attendances = await Attendance.aggregate([
+    const attendances = await Attendance.aggregate<{
+      _id: Types.ObjectId
+      diagnosisKey?: string
+      diagnosis?: string
+      symptoms?: string[]
+      [key: string]: unknown
+    }>([
       { $match: { patientId: new Types.ObjectId(String(id)) } },
       {
         $lookup: {
@@ -302,6 +310,7 @@ export const getAttendances = async (req: Request, res: Response) => {
           medicationsIds: 1,
           vitalSigns: 1,
           iaConditionId: 1,
+          diagnosisKey: 1,
           diagnosis: 1,
           createdAt: 1,
           updatedAt: 1
@@ -313,9 +322,45 @@ export const getAttendances = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Nenhum atendimento encontrado' })
     }
 
+    const enrichedAttendances = await Promise.all(
+      attendances.map(async (attendance) => {
+        const diagnosisKey = typeof attendance.diagnosisKey === 'string'
+          ? attendance.diagnosisKey.trim()
+          : ''
+        const diagnosis = typeof attendance.diagnosis === 'string'
+          ? attendance.diagnosis.trim()
+          : ''
+        const symptoms = Array.isArray(attendance.symptoms)
+          ? attendance.symptoms.filter((s): s is string => typeof s === 'string')
+          : []
+
+        if ((!diagnosisKey && !diagnosis) || symptoms.length === 0) {
+          return {
+            ...attendance,
+            iaTopSuggestion: undefined,
+            isIaTopSuggestionMatchDiagnosis: false
+          }
+        }
+
+        const suggestions = await suggestDiseasesFromReportedSymptoms(symptoms, {
+          limit: 1,
+          minCompatibility: 1
+        })
+        const topSuggestion = suggestions[0]?.disease
+
+        return {
+          ...attendance,
+          iaTopSuggestion: topSuggestion,
+          isIaTopSuggestionMatchDiagnosis: Boolean(topSuggestion) &&
+            toCanonicalDiseaseKey(topSuggestion) ===
+              toCanonicalDiseaseKey(diagnosisKey || diagnosis)
+        }
+      })
+    )
+
     res.json({
       message: 'Atendimentos encontrados com sucesso!',
-      data: attendances
+      data: enrichedAttendances
     })
   } catch (err) {
     console.error(err)

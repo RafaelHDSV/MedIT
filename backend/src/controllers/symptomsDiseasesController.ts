@@ -3,6 +3,7 @@ import {
   DiseaseSymptomKey,
   SYMPTOM_LABEL_PT
 } from '../interfaces/ISymptomsDiseases.js'
+import { toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
 import { diseaseSymptomsToRecord } from '../services/symptomsDiseaseSuggestionService.js'
 
@@ -38,5 +39,29 @@ export const getSymptomOptions = async (_req: Request, res: Response) => {
     return res
       .status(500)
       .json({ message: 'Erro ao listar sintomas da base de dados.' })
+  }
+}
+
+export const getDiseaseOptions = async (_req: Request, res: Response) => {
+  try {
+    const rows = await SymptomsDiseasesModel.find()
+      .select('disease')
+      .sort({ disease: 1 })
+      .lean<{ disease: string }[]>()
+
+    const diseases = rows.map((row) => ({
+      key: row.disease,
+      label: toDiseaseLabelPt(row.disease)
+    }))
+
+    return res.status(200).json({
+      message: 'Condições disponíveis para diagnóstico.',
+      data: { diseases }
+    })
+  } catch (err) {
+    console.error(err)
+    return res
+      .status(500)
+      .json({ message: 'Erro ao listar condições da base de dados.' })
   }
 }

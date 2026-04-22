@@ -2,6 +2,7 @@ import express from 'express'
 import {
   claimDoctorConsult,
   claimTriage,
+  completeAttendance,
   completeTriage,
   getStaffAttendanceDetails,
   getSuggestedDiseases,
@@ -17,6 +18,11 @@ router.post(
   '/:attendanceId/claim-consultation',
   authMiddleware,
   claimDoctorConsult
+)
+router.post(
+  '/:attendanceId/complete-attendance',
+  authMiddleware,
+  completeAttendance
 )
 router.get(
   '/:attendanceId/suggested-diseases',

@@ -25,7 +25,13 @@ const AttendanceSchema = new Schema<IAttendance>(
       type: String,
       required: true
     },
+    diagnosisKey: {
+      type: String
+    },
     diagnosis: {
+      type: String
+    },
+    diagnosisText: {
       type: String
     },
     date: {

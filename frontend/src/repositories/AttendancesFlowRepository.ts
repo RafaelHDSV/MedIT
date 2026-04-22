@@ -50,6 +50,23 @@ class AttendancesFlowRepository extends Repository {
     })
   }
 
+  async completeAttendance({
+    attendanceId,
+    diagnosisKey,
+    diagnosisText
+  }: {
+    attendanceId: string
+    diagnosisKey: string
+    diagnosisText?: string
+  }) {
+    return this.handle(() => {
+      return this.api.post(`${this.path}/${attendanceId}/complete-attendance`, {
+        diagnosisKey,
+        diagnosisText
+      })
+    })
+  }
+
   async claimConsultation({ attendanceId }: { attendanceId: string }) {
     return this.handle(() => {
       return this.api.post(`${this.path}/${attendanceId}/claim-consultation`)

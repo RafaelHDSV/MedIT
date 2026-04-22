@@ -4,6 +4,7 @@ import {
   AttendanceRisk,
   AttendanceStatus
 } from '../../interfaces/IAttendance.js'
+import { toDiseaseLabelPt } from '../../constants/diseaseLabelsPt.js'
 import { BloodType } from '../../interfaces/IPatient.js'
 import { Attendance } from '../../models/AttendanceModel.js'
 import { Doctor } from '../../models/DoctorModel.js'
@@ -156,7 +157,9 @@ type UnitPool = {
 type AttendanceSeed = {
   number: number
   complaint: string
+  diagnosisKey?: string
   diagnosis?: string
+  diagnosisText?: string
   date: Date
   risk: AttendanceRisk
   status: AttendanceStatus
@@ -668,12 +671,14 @@ const createAttendances = {
           opts?.patientId ?? faker.helpers.arrayElement(pool.patients)
         const { status, history } = buildCompletedFlow(date, risk)
         const diseaseProfile = pickDiseaseProfile()
-        const diagnosis =
-          diseaseProfile?.disease ?? faker.helpers.arrayElement(diagnoses)
+        const diagnosis = diseaseProfile?.disease
+          ? toDiseaseLabelPt(diseaseProfile.disease)
+          : faker.helpers.arrayElement(diagnoses)
         unitDocs.push(
           seedDoc({
             number: attendanceNumber++,
             complaint: faker.helpers.arrayElement(complaints),
+            diagnosisKey: diseaseProfile?.disease,
             diagnosis,
             date,
             risk,
@@ -973,12 +978,14 @@ const createAttendances = {
           ) as Types.ObjectId
           const { status, history } = buildCompletedFlow(date, risk)
           const diseaseProfile = pickDiseaseProfile()
-          const diagnosis =
-            diseaseProfile?.disease ?? faker.helpers.arrayElement(diagnoses)
+          const diagnosis = diseaseProfile?.disease
+            ? toDiseaseLabelPt(diseaseProfile.disease)
+            : faker.helpers.arrayElement(diagnoses)
           buf.push(
             seedDoc({
               number: attendanceNumber++,
               complaint: faker.helpers.arrayElement(complaints),
+              diagnosisKey: diseaseProfile?.disease,
               diagnosis,
               date,
               risk,

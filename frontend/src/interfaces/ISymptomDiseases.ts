@@ -3,6 +3,11 @@ export interface ISymptomOption {
   label: string
 }
 
+export interface IDiseaseOption {
+  key: string
+  label: string
+}
+
 export interface ISuggestedDiseases {
   disease: string
   compatibility: number

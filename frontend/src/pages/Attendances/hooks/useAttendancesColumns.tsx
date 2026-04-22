@@ -33,9 +33,6 @@ export function useAttendancesColumns({
     handleNavigateToDetails
   })
 
-  // VIEIRA: Adicionar assertividade IA
-  const assertivenessIA = true
-
   const columns: ColumnsType<IAttendance> = useMemo(
     () => [
       commonColumns.id(),
@@ -80,16 +77,20 @@ export function useAttendancesColumns({
         key: 'diagnosis',
         width: 120,
         ellipsis: true,
-        render: (text: string) => (
+        render: (text: string, record: IAttendance) => (
           <TooltipColumn
-            text={text ? `${text} ${assertivenessIA && '✅'}` : undefined}
+            text={
+              text
+                ? `${text}${record.isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}`
+                : undefined
+            }
           />
         )
       },
       commonColumns.createdAt(),
       commonColumns.updatedAt()
     ],
-    [commonColumns, assertivenessIA, canGoToDetails]
+    [commonColumns, canGoToDetails]
   )
 
   return columns

@@ -52,7 +52,9 @@ export interface IVitalSigns {
 
 export interface IAttendance extends IBaseInterface {
   complaint: string
+  diagnosisKey?: string
   diagnosis?: string
+  diagnosisText?: string
   date: Date
   risk: AttendanceRisk
   status: AttendanceStatus
@@ -70,6 +72,8 @@ export interface IAttendance extends IBaseInterface {
   generalObservation?: string
   conditions?: string[]
   allergies?: string[]
+  iaTopSuggestion?: string
+  isIaTopSuggestionMatchDiagnosis?: boolean
 }
 
 interface IAttendancePatient {
@@ -83,7 +87,9 @@ interface IAttendancePatient {
 export interface IAttendanceDetails {
   _id: ObjectId | string
   complaint: string
+  diagnosisKey?: string
   diagnosis?: string
+  diagnosisText?: string
   date: string | Date
   risk: AttendanceRisk
   status: AttendanceStatus

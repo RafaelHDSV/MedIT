@@ -2,6 +2,7 @@ import { Types } from 'mongoose'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
+import { toCanonicalDiseaseKey } from '../constants/diseaseLabelsPt.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
 import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
@@ -14,14 +15,6 @@ const ACTIVE_STATUSES = [
   AttendanceStatus.WAITING_ATTENDANCE,
   AttendanceStatus.IN_ATTENDANCE
 ]
-
-function normalizeConditionName(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim()
-    .toLowerCase()
-}
 
 function scoreDiseaseFromProfile(
   profile: Record<string, number>,
@@ -367,11 +360,14 @@ export const getDoctorIAAssertiveness = async ({
           $in: [AttendanceStatus.ATTENDANCE_COMPLETED, AttendanceStatus.COMPLETED]
         },
         date: { $gte: start, $lte: end },
-        diagnosis: { $exists: true, $type: 'string' },
+        $or: [
+          { diagnosisKey: { $exists: true, $type: 'string' } },
+          { diagnosis: { $exists: true, $type: 'string' } }
+        ],
         symptoms: { $exists: true, $type: 'array', $ne: [] }
       })
-        .select('diagnosis symptoms')
-        .lean<{ diagnosis?: string; symptoms?: string[] }[]>(),
+        .select('diagnosisKey diagnosis symptoms')
+        .lean<{ diagnosisKey?: string; diagnosis?: string; symptoms?: string[] }[]>(),
       SymptomsDiseasesModel.find()
         .select('disease symptoms')
         .lean<{ disease: string; symptoms?: Record<string, number> }[]>()
@@ -390,7 +386,10 @@ export const getDoctorIAAssertiveness = async ({
     let correctCount = 0
 
     for (const attendance of attendances) {
-      const diagnosisRaw = typeof attendance.diagnosis === 'string'
+      const diagnosisRaw = typeof attendance.diagnosisKey === 'string' &&
+        attendance.diagnosisKey.trim().length > 0
+        ? attendance.diagnosisKey.trim()
+        : typeof attendance.diagnosis === 'string'
         ? attendance.diagnosis.trim()
         : ''
       if (!diagnosisRaw) continue
@@ -415,8 +414,8 @@ export const getDoctorIAAssertiveness = async ({
 
       comparableCount++
       if (
-        normalizeConditionName(bestDisease) ===
-        normalizeConditionName(diagnosisRaw)
+        toCanonicalDiseaseKey(bestDisease) ===
+        toCanonicalDiseaseKey(diagnosisRaw)
       ) {
         correctCount++
       }

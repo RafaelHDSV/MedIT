@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import { AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
+import { toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { Patient } from '../models/PatientModel.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
@@ -177,6 +178,83 @@ export const claimDoctorConsult = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao assumir o atendimento.' })
+  }
+}
+
+export const completeAttendance = async (req: Request, res: Response) => {
+  try {
+    const attendanceId = paramId(req.params.attendanceId)
+    if (!Types.ObjectId.isValid(attendanceId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+
+    const user = await User.findById(req.userId)
+    if (!user || user.level !== UserLevels.DOCTOR) {
+      return res.status(403).json({
+        message: 'Apenas médicos podem finalizar o atendimento.'
+      })
+    }
+
+    const diagnosisKeyRaw = req.body?.diagnosisKey
+    const diagnosisTextRaw = req.body?.diagnosisText
+    const diagnosisKey =
+      typeof diagnosisKeyRaw === 'string' ? diagnosisKeyRaw.trim() : ''
+    const diagnosisText =
+      typeof diagnosisTextRaw === 'string' ? diagnosisTextRaw.trim() : ''
+
+    if (!diagnosisKey) {
+      return res.status(400).json({
+        message: 'Informe um diagnóstico válido para finalizar o atendimento.'
+      })
+    }
+
+    const disease = await SymptomsDiseasesModel.findOne({
+      disease: diagnosisKey
+    })
+      .select('disease')
+      .lean()
+
+    if (!disease) {
+      return res.status(400).json({
+        message: 'Diagnóstico não encontrado na base de condições.'
+      })
+    }
+
+    const updated = await Attendance.findOneAndUpdate(
+      {
+        _id: new Types.ObjectId(attendanceId),
+        doctorId: user._id,
+        status: AttendanceStatus.IN_ATTENDANCE
+      } as never,
+      {
+        $set: {
+          status: AttendanceStatus.ATTENDANCE_COMPLETED,
+          diagnosisKey: disease.disease,
+          diagnosis: toDiseaseLabelPt(disease.disease),
+          ...(diagnosisText ? { diagnosisText } : {})
+        },
+        ...(diagnosisText ? {} : { $unset: { diagnosisText: '' } }),
+        $push: {
+          changesHistory: historyEntry(AttendanceStatus.ATTENDANCE_COMPLETED)
+        }
+      },
+      { new: true }
+    )
+
+    if (!updated) {
+      return res.status(409).json({
+        message:
+          'Não foi possível finalizar o atendimento. Verifique se você é o médico responsável e se o atendimento está em andamento.'
+      })
+    }
+
+    return res.json({
+      message: 'Atendimento finalizado com sucesso.',
+      data: updated
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao finalizar atendimento.' })
   }
 }
 
