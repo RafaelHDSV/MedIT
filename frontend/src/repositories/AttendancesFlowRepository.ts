@@ -1,9 +1,9 @@
 import { api } from '@/api/api'
-import type { IAttendanceDetails } from '@/interfaces/IStaffAttendance'
+import type { IAttendanceDetails } from '@/interfaces/IAttendance'
 import type {
   ISuggestedDiseasesPayload,
   ISuggestionDetails
-} from '@/interfaces/ISymptomDisease'
+} from '@/interfaces/ISymptomDiseases'
 import { Repository } from './Repository'
 
 class AttendancesFlowRepository extends Repository {

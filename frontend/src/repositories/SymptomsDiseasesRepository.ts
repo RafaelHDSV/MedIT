@@ -1,5 +1,5 @@
 import { api } from '@/api/api'
-import type { ISymptomOption } from '@/interfaces/ISymptomDisease'
+import type { ISymptomOption } from '@/interfaces/ISymptomDiseases'
 import { Repository } from './Repository'
 
 class SymptomsDiseasesRepository extends Repository {
