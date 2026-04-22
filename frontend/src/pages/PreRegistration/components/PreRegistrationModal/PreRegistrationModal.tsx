@@ -1,5 +1,7 @@
 import Button from '@/components/Button/Button'
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
+import type { ISymptomOption } from '@/interfaces/ISymptomDiseases'
+import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
 import masks from '@/utils/masks'
 import { Flex, Modal } from 'antd'
 import dayjs from 'dayjs'
@@ -9,6 +11,7 @@ import styles from './PreRegistrationModal.module.scss'
 interface IPreRegistrationModalProps {
   values: PreRegistrationFormValues
   selectedSymptoms: string[]
+  symptomOptions: ISymptomOption[]
   submitForm: () => void
   isOpen: boolean
   setIsOpen: (open: boolean) => void
@@ -18,11 +21,13 @@ interface IPreRegistrationModalProps {
 function PreRegistrationModal({
   values,
   selectedSymptoms,
+  symptomOptions,
   submitForm,
   isOpen,
   setIsOpen,
   loading
 }: IPreRegistrationModalProps) {
+  const symptomLabelByKey = buildSymptomLabelMap(symptomOptions)
   const {
     mainComplaint,
     symptomStartDate,
@@ -63,7 +68,9 @@ function PreRegistrationModal({
             label='Sintomas selecionados'
             value={
               selectedSymptoms.length
-                ? selectedSymptoms.join(', ')
+                ? selectedSymptoms
+                    .map((k) => symptomLabelByKey[k] ?? k)
+                    .join(', ')
                 : 'Nenhum selecionado'
             }
           />

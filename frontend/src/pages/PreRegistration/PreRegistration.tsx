@@ -2,11 +2,14 @@ import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
+import type { ISymptomOption } from '@/interfaces/ISymptomDiseases'
 import PatientsRepository from '@/repositories/PatientsRepository'
+import SymptomsDiseasesRepository from '@/repositories/SymptomsDiseasesRepository'
 import { ROUTES } from '@/routes/constants'
+import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
 import { Flex, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type {
   IPreRegistrationErrors,
@@ -19,13 +22,34 @@ import SymptomsInfo from './components/SymptomsInfo/SymptomsInfo'
 
 function PreRegistration() {
   const { user } = useAuth()
-  console.log(user)
   const navigate = useNavigate()
   const [form] = useForm()
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<IPreRegistrationErrors>({})
+  const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
+
+  const symptomLabelByKey = useMemo(
+    () => buildSymptomLabelMap(symptomOptions),
+    [symptomOptions]
+  )
+
+  useEffect(() => {
+    async function fetchSymptomOptions() {
+      try {
+        const response = await SymptomsDiseasesRepository.getSymptomOptions()
+        setSymptomOptions(response?.data?.symptoms ?? [])
+      } catch (err) {
+        handleApiError({
+          err,
+          defaultMessage: 'Não foi possível carregar a lista de sintomas.'
+        })
+      }
+    }
+
+    fetchSymptomOptions()
+  }, [])
 
   async function onFinish(values: PreRegistrationFormValues) {
     try {
@@ -49,7 +73,9 @@ function PreRegistration() {
           painLevel: values.painLevel,
           selfMedicated: values.selfMedicated,
           symptomStartDate: values.symptomStartDate,
-          symptoms: selectedSymptoms,
+          symptoms: selectedSymptoms.map(
+            (key) => symptomLabelByKey[key] ?? key
+          ),
           unitId,
           birthDate: values.birthDate,
           gender: values.gender,
@@ -97,6 +123,7 @@ function PreRegistration() {
       <PreRegistrationModal
         values={form.getFieldsValue()}
         selectedSymptoms={selectedSymptoms}
+        symptomOptions={symptomOptions}
         submitForm={form.submit}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
@@ -112,6 +139,7 @@ function PreRegistration() {
           fieldErrors={fieldErrors}
         />
         <SymptomsInfo
+          options={symptomOptions}
           selectedSymptoms={selectedSymptoms}
           setSelectedSymptoms={setSelectedSymptoms}
         />
