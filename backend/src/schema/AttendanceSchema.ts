@@ -2,7 +2,9 @@ import { Schema } from 'mongoose'
 import {
   AttendanceRisk,
   AttendanceStatus,
-  IAttendance
+  IAttendance,
+  IPrescribedMedication,
+  PatientDisposition
 } from '../interfaces/IAttendance.js'
 
 const VitalSignsSchema = new Schema(
@@ -11,6 +13,17 @@ const VitalSignsSchema = new Schema(
     heartRate: { type: Number },
     temperature: { type: Number },
     oxygenSaturation: { type: Number }
+  },
+  { _id: false }
+)
+
+const PrescribedMedicationSchema = new Schema<IPrescribedMedication>(
+  {
+    name: { type: String, required: true },
+    dosage: { type: String },
+    frequency: { type: String },
+    duration: { type: String },
+    observation: { type: String }
   },
   { _id: false }
 )
@@ -100,7 +113,16 @@ const AttendanceSchema = new Schema<IAttendance>(
     symptoms: [{ type: String }],
     generalObservation: { type: String },
     conditions: [{ type: String }],
-    allergies: [{ type: String }]
+    allergies: [{ type: String }],
+    patientDisposition: {
+      type: String,
+      enum: Object.values(PatientDisposition)
+    },
+    prescribedMedications: {
+      type: [PrescribedMedicationSchema],
+      default: undefined
+    },
+    prescribedExams: [{ type: String }]
   },
   {
     timestamps: true

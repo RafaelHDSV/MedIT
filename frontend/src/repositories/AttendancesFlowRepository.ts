@@ -1,5 +1,9 @@
 import { api } from '@/api/api'
-import type { IAttendanceDetails } from '@/interfaces/IAttendance'
+import type {
+  IAttendanceDetails,
+  IPrescribedMedication,
+  PatientDisposition
+} from '@/interfaces/IAttendance'
 import type {
   ISuggestedDiseasesPayload,
   ISuggestionDetails
@@ -53,16 +57,25 @@ class AttendancesFlowRepository extends Repository {
   async completeAttendance({
     attendanceId,
     diagnosisKey,
-    diagnosisText
+    diagnosisText,
+    patientDisposition,
+    prescribedMedications,
+    prescribedExams
   }: {
     attendanceId: string
     diagnosisKey: string
     diagnosisText?: string
+    patientDisposition?: PatientDisposition
+    prescribedMedications?: IPrescribedMedication[]
+    prescribedExams?: string[]
   }) {
     return this.handle(() => {
       return this.api.post(`${this.path}/${attendanceId}/complete-attendance`, {
         diagnosisKey,
-        diagnosisText
+        diagnosisText,
+        patientDisposition,
+        prescribedMedications,
+        prescribedExams
       })
     })
   }

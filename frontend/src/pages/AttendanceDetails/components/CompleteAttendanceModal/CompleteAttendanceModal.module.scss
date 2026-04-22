@@ -1,0 +1,156 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 1.5rem;
+  color: var(--black);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+
+  &:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--black);
+  margin: 0 0 0.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.fullRow {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: 0.8125rem;
+  color: var(--gray, #666);
+}
+
+.diagnosisGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @include max-sm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.medicationList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.medicationCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--white);
+}
+
+.medicationGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+
+  @include max-md {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include max-sm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.removeMedication {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.addMedication {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.75rem;
+  background: var(--background, #f7f7f7);
+  color: var(--gray, #666);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+}
+
+.examTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.examTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8125rem;
+  color: var(--gray, #666);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+}
+
+.examTagSelected {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background: var(--primary-opaque, rgba(0, 0, 0, 0.04));
+}
+
+.footer {
+  margin-top: 1.5rem;
+}

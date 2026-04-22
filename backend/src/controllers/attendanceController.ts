@@ -1,6 +1,10 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import { AttendanceStatus } from '../interfaces/IAttendance.js'
+import {
+  AttendanceStatus,
+  IPrescribedMedication,
+  PatientDisposition
+} from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import { Attendance } from '../models/AttendanceModel.js'
@@ -12,6 +16,50 @@ import {
   suggestDiseasesFromReportedSymptoms
 } from '../services/symptomsDiseaseSuggestionService.js'
 import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
+
+const VALID_DISPOSITIONS = new Set<string>(Object.values(PatientDisposition))
+
+const sanitizeString = (value: unknown) =>
+  typeof value === 'string' ? value.trim() : ''
+
+function sanitizePrescribedMedications(
+  raw: unknown
+): IPrescribedMedication[] | undefined {
+  if (!Array.isArray(raw)) return undefined
+  const cleaned: IPrescribedMedication[] = []
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue
+    const record = item as Record<string, unknown>
+    const name = sanitizeString(record.name)
+    if (!name) continue
+    const med: IPrescribedMedication = { name }
+    const dosage = sanitizeString(record.dosage)
+    const frequency = sanitizeString(record.frequency)
+    const duration = sanitizeString(record.duration)
+    const observation = sanitizeString(record.observation)
+    if (dosage) med.dosage = dosage
+    if (frequency) med.frequency = frequency
+    if (duration) med.duration = duration
+    if (observation) med.observation = observation
+    cleaned.push(med)
+  }
+  return cleaned
+}
+
+function sanitizePrescribedExams(raw: unknown): string[] | undefined {
+  if (!Array.isArray(raw)) return undefined
+  const seen = new Set<string>()
+  const cleaned: string[] = []
+  for (const entry of raw) {
+    const value = sanitizeString(entry)
+    if (!value) continue
+    const key = value.toLocaleLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    cleaned.push(value)
+  }
+  return cleaned
+}
 
 const historyEntry = (status: AttendanceStatus) => ({
   status,
@@ -195,18 +243,31 @@ export const completeAttendance = async (req: Request, res: Response) => {
       })
     }
 
-    const diagnosisKeyRaw = req.body?.diagnosisKey
-    const diagnosisTextRaw = req.body?.diagnosisText
-    const diagnosisKey =
-      typeof diagnosisKeyRaw === 'string' ? diagnosisKeyRaw.trim() : ''
-    const diagnosisText =
-      typeof diagnosisTextRaw === 'string' ? diagnosisTextRaw.trim() : ''
+    const diagnosisKey = sanitizeString(req.body?.diagnosisKey)
+    const diagnosisText = sanitizeString(req.body?.diagnosisText)
+    const patientDispositionRaw = sanitizeString(req.body?.patientDisposition)
+    const prescribedMedications = sanitizePrescribedMedications(
+      req.body?.prescribedMedications
+    )
+    const prescribedExams = sanitizePrescribedExams(req.body?.prescribedExams)
 
     if (!diagnosisKey) {
       return res.status(400).json({
         message: 'Informe um diagnóstico válido para finalizar o atendimento.'
       })
     }
+
+    if (
+      patientDispositionRaw &&
+      !VALID_DISPOSITIONS.has(patientDispositionRaw)
+    ) {
+      return res.status(400).json({
+        message: 'Destino do paciente inválido.'
+      })
+    }
+    const patientDisposition = patientDispositionRaw
+      ? (patientDispositionRaw as PatientDisposition)
+      : undefined
 
     const disease = await SymptomsDiseasesModel.findOne({
       disease: diagnosisKey
@@ -220,6 +281,27 @@ export const completeAttendance = async (req: Request, res: Response) => {
       })
     }
 
+    const setPayload: Record<string, unknown> = {
+      status: AttendanceStatus.ATTENDANCE_COMPLETED,
+      diagnosisKey: disease.disease,
+      diagnosis: toDiseaseLabelPt(disease.disease)
+    }
+    const unsetPayload: Record<string, ''> = {}
+
+    if (diagnosisText) setPayload.diagnosisText = diagnosisText
+    else unsetPayload.diagnosisText = ''
+
+    if (patientDisposition) setPayload.patientDisposition = patientDisposition
+    else unsetPayload.patientDisposition = ''
+
+    if (prescribedMedications && prescribedMedications.length)
+      setPayload.prescribedMedications = prescribedMedications
+    else unsetPayload.prescribedMedications = ''
+
+    if (prescribedExams && prescribedExams.length)
+      setPayload.prescribedExams = prescribedExams
+    else unsetPayload.prescribedExams = ''
+
     const updated = await Attendance.findOneAndUpdate(
       {
         _id: new Types.ObjectId(attendanceId),
@@ -227,13 +309,10 @@ export const completeAttendance = async (req: Request, res: Response) => {
         status: AttendanceStatus.IN_ATTENDANCE
       } as never,
       {
-        $set: {
-          status: AttendanceStatus.ATTENDANCE_COMPLETED,
-          diagnosisKey: disease.disease,
-          diagnosis: toDiseaseLabelPt(disease.disease),
-          ...(diagnosisText ? { diagnosisText } : {})
-        },
-        ...(diagnosisText ? {} : { $unset: { diagnosisText: '' } }),
+        $set: setPayload,
+        ...(Object.keys(unsetPayload).length
+          ? { $unset: unsetPayload }
+          : {}),
         $push: {
           changesHistory: historyEntry(AttendanceStatus.ATTENDANCE_COMPLETED)
         }

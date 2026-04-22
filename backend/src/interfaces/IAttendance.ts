@@ -50,6 +50,29 @@ export interface IVitalSigns {
   oxygenSaturation?: number
 }
 
+export const PatientDisposition = {
+  HOSPITALIZED: 'hospitalized',
+  HOME: 'home',
+  OBSERVATION: 'observation',
+  TRANSFER: 'transfer'
+} as const
+export type PatientDisposition =
+  (typeof PatientDisposition)[keyof typeof PatientDisposition]
+export const PatientDispositionLabels = {
+  [PatientDisposition.HOSPITALIZED]: 'Ser internado',
+  [PatientDisposition.HOME]: 'Ir para casa',
+  [PatientDisposition.OBSERVATION]: 'Ficar em observação',
+  [PatientDisposition.TRANSFER]: 'Ser transferido'
+} as const
+
+export interface IPrescribedMedication {
+  name: string
+  dosage?: string
+  frequency?: string
+  duration?: string
+  observation?: string
+}
+
 export interface IAttendance extends IBaseInterface {
   complaint: string
   diagnosisKey?: string
@@ -76,4 +99,7 @@ export interface IAttendance extends IBaseInterface {
   generalObservation?: string
   conditions?: string[]
   allergies?: string[]
+  patientDisposition?: PatientDisposition
+  prescribedMedications?: IPrescribedMedication[]
+  prescribedExams?: string[]
 }

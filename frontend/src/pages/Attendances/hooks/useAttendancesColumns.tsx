@@ -75,7 +75,7 @@ export function useAttendancesColumns({
         title: 'Diagnóstico',
         dataIndex: 'diagnosis',
         key: 'diagnosis',
-        width: 120,
+        width: 220,
         ellipsis: true,
         render: (text: string, record: IAttendance) => (
           <TooltipColumn

@@ -22,12 +22,15 @@ import SymptomsDiseasesRepository from '@/repositories/SymptomsDiseasesRepositor
 import { ROUTES } from '@/routes/constants'
 import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
-import { Flex, Input, Select, message, Spin } from 'antd'
+import { Flex, message, Spin } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import RiskSelector from '../../components/Risk/RiskSelector/RiskSelector'
 import styles from './AttendanceDetails.module.scss'
+import CompleteAttendanceModal, {
+  type ICompleteAttendancePayload
+} from './components/CompleteAttendanceModal/CompleteAttendanceModal'
 import ConditionsCard from './components/ConditionsCard/ConditionsCard'
 import SuggestionDetailModal from './components/SuggestionDetailModal/SuggestionDetailModal'
 import VitalCard from './components/VitalCard/VitalCard'
@@ -48,14 +51,12 @@ function AttendanceDetails() {
   const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const [completeLoading, setCompleteLoading] = useState(false)
+  const [completeModalOpen, setCompleteModalOpen] = useState(false)
+  const [completeModalKey, setCompleteModalKey] = useState(0)
   const [suggestionDetail, setSuggestionDetail] =
     useState<ISuggestionDetails | null>(null)
   const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
   const [diseaseOptions, setDiseaseOptions] = useState<IDiseaseOption[]>([])
-  const [selectedDiagnosisKey, setSelectedDiagnosisKey] = useState<
-    string | undefined
-  >(undefined)
-  const [diagnosisText, setDiagnosisText] = useState('')
 
   const symptomLabelByKey = useMemo(
     () => buildSymptomLabelMap(symptomOptions),
@@ -77,8 +78,6 @@ function AttendanceDetails() {
       setAttendance(data)
       setSelectedRisk(risk)
       setObservation(generalObservation ?? '')
-      setSelectedDiagnosisKey(data.diagnosisKey)
-      setDiagnosisText(data.diagnosisText ?? '')
     } catch (err) {
       handleApiError({
         err,
@@ -261,9 +260,20 @@ function AttendanceDetails() {
     }
   }
 
-  async function handleCompleteAttendance() {
+  function openCompleteModal() {
     if (!attendanceId || !isDoctor) return
-    if (!selectedDiagnosisKey) {
+    setCompleteModalKey((key) => key + 1)
+    setCompleteModalOpen(true)
+  }
+
+  function closeCompleteModal() {
+    if (completeLoading) return
+    setCompleteModalOpen(false)
+  }
+
+  async function handleCompleteAttendance(payload: ICompleteAttendancePayload) {
+    if (!attendanceId || !isDoctor) return
+    if (!payload.diagnosisKey) {
       message.warning('Selecione um diagnóstico para finalizar o atendimento.')
       return
     }
@@ -271,10 +281,14 @@ function AttendanceDetails() {
       setCompleteLoading(true)
       await AttendancesFlowRepository.completeAttendance({
         attendanceId: String(attendanceId),
-        diagnosisKey: selectedDiagnosisKey,
-        diagnosisText: diagnosisText.trim() || undefined
+        diagnosisKey: payload.diagnosisKey,
+        diagnosisText: payload.diagnosisText,
+        patientDisposition: payload.patientDisposition,
+        prescribedMedications: payload.prescribedMedications,
+        prescribedExams: payload.prescribedExams
       })
       message.success('Atendimento finalizado com sucesso.')
+      setCompleteModalOpen(false)
       navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
       handleApiError({
@@ -286,6 +300,32 @@ function AttendanceDetails() {
     }
   }
 
+  const topSuggestionDisease = suggestions[0]?.disease
+  const [recommendedExams, setRecommendedExams] = useState<string[]>([])
+
+  useEffect(() => {
+    let active = true
+    async function fetchRecommendedExams() {
+      if (!attendanceId || !isDoctor || !topSuggestionDisease) {
+        if (active) setRecommendedExams([])
+        return
+      }
+      try {
+        const response = await AttendancesFlowRepository.getSuggestionDetail({
+          attendanceId,
+          disease: topSuggestionDisease
+        })
+        if (active) setRecommendedExams(response.data.exams ?? [])
+      } catch {
+        if (active) setRecommendedExams([])
+      }
+    }
+    fetchRecommendedExams()
+    return () => {
+      active = false
+    }
+  }, [attendanceId, isDoctor, topSuggestionDisease])
+
   const headerActions = (
     <Flex gap={8} wrap='wrap' justify='flex-end'>
       {isNurse && attendanceId ? (
@@ -294,11 +334,7 @@ function AttendanceDetails() {
         </Button>
       ) : null}
       {isDoctor ? (
-        <Button
-          loading={completeLoading}
-          disabled={!attendanceId}
-          onClick={handleCompleteAttendance}
-        >
+        <Button disabled={!attendanceId} onClick={openCompleteModal}>
           Finalizar atendimento
         </Button>
       ) : null}
@@ -338,6 +374,23 @@ function AttendanceDetails() {
         exams={suggestionDetail?.exams ?? []}
         symptomLabelByKey={symptomLabelByKey}
       />
+
+      {isDoctor ? (
+        <CompleteAttendanceModal
+          key={completeModalKey}
+          open={completeModalOpen}
+          loading={completeLoading}
+          onClose={closeCompleteModal}
+          onSubmit={handleCompleteAttendance}
+          diseaseOptions={diseaseOptions}
+          initialDiagnosisKey={attendance?.diagnosisKey}
+          initialDiagnosisText={attendance?.diagnosisText}
+          initialPatientDisposition={attendance?.patientDisposition}
+          initialPrescribedMedications={attendance?.prescribedMedications}
+          initialPrescribedExams={attendance?.prescribedExams}
+          recommendedExams={recommendedExams}
+        />
+      ) : null}
 
       <section>
         <AuthLayoutHeader
@@ -439,35 +492,6 @@ function AttendanceDetails() {
               </div>
             </section>
 
-            {isDoctor ? (
-              <section>
-                <h3 className={styles.title}>Diagnóstico médico</h3>
-                <Flex vertical gap={8}>
-                  <Select
-                    showSearch
-                    allowClear
-                    placeholder='Selecione o diagnóstico principal'
-                    options={diseaseOptions.map((disease) => ({
-                      value: disease.key,
-                      label: disease.label
-                    }))}
-                    value={selectedDiagnosisKey}
-                    onChange={(value) => setSelectedDiagnosisKey(value)}
-                    filterOption={(input, option) =>
-                      String(option?.label ?? '')
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                  />
-                  <Input.TextArea
-                    rows={3}
-                    placeholder='Observação diagnóstica complementar (opcional)'
-                    value={diagnosisText}
-                    onChange={(event) => setDiagnosisText(event.target.value)}
-                  />
-                </Flex>
-              </section>
-            ) : null}
           </div>
 
           {!isNurse && (
