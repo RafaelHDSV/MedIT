@@ -6,6 +6,23 @@
   margin-bottom: 1rem;
 }
 
+.clickable {
+  cursor: pointer;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--primary-color);
+  }
+}
+
 .name {
   font-size: 16px;
   font-weight: 700;
