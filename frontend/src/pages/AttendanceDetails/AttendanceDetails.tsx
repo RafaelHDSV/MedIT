@@ -491,7 +491,6 @@ function AttendanceDetails() {
                 ))}
               </div>
             </section>
-
           </div>
 
           {!isNurse && (

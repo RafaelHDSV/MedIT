@@ -357,7 +357,10 @@ export const getDoctorIAAssertiveness = async ({
         unitId: new Types.ObjectId(unitId),
         doctorId: new Types.ObjectId(doctorId),
         status: {
-          $in: [AttendanceStatus.ATTENDANCE_COMPLETED, AttendanceStatus.COMPLETED]
+          $in: [
+            AttendanceStatus.ATTENDANCE_COMPLETED,
+            AttendanceStatus.COMPLETED
+          ]
         },
         date: { $gte: start, $lte: end },
         $or: [
@@ -367,7 +370,9 @@ export const getDoctorIAAssertiveness = async ({
         symptoms: { $exists: true, $type: 'array', $ne: [] }
       })
         .select('diagnosisKey diagnosis symptoms')
-        .lean<{ diagnosisKey?: string; diagnosis?: string; symptoms?: string[] }[]>(),
+        .lean<
+          { diagnosisKey?: string; diagnosis?: string; symptoms?: string[] }[]
+        >(),
       SymptomsDiseasesModel.find()
         .select('disease symptoms')
         .lean<{ disease: string; symptoms?: Record<string, number> }[]>()
@@ -386,12 +391,13 @@ export const getDoctorIAAssertiveness = async ({
     let correctCount = 0
 
     for (const attendance of attendances) {
-      const diagnosisRaw = typeof attendance.diagnosisKey === 'string' &&
+      const diagnosisRaw =
+        typeof attendance.diagnosisKey === 'string' &&
         attendance.diagnosisKey.trim().length > 0
-        ? attendance.diagnosisKey.trim()
-        : typeof attendance.diagnosis === 'string'
-        ? attendance.diagnosis.trim()
-        : ''
+          ? attendance.diagnosisKey.trim()
+          : typeof attendance.diagnosis === 'string'
+            ? attendance.diagnosis.trim()
+            : ''
       if (!diagnosisRaw) continue
 
       const rawSymptoms = Array.isArray(attendance.symptoms)

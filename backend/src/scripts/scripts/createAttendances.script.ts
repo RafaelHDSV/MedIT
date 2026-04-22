@@ -399,7 +399,12 @@ function buildClinicalSnapshot({
   diseaseProfile?: DiseaseProfile
 }): Pick<
   AttendanceSeed,
-  'symptoms' | 'conditions' | 'allergies' | 'painLevel' | 'selfMedicated' | 'generalObservation'
+  | 'symptoms'
+  | 'conditions'
+  | 'allergies'
+  | 'painLevel'
+  | 'selfMedicated'
+  | 'generalObservation'
 > {
   const reachedTriage = hasReachedTriage(status)
   const extras = maybeClinicalExtras()

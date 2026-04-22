@@ -126,4 +126,3 @@ export function toCanonicalDiseaseKey(value: string): string {
 
   return normalized
 }
-

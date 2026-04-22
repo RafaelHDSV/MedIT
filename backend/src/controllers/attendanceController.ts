@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
+import { toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import {
   AttendanceStatus,
   IPrescribedMedication,
   PatientDisposition
 } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
-import { toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { Patient } from '../models/PatientModel.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
@@ -310,9 +310,7 @@ export const completeAttendance = async (req: Request, res: Response) => {
       } as never,
       {
         $set: setPayload,
-        ...(Object.keys(unsetPayload).length
-          ? { $unset: unsetPayload }
-          : {}),
+        ...(Object.keys(unsetPayload).length ? { $unset: unsetPayload } : {}),
         $push: {
           changesHistory: historyEntry(AttendanceStatus.ATTENDANCE_COMPLETED)
         }

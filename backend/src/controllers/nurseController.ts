@@ -325,14 +325,18 @@ export const getAttendances = async (req: Request, res: Response) => {
 
     const enrichedAttendances = await Promise.all(
       attendances.map(async (attendance) => {
-        const diagnosisKey = typeof attendance.diagnosisKey === 'string'
-          ? attendance.diagnosisKey.trim()
-          : ''
-        const diagnosis = typeof attendance.diagnosis === 'string'
-          ? attendance.diagnosis.trim()
-          : ''
+        const diagnosisKey =
+          typeof attendance.diagnosisKey === 'string'
+            ? attendance.diagnosisKey.trim()
+            : ''
+        const diagnosis =
+          typeof attendance.diagnosis === 'string'
+            ? attendance.diagnosis.trim()
+            : ''
         const symptoms = Array.isArray(attendance.symptoms)
-          ? attendance.symptoms.filter((s): s is string => typeof s === 'string')
+          ? attendance.symptoms.filter(
+              (s): s is string => typeof s === 'string'
+            )
           : []
 
         if ((!diagnosisKey && !diagnosis) || symptoms.length === 0) {
@@ -343,16 +347,20 @@ export const getAttendances = async (req: Request, res: Response) => {
           }
         }
 
-        const suggestions = await suggestDiseasesFromReportedSymptoms(symptoms, {
-          limit: 1,
-          minCompatibility: 1
-        })
+        const suggestions = await suggestDiseasesFromReportedSymptoms(
+          symptoms,
+          {
+            limit: 1,
+            minCompatibility: 1
+          }
+        )
         const topSuggestion = suggestions[0]?.disease
 
         return {
           ...attendance,
           iaTopSuggestion: topSuggestion,
-          isIaTopSuggestionMatchDiagnosis: Boolean(topSuggestion) &&
+          isIaTopSuggestionMatchDiagnosis:
+            Boolean(topSuggestion) &&
             toCanonicalDiseaseKey(topSuggestion) ===
               toCanonicalDiseaseKey(diagnosisKey || diagnosis)
         }

@@ -59,7 +59,7 @@ export async function suggestDiseasesFromReportedSymptoms(
       if (b.compatibility !== a.compatibility) {
         return b.compatibility - a.compatibility
       }
-      
+
       return a.disease.localeCompare(b.disease, 'pt')
     })
     .slice(0, limit)

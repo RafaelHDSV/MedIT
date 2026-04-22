@@ -5,7 +5,9 @@ import {
   PT_LOWER_TO_DISEASE_KEY
 } from '../interfaces/ISymptomsDiseases.js'
 
-export function getReportedSymptomsToDiseaseKeys(input: string[]): DiseaseSymptomKey[] {
+export function getReportedSymptomsToDiseaseKeys(
+  input: string[]
+): DiseaseSymptomKey[] {
   const out = new Set<DiseaseSymptomKey>()
 
   for (const raw of input) {

@@ -12,8 +12,8 @@ import {
   getAttendanceQueue,
   getAttended,
   getAverageTime,
-  getDoctorIAAssertiveness,
   getDoctorAverageTime,
+  getDoctorIAAssertiveness,
   getEntries,
   getHighRisk,
   getInAttendance,
@@ -104,28 +104,28 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     try {
       const [waitingPatients, attended, averageTime, assertiveness] =
         await Promise.all([
-        getWaitingForDoctor({
-          unitId: String(unitId)
-        }),
-        getAttended({
-          unitId: String(unitId),
-          period: String(period),
-          doctorId: String(userId),
-          referenceDate: ref
-        }),
-        getDoctorAverageTime({
-          unitId: String(unitId),
-          period: String(period),
-          doctorId: String(userId),
-          referenceDate: ref
-        }),
-        getDoctorIAAssertiveness({
-          unitId: String(unitId),
-          period: String(period),
-          doctorId: String(userId),
-          referenceDate: ref
-        })
-      ])
+          getWaitingForDoctor({
+            unitId: String(unitId)
+          }),
+          getAttended({
+            unitId: String(unitId),
+            period: String(period),
+            doctorId: String(userId),
+            referenceDate: ref
+          }),
+          getDoctorAverageTime({
+            unitId: String(unitId),
+            period: String(period),
+            doctorId: String(userId),
+            referenceDate: ref
+          }),
+          getDoctorIAAssertiveness({
+            unitId: String(unitId),
+            period: String(period),
+            doctorId: String(userId),
+            referenceDate: ref
+          })
+        ])
 
       if (
         waitingPatients === undefined ||
