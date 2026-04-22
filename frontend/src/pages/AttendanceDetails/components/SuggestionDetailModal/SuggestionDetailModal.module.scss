@@ -1,0 +1,74 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  padding-bottom: 1.25rem;
+  color: var(--black);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+
+  @include max-sm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.ratio {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+}
+
+.ratioSub {
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  color: var(--black);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  font-size: 12px;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 999px;
+  background: transparent;
+}
+
+.emptyNote {
+  font-size: 14px;
+  color: var(--gray);
+  margin: 0;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
