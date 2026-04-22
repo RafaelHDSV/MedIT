@@ -2,6 +2,8 @@ import { Types } from 'mongoose'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
+import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
+import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 
 const ACTIVE_STATUSES = [
@@ -12,6 +14,32 @@ const ACTIVE_STATUSES = [
   AttendanceStatus.WAITING_ATTENDANCE,
   AttendanceStatus.IN_ATTENDANCE
 ]
+
+function normalizeConditionName(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+}
+
+function scoreDiseaseFromProfile(
+  profile: Record<string, number>,
+  patientKeys: Set<string>
+): number {
+  let totalWeight = 0
+  let matchedWeight = 0
+
+  for (const [key, weightRaw] of Object.entries(profile)) {
+    const weight = Number(weightRaw) || 0
+    if (weight <= 0) continue
+    totalWeight += weight
+    if (patientKeys.has(key)) matchedWeight += weight
+  }
+
+  if (totalWeight <= 0) return 0
+  return Math.round((100 * matchedWeight) / totalWeight)
+}
 
 // ADMIN
 export const getEntries = async ({
@@ -314,6 +342,91 @@ export const getDoctorAverageTime = async ({
     return result.length ? Math.round(result[0].avg) : 0
   } catch (err) {
     console.error(err)
+  }
+}
+
+export const getDoctorIAAssertiveness = async ({
+  unitId,
+  period,
+  doctorId,
+  referenceDate
+}: {
+  unitId: string
+  period: string
+  doctorId: string
+  referenceDate?: string
+}) => {
+  try {
+    const { start, end } = getPeriodDateRange(period, referenceDate)
+
+    const [attendances, diseaseRows] = await Promise.all([
+      Attendance.find({
+        unitId: new Types.ObjectId(unitId),
+        doctorId: new Types.ObjectId(doctorId),
+        status: {
+          $in: [AttendanceStatus.ATTENDANCE_COMPLETED, AttendanceStatus.COMPLETED]
+        },
+        date: { $gte: start, $lte: end },
+        diagnosis: { $exists: true, $type: 'string' },
+        symptoms: { $exists: true, $type: 'array', $ne: [] }
+      })
+        .select('diagnosis symptoms')
+        .lean<{ diagnosis?: string; symptoms?: string[] }[]>(),
+      SymptomsDiseasesModel.find()
+        .select('disease symptoms')
+        .lean<{ disease: string; symptoms?: Record<string, number> }[]>()
+    ])
+
+    const diseaseProfiles = diseaseRows
+      .map((row) => ({
+        disease: row.disease,
+        profile: row.symptoms ?? {}
+      }))
+      .filter((row) => row.disease && Object.keys(row.profile).length > 0)
+
+    if (!diseaseProfiles.length) return 0
+
+    let comparableCount = 0
+    let correctCount = 0
+
+    for (const attendance of attendances) {
+      const diagnosisRaw = typeof attendance.diagnosis === 'string'
+        ? attendance.diagnosis.trim()
+        : ''
+      if (!diagnosisRaw) continue
+
+      const rawSymptoms = Array.isArray(attendance.symptoms)
+        ? attendance.symptoms.filter((s): s is string => typeof s === 'string')
+        : []
+      const patientKeys = new Set(getReportedSymptomsToDiseaseKeys(rawSymptoms))
+      if (patientKeys.size === 0) continue
+
+      let bestDisease = ''
+      let bestScore = -1
+      for (const disease of diseaseProfiles) {
+        const score = scoreDiseaseFromProfile(disease.profile, patientKeys)
+        if (score > bestScore) {
+          bestScore = score
+          bestDisease = disease.disease
+        }
+      }
+
+      if (!bestDisease) continue
+
+      comparableCount++
+      if (
+        normalizeConditionName(bestDisease) ===
+        normalizeConditionName(diagnosisRaw)
+      ) {
+        correctCount++
+      }
+    }
+
+    if (comparableCount === 0) return 0
+    return Math.round((correctCount / comparableCount) * 100)
+  } catch (err) {
+    console.error(err)
+    return 0
   }
 }
 

@@ -12,6 +12,7 @@ import {
   getAttendanceQueue,
   getAttended,
   getAverageTime,
+  getDoctorIAAssertiveness,
   getDoctorAverageTime,
   getEntries,
   getHighRisk,
@@ -101,7 +102,8 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
 
   async function getDoctorData(): Promise<IDoctorStatusCard | undefined> {
     try {
-      const [waitingPatients, attended, averageTime] = await Promise.all([
+      const [waitingPatients, attended, averageTime, assertiveness] =
+        await Promise.all([
         getWaitingForDoctor({
           unitId: String(unitId)
         }),
@@ -116,13 +118,20 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
           period: String(period),
           doctorId: String(userId),
           referenceDate: ref
+        }),
+        getDoctorIAAssertiveness({
+          unitId: String(unitId),
+          period: String(period),
+          doctorId: String(userId),
+          referenceDate: ref
         })
       ])
 
       if (
         waitingPatients === undefined ||
         attended === undefined ||
-        averageTime === undefined
+        averageTime === undefined ||
+        assertiveness === undefined
       ) {
         throw new Error('Erro ao buscar dados do dashboard')
       }
@@ -131,8 +140,7 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
         waitingPatients,
         attended,
         averageTime,
-        // VIEIRA: Adicionar assertividade IA
-        assertiveness: 0
+        assertiveness
       }
     } catch (err) {
       console.error(err)

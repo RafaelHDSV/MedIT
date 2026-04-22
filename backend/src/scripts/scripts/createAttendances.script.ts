@@ -9,6 +9,7 @@ import { Attendance } from '../../models/AttendanceModel.js'
 import { Doctor } from '../../models/DoctorModel.js'
 import { Nurse } from '../../models/NurseModel.js'
 import { Patient } from '../../models/PatientModel.js'
+import SymptomsDiseasesModel from '../../models/SymptomsDiseasesModel.js'
 import { Unit } from '../../models/UnitModel.js'
 
 /** Janela: hoje − 364 dias até agora (≈ 1 ano rolante). */
@@ -85,6 +86,38 @@ const diagnoses = [
   'Exacerbação de asma leve'
 ]
 
+const TRIAGE_OR_LATER_STATUSES = new Set<AttendanceStatus>([
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE,
+  AttendanceStatus.ATTENDANCE_COMPLETED,
+  AttendanceStatus.COMPLETED
+])
+
+const CONDITIONS_POOL = [
+  'Hipertensão',
+  'Diabetes mellitus',
+  'Asma',
+  'Enxaqueca',
+  'Dislipidemia',
+  'Doença renal crônica',
+  'Doença autoimune',
+  'Cardiopatia'
+]
+
+const ALLERGIES_POOL = [
+  'Dipirona',
+  'Penicilina',
+  'Amoxicilina',
+  'AINEs',
+  'Látex',
+  'Frutos do mar',
+  'Picada de inseto',
+  'Sem alergias conhecidas'
+]
+
 const COMPLETED_STATUSES: AttendanceStatus[] = [
   AttendanceStatus.ATTENDANCE_COMPLETED,
   AttendanceStatus.COMPLETED
@@ -141,6 +174,18 @@ type AttendanceSeed = {
   selfMedicated?: boolean
   symptoms?: string[]
   generalObservation?: string
+  conditions?: string[]
+  allergies?: string[]
+}
+
+type SymptomsDiseaseSeedRow = {
+  disease: string
+  symptoms?: Record<string, number> | Map<string, number>
+}
+
+type DiseaseProfile = {
+  disease: string
+  positiveSymptoms: string[]
 }
 
 function randomVitalSigns() {
@@ -311,25 +356,12 @@ function isSameCalendarDay(a: Date, b: Date): boolean {
 
 function maybeClinicalExtras(): Pick<
   AttendanceSeed,
-  'painLevel' | 'selfMedicated' | 'symptoms' | 'generalObservation'
+  'painLevel' | 'selfMedicated' | 'generalObservation'
 > {
   if (!faker.datatype.boolean({ probability: 0.4 })) return {}
-  const symptomsPool = [
-    'Febre baixa',
-    'Calafrios',
-    'Mal-estar',
-    'Coriza',
-    'Tosse seca',
-    'Dor ao urinar',
-    'Inapetência'
-  ]
   return {
     painLevel: faker.number.int({ min: 0, max: 10 }),
     selfMedicated: faker.datatype.boolean(),
-    symptoms: faker.helpers.arrayElements(symptomsPool, {
-      min: 1,
-      max: 3
-    }),
     generalObservation: faker.datatype.boolean()
       ? faker.helpers.arrayElement([
           'Paciente orientado e cooperativo.',
@@ -338,6 +370,72 @@ function maybeClinicalExtras(): Pick<
           'Relato de evolução há 2–3 dias.'
         ])
       : undefined
+  }
+}
+
+function hasReachedTriage(status: AttendanceStatus): boolean {
+  return TRIAGE_OR_LATER_STATUSES.has(status)
+}
+
+function getPositiveSymptomKeys(
+  symptoms: SymptomsDiseaseSeedRow['symptoms']
+): string[] {
+  if (!symptoms) return []
+  const asRecord =
+    symptoms instanceof Map ? Object.fromEntries(symptoms.entries()) : symptoms
+  return Object.entries(asRecord)
+    .filter(([, weight]) => Number(weight) > 0)
+    .map(([key]) => key)
+}
+
+function buildClinicalSnapshot({
+  status,
+  diseaseProfile
+}: {
+  status: AttendanceStatus
+  diseaseProfile?: DiseaseProfile
+}): Pick<
+  AttendanceSeed,
+  'symptoms' | 'conditions' | 'allergies' | 'painLevel' | 'selfMedicated' | 'generalObservation'
+> {
+  const reachedTriage = hasReachedTriage(status)
+  const extras = maybeClinicalExtras()
+
+  let symptoms: string[] | undefined
+  if (reachedTriage) {
+    const pool = diseaseProfile?.positiveSymptoms?.length
+      ? diseaseProfile.positiveSymptoms
+      : ['fever', 'fatigue', 'headache']
+    const minSymptoms = Math.min(2, pool.length)
+    const maxSymptoms = Math.min(6, pool.length)
+    symptoms = faker.helpers.arrayElements(pool, {
+      min: Math.max(1, minSymptoms),
+      max: Math.max(1, maxSymptoms)
+    })
+  } else if (faker.datatype.boolean({ probability: 0.25 })) {
+    const pool = diseaseProfile?.positiveSymptoms?.length
+      ? diseaseProfile.positiveSymptoms
+      : ['fever', 'dryCough']
+    symptoms = faker.helpers.arrayElements(pool, {
+      min: 1,
+      max: Math.min(3, pool.length)
+    })
+  }
+
+  const conditions = faker.helpers.arrayElements(CONDITIONS_POOL, {
+    min: reachedTriage ? 1 : 0,
+    max: reachedTriage ? 2 : 1
+  })
+  const allergies = faker.helpers.arrayElements(ALLERGIES_POOL, {
+    min: reachedTriage ? 1 : 0,
+    max: reachedTriage ? 2 : 1
+  })
+
+  return {
+    ...extras,
+    symptoms: symptoms && symptoms.length > 0 ? symptoms : undefined,
+    conditions: conditions.length > 0 ? conditions : undefined,
+    allergies: allergies.length > 0 ? allergies : undefined
   }
 }
 
@@ -409,15 +507,6 @@ function seedDoc(
   }
 }
 
-function seedCompleted(
-  args: Omit<AttendanceSeed, 'medicationsIds' | 'iaConditionId'> & {
-    medicationsIds?: Types.ObjectId[]
-    iaConditionId?: Types.ObjectId
-  }
-): AttendanceSeed {
-  return seedDoc({ ...args, ...maybeClinicalExtras() })
-}
-
 const createAttendances = {
   name: 'create-attendances',
   description:
@@ -477,6 +566,21 @@ const createAttendances = {
       console.log('❌ Nenhuma unidade com dados suficientes')
       process.exit(1)
     }
+
+    const symptomsDiseases = await SymptomsDiseasesModel.find()
+      .select('disease symptoms')
+      .lean<SymptomsDiseaseSeedRow[]>()
+    const diseaseProfiles: DiseaseProfile[] = symptomsDiseases
+      .map((row) => ({
+        disease: row.disease,
+        positiveSymptoms: getPositiveSymptomKeys(row.symptoms)
+      }))
+      .filter((row) => row.disease && row.positiveSymptoms.length > 0)
+
+    const pickDiseaseProfile = (): DiseaseProfile | undefined =>
+      diseaseProfiles.length
+        ? (faker.helpers.arrayElement(diseaseProfiles) as DiseaseProfile)
+        : undefined
 
     console.log(`✅ ${unitPools.length} unidade(s) válida(s)\n`)
 
@@ -563,11 +667,14 @@ const createAttendances = {
         const patientId =
           opts?.patientId ?? faker.helpers.arrayElement(pool.patients)
         const { status, history } = buildCompletedFlow(date, risk)
+        const diseaseProfile = pickDiseaseProfile()
+        const diagnosis =
+          diseaseProfile?.disease ?? faker.helpers.arrayElement(diagnoses)
         unitDocs.push(
-          seedCompleted({
+          seedDoc({
             number: attendanceNumber++,
             complaint: faker.helpers.arrayElement(complaints),
-            diagnosis: faker.helpers.arrayElement(diagnoses),
+            diagnosis,
             date,
             risk,
             status,
@@ -578,7 +685,11 @@ const createAttendances = {
             changesHistory: history,
             vitalSigns: randomVitalSigns(),
             createdAt: date,
-            updatedAt: date
+            updatedAt: date,
+            ...buildClinicalSnapshot({
+              status,
+              diseaseProfile
+            })
           })
         )
         countByDay.set(k, (countByDay.get(k) ?? 0) + 1)
@@ -635,6 +746,7 @@ const createAttendances = {
         const nurseId = pool.nurses[row % N]
         const risk = faker.helpers.arrayElement(riskDistribution)
         const target = pickActiveTargetStatus()
+        const diseaseProfile = pickDiseaseProfile()
 
         let status: AttendanceStatus = AttendanceStatus.IN_TRIAGE
         let history: { status: AttendanceStatus; changedAt: Date }[] = []
@@ -719,7 +831,11 @@ const createAttendances = {
             changesHistory: history,
             vitalSigns: randomVitalSigns(),
             createdAt: date,
-            updatedAt: lastAt
+            updatedAt: lastAt,
+            ...buildClinicalSnapshot({
+              status,
+              diseaseProfile
+            })
           })
         )
         countByDay.set(
@@ -856,11 +972,14 @@ const createAttendances = {
             pool.doctors
           ) as Types.ObjectId
           const { status, history } = buildCompletedFlow(date, risk)
+          const diseaseProfile = pickDiseaseProfile()
+          const diagnosis =
+            diseaseProfile?.disease ?? faker.helpers.arrayElement(diagnoses)
           buf.push(
-            seedCompleted({
+            seedDoc({
               number: attendanceNumber++,
               complaint: faker.helpers.arrayElement(complaints),
-              diagnosis: faker.helpers.arrayElement(diagnoses),
+              diagnosis,
               date,
               risk,
               status,
@@ -871,7 +990,11 @@ const createAttendances = {
               changesHistory: history,
               vitalSigns: randomVitalSigns(),
               createdAt: date,
-              updatedAt: date
+              updatedAt: date,
+              ...buildClinicalSnapshot({
+                status,
+                diseaseProfile
+              })
             })
           )
         }
