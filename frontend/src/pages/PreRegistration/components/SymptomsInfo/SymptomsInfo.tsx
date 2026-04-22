@@ -1,39 +1,19 @@
 import SymptomTag from '@/components/SymptomTag/SymptomTag'
+import type { ISymptomOption } from '@/interfaces/ISymptomDiseases'
 import { Flex } from 'antd'
 import parentStyles from '../../PreRegistration.module.scss'
 
 interface ISymptomsInfoProps {
+  options: ISymptomOption[]
   selectedSymptoms: string[]
   setSelectedSymptoms: React.Dispatch<React.SetStateAction<string[]>>
 }
 
 function SymptomsInfo({
+  options,
   selectedSymptoms,
   setSelectedSymptoms
 }: ISymptomsInfoProps) {
-  // VIEIRA: Adicionar back
-  const symptoms = [
-    'Febre',
-    'Dor de cabeça',
-    'Dor no corpo',
-    'Tosse',
-    'Náusea',
-    'Fadiga',
-    'Dor de garganta',
-    'Calafrios',
-    'Falta de ar',
-    'Dor abdominal',
-    'Diarreia',
-    'Vômito',
-    'Confusão mental',
-    'Perda de olfato/paladar',
-    'Erupção cutânea',
-    'Inchaço',
-    'Dificuldade para dormir',
-    'Ansiedade',
-    'Depressão'
-  ]
-
   const handleSelectSymptoms = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
@@ -47,13 +27,13 @@ function SymptomsInfo({
       <h3 className={parentStyles.sectionTitle}>Sintomas</h3>
 
       <Flex wrap='wrap' gap={8}>
-        {symptoms.map((symptom) => (
+        {options.map(({ key, label }) => (
           <SymptomTag
-            key={symptom}
-            symptom={symptom}
+            key={key}
+            symptom={label}
             clickable
-            selected={selectedSymptoms.includes(symptom)}
-            onClick={() => handleSelectSymptoms(symptom)}
+            selected={selectedSymptoms.includes(key)}
+            onClick={() => handleSelectSymptoms(key)}
           />
         ))}
       </Flex>
