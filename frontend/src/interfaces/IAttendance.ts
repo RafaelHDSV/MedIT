@@ -71,3 +71,32 @@ export interface IAttendance extends IBaseInterface {
   conditions?: string[]
   allergies?: string[]
 }
+
+interface IAttendancePatient {
+  name?: string
+  birthDate?: string | Date
+  gender?: string
+  allergies?: string[]
+  conditions?: string[]
+}
+
+export interface IAttendanceDetails {
+  _id: ObjectId | string
+  complaint: string
+  diagnosis?: string
+  date: string | Date
+  risk: AttendanceRisk
+  status: AttendanceStatus
+  unitId: ObjectId | string
+  nurseId?: ObjectId | string
+  doctorId?: ObjectId | string
+  vitalSigns?: IVitalSigns
+  painLevel?: number
+  selfMedicated?: boolean
+  symptomStartDate?: string | Date
+  symptoms?: string[]
+  generalObservation?: string
+  conditions?: string[]
+  allergies?: string[]
+  patient?: IAttendancePatient
+}
