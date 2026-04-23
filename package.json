@@ -1,13 +1,13 @@
 {
   "scripts": {
     "base": "git pull && yarn",
-    "dev": "yarn base && concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
+    "dev": "yarn base && concurrently -n frontend,backend -c blue,green \"yarn dev:frontend\" \"yarn dev:backend\"",
     "dev:frontend": "cd frontend && yarn && yarn dev",
     "dev:backend": "cd backend && yarn && yarn dev",
-    "format": "yarn base && concurrently \"yarn format:frontend\" \"yarn format:backend\"",
+    "format": "yarn base && concurrently -n frontend,backend -c blue,green \"yarn format:frontend\" \"yarn format:backend\"",
     "format:frontend": "cd frontend && yarn format",
     "format:backend": "cd backend && yarn format",
-    "test": "yarn base && concurrently \"yarn test:frontend\" \"yarn test:backend\"",
+    "test": "yarn base && concurrently -n frontend,backend -c blue,green \"yarn test:frontend\" \"yarn test:backend\"",
     "test:frontend": "cd frontend && yarn tsc",
     "test:backend": "cd backend && yarn tsc",
     "scripts": "cd backend && yarn scripts"
