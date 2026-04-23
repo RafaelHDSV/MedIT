@@ -282,7 +282,7 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
             {validDevelopmerEmail.some((email) =>
               user?.email?.includes(email)
             ) && devClicked > 0
-              ? devClicked
+              ? `Contador: (${devClicked})`
               : ''}
           </Typography.Title>
           <Typography.Paragraph>
