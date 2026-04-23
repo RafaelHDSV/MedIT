@@ -15,6 +15,8 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
   - [5.8 Visibilidade de atendimentos por perfil](#58-visibilidade-de-atendimentos-por-perfil)
   - [5.9 Jornada do paciente: pré-atendimento remoto, chegada e filas](#59-jornada-do-paciente-pré-atendimento-remoto-chegada-e-filas)
   - [5.10 Seeds de demonstração (atendimentos e medicamentos)](#510-seeds-de-demonstração-atendimentos-e-medicamentos)
+  - [5.11 API de sintomas-doenças e sugestões no atendimento](#511-api-de-sintomas-doenças-e-sugestões-no-atendimento)
+  - [5.12 Índice adicional de scripts do backend](#512-índice-adicional-de-scripts-do-backend)
 - [6. Arquitetura e stack](#6-arquitetura-e-stack)
   - [6.1 Mapa do repositório (pastas, rotas e cliente)](#61-mapa-do-repositório-pastas-rotas-e-cliente)
 - [7. Modelo de atendimento no código](#7-modelo-de-atendimento-no-código)
@@ -42,7 +44,7 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
 | Segurança | JWT (access + refresh), bcrypt; rotas de negócio montadas sob prefixo `/auth/...` (ver [§6.1](#61-mapa-do-repositório-pastas-rotas-e-cliente)) |
 | Dados sintoma–doença | Coleção `SymptomsDisease`; carga via script em `backend/src/scripts/scripts/createSymptomsDiaseases.script.ts` |
 
-Monorepo na raiz: `package.json` usa **Yarn** e **concurrently** — `yarn dev` instala/atualiza dependências (`yarn base`) e sobe frontend e backend em paralelo (`yarn dev:frontend` / `yarn dev:backend`). Testes de tipo: `yarn test` → `tsc` em cada pacote. Scripts de banco/dados: `yarn scripts` na raiz (delega a `cd backend && yarn scripts`).
+Monorepo na raiz: `package.json` usa **Yarn** e **concurrently** — `yarn dev` instala/atualiza dependências (`yarn base`) e sobe frontend e backend em paralelo (`yarn dev:frontend` / `yarn dev:backend`). Testes de tipo: `yarn test` → `tsc` em cada pacote. Formatação: `yarn format` (Prettier em `frontend` e `backend`). Scripts de banco/dados: `yarn scripts` na raiz (delega a `cd backend && yarn scripts`). Na raiz existem ainda [`CONTRIBUTING.md`](CONTRIBUTING.md) e [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
 ---
 
@@ -138,6 +140,8 @@ No repositório, a classificação segue **cinco níveis** compatíveis com uma 
 - Consulta informativa conforme permissões.
 - A listagem **parte da própria unidade** do usuário (estoque e cadastro locais).
 - Quando um item **não está disponível** na unidade atual, o sistema permite consultar **unidades parceiras** para localizar o medicamento em outro ponto da rede (apenas consulta / encaminhamento informativo, conforme regras de negócio e privacidade).
+- No modelo `IUnit` / `UnitSchema`, o campo **`partnerUnitIds`** (ObjectIds de outras unidades) materializa essa rede; pode ser preenchido pela interface administrativa ou, em ambientes de demonstração, por scripts de migração (ver [§5.12](#512-índice-adicional-de-scripts-do-backend)).
+- Rota de medicamentos no front: **`/auth/units/:unitId/medications`** (constante `ROUTES.MEDICAMENTS` em `frontend/src/routes/constants.ts` — o identificador interno mantém o histórico `MEDICAMENTS`).
 
 ### 5.6 Dashboard, período, ocupação e gráficos
 
@@ -168,7 +172,8 @@ O **dashboard administrativo** (`frontend/src/pages/Dashboard`, API em `backend/
 
 ### 5.7 Nível MedIT e administrador de unidade
 
-- **Situação atual (protótipo):** perfis com nível administrativo podem existir sem fluxo completo na UI; em muitos cenários de teste o **administrador é criado diretamente no banco de dados**.
+- **Situação atual (protótipo):** perfis com nível administrativo podem existir sem fluxo completo na UI; em muitos cenários de teste o **administrador é criado diretamente no banco de dados** ou via script `create-tcc-admins` (ver [§5.12](#512-índice-adicional-de-scripts-do-backend)).
+- **No código hoje:** o enum `UserLevels` (`backend/src/interfaces/IUser.ts`) define apenas **`admin`**, **`doctor`**, **`nurse`**, **`patient`**; o administrador é um **discriminator** Mongoose (`Admin` em `backend/src/models/AdminModel.ts`) sobre a coleção de usuários. O rótulo **“nível MedIT”** no documento descreve a **evolução de produto** (operador da plataforma acima do admin de unidade), ainda **sem** valor distinto nesse enum.
 - **Situação desejada:** existe um nível **MedIT** (superior ao administrador de unidade), responsável por:
   - cadastrar e manter **unidades**;
   - criar e associar **administradores** a uma unidade específica.
@@ -205,7 +210,7 @@ Documentação detalhada da regra de negócio do seed de atendimentos: [`backend
 - **Fluxo completo** no histórico: desde `onTheWay` até `completed`; estados ativos incluem `onTheWay` e `waitingTriage`; `doctorId` omitido em `onTheWay` / `waitingTriage` quando aplicável.
 - **Mínimos** por paciente/médico/enfermeiro (ex.: ≥5 concluídos): preenchidos com concluídos extras no **dia civil com menor carga** que ainda tenha vaga; se o teto impedir, o script emite aviso.
 - **Top-up global** desligado (`TARGET_MIN_TOTAL_ATTENDANCES = 0`) para não violar o teto diário.
-- **Granularidade:** o seed usa **horário local** na montagem dos dias; o dashboard usa **UTC** em `getPeriodDateRange` — pode haver pequeno desvio visual nas bordas do dia entre seed e agregação.
+- **Granularidade:** o seed usa **horário local** na montagem dos dias; `getPeriodDateRange` devolve `start`/`end` como **instantes `Date` em UTC** a partir do ano/mês/dia civil, usando **“agora” em America/Sao_Paulo** quando não há `referenceDate` e âncora `YYYY-MM-DD` ao **meio-dia UTC** para estabilizar o dia da semana — ainda pode haver pequeno desvio nas bordas do dia entre seed e agregação.
 
 **Medicamentos (`backend/src/scripts/scripts/createMedications.script.ts`)**
 
@@ -213,6 +218,35 @@ Documentação detalhada da regra de negócio do seed de atendimentos: [`backend
 - **Por unidade:** embaralhamento **determinístico** a partir do `unitId` + recorte de **fração** do pool permitido (`PROFILE_CATALOG_RATIO`, com piso `MIN_MEDS_PER_UNIT`), de modo que **unidades diferentes** têm **conjuntos e quantidades de itens** distintos.
 - **Extras por perfil** (`PROFILE_EXTRA_MEDICATIONS`): itens que só aparecem em UBS, UPA, hospital ou centro de especialidades (ex.: urgência vs. itens de alta complexidade hospitalar).
 - **Estoque:** teto efetivo **`effectiveStockRange(unitId, profile)`** multiplica o `max` do perfil por um fator derivado do hash da unidade; sorteio por linha com **jitter**; alguns índices forçados a estoque zero (proporção ~7% do catálogo da unidade). Medicamentos muito sensíveis (ex.: morfina, fentanila, antivenenos) usam faixa proporcional menor.
+
+### 5.11 API de sintomas-doenças e sugestões no atendimento
+
+- **`GET /auth/symptoms-diseases/symptom-options`** e **`GET /auth/symptoms-diseases/disease-options`** (com `authMiddleware`) — agregam listas para o cliente (`SymptomsDiseasesRepository`, pré-cadastro do paciente e tela de detalhe do atendimento).
+- **Sugestões ligadas ao episódio** (sempre com JWT e escopo pela **mesma `unitId`** do profissional):
+  - **`GET /auth/attendances/:attendanceId/suggested-diseases`** — lê `symptoms[]` gravados no atendimento, normaliza chaves com `getReportedSymptomsToDiseaseKeys` e devolve ranqueamento via `suggestDiseasesFromReportedSymptoms` (`backend/src/services/symptomsDiseaseSuggestionService.ts`). Perfis autorizados na API: **médico e enfermeiro** (`staffLevelsSuggest` em `attendanceController.ts`).
+  - **`GET /auth/attendances/:attendanceId/suggestion-detail?disease=...`** — detalhe para uma doença da base: compatibilidade, chaves de referência, medicamentos e exames curados no documento `SymptomsDiseases`.
+  - **`POST /auth/attendances/:attendanceId/complete-attendance`** — apenas **médico** titular (`doctorId`), com atendimento em **`inAttendance`**; exige **`diagnosisKey`** existente na coleção `SymptomsDiseases`; atualiza para **`attendanceCompleted`**, grava diagnóstico textual opcional, destino do paciente, medicamentos e exames prescritos (listas sanitizadas no controller).
+- **Pontuação (regra):** para cada doença, soma-se o peso dos sintomas de referência que coincidem com as chaves derivadas do relato; a compatibilidade é **`round(100 × matchedWeight / totalWeight)`** (pesos ≤0 ignorados no denominador). Limite e piso mínimo configuráveis na função de sugestão (padrão: até 15 resultados, compatibilidade ≥ 1%).
+- **Interface:** em `AttendanceDetails`, o painel de sugestões e o `SuggestionDetailModal` são carregados para o perfil **médico** (`getSuggestedDiseases` / `getSuggestionDetail`); a enfermeira usa a mesma tela para triagem e **“Concluir triagem”**, sem consumir a lista de sugestões nessa página (mas a API já permite enfermeiro nas rotas de sugestão, se no futuro a UI quiser reutilizar).
+
+### 5.12 Índice adicional de scripts do backend
+
+Além dos seeds detalhados em [§5.10](#510-seeds-de-demonstração-atendimentos-e-medicamentos), o runner em **`backend/src/scripts/scripts/`** (`yarn scripts`, menu com **`@inquirer/prompts`**) expõe scripts utilitários. Nomes abaixo são os **`name`** registados em cada script (executar só em ambiente consciente; vários assumem dados de demo Sorocaba / IDs fixos).
+
+**Carga e demonstração**
+
+- `create-units`, `create-doctors-by-unit`, `create-nurses-by-unit`, `create-patients-by-unit`, `create-tcc-users`, `create-tcc-admins` — populam unidades, profissionais, pacientes e contas da equipa TCC.
+- `create-symptoms-diseases`, `create-attendances`, `create-medications` — base sintoma–doença, episódios e estoque (ver [§5.10](#510-seeds-de-demonstração-atendimentos-e-medicamentos)).
+
+**Vínculos e migrações pontuais**
+
+- `link-units-to-users`, `link-units-to-attendances` — associa `unitId` em utilizadores ou atendimentos.
+- `migrate-partner-units` — preenche `partnerUnitIds` por **grupos fixos de ObjectIds** (rede básica e rede de urgência do demo); hospitais/centros de especialidades ficam para parceria manual, conforme comentário no script.
+- `migrateUserEnums`, `update-user-levels`, `update-role-to-level` — normalização de enums / níveis legados.
+
+**Correção de dados e enriquecimento**
+
+- `fix-units-data`, `update-address-unit`, `add-zipcode-unit`, `add-doctor-fields`, `add-number-to-attendances`, `add-timestamp-user`, `update-user-numbers`, `backfill-patient-health-data`, `normalize-allergies-conditions`, `normalize-nurses-coren`, `removeAgeProp`.
 
 ---
 
@@ -243,22 +277,22 @@ MongoDB (Mongoose)
 - **`server.ts`** — sobe Express após `connectDatabase()`; `cors()` + `express.json()`; montagem de rotas (todas abaixo partindo da raiz configurada no cliente).
 - **Rotas HTTP** (arquivos em `routes/`, importados em `server.ts`):
   - `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`; `GET /auth/signup/units` (lista de unidades para cadastro) — `authRoutes`.
-  - `/auth/users` — `usersRoutes`; `/auth/doctors` — `doctorsRoutes`; `/auth/nurses` — `nursesRoutes`; `/auth/patients` — `patientsRoutes` (`POST /` cria paciente **sem** JWT; rotas autenticadas: pré-atendimento, chegada, listagens, etc.); `/auth/units` — `unitsRoutes`; `/auth/dashboard` — `dashboardRoutes` (cards, fila, gráfico por tempo); `/auth/attendances` — `attendancesRoutes` (claim triagem/consulta, conclusão de triagem, etc.); `/auth/medications` — `medicationRoutes`.
+  - `/auth/users` — `usersRoutes`; `/auth/doctors` — `doctorsRoutes`; `/auth/nurses` — `nursesRoutes`; `/auth/patients` — `patientsRoutes` (`POST /` cria paciente **sem** JWT; rotas autenticadas: pré-atendimento, chegada, listagens, etc.); `/auth/units` — `unitsRoutes`; `/auth/dashboard` — `dashboardRoutes` (cards, fila, gráfico por tempo); `/auth/attendances` — `attendancesRoutes` (ver [§5.11](#511-api-de-sintomas-doenças-e-sugestões-no-atendimento) e [§7](#7-modelo-de-atendimento-no-código)); `/auth/medications` — `medicationRoutes`; **`/auth/symptoms-diseases`** — `symptomsDiseasesRoutes` (`symptom-options`, `disease-options`).
 - **`controllers/`** — handlers finos que chamam serviços ou modelos.
 - **`services/`** — regras e agregações mais pesadas (ex.: `attendanceService.ts` para contagens do dashboard, filas e recortes por período).
 - **`middlewares/authMiddleware.ts`** — validação JWT na maioria dos handlers sob `/auth/...`; **sem** middleware em `login`, `refresh`, `logout` e `GET /auth/signup/units` (rotas públicas definidas em `authRoutes`).
 - **`models/` + `schema/`** — definição Mongoose; **`interfaces/`** — tipos compartilhados com o domínio.
-- **`utils/`** — utilitários (`getPeriodDateRange.ts` devolve intervalos em **`Date` UTC** para consultas; âncora opcional `YYYY-MM-DD` com parsing via meio-dia UTC para estabilizar o dia da semana).
+- **`utils/`** — utilitários (`getPeriodDateRange.ts`: intervalos como objetos **`Date`** em UTC para consultas; “hoje” sem âncora a partir de **America/Sao_Paulo**; ver [§5.10](#510-seeds-de-demonstração-atendimentos-e-medicamentos)); `getReportedSymptomsToDiseaseKeys.ts` — normalização de sintomas reportados para chaves da base de regras.
 - **`config/database.ts`** — conexão MongoDB (`MONGO_URL` em `.env`).
 - **`globals/Config.ts`** — `PORT`, `MONGO_URL`, segredos JWT a partir de `process.env`.
-- **`scripts/`** — `runner.ts` descobre automaticamente todos os `*.script.ts` / `*.script.js` em `scripts/scripts/`, exportados como `default` com metadados (`Script` em `scripts/types.ts`). Execução: `yarn scripts` no backend (ou via raiz); argumento CLI executa script por nome; sem argumento, menu interativo (**Inquirer**).
+- **`scripts/`** — `runner.ts` descobre automaticamente todos os `*.script.ts` / `*.script.js` em `scripts/scripts/`, exportados como `default` com metadados (`Script` em `scripts/types.ts`). Execução: `yarn scripts` no backend (ou via raiz); argumento CLI executa script por nome; sem argumento, menu interativo (**`@inquirer/prompts`**). Índice resumido dos nomes em [§5.12](#512-índice-adicional-de-scripts-do-backend).
 
 **Frontend — `frontend/src/`**
 
 - **`main.tsx`** — monta a árvore React, providers (Ant Design, auth).
 - **`routes/AppRoutes.tsx`** — **React Router**; rotas públicas em `/` (SignIn/SignUp com `UnauthRoute`) vs área autenticada em `/auth` com `AuthRoute` e `AuthLayout`; `pages/routerPages` centraliza exports das páginas.
 - **`routes/constants.ts`** — objeto `ROUTES` (paths) usado na navegação e no menu.
-- **`repositories/`** — um arquivo por agregado (`AuthRepository`, `DashboardRepository`, `PatientsRepository`, `AttendancesFlowRepository`, `MedicationsRepository`, `UnitsRepository`, `DoctorsRepository`, `NursesRepository`, `UserRepository`); padrão `extends Repository` + método `handle()` para extrair `data` da resposta Axios.
+- **`repositories/`** — um arquivo por agregado (`AuthRepository`, `DashboardRepository`, `PatientsRepository`, `AttendancesFlowRepository`, `MedicationsRepository`, `UnitsRepository`, `DoctorsRepository`, `NursesRepository`, `UserRepository`, **`SymptomsDiseasesRepository`**); padrão `extends Repository` + método `handle()` para extrair `data` da resposta Axios.
 - **`api/api.ts`** — instância Axios, interceptors de **Authorization** e **renovação de token** em `401` (refresh + retry; falha redireciona para `/`).
 - **`contexts/`** — `AuthProvider` / `useAuth` (token, usuário, nível `UserLevels`); config global do Ant Design.
 - **`hooks/`** — hooks reutilizáveis (`useAuth`, colunas de tabelas por página em `pages/.../hooks`).
@@ -293,6 +327,7 @@ O modelo de **atendimento** (`IAttendance` / `AttendanceSchema`) centraliza o fl
 | Enfermeira assume o caso | `inTriage` (+ `nurseId`) | API de “claim” da triagem |
 | Enfermeira libera para o médico | `waitingAttendance` | API de conclusão da triagem |
 | Médico assume o caso | `inAttendance` (+ `doctorId`) | API de “claim” da consulta |
+| Médico finaliza o episódio | `attendanceCompleted` (+ diagnóstico / prescrições conforme payload) | `POST .../complete-attendance` (titular, a partir de `inAttendance`) |
 
 Fluxo simplificado (alinhado ao código atual):
 
@@ -303,19 +338,19 @@ flowchart LR
   C --> D[Em triagem com enfermeira]
   D --> E[Aguardando médico pool]
   E --> F[Em atendimento com médico]
-  F --> G[Concluído]
+  F --> G[Atendimento concluído pelo médico]
 ```
 
 ---
 
 ## 8. Mecanismo inteligente (regras)
 
-1. O paciente (ou o fluxo de triagem) informa **sintomas** estruturados.
-2. O sistema consulta a **base sintoma–doença** (documentos com mapa de sintomas e pesos).
-3. Um algoritmo **determinístico** calcula compatibilidade (ex.: pontuação por sobreposição com vetor de sintomas da doença).
-4. Retorna as condições com **maior correspondência**, ordenadas para apoio à leitura clínica.
+1. O paciente (ou o fluxo de triagem) informa **sintomas** estruturados (chaves alinhadas à base).
+2. O sistema consulta a **base sintoma–doença** (`SymptomsDiseases` / `SymptomsDiseasesModel`): cada doença possui um mapa `symptoms` (pesos numéricos; valores ≤0 não entram no denominador da pontuação).
+3. O serviço **`symptomsDiseaseSuggestionService.ts`** aplica regra **determinística**: para cada doença, **compatibilidade em %** = soma dos pesos dos sintomas de referência que coincidem com as chaves derivadas do relato, dividida pela soma dos pesos positivos da doença, arredondada (`scoreDisease`). Empate desempata por nome (`pt`).
+4. A API expõe listas para o cliente, ranqueamento por episódio e detalhe por doença (ver [§5.11](#511-api-de-sintomas-doenças-e-sugestões-no-atendimento)); o encerramento médico valida **`diagnosisKey`** contra o mesmo catálogo.
 
-**Não há** aprendizado de máquina nem **diagnóstico automatizado**. Trata-se de **IA simbólica baseada em regras** e dados curados (script de seed no backend).
+**Não há** aprendizado de máquina nem **diagnóstico automatizado**. Trata-se de **IA simbólica baseada em regras** e dados curados (script `create-symptoms-diseases` no backend).
 
 ---
 
@@ -376,6 +411,7 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 - **Chegada na unidade:** `POST /auth/patients/attendances/:attendanceId/confirm-arrival` — apenas o **titular** do atendimento, apenas a partir de **`onTheWay`** → **`waitingTriage`** (+ histórico). No dashboard do paciente, botão dedicado quando há episódio “a caminho”.
 - **Filas no dashboard (por `unitId`):** agregações e contadores consideram, para enfermagem, **`waitingTriage` sem `nurseId`**; para o médico, **`waitingAttendance` sem `doctorId`** — ou seja, **pool compartilhado na unidade** até alguém assumir.
 - **Vínculo profissional atômico:** `POST /auth/attendances/:id/claim-triage` (enfermeira, mesma unidade), `POST /auth/attendances/:id/complete-triage` (enfermeira dona do caso em `inTriage`), `POST /auth/attendances/:id/claim-consultation` (médico, mesma unidade). Respostas **409** quando o estado já não permite a operação (ex.: outro profissional assumiu primeiro). A UI da fila chama essas rotas antes de navegar ao detalhe do atendimento (enfermeira/médico).
+- **Sugestões e fecho clínico:** na página `AttendanceDetails`, o **médico** obtém sugestões em tempo real via **`getSuggestedDiseases`** / **`getSuggestionDetail`** e finaliza o caso com **`complete-attendance`** (modal com diagnóstico obrigatório da base, prescrições e exames). Ver [§5.11](#511-api-de-sintomas-doenças-e-sugestões-no-atendimento).
 - **Projeções de listagem** de atendimentos (paciente, médico, enfermeiro) passam a incluir os **campos de pré-atendimento** na raiz, para exibição e evolução futura da triagem.
 
 **Dashboard (API + front)**
@@ -388,11 +424,12 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 
 - **`createAttendances.script.ts`** — comportamento atual resumido em [§5.10](#510-seeds-de-demonstração-atendimentos-e-medicamentos); especificação editável em [`createAttendances.md`](backend/src/scripts/createAttendances.md).
 - **`createMedications.script.ts`** — medicamentos e estoques **variados por unidade** (recorte do catálogo + extras por perfil + teto de estoque efetivo por `unitId`); ver [§5.10](#510-seeds-de-demonstração-atendimentos-e-medicamentos).
+- **Outros scripts** — catálogo por nome em [§5.12](#512-índice-adicional-de-scripts-do-backend).
 - **Detalhe de produto:** na visão mês do gráfico, zeros nos últimos dias do mês corrente podem ser esperados (ver [§5.6](#56-dashboard-período-ocupação-e-gráficos)).
 
 **Em evolução / parcial**
 
-- Algumas telas ainda exibem **dados estáticos** ou mocks enquanto a integração completa com a API é finalizada (ex.: sugestões de condições na UI de detalhes do atendimento podem não refletir ainda o cálculo em tempo real no backend).
+- Algumas áreas ainda podem usar **placeholders** ou integração incompleta em relação à visão completa do TCC (ex.: relatórios exportáveis, notificações push).
 - Campos adicionais da triagem (escala de dor, frequência respiratória, etc.) podem ser expandidos além do subdocumento mínimo atual de sinais vitais.
 - **Governança multi-unidade:** hoje o administrador pode ser criado **manualmente no banco**; o nível **MedIT**, o vínculo estrito **admin ↔ uma unidade**, o **isolamento de atendimentos** (médico/enfermeiro/paciente só os seus) e a **busca em unidades parceiras** para medicamentos descrevem a **direção do produto** e devem ser reforçados nos middlewares e consultas da API.
 
