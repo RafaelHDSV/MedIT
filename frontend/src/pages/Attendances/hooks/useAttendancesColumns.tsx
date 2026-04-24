@@ -21,7 +21,6 @@ export function useAttendancesColumns({
   const handleNavigateToDetails = useCallback(
     (id: ObjectId | undefined) => {
       if (!id || !canGoToDetails) return
-      // VIEIRA: Implementar navegação para detalhes do atendimento
       navigate(
         ROUTES.ATTENDANCE_DETAILS.path.replace(':attendanceId', id.toString())
       )

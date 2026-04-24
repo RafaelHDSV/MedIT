@@ -49,7 +49,6 @@ function MedicationModal({
       })
       message.success('Medicamento cadastrado com sucesso!')
       handleCancelModal()
-      // VIEIRA: Verificar se não dá pra tirar e usar useEffect fora
       fetchMedications()
     } catch (err) {
       handleApiError({
