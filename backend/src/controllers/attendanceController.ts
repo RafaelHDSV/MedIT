@@ -2,9 +2,11 @@ import { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import { toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import {
+  AttendanceRisk,
   AttendanceStatus,
   IPrescribedMedication,
-  PatientDisposition
+  PatientDisposition,
+  type IVitalSigns
 } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
@@ -16,6 +18,7 @@ import {
   suggestDiseasesFromReportedSymptoms
 } from '../services/symptomsDiseaseSuggestionService.js'
 import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
+import { parseFiniteNumber, parsePositiveInt } from '../utils/parseNumbers.js'
 
 const VALID_DISPOSITIONS = new Set<string>(Object.values(PatientDisposition))
 
@@ -65,6 +68,93 @@ const historyEntry = (status: AttendanceStatus) => ({
   status,
   changedAt: new Date()
 })
+
+function parseVitalSignsFromBody(raw: unknown): IVitalSigns | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined
+
+  const rawObject = raw as Record<string, unknown>
+  const { temperature, heartRate, oxygenSaturation, bloodPressure } = rawObject
+  const vitalSigns: IVitalSigns = {}
+
+  const t = parseFiniteNumber(temperature)
+  if (t !== undefined && t >= 20 && t <= 65) vitalSigns.temperature = t
+
+  const hr = parsePositiveInt(heartRate)
+  if (hr !== undefined && hr > 0 && hr <= 400) vitalSigns.heartRate = hr
+
+  const o2 = parsePositiveInt(oxygenSaturation)
+  if (o2 !== undefined && o2 <= 100) vitalSigns.oxygenSaturation = o2
+
+  if (typeof bloodPressure === 'string') {
+    const bp = bloodPressure.trim().slice(0, 32)
+    if (bp) vitalSigns.bloodPressure = bp
+  }
+
+  return Object.keys(vitalSigns).length > 0 ? vitalSigns : undefined
+}
+
+function sanitizeTriageCompletionFields(body: unknown): {
+  set: Record<string, unknown>
+  unset: Record<string, ''>
+  error?: string
+} {
+  const VALID_RISKS = new Set<string>(Object.values(AttendanceRisk))
+
+  const set: Record<string, unknown> = {}
+  const unset: Record<string, ''> = {}
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return { set, unset }
+  }
+  const b = body as Record<string, unknown>
+
+  if (Object.prototype.hasOwnProperty.call(b, 'risk')) {
+    const riskRaw = typeof b.risk === 'string' ? b.risk.trim() : ''
+    if (!riskRaw || !VALID_RISKS.has(riskRaw)) {
+      return { set, unset, error: 'Classificação de risco inválida.' }
+    }
+    set.risk = riskRaw as AttendanceRisk
+  }
+
+  if (Object.prototype.hasOwnProperty.call(b, 'symptoms')) {
+    if (!Array.isArray(b.symptoms)) {
+      return { set, unset, error: 'Lista de sintomas inválida.' }
+    }
+    set.symptoms = b.symptoms.map((s) => String(s).trim()).filter(Boolean)
+  }
+
+  if (Object.prototype.hasOwnProperty.call(b, 'generalObservation')) {
+    if (typeof b.generalObservation !== 'string') {
+      return { set, unset, error: 'Observação geral inválida.' }
+    }
+    const go = b.generalObservation.trim()
+    if (go) set.generalObservation = go
+    else unset.generalObservation = ''
+  }
+
+  if (Object.prototype.hasOwnProperty.call(b, 'painLevel')) {
+    if (b.painLevel === null) {
+      unset.painLevel = ''
+    } else {
+      const p = parseFiniteNumber(b.painLevel)
+      if (p === undefined || p < 0 || p > 10) {
+        return {
+          set,
+          unset,
+          error: 'Escala de dor deve ser um número entre 0 e 10.'
+        }
+      }
+      set.painLevel = Math.round(p * 10) / 10
+    }
+  }
+
+  if (Object.prototype.hasOwnProperty.call(b, 'vitalSigns')) {
+    const parsed = parseVitalSignsFromBody(b.vitalSigns)
+    if (parsed && Object.keys(parsed).length > 0) set.vitalSigns = parsed
+    else unset.vitalSigns = ''
+  }
+
+  return { set, unset }
+}
 
 const paramId = (value: string | string[] | undefined) =>
   String(Array.isArray(value) ? value[0] : value)
@@ -144,12 +234,22 @@ export const completeTriage = async (req: Request, res: Response) => {
       status: AttendanceStatus.IN_TRIAGE
     }
 
+    const triageFields = sanitizeTriageCompletionFields(req.body)
+    if (triageFields.error) {
+      return res.status(400).json({ message: triageFields.error })
+    }
+
+    const setPayload: Record<string, unknown> = {
+      status: AttendanceStatus.WAITING_ATTENDANCE,
+      ...triageFields.set
+    }
+    const unsetPayload = triageFields.unset
+
     const updated = await Attendance.findOneAndUpdate(
       triageFilter as never,
       {
-        $set: {
-          status: AttendanceStatus.WAITING_ATTENDANCE
-        },
+        $set: setPayload,
+        ...(Object.keys(unsetPayload).length ? { $unset: unsetPayload } : {}),
         $push: {
           changesHistory: historyEntry(AttendanceStatus.WAITING_ATTENDANCE)
         }

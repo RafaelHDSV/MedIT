@@ -1,6 +1,7 @@
 import { api } from '@/api/api'
 import type {
   IAttendanceDetails,
+  ICompleteTriagePayload,
   IPrescribedMedication,
   PatientDisposition
 } from '@/interfaces/IAttendance'
@@ -48,9 +49,22 @@ class AttendancesFlowRepository extends Repository {
     })
   }
 
-  async completeTriage({ attendanceId }: { attendanceId: string }) {
+  async completeTriage({
+    attendanceId,
+    risk,
+    symptoms,
+    generalObservation,
+    vitalSigns,
+    painLevel
+  }: ICompleteTriagePayload) {
     return this.handle(() => {
-      return this.api.post(`${this.path}/${attendanceId}/complete-triage`)
+      return this.api.post(`${this.path}/${attendanceId}/complete-triage`, {
+        risk,
+        symptoms,
+        generalObservation,
+        vitalSigns,
+        painLevel
+      })
     })
   }
 

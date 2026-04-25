@@ -50,6 +50,14 @@ export interface IVitalSigns {
   oxygenSaturation?: number
 }
 
+export type VitalFieldDraft = {
+  temperature: string
+  bloodPressure: string
+  heartRate: string
+  oxygenSaturation: string
+  painLevel: string
+}
+
 export const PatientDisposition = {
   HOSPITALIZED: 'hospitalized',
   HOME: 'home',
@@ -134,4 +142,13 @@ export interface IAttendanceDetails {
   prescribedMedications?: IPrescribedMedication[]
   prescribedExams?: string[]
   patient?: IAttendancePatient
+}
+
+export interface ICompleteTriagePayload {
+  attendanceId: string
+  risk?: AttendanceRisk
+  symptoms?: string[]
+  generalObservation?: string
+  vitalSigns?: IVitalSigns
+  painLevel?: number | null
 }

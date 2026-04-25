@@ -8,7 +8,9 @@ import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import {
   AttendanceRisk,
-  type IAttendanceDetails
+  type IAttendanceDetails,
+  type IVitalSigns,
+  type VitalFieldDraft
 } from '@/interfaces/IAttendance'
 import type {
   IDiseaseOption,
@@ -35,6 +37,63 @@ import ConditionsCard from './components/ConditionsCard/ConditionsCard'
 import SuggestionDetailModal from './components/SuggestionDetailModal/SuggestionDetailModal'
 import VitalCard from './components/VitalCard/VitalCard'
 
+function isValidNumber(value: number | undefined): boolean {
+  return value != null && Number.isFinite(value)
+}
+
+function buildVitalDraftFromAttendance(
+  attendance: IAttendanceDetails
+): VitalFieldDraft {
+  const { vitalSigns } = attendance
+  const { temperature, bloodPressure, heartRate, oxygenSaturation } =
+    vitalSigns || {}
+
+  return {
+    temperature: isValidNumber(temperature)
+      ? (Math.round(Number(temperature) * 10) / 10).toFixed(1)
+      : '',
+    bloodPressure: bloodPressure ? bloodPressure.trim() : '',
+    heartRate: isValidNumber(heartRate) ? String(heartRate) : '',
+    oxygenSaturation: isValidNumber(oxygenSaturation)
+      ? String(oxygenSaturation)
+      : '',
+    painLevel: isValidNumber(attendance.painLevel)
+      ? String(attendance.painLevel)
+      : ''
+  }
+}
+
+function buildVitalSignsPayload(
+  draftVitalSign: VitalFieldDraft
+): IVitalSigns | undefined {
+  const vitalSign: IVitalSigns = {}
+  const { temperature, bloodPressure, heartRate, oxygenSaturation } =
+    draftVitalSign
+
+  const temperatureNumber = parseFloat(temperature.replace(',', '.'))
+  if (temperature && isValidNumber(temperatureNumber)) {
+    vitalSign.temperature = temperatureNumber
+  }
+
+  if (bloodPressure) vitalSign.bloodPressure = bloodPressure
+
+  const heartRateNumber = Number(heartRate)
+  if (heartRate && isValidNumber(heartRateNumber) && heartRateNumber > 0) {
+    vitalSign.heartRate = heartRateNumber
+  }
+
+  const oxygenSaturationNumber = Number(oxygenSaturation)
+  if (
+    oxygenSaturation &&
+    isValidNumber(oxygenSaturationNumber) &&
+    oxygenSaturationNumber >= 0
+  ) {
+    vitalSign.oxygenSaturation = oxygenSaturationNumber
+  }
+
+  return Object.keys(vitalSign).length > 0 ? vitalSign : undefined
+}
+
 function AttendanceDetails() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -57,6 +116,13 @@ function AttendanceDetails() {
     useState<ISuggestionDetails | null>(null)
   const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
   const [diseaseOptions, setDiseaseOptions] = useState<IDiseaseOption[]>([])
+  const [vitalDraft, setVitalDraft] = useState<VitalFieldDraft>({
+    temperature: '',
+    bloodPressure: '',
+    heartRate: '',
+    oxygenSaturation: '',
+    painLevel: ''
+  })
 
   const symptomLabelByKey = useMemo(
     () => buildSymptomLabelMap(symptomOptions),
@@ -129,6 +195,11 @@ function AttendanceDetails() {
   useEffect(() => {
     loadAttendance()
   }, [loadAttendance])
+
+  useEffect(() => {
+    if (!attendance) return
+    setVitalDraft(buildVitalDraftFromAttendance(attendance))
+  }, [attendance])
 
   useEffect(() => {
     async function fetchSymptomOptions() {
@@ -211,8 +282,6 @@ function AttendanceDetails() {
   const arrivalLabel = attendance?.date
     ? dayjs(attendance.date).format('DD/MM/YYYY HH:mm')
     : '—'
-  const vitalSigns = attendance?.vitalSigns
-
   const allergiesText = useMemo(() => {
     const allergies = patient?.allergies?.length
       ? patient.allergies.join(', ')
@@ -240,11 +309,36 @@ function AttendanceDetails() {
   }
 
   async function handleCompleteTriage() {
-    if (!attendanceId) return
+    if (!attendanceId || !attendance) return
+
+    const risk = selectedRisk ?? attendance.risk
+    if (!risk) {
+      message.warning('Selecione a classificação de risco.')
+      return
+    }
+
     try {
       setTriageLoading(true)
+      const vitalSignsPayload = buildVitalSignsPayload(vitalDraft)
+      const { painLevel } = vitalDraft
+      let finalPainLevel: number | undefined
+
+      const parsedPainLevel = parseFloat(painLevel?.replace(',', '.'))
+      if (
+        isValidNumber(parsedPainLevel) &&
+        parsedPainLevel >= 0 &&
+        parsedPainLevel <= 10
+      ) {
+        finalPainLevel = Math.round(parsedPainLevel * 10) / 10
+      }
+
       await AttendancesFlowRepository.completeTriage({
-        attendanceId: String(attendanceId)
+        attendanceId: String(attendanceId),
+        risk,
+        symptoms: selectedSymptoms,
+        generalObservation: observation,
+        vitalSigns: vitalSignsPayload ?? {},
+        ...(finalPainLevel !== undefined ? { painLevel: finalPainLevel } : {})
       })
       message.success(
         'Triagem concluída. O paciente foi encaminhado à fila médica.'
@@ -431,47 +525,45 @@ function AttendanceDetails() {
               <div className={styles.grid}>
                 <VitalCard
                   label='Temperatura'
-                  value={
-                    vitalSigns?.temperature !== undefined &&
-                    vitalSigns?.temperature !== null
-                      ? vitalSigns.temperature
-                      : '—'
-                  }
+                  value={vitalDraft.temperature}
                   suffix='°'
+                  onChange={(temperature) =>
+                    setVitalDraft((prev) => ({ ...prev, temperature }))
+                  }
                 />
                 <VitalCard
                   label='Pressão Arterial'
-                  value={vitalSigns?.bloodPressure ?? '—'}
+                  value={vitalDraft.bloodPressure}
+                  onChange={(bloodPressure) =>
+                    setVitalDraft((prev) => ({ ...prev, bloodPressure }))
+                  }
                 />
                 <VitalCard
                   label='Fre. Cardíaca'
-                  value={
-                    vitalSigns?.heartRate !== undefined &&
-                    vitalSigns?.heartRate !== null
-                      ? vitalSigns.heartRate
-                      : '—'
-                  }
+                  value={vitalDraft.heartRate}
                   suffix=' bpm'
+                  onChange={(heartRate) =>
+                    setVitalDraft((prev) => ({ ...prev, heartRate }))
+                  }
                 />
                 <VitalCard
                   label='Saturação O2'
-                  value={
-                    vitalSigns?.oxygenSaturation !== undefined &&
-                    vitalSigns?.oxygenSaturation !== null
-                      ? vitalSigns.oxygenSaturation
-                      : '—'
-                  }
+                  value={vitalDraft.oxygenSaturation}
                   suffix='%'
+                  onChange={(oxygenSaturation) =>
+                    setVitalDraft((prev) => ({
+                      ...prev,
+                      oxygenSaturation
+                    }))
+                  }
                 />
                 <VitalCard
                   label='Escala de Dor'
-                  value={
-                    attendance.painLevel !== undefined &&
-                    attendance.painLevel !== null
-                      ? attendance.painLevel
-                      : '—'
-                  }
+                  value={vitalDraft.painLevel}
                   suffix='/10'
+                  onChange={(painLevel) =>
+                    setVitalDraft((prev) => ({ ...prev, painLevel }))
+                  }
                 />
               </div>
             </section>

@@ -1,8 +1,7 @@
+import { InputText } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import { UserLevels } from '@/interfaces/IUser'
-import { useState } from 'react'
 import styles from './VitalCard.module.scss'
-import { InputText } from '@/components/FormComponents/FormComponents'
 
 interface IVitalCard {
   value: string | number
@@ -13,7 +12,8 @@ interface IVitalCard {
 
 function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
   const { user } = useAuth()
-  const [inputValue, setInputValue] = useState(String(value))
+  const stringValue =
+    value !== undefined && value !== null && value !== '—' ? String(value) : ''
   const isNurse = user?.level === UserLevels.NURSE
   const canEditVital = isNurse
 
@@ -29,9 +29,7 @@ function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setInputValue(value)
-    onChange?.(value)
+    onChange?.(e.target.value)
   }
 
   return (
@@ -39,18 +37,18 @@ function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
       {canEditVital ? (
         <InputText
           className={styles.input}
-          value={inputValue}
+          value={stringValue}
           mask={labelsToMasks()}
           onChange={handleChange}
           placeholder='0'
           suffix={suffix}
           style={{
-            width: `${Math.max(inputValue.length + 2, 1) + (suffix ? suffix.length : 0)}ch`
+            width: `${Math.max(stringValue.length + 2, 1) + (suffix ? suffix.length : 0)}ch`
           }}
         />
       ) : (
         <span className={styles.value}>
-          {value}
+          {stringValue !== '' ? stringValue : '—'}
           {suffix}
         </span>
       )}
