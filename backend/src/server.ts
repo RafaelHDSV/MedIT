@@ -38,5 +38,5 @@ app.use(`${path}/medications`, medicationRoutes)
 app.use(`${path}/symptoms-diseases`, symptomsDiseasesRoutes)
 
 app.listen(PORT, () => {
-  console.log(`Servidor está rodando! ${PORT}`)
+  console.log(`Servidor está rodando em http://localhost:${PORT}`)
 })
