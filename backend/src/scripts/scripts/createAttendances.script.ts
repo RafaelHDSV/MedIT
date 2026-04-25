@@ -683,20 +683,24 @@ const createAttendances: Script = {
 
     // ── Detect TCC members ──────────────────────────────────────────────
 
+    const TCC_SHORT_NAMES = ['brenda', 'evellin', 'jota', 'take', 'rafa', 'vieira', 'victor']
+
+    const tccEmailPattern = TCC_SHORT_NAMES.map((s) => `^\\w+\\.${s}@yopmail\\.com$`).join('|')
+
     const tccPatientIdSet = new Set(
-      (await Patient.find({ email: { $regex: '@yopmail\\.com$' } } as never)
+      (await Patient.find({ email: { $regex: tccEmailPattern, $options: 'i' } } as never)
         .select('_id')
         .lean<{ _id: Types.ObjectId }[]>())
         .map((p) => String(p._id))
     )
     const tccNurseIdSet = new Set(
-      (await Nurse.find({ email: { $regex: '@yopmail\\.com$' } } as never)
+      (await Nurse.find({ email: { $regex: tccEmailPattern, $options: 'i' } } as never)
         .select('_id')
         .lean<{ _id: Types.ObjectId }[]>())
         .map((n) => String(n._id))
     )
     const tccDoctorIdSet = new Set(
-      (await Doctor.find({ email: { $regex: '@yopmail\\.com$' } } as never)
+      (await Doctor.find({ email: { $regex: tccEmailPattern, $options: 'i' } } as never)
         .select('_id')
         .lean<{ _id: Types.ObjectId }[]>())
         .map((d) => String(d._id))
