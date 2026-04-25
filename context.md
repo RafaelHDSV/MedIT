@@ -1,4 +1,4 @@
-# MedIT — Plataforma digital de apoio à triagem e organização do fluxo hospitalar
+﻿# MedIT — Plataforma digital de apoio à triagem e organização do fluxo hospitalar
 
 Documento de visão do produto e do trabalho acadêmico, alinhado ao repositório **MedIT** (monorepo `frontend` + `backend`). Detalhes de execução, scripts e pré-requisitos estão no [`README.md`](README.md).
 
@@ -204,13 +204,17 @@ Documentação detalhada da regra de negócio do seed de atendimentos: [`backend
 
 **Atendimentos (`backend/src/scripts/scripts/createAttendances.script.ts`)**
 
-- Janela rolante ~**365 dias** (meia-noite local) até o instante da execução; `deleteMany` em atendimentos antes de inserir.
-- **Teto diário por unidade:** no máximo **30** documentos com o **mesmo dia civil** de `date` (contagem **por unidade**). Meta base diária sorteada entre **15 e 30** (`dailyTarget`); dias anteriores recebem essa quantidade de **concluídos**; o **dia atual** limita concluídos pela fração do dia já decorrida (`elapsedDayFraction`).
-- **Ativos (não concluídos):** apenas no **dia da execução** do script; `date` e âncoras de histórico permanecem no “hoje”. Quantidade derivada de uma faixa em torno de **`maxOccupancy`** (fração configurável no script), respeitando o teto do dia.
-- **Fluxo completo** no histórico: desde `onTheWay` até `completed`; estados ativos incluem `onTheWay` e `waitingTriage`; `doctorId` omitido em `onTheWay` / `waitingTriage` quando aplicável.
-- **Mínimos** por paciente/médico/enfermeiro (ex.: ≥5 concluídos): preenchidos com concluídos extras no **dia civil com menor carga** que ainda tenha vaga; se o teto impedir, o script emite aviso.
-- **Top-up global** desligado (`TARGET_MIN_TOTAL_ATTENDANCES = 0`) para não violar o teto diário.
-- **Granularidade:** o seed usa **horário local** na montagem dos dias; `getPeriodDateRange` devolve `start`/`end` como **instantes `Date` em UTC** a partir do ano/mês/dia civil, usando **“agora” em America/Sao_Paulo** quando não há `referenceDate` e âncora `YYYY-MM-DD` ao **meio-dia UTC** para estabilizar o dia da semana — ainda pode haver pequeno desvio nas bordas do dia entre seed e agregação.
+- Janela rolante de ~**365 dias** (meia-noite local) ate o instante da execucao; `deleteMany` em atendimentos antes de inserir.
+- **Equalizacao diaria (sem spikes):** meta diferenciada por tipo de dia -- dias de semana **[21-26]**, fins de semana **[14-19]** -- com jitter de +/-2 para variacao natural. Teto absoluto **30/dia** por unidade (historico); dia atual usa cap separado de **45** (inclui ativos). Volume estimado: ~**8.400/unidade**, totalizando ~**101k** com 12 unidades.
+- **Distribuicao horaria realista:** horas ponderadas -- ~80% dos atendimentos concentrados entre 8h-20h (pico em 9-11h e 14-17h); madrugada com volume minimo.
+- **Sinais vitais correlacionados com risco:** emergencia -> temp alta (38.5-40.5 C), FC elevada (110-160), SpO2 baixa (85-93%), PA alta; nao urgente -> valores dentro da normalidade. Nivel de dor (`painLevel`) tambem proporcional ao risco.
+- **Dados clinicos completos para apresentacao:** queixa principal mapeada aos sintomas do perfil de doenca (`SYMPTOM_KEY_TO_COMPLAINTS`); ~60% dos concluidos recebem prescricoes de medicamentos (com dosagem, frequencia, duracao); ~40% recebem exames prescritos; disposicao do paciente (`patientDisposition`) correlacionada ao risco; `diagnosisText`, `generalObservation`, `selfMedicated` e `symptomStartDate` preenchidos realisticamente.
+- **Membros do TCC com minimos garantidos:** deteccao por email (`{level}.{shortName}@yopmail.com`, short names: brenda, evellin, jota, take, rafa, vieira, victor). Pacientes TCC: >=**10 concluidos**; medicos TCC: >=**8 concluidos** atribuidos + **2 ativos** `IN_ATTENDANCE`; enfermeiros TCC: >=**8 concluidos** atribuidos + **1 ativo** `IN_TRIAGE`. Minimos adicionados ao dia com menor carga.
+- **Fila ativa por unidade (dia atual):** **5** `WAITING_TRIAGE` sem `nurseId` (fila do enfermeiro) + **5** `WAITING_ATTENDANCE` sem `doctorId` (fila do medico) + ativos atribuidos para profissionais TCC + ~7 extras variados (ON_THE_WAY, IN_TRIAGE, IN_ATTENDANCE, etc.).
+- **Distribuicao justa (round-robin shuffled):** pacientes, enfermeiros e medicos sao atribuidos por round-robin com shuffle previo, garantindo cobertura minima para todos sem concentrar atendimentos em poucos.
+- **Fluxo completo** no historico: desde `onTheWay` ate `completed` com timing variavel (+/-30% jitter por passo); `nurseId` omitido em `onTheWay`/`waitingTriage`; `doctorId` omitido ate `inAttendance`.
+- **Batches seguros para MongoDB Free:** lotes de **300** com `insertMany(..., { ordered: false, timestamps: false })`; processamento sequencial por unidade.
+- **Granularidade:** o seed usa horario local na montagem dos dias; `getPeriodDateRange` devolve `start`/`end` como instantes `Date` em UTC -- ainda pode haver pequeno desvio nas bordas do dia entre seed e agregacao.
 
 **Medicamentos (`backend/src/scripts/scripts/createMedications.script.ts`)**
 
@@ -427,10 +431,15 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 - **Outros scripts** — catálogo por nome em [§5.12](#512-índice-adicional-de-scripts-do-backend).
 - **Detalhe de produto:** na visão mês do gráfico, zeros nos últimos dias do mês corrente podem ser esperados (ver [§5.6](#56-dashboard-período-ocupação-e-gráficos)).
 
+**Triagem — sinais vitais editáveis pela enfermeira**
+
+- O componente `VitalCard` (`frontend/src/pages/AttendanceDetails/components/VitalCard/VitalCard.tsx`) é um componente **controlado**: o valor exibido vem diretamente da prop `value` e alterações chamam `onChange` imediatamente (sem estado interno). Apenas enfermeiros (`UserLevels.NURSE`) podem editar; demais perfis veem o valor como texto.
+- Em `AttendanceDetails.tsx`, um `vitalDraft` (state) mantém os campos editáveis de sinais vitais (temperatura, pressão arterial, frequência cardíaca, saturação O₂, nível de dor). Ao **"Concluir triagem"**, os valores são enviados junto com risco, sintomas e observações via `AttendancesFlowRepository.completeTriage`.
+- No backend, `attendanceController.ts` sanitiza e valida cada campo de sinais vitais (`parseVitalSignsFromBody`) e atualiza o documento de atendimento com `$set`/`$unset` atômicos.
+
 **Em evolução / parcial**
 
 - Algumas áreas ainda podem usar **placeholders** ou integração incompleta em relação à visão completa do TCC (ex.: relatórios exportáveis, notificações push).
-- Campos adicionais da triagem (escala de dor, frequência respiratória, etc.) podem ser expandidos além do subdocumento mínimo atual de sinais vitais.
 - **Governança multi-unidade:** hoje o administrador pode ser criado **manualmente no banco**; o nível **MedIT**, o vínculo estrito **admin ↔ uma unidade**, o **isolamento de atendimentos** (médico/enfermeiro/paciente só os seus) e a **busca em unidades parceiras** para medicamentos descrevem a **direção do produto** e devem ser reforçados nos middlewares e consultas da API.
 
 Para lista resumida do que o README declara como implementado, ver seção “Funcionalidades” em [`README.md`](README.md).
