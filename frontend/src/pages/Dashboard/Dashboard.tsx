@@ -107,6 +107,15 @@ function Dashboard() {
   }, [fetchDashboardStatus])
 
   const cardsData = useMemo(() => {
+    const highRiskPercentage =
+      dashboardStatusData?.highRisk && dashboardStatusData?.entries
+        ? (dashboardStatusData?.highRisk / dashboardStatusData?.entries) * 100
+        : 0
+    const attendedPercentage =
+      dashboardStatusData?.attended && dashboardStatusData?.entries
+        ? (dashboardStatusData?.attended / dashboardStatusData?.entries) * 100
+        : 0
+
     switch (user?.level) {
       case UserLevels.ADMIN:
         return [
@@ -127,6 +136,7 @@ function Dashboard() {
             value: dashboardStatusData?.attended
               ? masks(dashboardStatusData?.attended, 'number')
               : undefined,
+            subValue: `(${masks(attendedPercentage, 'percentage')})`,
             label: 'Atendidos'
           },
           {
@@ -149,6 +159,7 @@ function Dashboard() {
             value: dashboardStatusData?.highRisk
               ? masks(dashboardStatusData?.highRisk, 'number')
               : undefined,
+            subValue: `(${masks(highRiskPercentage, 'percentage')})`,
             label: 'Risco alto'
           }
         ]
@@ -334,11 +345,12 @@ function Dashboard() {
       />
 
       <div className={`${styles.container} ${styles[user?.level ?? '']}`}>
-        {cardsData.map(({ Icon, value, label }) => (
+        {cardsData.map(({ Icon, value, subValue, label }) => (
           <DashboardStatusCard
             key={label}
             Icon={Icon}
             value={value}
+            subValue={subValue}
             label={label}
             loading={loading}
           />

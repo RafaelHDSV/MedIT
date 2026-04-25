@@ -56,6 +56,10 @@
     flex-direction: column;
 
     .value {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+
       font-size: 2rem;
       font-weight: 600;
       color: var(--black);
@@ -65,7 +69,8 @@
       }
     }
 
-    .label {
+    .label,
+    .subValue {
       font-size: 14px;
       color: var(--gray);
       line-height: 1.3;

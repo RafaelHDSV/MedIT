@@ -97,6 +97,16 @@ const bloodPressureMask = (value?: string) => {
   return diastolic ? `${systolic}/${diastolic}` : systolic
 }
 
+const percentageMask = (value?: string) => {
+  const number = Number(value)
+  if (isNaN(number)) return ''
+  if (Number.isInteger(number)) return `${number}%`
+
+  let str = number.toFixed(2)
+  str = str.replace(/\.?0+$/, '')
+  return `${str}%`
+}
+
 export type MaskEnum =
   | 'cpf'
   | 'cellphone'
@@ -108,6 +118,7 @@ export type MaskEnum =
   | 'boolean'
   | 'temperature'
   | 'bloodPressure'
+  | 'percentage'
 
 function masks(
   value: string | number | undefined | null | object | boolean,
@@ -139,6 +150,8 @@ function masks(
       return temperatureMask(result)
     case 'bloodPressure':
       return bloodPressureMask(result)
+    case 'percentage':
+      return percentageMask(result)
     default:
       return result
   }
