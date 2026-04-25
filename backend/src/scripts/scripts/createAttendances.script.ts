@@ -1,10 +1,13 @@
 import { faker } from '@faker-js/faker'
 import { Types } from 'mongoose'
+import { toDiseaseLabelPt } from '../../constants/diseaseLabelsPt.js'
 import {
   AttendanceRisk,
-  AttendanceStatus
+  AttendanceStatus,
+  PatientDisposition,
+  type IPrescribedMedication,
+  type IVitalSigns
 } from '../../interfaces/IAttendance.js'
-import { toDiseaseLabelPt } from '../../constants/diseaseLabelsPt.js'
 import { BloodType } from '../../interfaces/IPatient.js'
 import { Attendance } from '../../models/AttendanceModel.js'
 import { Doctor } from '../../models/DoctorModel.js'
@@ -12,51 +15,71 @@ import { Nurse } from '../../models/NurseModel.js'
 import { Patient } from '../../models/PatientModel.js'
 import SymptomsDiseasesModel from '../../models/SymptomsDiseasesModel.js'
 import { Unit } from '../../models/UnitModel.js'
+import type { Script } from '../types.js'
 
-/** Janela: hoje − 364 dias até agora (≈ 1 ano rolante). */
+// ── Configuration ───────────────────────────────────────────────────────────
+
 const DAYS_BACK = 364
-
-const MIN_COMPLETED_PER_PATIENT = 5
-const MIN_COMPLETED_PER_DOCTOR = 5
-const MIN_COMPLETED_PER_NURSE = 5
-
-/** Ocupação = ativos / maxOccupancy (reduzida para não dominar o gráfico por dia). */
-const OCCUPANCY_TARGET_MIN = 0.45
-const OCCUPANCY_TARGET_MAX = 0.68
-
-/** Lotes pequenos para Atlas free / memória estável. */
 const INSERT_BATCH_SIZE = 400
 
-/** Regra suprema: máximo de documentos com o mesmo dia civil de `date` (por unidade). */
-const MAX_ATTENDANCES_PER_CALENDAR_DAY = 30
+/** Daily target ranges (equalization). */
+const WEEKDAY_TARGET_MIN = 21
+const WEEKDAY_TARGET_MAX = 26
+const WEEKEND_TARGET_MIN = 14
+const WEEKEND_TARGET_MAX = 19
+const ABSOLUTE_MAX_PER_DAY = 30
+const TODAY_TOTAL_CAP = 45
 
-/** Meta diária mínima (equalização; sorteio fica entre min e max). */
-const MIN_ATTENDANCES_PER_CALENDAR_DAY = 15
+/** TCC member minimums. */
+const TCC_MIN_COMPLETED_PER_PATIENT = 10
+const TCC_MIN_COMPLETED_PER_DOCTOR = 8
+const TCC_MIN_COMPLETED_PER_NURSE = 8
 
-/**
- * Meta global para top-up em lotes (0 = desligado: top-up quebraria o teto diário
- * da regra suprema em createAttendances.md).
- */
-const TARGET_MIN_TOTAL_ATTENDANCES = 0
+/** Unassigned queue minimums per unit. */
+const MIN_QUEUE_WAITING_TRIAGE = 5
+const MIN_QUEUE_WAITING_ATTENDANCE = 5
 
-/** Teto de segurança para não estourar cluster free acidentalmente. */
-const ABSOLUTE_MAX_TOTAL_ATTENDANCES = 180_000
+/** Each TCC professional gets at least this many assigned active attendances. */
+const TCC_ACTIVE_PER_DOCTOR = 2
+const TCC_ACTIVE_PER_NURSE = 1
 
-/** Máximo de lotes extras no top-up (400 × 400 = 160k teto teórico). */
-const MAX_TOP_UP_BATCHES = 450
-
-const riskDistribution = [
-  AttendanceRisk.NOT_URGENT,
-  AttendanceRisk.NOT_URGENT,
-  AttendanceRisk.NOT_URGENT,
-  AttendanceRisk.LESS_URGENT,
-  AttendanceRisk.LESS_URGENT,
-  AttendanceRisk.URGENT,
-  AttendanceRisk.VERY_URGENT,
-  AttendanceRisk.EMERGENCY
+const RISK_WEIGHTS: { value: AttendanceRisk; weight: number }[] = [
+  { value: AttendanceRisk.NOT_URGENT, weight: 30 },
+  { value: AttendanceRisk.LESS_URGENT, weight: 25 },
+  { value: AttendanceRisk.URGENT, weight: 20 },
+  { value: AttendanceRisk.VERY_URGENT, weight: 15 },
+  { value: AttendanceRisk.EMERGENCY, weight: 10 }
 ]
 
-const complaints = [
+const FULL_FLOW: AttendanceStatus[] = [
+  AttendanceStatus.ON_THE_WAY,
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE,
+  AttendanceStatus.ATTENDANCE_COMPLETED,
+  AttendanceStatus.COMPLETED
+]
+
+const COMPLETED_STATUSES = new Set<AttendanceStatus>([
+  AttendanceStatus.ATTENDANCE_COMPLETED,
+  AttendanceStatus.COMPLETED
+])
+
+const TRIAGE_OR_LATER = new Set<AttendanceStatus>([
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE,
+  AttendanceStatus.ATTENDANCE_COMPLETED,
+  AttendanceStatus.COMPLETED
+])
+
+// ── Static Data ─────────────────────────────────────────────────────────────
+
+const COMPLAINTS = [
   'Dor de cabeça',
   'Febre',
   'Dor abdominal',
@@ -74,28 +97,47 @@ const complaints = [
   'Diarreia'
 ]
 
-const diagnoses = [
-  'Virose',
-  'Gripe',
-  'Infecção leve',
-  'Gastrite',
-  'Sinusite',
-  'Lombalgia',
-  'Cefaleia tensional',
-  'Faringite',
-  'ITU não complicada',
-  'Exacerbação de asma leve'
-]
+const SYMPTOM_KEY_TO_COMPLAINTS: Record<string, string[]> = {
+  fever: ['Febre'],
+  headache: ['Dor de cabeça'],
+  cough: ['Tosse persistente'],
+  dryCough: ['Tosse persistente'],
+  soreThroat: ['Dor de garganta'],
+  abdominalPain: ['Dor abdominal'],
+  nausea: ['Náusea'],
+  nauseaVomiting: ['Náusea'],
+  chestPain: ['Dor no peito'],
+  shortnessOfBreath: ['Falta de ar'],
+  breathlessness: ['Falta de ar'],
+  dizziness: ['Tontura'],
+  backPain: ['Dor lombar'],
+  lowerBackPain: ['Dor lombar'],
+  dysuria: ['Ardor ao urinar'],
+  diarrhea: ['Diarreia'],
+  runnyNose: ['Coriza e espirros'],
+  sneezing: ['Coriza e espirros'],
+  fatigue: ['Febre', 'Tontura'],
+  jointPain: ['Dor no joelho'],
+  musclePain: ['Dor lombar'],
+  palpitation: ['Palpitação']
+}
 
-const TRIAGE_OR_LATER_STATUSES = new Set<AttendanceStatus>([
-  AttendanceStatus.WAITING_TRIAGE,
-  AttendanceStatus.IN_TRIAGE,
-  AttendanceStatus.TRIAGE_COMPLETED,
-  AttendanceStatus.WAITING_ATTENDANCE,
-  AttendanceStatus.IN_ATTENDANCE,
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED
-])
+const OBSERVATIONS = [
+  'Paciente orientado e cooperativo durante toda a triagem.',
+  'Relato de início dos sintomas há aproximadamente 2 a 3 dias.',
+  'Paciente refere automedicação com analgésicos comuns sem melhora.',
+  'Sinais vitais estáveis na admissão.',
+  'Paciente acompanhado por familiar durante o atendimento.',
+  'Histórico pessoal sem comorbidades relevantes.',
+  'Paciente relata episódios semelhantes nos últimos meses.',
+  'Nega uso de medicações contínuas.',
+  'Paciente relata piora progressiva do quadro.',
+  'Orientado quanto à importância de retorno em caso de piora.',
+  'Paciente calmo e colaborativo.',
+  'Exame físico sem alterações significativas.',
+  'Paciente com queixa de evolução aguda.',
+  'Encaminhado para avaliação complementar conforme protocolo.'
+]
 
 const CONDITIONS_POOL = [
   'Hipertensão',
@@ -119,34 +161,69 @@ const ALLERGIES_POOL = [
   'Sem alergias conhecidas'
 ]
 
-const COMPLETED_STATUSES: AttendanceStatus[] = [
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED
+const MEDICATION_POOL: { name: string; dosages: string[] }[] = [
+  { name: 'Dipirona', dosages: ['500mg', '1g'] },
+  { name: 'Paracetamol', dosages: ['500mg', '750mg'] },
+  { name: 'Ibuprofeno', dosages: ['400mg', '600mg'] },
+  { name: 'Amoxicilina', dosages: ['500mg', '875mg'] },
+  { name: 'Azitromicina', dosages: ['500mg'] },
+  { name: 'Omeprazol', dosages: ['20mg', '40mg'] },
+  { name: 'Dexametasona', dosages: ['4mg'] },
+  { name: 'Loratadina', dosages: ['10mg'] },
+  { name: 'Metoclopramida', dosages: ['10mg'] },
+  { name: 'Buscopan Composto', dosages: ['10mg + 250mg'] },
+  { name: 'Simeticona', dosages: ['125mg'] },
+  { name: 'Diclofenaco', dosages: ['50mg'] }
 ]
 
-const ACTIVE_STATUSES: AttendanceStatus[] = [
-  AttendanceStatus.ON_THE_WAY,
-  AttendanceStatus.WAITING_TRIAGE,
-  AttendanceStatus.IN_TRIAGE,
-  AttendanceStatus.TRIAGE_COMPLETED,
-  AttendanceStatus.WAITING_ATTENDANCE,
-  AttendanceStatus.IN_ATTENDANCE
+const MEDICATION_FREQUENCIES = [
+  '8 em 8 horas',
+  '12 em 12 horas',
+  '6 em 6 horas',
+  '1x ao dia',
+  '2x ao dia'
+]
+const MEDICATION_DURATIONS = ['3 dias', '5 dias', '7 dias', '10 dias', '14 dias']
+
+const EXAM_POOL = [
+  'Hemograma completo',
+  'PCR',
+  'VHS',
+  'Glicemia de jejum',
+  'Ureia e creatinina',
+  'TGO e TGP',
+  'Raio-X de tórax',
+  'ECG',
+  'Urina tipo I',
+  'Ultrassonografia abdominal'
 ]
 
-const FULL_FLOW: AttendanceStatus[] = [
-  AttendanceStatus.ON_THE_WAY,
-  AttendanceStatus.WAITING_TRIAGE,
-  AttendanceStatus.IN_TRIAGE,
-  AttendanceStatus.TRIAGE_COMPLETED,
-  AttendanceStatus.WAITING_ATTENDANCE,
-  AttendanceStatus.IN_ATTENDANCE,
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED
+const DIAGNOSIS_TEXTS = [
+  'Quadro clínico compatível com o diagnóstico proposto. Paciente orientado sobre tratamento.',
+  'Evolução favorável após medicação inicial. Alta com orientações.',
+  'Paciente estável, sem sinais de gravidade. Acompanhamento ambulatorial recomendado.',
+  'Quadro autolimitado. Prescrito tratamento sintomático e repouso.',
+  'Melhora significativa após hidratação e medicação. Alta médica.',
+  'Exames complementares sem alterações relevantes. Seguimento em UBS.'
 ]
+
+const FALLBACK_DIAGNOSES = [
+  'Virose',
+  'Gripe',
+  'Infecção leve',
+  'Gastrite',
+  'Sinusite',
+  'Lombalgia',
+  'Cefaleia tensional',
+  'Faringite',
+  'ITU não complicada',
+  'Exacerbação de asma leve'
+]
+
+// ── Types ───────────────────────────────────────────────────────────────────
 
 type UnitPool = {
   unitId: Types.ObjectId
-  /** Capacidade nominal (leitos/vagas) — o dashboard usa isso na ocupação. */
   maxOccupancy: number
   unitName: string
   patients: Types.ObjectId[]
@@ -169,21 +246,20 @@ type AttendanceSeed = {
   doctorId?: Types.ObjectId
   medicationsIds: Types.ObjectId[]
   changesHistory: { status: AttendanceStatus; changedAt: Date }[]
-  vitalSigns: ReturnType<typeof randomVitalSigns>
+  vitalSigns: IVitalSigns
   iaConditionId: Types.ObjectId
   createdAt: Date
   updatedAt: Date
   painLevel?: number
   selfMedicated?: boolean
+  symptomStartDate?: Date
   symptoms?: string[]
   generalObservation?: string
   conditions?: string[]
   allergies?: string[]
-}
-
-type SymptomsDiseaseSeedRow = {
-  disease: string
-  symptoms?: Record<string, number> | Map<string, number>
+  patientDisposition?: PatientDisposition
+  prescribedMedications?: IPrescribedMedication[]
+  prescribedExams?: string[]
 }
 
 type DiseaseProfile = {
@@ -191,162 +267,104 @@ type DiseaseProfile = {
   positiveSymptoms: string[]
 }
 
-function randomVitalSigns() {
-  return {
-    bloodPressure: `${faker.number.int({ min: 90, max: 180 })}/${faker.number.int({ min: 60, max: 110 })}`,
-    heartRate: faker.number.int({ min: 60, max: 130 }),
-    temperature: faker.number.float({
-      min: 36,
-      max: 39.5,
-      fractionDigits: 1
-    }),
-    oxygenSaturation: faker.number.int({ min: 88, max: 100 })
-  }
+type SymptomsDiseaseSeedRow = {
+  disease: string
+  symptoms?: Record<string, number> | Map<string, number>
 }
 
-function riskStepMinutes(risk: AttendanceRisk): number {
-  const timeMultiplier: Record<AttendanceRisk, number> = {
-    [AttendanceRisk.EMERGENCY]: 5,
-    [AttendanceRisk.VERY_URGENT]: 10,
-    [AttendanceRisk.URGENT]: 15,
-    [AttendanceRisk.LESS_URGENT]: 25,
-    [AttendanceRisk.NOT_URGENT]: 40
+// ── Weighted Random Helpers ─────────────────────────────────────────────────
+
+function weightedPick<T>(items: { value: T; weight: number }[]): T {
+  const total = items.reduce((s, i) => s + i.weight, 0)
+  let r = Math.random() * total
+  for (const item of items) {
+    r -= item.weight
+    if (r <= 0) return item.value
   }
-  return timeMultiplier[risk] ?? 20
+  return items[items.length - 1].value
 }
 
-function buildCompletedFlow(
-  startedAt: Date,
-  risk: AttendanceRisk
-): {
-  status: AttendanceStatus
-  history: { status: AttendanceStatus; changedAt: Date }[]
-} {
-  const stepMs = riskStepMinutes(risk) * 60_000
-  return {
-    status: AttendanceStatus.COMPLETED,
-    history: FULL_FLOW.map((status, i) => ({
-      status,
-      changedAt: new Date(startedAt.getTime() + i * stepMs)
-    }))
-  }
+function pickRisk(): AttendanceRisk {
+  return weightedPick(RISK_WEIGHTS)
 }
 
 /**
- * Ativo com última transição perto de `endTime`; `date` = início (entrada),
- * espalhado no tempo — evita concentrar todos os ativos no “dia atual” nos gráficos.
+ * Weighted hour: heavier 8h–20h, lighter overnight.
+ * Realistic for an emergency room.
  */
-function buildActiveFlowAnchored(
-  endTime: Date,
-  risk: AttendanceRisk,
-  targetStatus: AttendanceStatus
-): {
-  status: AttendanceStatus
-  date: Date
-  history: { status: AttendanceStatus; changedAt: Date }[]
-} {
-  const idx = FULL_FLOW.indexOf(targetStatus)
-  const lastIdx =
-    idx >= 0 ? idx : FULL_FLOW.indexOf(AttendanceStatus.IN_ATTENDANCE)
-  const stepMs = riskStepMinutes(risk) * 60_000
-  const slice = FULL_FLOW.slice(0, lastIdx + 1)
-  const startedAt = new Date(endTime.getTime() - lastIdx * stepMs)
-  const history = slice.map((status, i) => ({
-    status,
-    changedAt: new Date(startedAt.getTime() + i * stepMs)
-  }))
-  return {
-    status: slice[slice.length - 1],
-    date: startedAt,
-    history
+const HOUR_WEIGHTS = [
+  1, 1, 1, 1, 1, 2, 3, 5, 10, 12, 12, 11, 8, 9, 11, 12, 11, 10, 8, 7, 5, 4,
+  2, 1
+]
+
+function randomWeightedHour(): number {
+  const items = HOUR_WEIGHTS.map((w, h) => ({ value: h, weight: w }))
+  return weightedPick(items)
+}
+
+// ── Vital Signs (risk-correlated) ───────────────────────────────────────────
+
+function vitalSignsForRisk(risk: AttendanceRisk): IVitalSigns {
+  switch (risk) {
+    case AttendanceRisk.EMERGENCY:
+      return {
+        temperature: faker.number.float({ min: 38.5, max: 40.5, fractionDigits: 1 }),
+        heartRate: faker.number.int({ min: 110, max: 160 }),
+        oxygenSaturation: faker.number.int({ min: 85, max: 93 }),
+        bloodPressure: `${faker.number.int({ min: 160, max: 200 })}/${faker.number.int({ min: 90, max: 120 })}`
+      }
+    case AttendanceRisk.VERY_URGENT:
+      return {
+        temperature: faker.number.float({ min: 38.0, max: 39.5, fractionDigits: 1 }),
+        heartRate: faker.number.int({ min: 95, max: 135 }),
+        oxygenSaturation: faker.number.int({ min: 90, max: 95 }),
+        bloodPressure: `${faker.number.int({ min: 140, max: 180 })}/${faker.number.int({ min: 80, max: 110 })}`
+      }
+    case AttendanceRisk.URGENT:
+      return {
+        temperature: faker.number.float({ min: 37.5, max: 39.0, fractionDigits: 1 }),
+        heartRate: faker.number.int({ min: 85, max: 115 }),
+        oxygenSaturation: faker.number.int({ min: 93, max: 97 }),
+        bloodPressure: `${faker.number.int({ min: 130, max: 160 })}/${faker.number.int({ min: 75, max: 100 })}`
+      }
+    case AttendanceRisk.LESS_URGENT:
+      return {
+        temperature: faker.number.float({ min: 36.5, max: 38.0, fractionDigits: 1 }),
+        heartRate: faker.number.int({ min: 70, max: 100 }),
+        oxygenSaturation: faker.number.int({ min: 95, max: 99 }),
+        bloodPressure: `${faker.number.int({ min: 110, max: 140 })}/${faker.number.int({ min: 65, max: 90 })}`
+      }
+    default:
+      return {
+        temperature: faker.number.float({ min: 36.0, max: 37.5, fractionDigits: 1 }),
+        heartRate: faker.number.int({ min: 60, max: 90 }),
+        oxygenSaturation: faker.number.int({ min: 96, max: 100 }),
+        bloodPressure: `${faker.number.int({ min: 100, max: 130 })}/${faker.number.int({ min: 60, max: 85 })}`
+      }
   }
 }
 
-function windowBounds(now: Date): { start: Date; end: Date } {
-  const end = new Date(now)
-  const start = new Date(now)
-  start.setHours(0, 0, 0, 0)
-  start.setDate(start.getDate() - DAYS_BACK)
-  return { start, end: end }
+function painLevelForRisk(risk: AttendanceRisk): number {
+  switch (risk) {
+    case AttendanceRisk.EMERGENCY:
+      return faker.number.int({ min: 7, max: 10 })
+    case AttendanceRisk.VERY_URGENT:
+      return faker.number.int({ min: 5, max: 9 })
+    case AttendanceRisk.URGENT:
+      return faker.number.int({ min: 4, max: 7 })
+    case AttendanceRisk.LESS_URGENT:
+      return faker.number.int({ min: 2, max: 5 })
+    default:
+      return faker.number.int({ min: 0, max: 3 })
+  }
 }
 
-/** Concluído com `date` caindo no dia civil `dayStart` (00h local). */
-function randomCompletedStartOnCalendarDay(
-  dayStart: Date,
-  windowEnd: Date,
-  risk: AttendanceRisk
-): Date {
-  const stepMs = riskStepMinutes(risk) * 60_000
-  const flowSpan = (FULL_FLOW.length - 1) * stepMs
-  const dayEnd = new Date(dayStart)
-  dayEnd.setDate(dayEnd.getDate() + 1)
-  const endCap =
-    Math.min(dayEnd.getTime(), windowEnd.getTime(), Date.now()) -
-    flowSpan -
-    60_000
-  const startMs = dayStart.getTime()
-  if (endCap <= startMs) {
-    return new Date(startMs + 60_000)
-  }
-  return new Date(
-    faker.number.int({ min: Math.floor(startMs), max: Math.floor(endCap) })
-  )
-}
+// ── Time Helpers ────────────────────────────────────────────────────────────
 
 function startOfLocalDay(d: Date): Date {
   const x = new Date(d)
   x.setHours(0, 0, 0, 0)
   return x
-}
-
-/**
- * Fração do dia civil já decorrida (evita tratar "hoje" como 24h cheias no seed).
- */
-function elapsedDayFraction(now: Date): number {
-  const sod = startOfLocalDay(now)
-  const raw = (now.getTime() - sod.getTime()) / 86_400_000
-  return Math.min(1, Math.max(0.1, raw))
-}
-
-/** Meia-noite de um dia aleatório entre o início da janela e hoje (para top-up repartido). */
-function randomCalendarDayStartInWindow(windowStart: Date, now: Date): Date {
-  const a = startOfLocalDay(windowStart)
-  const b = startOfLocalDay(now)
-  const span = Math.max(0, Math.floor((b.getTime() - a.getTime()) / 86_400_000))
-  const off = faker.number.int({ min: 0, max: span })
-  const d = new Date(a)
-  d.setDate(d.getDate() + off)
-  return d
-}
-
-/**
- * Última transição do fluxo ativo dentro do dia `dayStart`, com início (`date`)
- * no mesmo dia civil — reparte ativos no eixo temporal do dashboard.
- */
-function randomActiveEndTimeOnCalendarDay(
-  dayStart: Date,
-  windowStart: Date,
-  now: Date,
-  risk: AttendanceRisk,
-  targetStatus: AttendanceStatus
-): Date | null {
-  const idx = FULL_FLOW.indexOf(targetStatus)
-  const lastIdx =
-    idx >= 0 ? idx : FULL_FLOW.indexOf(AttendanceStatus.IN_ATTENDANCE)
-  const stepMs = riskStepMinutes(risk) * 60_000
-  const flowMs = lastIdx * stepMs
-
-  const dayEnd = new Date(dayStart)
-  dayEnd.setDate(dayEnd.getDate() + 1)
-
-  const day0 = startOfLocalDay(dayStart).getTime()
-  const ws0 = startOfLocalDay(windowStart).getTime()
-  const endMin = Math.max(day0, ws0) + flowMs + 60_000
-  const endMax = Math.min(dayEnd.getTime(), now.getTime()) - 2 * 60_000
-  if (endMax <= endMin) return null
-  return new Date(
-    faker.number.int({ min: Math.floor(endMin), max: Math.floor(endMax) })
-  )
 }
 
 function isSameCalendarDay(a: Date, b: Date): boolean {
@@ -357,28 +375,88 @@ function isSameCalendarDay(a: Date, b: Date): boolean {
   )
 }
 
-function maybeClinicalExtras(): Pick<
-  AttendanceSeed,
-  'painLevel' | 'selfMedicated' | 'generalObservation'
-> {
-  if (!faker.datatype.boolean({ probability: 0.4 })) return {}
-  return {
-    painLevel: faker.number.int({ min: 0, max: 10 }),
-    selfMedicated: faker.datatype.boolean(),
-    generalObservation: faker.datatype.boolean()
-      ? faker.helpers.arrayElement([
-          'Paciente orientado e cooperativo.',
-          'Histórico sem alergias medicamentosas relevantes.',
-          'Sinais vitais estáveis na chegada.',
-          'Relato de evolução há 2–3 dias.'
-        ])
-      : undefined
-  }
+function dayKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function hasReachedTriage(status: AttendanceStatus): boolean {
-  return TRIAGE_OR_LATER_STATUSES.has(status)
+function isWeekend(d: Date): boolean {
+  const dow = d.getDay()
+  return dow === 0 || dow === 6
 }
+
+function elapsedDayFraction(now: Date): number {
+  const sod = startOfLocalDay(now)
+  return Math.min(1, Math.max(0.1, (now.getTime() - sod.getTime()) / 86_400_000))
+}
+
+function riskStepMinutes(risk: AttendanceRisk): number {
+  const base: Record<AttendanceRisk, number> = {
+    [AttendanceRisk.EMERGENCY]: 5,
+    [AttendanceRisk.VERY_URGENT]: 10,
+    [AttendanceRisk.URGENT]: 15,
+    [AttendanceRisk.LESS_URGENT]: 25,
+    [AttendanceRisk.NOT_URGENT]: 35
+  }
+  return base[risk] ?? 20
+}
+
+function randomDateOnCalendarDay(dayStart: Date, now: Date): Date {
+  const hour = randomWeightedHour()
+  const minute = faker.number.int({ min: 0, max: 59 })
+  const second = faker.number.int({ min: 0, max: 59 })
+
+  const d = new Date(dayStart)
+  d.setHours(hour, minute, second, 0)
+
+  if (d.getTime() > now.getTime()) {
+    d.setTime(now.getTime() - faker.number.int({ min: 60_000, max: 600_000 }))
+  }
+  return d
+}
+
+// ── Flow Builders ───────────────────────────────────────────────────────────
+
+function buildCompletedFlow(
+  startedAt: Date,
+  risk: AttendanceRisk
+): { status: AttendanceStatus; history: { status: AttendanceStatus; changedAt: Date }[] } {
+  const baseStepMs = riskStepMinutes(risk) * 60_000
+  let cursor = startedAt.getTime()
+
+  const history = FULL_FLOW.map((status) => {
+    const entry = { status, changedAt: new Date(cursor) }
+    const jitter = faker.number.float({ min: 0.7, max: 1.3, fractionDigits: 2 })
+    cursor += Math.max(60_000, Math.round(baseStepMs * jitter))
+    return entry
+  })
+
+  return { status: AttendanceStatus.COMPLETED, history }
+}
+
+function buildActiveFlow(
+  endTime: Date,
+  risk: AttendanceRisk,
+  targetStatus: AttendanceStatus
+): {
+  status: AttendanceStatus
+  date: Date
+  history: { status: AttendanceStatus; changedAt: Date }[]
+} {
+  const idx = FULL_FLOW.indexOf(targetStatus)
+  const lastIdx = idx >= 0 ? idx : FULL_FLOW.indexOf(AttendanceStatus.IN_ATTENDANCE)
+  const baseStepMs = riskStepMinutes(risk) * 60_000
+  const slice = FULL_FLOW.slice(0, lastIdx + 1)
+  const startedAt = new Date(endTime.getTime() - lastIdx * baseStepMs)
+
+  const history = slice.map((status, i) => ({
+    status,
+    changedAt: new Date(startedAt.getTime() + i * baseStepMs)
+  }))
+
+  return { status: slice[slice.length - 1], date: startedAt, history }
+}
+
+// ── Clinical Data Builders ──────────────────────────────────────────────────
 
 function getPositiveSymptomKeys(
   symptoms: SymptomsDiseaseSeedRow['symptoms']
@@ -391,94 +469,140 @@ function getPositiveSymptomKeys(
     .map(([key]) => key)
 }
 
-function buildClinicalSnapshot({
-  status,
-  diseaseProfile
-}: {
-  status: AttendanceStatus
-  diseaseProfile?: DiseaseProfile
-}): Pick<
-  AttendanceSeed,
-  | 'symptoms'
-  | 'conditions'
-  | 'allergies'
-  | 'painLevel'
-  | 'selfMedicated'
-  | 'generalObservation'
-> {
-  const reachedTriage = hasReachedTriage(status)
-  const extras = maybeClinicalExtras()
+function pickComplaintFromSymptoms(symptoms: string[]): string {
+  const candidates: string[] = []
+  for (const s of symptoms) {
+    const mapped = SYMPTOM_KEY_TO_COMPLAINTS[s]
+    if (mapped) candidates.push(...mapped)
+  }
+  if (candidates.length > 0) {
+    return faker.helpers.arrayElement([...new Set(candidates)])
+  }
+  return faker.helpers.arrayElement(COMPLAINTS)
+}
 
-  let symptoms: string[] | undefined
+function buildSymptoms(
+  status: AttendanceStatus,
+  diseaseProfile?: DiseaseProfile
+): string[] | undefined {
+  const reachedTriage = TRIAGE_OR_LATER.has(status)
   if (reachedTriage) {
-    const pool = diseaseProfile?.positiveSymptoms?.length
-      ? diseaseProfile.positiveSymptoms
-      : ['fever', 'fatigue', 'headache']
-    const minSymptoms = Math.min(2, pool.length)
-    const maxSymptoms = Math.min(6, pool.length)
-    symptoms = faker.helpers.arrayElements(pool, {
-      min: Math.max(1, minSymptoms),
-      max: Math.max(1, maxSymptoms)
+    const pool =
+      diseaseProfile?.positiveSymptoms?.length
+        ? diseaseProfile.positiveSymptoms
+        : ['fever', 'fatigue', 'headache']
+    return faker.helpers.arrayElements(pool, {
+      min: Math.max(1, Math.min(2, pool.length)),
+      max: Math.max(1, Math.min(6, pool.length))
     })
-  } else if (faker.datatype.boolean({ probability: 0.25 })) {
-    const pool = diseaseProfile?.positiveSymptoms?.length
-      ? diseaseProfile.positiveSymptoms
-      : ['fever', 'dryCough']
-    symptoms = faker.helpers.arrayElements(pool, {
+  }
+  if (faker.datatype.boolean({ probability: 0.25 })) {
+    const pool =
+      diseaseProfile?.positiveSymptoms?.length
+        ? diseaseProfile.positiveSymptoms
+        : ['fever', 'dryCough']
+    return faker.helpers.arrayElements(pool, {
       min: 1,
       max: Math.min(3, pool.length)
     })
   }
+  return undefined
+}
 
-  const conditions = faker.helpers.arrayElements(CONDITIONS_POOL, {
-    min: reachedTriage ? 1 : 0,
-    max: reachedTriage ? 2 : 1
-  })
-  const allergies = faker.helpers.arrayElements(ALLERGIES_POOL, {
-    min: reachedTriage ? 1 : 0,
-    max: reachedTriage ? 2 : 1
-  })
+function buildPrescriptions(risk: AttendanceRisk): {
+  prescribedMedications?: IPrescribedMedication[]
+  prescribedExams?: string[]
+  patientDisposition?: PatientDisposition
+  diagnosisText?: string
+} {
+  if (!faker.datatype.boolean({ probability: 0.6 })) return {}
+
+  const medCount = faker.number.int({ min: 1, max: 3 })
+  const used = new Set<string>()
+  const meds: IPrescribedMedication[] = []
+  for (let i = 0; i < medCount; i++) {
+    const entry = faker.helpers.arrayElement(MEDICATION_POOL)
+    if (used.has(entry.name)) continue
+    used.add(entry.name)
+    meds.push({
+      name: entry.name,
+      dosage: faker.helpers.arrayElement(entry.dosages),
+      frequency: faker.helpers.arrayElement(MEDICATION_FREQUENCIES),
+      duration: faker.helpers.arrayElement(MEDICATION_DURATIONS)
+    })
+  }
+
+  const exams = faker.datatype.boolean({ probability: 0.4 })
+    ? faker.helpers.arrayElements(EXAM_POOL, { min: 1, max: 3 })
+    : undefined
+
+  const isHighRisk =
+    risk === AttendanceRisk.EMERGENCY || risk === AttendanceRisk.VERY_URGENT
+
+  const dispositionPool = [
+    PatientDisposition.HOME,
+    PatientDisposition.HOME,
+    PatientDisposition.HOME,
+    PatientDisposition.HOME,
+    PatientDisposition.HOME,
+    PatientDisposition.OBSERVATION,
+    PatientDisposition.OBSERVATION,
+    PatientDisposition.HOSPITALIZED,
+    ...(isHighRisk
+      ? [PatientDisposition.HOSPITALIZED, PatientDisposition.TRANSFER]
+      : [])
+  ]
 
   return {
-    ...extras,
-    symptoms: symptoms && symptoms.length > 0 ? symptoms : undefined,
-    conditions: conditions.length > 0 ? conditions : undefined,
-    allergies: allergies.length > 0 ? allergies : undefined
+    prescribedMedications: meds.length > 0 ? meds : undefined,
+    prescribedExams: exams,
+    patientDisposition: faker.helpers.arrayElement(dispositionPool),
+    diagnosisText: faker.datatype.boolean({ probability: 0.3 })
+      ? faker.helpers.arrayElement(DIAGNOSIS_TEXTS)
+      : undefined
   }
 }
 
-/** Prefixos do fluxo real (inclui a caminho e aguardando triagem). */
-function pickActiveTargetStatus(): AttendanceStatus {
-  return faker.helpers.arrayElement([
-    AttendanceStatus.ON_THE_WAY,
-    AttendanceStatus.WAITING_TRIAGE,
-    AttendanceStatus.IN_TRIAGE,
-    AttendanceStatus.TRIAGE_COMPLETED,
-    AttendanceStatus.WAITING_ATTENDANCE,
-    AttendanceStatus.IN_ATTENDANCE
-  ])
+// ── Document Assembly ───────────────────────────────────────────────────────
+
+function assembleSeed(
+  base: Omit<
+    AttendanceSeed,
+    'medicationsIds' | 'iaConditionId' | 'vitalSigns' | 'painLevel'
+  > &
+    Partial<Pick<AttendanceSeed, 'vitalSigns' | 'painLevel'>>
+): AttendanceSeed {
+  return {
+    ...base,
+    vitalSigns: base.vitalSigns ?? vitalSignsForRisk(base.risk),
+    painLevel: base.painLevel ?? painLevelForRisk(base.risk),
+    medicationsIds: [],
+    iaConditionId: new Types.ObjectId()
+  }
 }
 
-async function insertBatched(docs: AttendanceSeed[]) {
+// ── Batch Insert ────────────────────────────────────────────────────────────
+
+async function insertBatched(docs: AttendanceSeed[]): Promise<void> {
   for (let i = 0; i < docs.length; i += INSERT_BATCH_SIZE) {
     const chunk = docs.slice(i, i + INSERT_BATCH_SIZE)
     await Attendance.insertMany(chunk, { ordered: false, timestamps: false })
   }
 }
 
-async function ensurePatients(pool: UnitPool, minCount: number): Promise<void> {
+// ── Patient Pool Management ─────────────────────────────────────────────────
+
+async function ensurePatients(
+  pool: UnitPool,
+  minCount: number
+): Promise<void> {
   while (pool.patients.length < minCount) {
     const firstName = faker.person.firstName()
     const lastName = faker.person.lastName()
-    const cpf = faker.string.numeric(11)
     const created = (await Patient.create({
       name: `${firstName} ${lastName}`,
-      cpf,
-      email: faker.internet.email({
-        firstName,
-        lastName,
-        provider: 'seed.med.br'
-      }),
+      cpf: faker.string.numeric(11),
+      email: faker.internet.email({ firstName, lastName, provider: 'seed.med.br' }),
       password: 'fastpass',
       gender: faker.helpers.arrayElement(['male', 'female']),
       birthDate: faker.date.birthdate({ min: 18, max: 80, mode: 'age' }),
@@ -491,44 +615,31 @@ async function ensurePatients(pool: UnitPool, minCount: number): Promise<void> {
       allergies: []
     } as never)) as { _id: Types.ObjectId }
     pool.patients.push(new Types.ObjectId(String(created._id)))
-    console.log(
-      `   ➕ Paciente extra criado na unidade ${pool.unitId} (pool mínimo)`
-    )
   }
 }
 
-function seedDoc(
-  args: Omit<AttendanceSeed, 'medicationsIds' | 'iaConditionId'> & {
-    medicationsIds?: Types.ObjectId[]
-    iaConditionId?: Types.ObjectId
-  } & Partial<
-      Pick<
-        AttendanceSeed,
-        'painLevel' | 'selfMedicated' | 'symptoms' | 'generalObservation'
-      >
-    >
-): AttendanceSeed {
-  return {
-    ...args,
-    medicationsIds: args.medicationsIds ?? [],
-    iaConditionId: args.iaConditionId ?? new Types.ObjectId()
-  }
-}
+// ── Main Script ─────────────────────────────────────────────────────────────
 
-const createAttendances = {
+const createAttendances: Script = {
   name: 'create-attendances',
   description:
-    'Ano rolante: equalização 15–30/dia (teto 30), fluxo completo; ativos só no dia atual; lotes',
+    'Ano rolante equalizado; sinais vitais correlacionados; mínimos TCC; fila ativa; lotes seguros',
+
   async run() {
     console.log('❌ Removendo atendimentos existentes…')
     const deleted = await Attendance.deleteMany()
     console.log(`   ${deleted.deletedCount} documento(s) removido(s)`)
 
     const now = new Date()
-    const { start: windowStart, end: windowEnd } = windowBounds(now)
+    const windowStart = startOfLocalDay(now)
+    windowStart.setDate(windowStart.getDate() - DAYS_BACK)
+    const windowEnd = new Date(now)
+
     console.log(
       `📅 Janela: ${windowStart.toISOString().slice(0, 10)} → ${windowEnd.toISOString().slice(0, 10)} (~${DAYS_BACK + 1} dias)`
     )
+
+    // ── Load units ──────────────────────────────────────────────────────
 
     const units = await Unit.find()
     if (!units.length) {
@@ -550,19 +661,14 @@ const createAttendances = {
 
       if (!patients.length || !nurses.length || !doctors.length) {
         console.warn(
-          `⚠️  Unidade "${unit.name}" sem pacientes/enfermeiros/médicos — ignorada`
+          `⚠️  Unidade "${(unit as { name?: string }).name}" sem pacientes/enfermeiros/médicos — ignorada`
         )
         continue
       }
 
-      const maxOcc = Math.max(
-        1,
-        Number((unit as { maxOccupancy?: number }).maxOccupancy) || 50
-      )
-
       unitPools.push({
         unitId: new Types.ObjectId(String(unit._id)),
-        maxOccupancy: maxOcc,
+        maxOccupancy: Math.max(1, Number((unit as { maxOccupancy?: number }).maxOccupancy) || 50),
         unitName: String((unit as { name?: string }).name ?? ''),
         patients: patients.map((p) => p._id),
         nurses: nurses.map((n) => n._id),
@@ -575,75 +681,227 @@ const createAttendances = {
       process.exit(1)
     }
 
+    // ── Detect TCC members ──────────────────────────────────────────────
+
+    const tccPatientIdSet = new Set(
+      (await Patient.find({ email: { $regex: '@yopmail\\.com$' } } as never)
+        .select('_id')
+        .lean<{ _id: Types.ObjectId }[]>())
+        .map((p) => String(p._id))
+    )
+    const tccNurseIdSet = new Set(
+      (await Nurse.find({ email: { $regex: '@yopmail\\.com$' } } as never)
+        .select('_id')
+        .lean<{ _id: Types.ObjectId }[]>())
+        .map((n) => String(n._id))
+    )
+    const tccDoctorIdSet = new Set(
+      (await Doctor.find({ email: { $regex: '@yopmail\\.com$' } } as never)
+        .select('_id')
+        .lean<{ _id: Types.ObjectId }[]>())
+        .map((d) => String(d._id))
+    )
+
+    console.log(
+      `🎓 TCC: ${tccPatientIdSet.size} pacientes, ${tccNurseIdSet.size} enfermeiros, ${tccDoctorIdSet.size} médicos`
+    )
+
+    // ── Load disease profiles ───────────────────────────────────────────
+
     const symptomsDiseases = await SymptomsDiseasesModel.find()
       .select('disease symptoms')
       .lean<SymptomsDiseaseSeedRow[]>()
+
     const diseaseProfiles: DiseaseProfile[] = symptomsDiseases
       .map((row) => ({
         disease: row.disease,
         positiveSymptoms: getPositiveSymptomKeys(row.symptoms)
       }))
-      .filter((row) => row.disease && row.positiveSymptoms.length > 0)
+      .filter((r) => r.disease && r.positiveSymptoms.length > 0)
 
     const pickDiseaseProfile = (): DiseaseProfile | undefined =>
       diseaseProfiles.length
         ? (faker.helpers.arrayElement(diseaseProfiles) as DiseaseProfile)
         : undefined
 
-    console.log(`✅ ${unitPools.length} unidade(s) válida(s)\n`)
+    console.log(`✅ ${unitPools.length} unidade(s), ${diseaseProfiles.length} perfis de doença\n`)
+
+    // ── Build calendar days ─────────────────────────────────────────────
+
+    const calendarDays: Date[] = []
+    {
+      const c = new Date(windowStart)
+      c.setHours(0, 0, 0, 0)
+      const last = startOfLocalDay(now)
+      while (c.getTime() <= last.getTime()) {
+        calendarDays.push(new Date(c))
+        c.setDate(c.getDate() + 1)
+      }
+    }
+
+    const todayStart = startOfLocalDay(now)
 
     let attendanceNumber = 1
 
+    // ── Per-unit generation ─────────────────────────────────────────────
+
     for (const pool of unitPools) {
-      console.log(`🏥 Unidade ${pool.unitId}`)
+      console.log(`🏥 Unidade "${pool.unitName}" (${pool.unitId})`)
 
-      const D = pool.doctors.length
-      const N = pool.nurses.length
-      const P = pool.patients.length
+      const unitTccPatients = pool.patients.filter((id) => tccPatientIdSet.has(String(id)))
+      const unitTccNurses = pool.nurses.filter((id) => tccNurseIdSet.has(String(id)))
+      const unitTccDoctors = pool.doctors.filter((id) => tccDoctorIdSet.has(String(id)))
 
-      const occLow = Math.max(
-        1,
-        Math.ceil(pool.maxOccupancy * OCCUPANCY_TARGET_MIN)
-      )
-      const occHigh = Math.max(
-        occLow,
-        Math.floor(pool.maxOccupancy * OCCUPANCY_TARGET_MAX)
-      )
+      // Shuffle pools for natural distribution while keeping round-robin fairness
+      const shuffledPatients = faker.helpers.shuffle([...pool.patients])
+      const shuffledNurses = faker.helpers.shuffle([...pool.nurses])
+      const shuffledDoctors = faker.helpers.shuffle([...pool.doctors])
 
-      const pickDoctor = () =>
-        faker.helpers.arrayElement(pool.doctors) as Types.ObjectId
-      const pickNurse = () =>
-        faker.helpers.arrayElement(pool.nurses) as Types.ObjectId
+      let pIdx = 0
+      let nIdx = 0
+      let dIdx = 0
+      const nextPatient = () => shuffledPatients[pIdx++ % shuffledPatients.length]
+      const nextNurse = () => shuffledNurses[nIdx++ % shuffledNurses.length]
+      const nextDoctor = () => shuffledDoctors[dIdx++ % shuffledDoctors.length]
 
-      const dayKey = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      // Tracking
+      const countByDay = new Map<string, number>()
+      const completedByPatient = new Map<string, number>()
+      const completedByDoctor = new Map<string, number>()
+      const completedByNurse = new Map<string, number>()
+      const unitDocs: AttendanceSeed[] = []
 
-      const todayStart = startOfLocalDay(now)
-      const calendarDays: Date[] = []
-      {
-        const c = new Date(windowStart)
-        c.setHours(0, 0, 0, 0)
-        const last = startOfLocalDay(now)
-        while (c.getTime() <= last.getTime()) {
-          calendarDays.push(new Date(c))
-          c.setDate(c.getDate() + 1)
+      for (const d of calendarDays) countByDay.set(dayKey(d), 0)
+
+      const roomOnDay = (d: Date) =>
+        ABSOLUTE_MAX_PER_DAY - (countByDay.get(dayKey(d)) ?? 0)
+
+      const incCounters = (doc: AttendanceSeed) => {
+        const k = dayKey(doc.date)
+        countByDay.set(k, (countByDay.get(k) ?? 0) + 1)
+        if (COMPLETED_STATUSES.has(doc.status)) {
+          const pid = String(doc.patientId)
+          completedByPatient.set(pid, (completedByPatient.get(pid) ?? 0) + 1)
+          if (doc.doctorId) {
+            const did = String(doc.doctorId)
+            completedByDoctor.set(did, (completedByDoctor.get(did) ?? 0) + 1)
+          }
+          if (doc.nurseId) {
+            const nid = String(doc.nurseId)
+            completedByNurse.set(nid, (completedByNurse.get(nid) ?? 0) + 1)
+          }
         }
       }
 
-      const countByDay = new Map<string, number>()
-      for (const d of calendarDays) countByDay.set(dayKey(d), 0)
+      const pushCompleted = (
+        dayStart: Date,
+        opts: {
+          patientId: Types.ObjectId
+          nurseId: Types.ObjectId
+          doctorId: Types.ObjectId
+        }
+      ): boolean => {
+        if (roomOnDay(dayStart) <= 0) return false
 
-      const roomOn = (d: Date) =>
-        MAX_ATTENDANCES_PER_CALENDAR_DAY - (countByDay.get(dayKey(d)) ?? 0)
+        const risk = pickRisk()
+        const startDate = randomDateOnCalendarDay(dayStart, windowEnd)
+        const diseaseProfile = pickDiseaseProfile()
+        const { status, history } = buildCompletedFlow(startDate, risk)
+        const symptoms = buildSymptoms(status, diseaseProfile)
+        const complaint =
+          symptoms?.length ? pickComplaintFromSymptoms(symptoms) : faker.helpers.arrayElement(COMPLAINTS)
 
-      const unitDocs: AttendanceSeed[] = []
+        const diagnosis = diseaseProfile?.disease
+          ? toDiseaseLabelPt(diseaseProfile.disease)
+          : faker.helpers.arrayElement(FALLBACK_DIAGNOSES)
 
-      const pickDayWithLeastLoad = (): Date | null => {
+        const selfMedicated = faker.datatype.boolean({
+          probability: risk === AttendanceRisk.NOT_URGENT ? 0.4 : 0.15
+        })
+
+        const lastHistoryAt = history[history.length - 1]?.changedAt ?? startDate
+
+        const doc = assembleSeed({
+          number: attendanceNumber++,
+          complaint,
+          diagnosisKey: diseaseProfile?.disease,
+          diagnosis,
+          date: startDate,
+          risk,
+          status,
+          unitId: pool.unitId,
+          patientId: opts.patientId,
+          nurseId: opts.nurseId,
+          doctorId: opts.doctorId,
+          changesHistory: history,
+          createdAt: startDate,
+          updatedAt: lastHistoryAt,
+          symptoms,
+          selfMedicated,
+          symptomStartDate: new Date(
+            startDate.getTime() - faker.number.int({ min: 1, max: 7 }) * 86_400_000
+          ),
+          generalObservation: faker.datatype.boolean({ probability: 0.35 })
+            ? faker.helpers.arrayElement(OBSERVATIONS)
+            : undefined,
+          conditions: faker.helpers.arrayElements(CONDITIONS_POOL, {
+            min: 0,
+            max: 2
+          }),
+          allergies: faker.helpers.arrayElements(ALLERGIES_POOL, {
+            min: 0,
+            max: 2
+          }),
+          ...buildPrescriptions(risk)
+        })
+
+        unitDocs.push(doc)
+        incCounters(doc)
+        return true
+      }
+
+      // ── Phase 1: fill calendar days with completed attendances ────────
+
+      for (const day of calendarDays) {
+        const isToday = isSameCalendarDay(day, todayStart)
+        let target: number
+
+        if (isToday) {
+          const fraction = elapsedDayFraction(now)
+          const base = isWeekend(day) ? WEEKEND_TARGET_MIN : WEEKDAY_TARGET_MIN
+          target = Math.max(3, Math.ceil(base * fraction))
+        } else {
+          const min = isWeekend(day) ? WEEKEND_TARGET_MIN : WEEKDAY_TARGET_MIN
+          const max = isWeekend(day) ? WEEKEND_TARGET_MAX : WEEKDAY_TARGET_MAX
+          const mid = (min + max) / 2
+          const jitter = faker.number.int({ min: -2, max: 2 })
+          target = Math.max(min, Math.min(max, Math.round(mid + jitter)))
+        }
+
+        for (let i = 0; i < target; i++) {
+          if (
+            !pushCompleted(day, {
+              patientId: nextPatient(),
+              nurseId: nextNurse(),
+              doctorId: nextDoctor()
+            })
+          ) {
+            break
+          }
+        }
+      }
+
+      console.log(`   📊 Fase 1 (diário): ${unitDocs.length} atendimentos concluídos`)
+
+      // ── Phase 2: TCC minimums ────────────────────────────────────────
+
+      const pickLeastLoadedDay = (): Date | null => {
         let best: Date | null = null
         let bestCount = Infinity
         for (const d of calendarDays) {
+          if (isSameCalendarDay(d, todayStart)) continue
           const c = countByDay.get(dayKey(d)) ?? 0
-          if (c >= MAX_ATTENDANCES_PER_CALENDAR_DAY) continue
+          if (c >= ABSOLUTE_MAX_PER_DAY) continue
           if (c < bestCount) {
             bestCount = c
             best = d
@@ -652,379 +910,203 @@ const createAttendances = {
         return best
       }
 
-      const pushCompletedOnDay = (
-        dayStart: Date,
-        opts?: {
+      let tccAdded = 0
+
+      for (const patientId of unitTccPatients) {
+        while ((completedByPatient.get(String(patientId)) ?? 0) < TCC_MIN_COMPLETED_PER_PATIENT) {
+          const day = pickLeastLoadedDay()
+          if (!day) break
+          if (!pushCompleted(day, { patientId, nurseId: nextNurse(), doctorId: nextDoctor() })) break
+          tccAdded++
+        }
+      }
+
+      for (const doctorId of unitTccDoctors) {
+        while ((completedByDoctor.get(String(doctorId)) ?? 0) < TCC_MIN_COMPLETED_PER_DOCTOR) {
+          const day = pickLeastLoadedDay()
+          if (!day) break
+          if (!pushCompleted(day, { patientId: nextPatient(), nurseId: nextNurse(), doctorId })) break
+          tccAdded++
+        }
+      }
+
+      for (const nurseId of unitTccNurses) {
+        while ((completedByNurse.get(String(nurseId)) ?? 0) < TCC_MIN_COMPLETED_PER_NURSE) {
+          const day = pickLeastLoadedDay()
+          if (!day) break
+          if (!pushCompleted(day, { patientId: nextPatient(), doctorId: nextDoctor(), nurseId })) break
+          tccAdded++
+        }
+      }
+
+      if (tccAdded > 0) {
+        console.log(`   🎓 Fase 2 (TCC mínimos): +${tccAdded} concluídos`)
+      }
+
+      // ── Phase 3: today's active attendances ──────────────────────────
+
+      const todayKey = dayKey(todayStart)
+      const todayCurrentCount = () => countByDay.get(todayKey) ?? 0
+
+      const pushActive = (
+        targetStatus: AttendanceStatus,
+        opts: {
           patientId?: Types.ObjectId
           nurseId?: Types.ObjectId
           doctorId?: Types.ObjectId
-        }
+        } = {}
       ): boolean => {
-        const k = dayKey(dayStart)
-        if ((countByDay.get(k) ?? 0) >= MAX_ATTENDANCES_PER_CALENDAR_DAY) {
+        if (todayCurrentCount() >= TODAY_TOTAL_CAP) return false
+
+        const risk = pickRisk()
+        const minutesAgo = faker.number.int({ min: 10, max: 180 })
+        const endTime = new Date(now.getTime() - minutesAgo * 60_000)
+        const built = buildActiveFlow(endTime, risk, targetStatus)
+
+        if (built.date.getTime() < todayStart.getTime()) {
           return false
         }
-        const risk = faker.helpers.arrayElement(riskDistribution)
-        const date = randomCompletedStartOnCalendarDay(
-          dayStart,
-          windowEnd,
-          risk
-        )
-        const nurseId = opts?.nurseId ?? pickNurse()
-        const doctorId = opts?.doctorId ?? pickDoctor()
-        const patientId =
-          opts?.patientId ?? faker.helpers.arrayElement(pool.patients)
-        const { status, history } = buildCompletedFlow(date, risk)
+
+        const patientId = opts.patientId ?? nextPatient()
         const diseaseProfile = pickDiseaseProfile()
-        const diagnosis = diseaseProfile?.disease
-          ? toDiseaseLabelPt(diseaseProfile.disease)
-          : faker.helpers.arrayElement(diagnoses)
-        unitDocs.push(
-          seedDoc({
-            number: attendanceNumber++,
-            complaint: faker.helpers.arrayElement(complaints),
-            diagnosisKey: diseaseProfile?.disease,
-            diagnosis,
-            date,
-            risk,
-            status,
-            unitId: pool.unitId,
-            patientId,
-            nurseId,
-            doctorId,
-            changesHistory: history,
-            vitalSigns: randomVitalSigns(),
-            createdAt: date,
-            updatedAt: date,
-            ...buildClinicalSnapshot({
-              status,
-              diseaseProfile
-            })
-          })
-        )
-        countByDay.set(k, (countByDay.get(k) ?? 0) + 1)
+        const symptoms = buildSymptoms(built.status, diseaseProfile)
+        const complaint =
+          symptoms?.length ? pickComplaintFromSymptoms(symptoms) : faker.helpers.arrayElement(COMPLAINTS)
+
+        const needsNurse =
+          built.status !== AttendanceStatus.ON_THE_WAY &&
+          built.status !== AttendanceStatus.WAITING_TRIAGE
+        const needsDoctor =
+          built.status === AttendanceStatus.IN_ATTENDANCE ||
+          built.status === AttendanceStatus.ATTENDANCE_COMPLETED
+
+        const nurseId =
+          needsNurse ? (opts.nurseId ?? nextNurse()) : undefined
+        const doctorId =
+          needsDoctor ? (opts.doctorId ?? nextDoctor()) : undefined
+
+        const lastAt = built.history[built.history.length - 1]?.changedAt ?? endTime
+
+        const selfMedicated = faker.datatype.boolean({
+          probability: risk === AttendanceRisk.NOT_URGENT ? 0.4 : 0.15
+        })
+
+        const doc = assembleSeed({
+          number: attendanceNumber++,
+          complaint,
+          date: built.date,
+          risk,
+          status: built.status,
+          unitId: pool.unitId,
+          patientId,
+          nurseId,
+          doctorId,
+          changesHistory: built.history,
+          createdAt: built.date,
+          updatedAt: lastAt,
+          symptoms,
+          selfMedicated,
+          symptomStartDate: new Date(
+            built.date.getTime() - faker.number.int({ min: 1, max: 5 }) * 86_400_000
+          ),
+          generalObservation: faker.datatype.boolean({ probability: 0.3 })
+            ? faker.helpers.arrayElement(OBSERVATIONS)
+            : undefined,
+          conditions: faker.helpers.arrayElements(CONDITIONS_POOL, { min: 0, max: 2 }),
+          allergies: faker.helpers.arrayElements(ALLERGIES_POOL, { min: 0, max: 2 })
+        })
+
+        unitDocs.push(doc)
+        countByDay.set(todayKey, todayCurrentCount() + 1)
         return true
       }
 
-      const dailyTarget = faker.number.int({
-        min: MIN_ATTENDANCES_PER_CALENDAR_DAY,
-        max: MAX_ATTENDANCES_PER_CALENDAR_DAY
-      })
-
-      for (const dayStart of calendarDays) {
-        if (isSameCalendarDay(dayStart, now)) {
-          const capToday = Math.max(
-            4,
-            Math.ceil(dailyTarget * elapsedDayFraction(now))
-          )
-          const nToday = Math.min(dailyTarget, capToday, roomOn(dayStart))
-          for (let i = 0; i < nToday; i++) {
-            if (!pushCompletedOnDay(dayStart)) break
+      const usedActivePatients = new Set<string>()
+      const safeNextPatient = () => {
+        for (let attempt = 0; attempt < pool.patients.length; attempt++) {
+          const id = nextPatient()
+          if (!usedActivePatients.has(String(id))) {
+            usedActivePatients.add(String(id))
+            return id
           }
-          continue
         }
+        return nextPatient()
+      }
 
-        let added = 0
-        while (added < dailyTarget && roomOn(dayStart) > 0) {
-          if (!pushCompletedOnDay(dayStart)) break
-          added++
+      if (pool.patients.length < MIN_QUEUE_WAITING_TRIAGE + MIN_QUEUE_WAITING_ATTENDANCE + 20) {
+        await ensurePatients(pool, MIN_QUEUE_WAITING_TRIAGE + MIN_QUEUE_WAITING_ATTENDANCE + 30)
+      }
+
+      let activeCount = 0
+
+      for (let i = 0; i < MIN_QUEUE_WAITING_TRIAGE; i++) {
+        if (pushActive(AttendanceStatus.WAITING_TRIAGE, { patientId: safeNextPatient() })) {
+          activeCount++
         }
       }
 
-      let activeGoal = faker.number.int({ min: occLow, max: occHigh })
-      activeGoal = Math.min(activeGoal, Math.max(0, roomOn(todayStart)))
-      if (pool.patients.length < activeGoal) {
-        console.log(
-          `   Ajustando pool de pacientes (${P} → ≥${activeGoal} para ativos do dia)`
-        )
-        await ensurePatients(pool, activeGoal)
+      for (let i = 0; i < MIN_QUEUE_WAITING_ATTENDANCE; i++) {
+        if (pushActive(AttendanceStatus.WAITING_ATTENDANCE, { patientId: safeNextPatient() })) {
+          activeCount++
+        }
       }
 
-      const usedPatients = new Set<string>()
-      let row = 0
-      while (row < activeGoal) {
-        const patient = pool.patients.find(
-          (p) => !usedPatients.has(p.toString())
-        )
-        if (!patient) {
-          await ensurePatients(pool, pool.patients.length + activeGoal)
-          continue
-        }
-        usedPatients.add(patient.toString())
-
-        const doctorId = pool.doctors[row % D]
-        const nurseId = pool.nurses[row % N]
-        const risk = faker.helpers.arrayElement(riskDistribution)
-        const target = pickActiveTargetStatus()
-        const diseaseProfile = pickDiseaseProfile()
-
-        let status: AttendanceStatus = AttendanceStatus.IN_TRIAGE
-        let history: { status: AttendanceStatus; changedAt: Date }[] = []
-        let date: Date = new Date(todayStart.getTime() + 60_000)
-        let lastAt: Date = new Date(now)
-        let ok = false
-        for (let attempt = 0; attempt < 50 && !ok; attempt++) {
-          const endTime = randomActiveEndTimeOnCalendarDay(
-            todayStart,
-            windowStart,
-            now,
-            risk,
-            target
-          )
-          if (!endTime) continue
-          const built = buildActiveFlowAnchored(endTime, risk, target)
+      for (const doctorId of unitTccDoctors) {
+        for (let i = 0; i < TCC_ACTIVE_PER_DOCTOR; i++) {
           if (
-            built.date.getTime() >= todayStart.getTime() &&
-            built.date.getTime() < todayStart.getTime() + 86_400_000
-          ) {
-            status = built.status
-            history = built.history
-            date = built.date
-            lastAt = history[history.length - 1]?.changedAt ?? endTime
-            ok = true
-          }
-        }
-        if (!ok) {
-          const fbRisk = AttendanceRisk.NOT_URGENT
-          const fbTarget = AttendanceStatus.IN_ATTENDANCE
-          for (let attempt = 0; attempt < 80 && !ok; attempt++) {
-            const endTime = randomActiveEndTimeOnCalendarDay(
-              todayStart,
-              windowStart,
-              now,
-              fbRisk,
-              fbTarget
-            )
-            if (!endTime) continue
-            const built = buildActiveFlowAnchored(endTime, fbRisk, fbTarget)
-            if (
-              built.date.getTime() >= todayStart.getTime() &&
-              built.date.getTime() < todayStart.getTime() + 86_400_000
-            ) {
-              status = built.status
-              history = built.history
-              date = built.date
-              lastAt = history[history.length - 1]?.changedAt ?? endTime
-              ok = true
-            }
-          }
-        }
-        if (!ok) {
-          const endTime = new Date(
-            now.getTime() - faker.number.int({ min: 15, max: 120 }) * 60_000
-          )
-          const built = buildActiveFlowAnchored(endTime, risk, target)
-          status = built.status
-          history = built.history
-          date = built.date
-          lastAt = history[history.length - 1]?.changedAt ?? endTime
-        }
-
-        if (roomOn(todayStart) <= 0) break
-
-        const needsDoctor =
-          status !== AttendanceStatus.WAITING_TRIAGE &&
-          status !== AttendanceStatus.ON_THE_WAY
-
-        unitDocs.push(
-          seedDoc({
-            number: attendanceNumber++,
-            complaint: faker.helpers.arrayElement(complaints),
-            diagnosis: undefined,
-            date,
-            risk,
-            status,
-            unitId: pool.unitId,
-            patientId: patient,
-            nurseId,
-            doctorId: needsDoctor ? doctorId : undefined,
-            changesHistory: history,
-            vitalSigns: randomVitalSigns(),
-            createdAt: date,
-            updatedAt: lastAt,
-            ...buildClinicalSnapshot({
-              status,
-              diseaseProfile
-            })
-          })
-        )
-        countByDay.set(
-          dayKey(todayStart),
-          (countByDay.get(dayKey(todayStart)) ?? 0) + 1
-        )
-        row++
-      }
-
-      const countCompletedForPatient = (id: Types.ObjectId) =>
-        unitDocs.filter(
-          (a) =>
-            a.patientId.toString() === id.toString() &&
-            COMPLETED_STATUSES.includes(a.status)
-        ).length
-
-      const countCompletedForDoctor = (id: Types.ObjectId) =>
-        unitDocs.filter(
-          (a) =>
-            a.doctorId?.toString() === id.toString() &&
-            COMPLETED_STATUSES.includes(a.status)
-        ).length
-
-      const countCompletedForNurse = (id: Types.ObjectId) =>
-        unitDocs.filter(
-          (a) =>
-            a.nurseId?.toString() === id.toString() &&
-            COMPLETED_STATUSES.includes(a.status)
-        ).length
-
-      // --- Mínimos por paciente / médico / enfermeiro (respeitando teto diário) ---
-      for (const patientId of pool.patients) {
-        while (
-          countCompletedForPatient(patientId) < MIN_COMPLETED_PER_PATIENT
-        ) {
-          const dayPick = pickDayWithLeastLoad()
-          if (!dayPick) {
-            console.warn(
-              `   ⚠️  Teto ${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia: não coube o mínimo por paciente (${patientId}).`
-            )
-            break
-          }
-          if (
-            !pushCompletedOnDay(dayPick, {
-              patientId,
-              nurseId: pickNurse(),
-              doctorId: pickDoctor()
+            pushActive(AttendanceStatus.IN_ATTENDANCE, {
+              patientId: safeNextPatient(),
+              nurseId: nextNurse(),
+              doctorId
             })
           ) {
-            break
+            activeCount++
           }
         }
       }
 
-      for (const doctorId of pool.doctors) {
-        while (countCompletedForDoctor(doctorId) < MIN_COMPLETED_PER_DOCTOR) {
-          const dayPick = pickDayWithLeastLoad()
-          if (!dayPick) {
-            console.warn(
-              `   ⚠️  Teto ${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia: não coube o mínimo por médico (${doctorId}).`
-            )
-            break
-          }
+      for (const nurseId of unitTccNurses) {
+        for (let i = 0; i < TCC_ACTIVE_PER_NURSE; i++) {
           if (
-            !pushCompletedOnDay(dayPick, {
-              doctorId,
-              patientId: faker.helpers.arrayElement(pool.patients),
-              nurseId: pickNurse()
+            pushActive(AttendanceStatus.IN_TRIAGE, {
+              patientId: safeNextPatient(),
+              nurseId
             })
           ) {
-            break
+            activeCount++
           }
         }
       }
 
-      for (const nurseId of pool.nurses) {
-        while (countCompletedForNurse(nurseId) < MIN_COMPLETED_PER_NURSE) {
-          const dayPick = pickDayWithLeastLoad()
-          if (!dayPick) {
-            console.warn(
-              `   ⚠️  Teto ${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia: não coube o mínimo por enfermeiro (${nurseId}).`
-            )
-            break
-          }
-          if (
-            !pushCompletedOnDay(dayPick, {
-              nurseId,
-              patientId: faker.helpers.arrayElement(pool.patients),
-              doctorId: pickDoctor()
-            })
-          ) {
-            break
-          }
+      const extraActiveTargets: AttendanceStatus[] = [
+        AttendanceStatus.ON_THE_WAY,
+        AttendanceStatus.ON_THE_WAY,
+        AttendanceStatus.WAITING_TRIAGE,
+        AttendanceStatus.IN_TRIAGE,
+        AttendanceStatus.WAITING_ATTENDANCE,
+        AttendanceStatus.IN_ATTENDANCE,
+        AttendanceStatus.IN_ATTENDANCE
+      ]
+      for (const st of extraActiveTargets) {
+        if (pushActive(st, { patientId: safeNextPatient() })) {
+          activeCount++
         }
       }
 
-      const baseCount = unitDocs.length
-      console.log(
-        `   → Unidade: ${baseCount} atendimento(s) (≤${MAX_ATTENDANCES_PER_CALENDAR_DAY}/dia, meta diária ${dailyTarget}) — inserindo…`
-      )
+      console.log(`   🔄 Fase 3 (ativos hoje): ${activeCount} atendimentos em andamento`)
+      console.log(`   → Total unidade: ${unitDocs.length} — inserindo em lotes de ${INSERT_BATCH_SIZE}…`)
+
       await insertBatched(unitDocs)
     }
 
-    let total = await Attendance.countDocuments()
+    // ── Summary ─────────────────────────────────────────────────────────
 
-    if (
-      total < TARGET_MIN_TOTAL_ATTENDANCES &&
-      total < ABSOLUTE_MAX_TOTAL_ATTENDANCES
-    ) {
-      console.log(
-        `\n↪ Top-up: ${total} < meta ${TARGET_MIN_TOTAL_ATTENDANCES} — lotes de ${INSERT_BATCH_SIZE}…`
-      )
-      let topUpRound = 0
-      while (
-        total < TARGET_MIN_TOTAL_ATTENDANCES &&
-        total < ABSOLUTE_MAX_TOTAL_ATTENDANCES &&
-        topUpRound < MAX_TOP_UP_BATCHES
-      ) {
-        const buf: AttendanceSeed[] = []
-        for (let k = 0; k < INSERT_BATCH_SIZE; k++) {
-          const pool = unitPools[(topUpRound + k) % unitPools.length]
-          const risk = faker.helpers.arrayElement(riskDistribution)
-          const dayPick = randomCalendarDayStartInWindow(windowStart, now)
-          const date = randomCompletedStartOnCalendarDay(
-            dayPick,
-            windowEnd,
-            risk
-          )
-          const patientId = faker.helpers.arrayElement(pool.patients)
-          const nurseId = faker.helpers.arrayElement(
-            pool.nurses
-          ) as Types.ObjectId
-          const doctorId = faker.helpers.arrayElement(
-            pool.doctors
-          ) as Types.ObjectId
-          const { status, history } = buildCompletedFlow(date, risk)
-          const diseaseProfile = pickDiseaseProfile()
-          const diagnosis = diseaseProfile?.disease
-            ? toDiseaseLabelPt(diseaseProfile.disease)
-            : faker.helpers.arrayElement(diagnoses)
-          buf.push(
-            seedDoc({
-              number: attendanceNumber++,
-              complaint: faker.helpers.arrayElement(complaints),
-              diagnosisKey: diseaseProfile?.disease,
-              diagnosis,
-              date,
-              risk,
-              status,
-              unitId: pool.unitId,
-              patientId,
-              nurseId,
-              doctorId,
-              changesHistory: history,
-              vitalSigns: randomVitalSigns(),
-              createdAt: date,
-              updatedAt: date,
-              ...buildClinicalSnapshot({
-                status,
-                diseaseProfile
-              })
-            })
-          )
-        }
-        await insertBatched(buf)
-        topUpRound++
-        total = await Attendance.countDocuments()
-      }
-      console.log(`↪ Top-up: ${topUpRound} lote(s); total agora: ${total}`)
-    }
-
+    const total = await Attendance.countDocuments()
     console.log(`\n✅ Total no banco: ${total} atendimento(s)`)
 
     for (const pool of unitPools) {
-      const unit = units.find(
-        (u) => u._id.toString() === pool.unitId.toString()
-      )
       const n = await Attendance.countDocuments({ unitId: pool.unitId })
-      console.log(`   ${unit?.name ?? pool.unitId}: ${n}`)
+      console.log(`   ${pool.unitName}: ${n}`)
     }
 
     console.log('\n✅ Script concluído.')
