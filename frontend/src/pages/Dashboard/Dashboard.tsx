@@ -136,7 +136,7 @@ function Dashboard() {
             value: dashboardStatusData?.attended
               ? masks(dashboardStatusData?.attended, 'number')
               : undefined,
-            subValue: `(${masks(attendedPercentage, 'percentage')})`,
+            subValue: masks(attendedPercentage, 'percentage'),
             label: 'Atendidos'
           },
           {
@@ -159,7 +159,7 @@ function Dashboard() {
             value: dashboardStatusData?.highRisk
               ? masks(dashboardStatusData?.highRisk, 'number')
               : undefined,
-            subValue: `(${masks(highRiskPercentage, 'percentage')})`,
+            subValue: masks(highRiskPercentage, 'percentage'),
             label: 'Risco alto'
           }
         ]
