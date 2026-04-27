@@ -208,7 +208,12 @@ function AttendanceDetails() {
           SymptomsDiseasesRepository.getSymptomOptions(),
           SymptomsDiseasesRepository.getDiseaseOptions()
         ])
-        setSymptomOptions(symptomsResponse.data.symptoms ?? [])
+        setSymptomOptions(
+          symptomsResponse.data.symptoms.sort(
+            (a: ISymptomOption, b: ISymptomOption) =>
+              a.label.localeCompare(b.label)
+          ) ?? []
+        )
         setDiseaseOptions(diseasesResponse.data.diseases ?? [])
       } catch (err) {
         handleApiError({

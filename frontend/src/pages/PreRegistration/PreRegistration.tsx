@@ -39,7 +39,12 @@ function PreRegistration() {
     async function fetchSymptomOptions() {
       try {
         const response = await SymptomsDiseasesRepository.getSymptomOptions()
-        setSymptomOptions(response?.data?.symptoms ?? [])
+        setSymptomOptions(
+          response?.data?.symptoms.sort(
+            (a: ISymptomOption, b: ISymptomOption) =>
+              a.label.localeCompare(b.label)
+          ) ?? []
+        )
       } catch (err) {
         handleApiError({
           err,
