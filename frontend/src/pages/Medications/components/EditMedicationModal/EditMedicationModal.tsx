@@ -5,29 +5,29 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { handleApiError } from '@/helpers/handleApiError'
-import {
-  MedicationCategoriesLabels,
-  type IMedicationFormErrors,
-  type MedicationFormValues
-} from '@/interfaces/IMedication'
+import type { IMedication, IMedicationFormErrors } from '@/interfaces/IMedication'
+import { MedicationCategoriesLabels } from '@/interfaces/IMedication'
+import type { MedicationFormValues } from '@/interfaces/IMedication'
 import MedicationsRepository from '@/repositories/MedicationsRepository'
 import { Form, InputNumber, message, Modal, Radio } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
-import styles from './MedicationModal.module.scss'
+import styles from '../MedicationModal/MedicationModal.module.scss'
 
-interface IMedicationModalProps {
+interface IEditMedicationModalProps {
+  medication?: IMedication
   isModalOpen: boolean
   setIsModalOpen: (bool: boolean) => void
   fetchMedications: () => void
 }
 
-function MedicationModal({
+function EditMedicationModal({
+  medication,
   isModalOpen,
   setIsModalOpen,
   fetchMedications
-}: IMedicationModalProps) {
+}: IEditMedicationModalProps) {
   const { unitId } = useParams()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
@@ -35,24 +35,39 @@ function MedicationModal({
 
   const inputHeight = '2.5rem'
 
-  async function onFinish(values: MedicationFormValues) {
+  useEffect(() => {
+    if (!medication || !isModalOpen) return
+
+    form.setFieldsValue({
+      name: medication.name,
+      category: medication.category,
+      description: medication.description,
+      stockQuantity: medication.stockQuantity,
+      requiresPrescription: medication.requiresPrescription
+    })
+  }, [medication, isModalOpen, form])
+
+  async function onFinish(values: Omit<MedicationFormValues, 'unitId'>) {
+    if (!medication?._id) return
+
     setLoading(true)
 
     try {
-      await MedicationsRepository.createMedication({
+      await MedicationsRepository.editMedication({
+        medicationId: String(medication._id),
         body: {
           ...values,
           unitId: String(unitId),
-          requiresPrescription: values.requiresPrescription ? true : false
+          requiresPrescription: Boolean(values.requiresPrescription)
         }
       })
-      message.success('Medicamento cadastrado com sucesso!')
+      message.success('Medicamento atualizado com sucesso!')
       handleCancelModal()
       fetchMedications()
     } catch (err) {
       handleApiError({
         err,
-        defaultMessage: 'Erro ao cadastrar medicamento',
+        defaultMessage: 'Erro ao editar medicamento',
         setFieldErrors
       })
     } finally {
@@ -74,7 +89,7 @@ function MedicationModal({
       footer={null}
       centered
     >
-      <h2>Cadastrar medicamento</h2>
+      <h2>Editar medicamento</h2>
 
       <Form
         form={form}
@@ -163,7 +178,6 @@ function MedicationModal({
             help={fieldErrors.requiresPrescription}
           >
             <Radio.Group
-              defaultValue={false}
               options={[
                 { label: 'Sim', value: true },
                 { label: 'Não', value: false }
@@ -175,7 +189,7 @@ function MedicationModal({
         <footer className={styles.footer}>
           <FormItem>
             <Button htmlType='submit' loading={loading}>
-              Cadastrar
+              Salvar alterações
             </Button>
           </FormItem>
         </footer>
@@ -184,4 +198,4 @@ function MedicationModal({
   )
 }
 
-export default MedicationModal
+export default EditMedicationModal

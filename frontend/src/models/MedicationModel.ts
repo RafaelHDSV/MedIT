@@ -11,6 +11,12 @@ const MedicationModel = {
     if (!userLevel) return false
     const invalidLevels: UserLevels[] = [UserLevels.PATIENT]
     return !invalidLevels.includes(userLevel as UserLevels)
+  },
+
+  canEditMedication: (userLevel?: UserLevels) => {
+    if (!userLevel) return false
+    const invalidLevels: UserLevels[] = [UserLevels.PATIENT]
+    return !invalidLevels.includes(userLevel as UserLevels)
   }
 }
 

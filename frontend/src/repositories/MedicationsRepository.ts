@@ -14,6 +14,18 @@ class MedicationsRepository extends Repository {
       return this.api.post(`${this.path}`, body)
     })
   }
+
+  async editMedication({
+    medicationId,
+    body
+  }: {
+    medicationId: string
+    body: MedicationFormValues
+  }) {
+    return this.handle(() => {
+      return this.api.put(`${this.path}/${medicationId}`, body)
+    })
+  }
 }
 
 export default new MedicationsRepository({

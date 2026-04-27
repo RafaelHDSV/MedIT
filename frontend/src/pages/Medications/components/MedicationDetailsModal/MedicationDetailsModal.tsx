@@ -1,4 +1,5 @@
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
+import Button from '@/components/Button/Button'
 import Tag from '@/components/Tag/Tag'
 import { useAuth } from '@/hooks/useAuth'
 import {
@@ -33,14 +34,17 @@ function PrescriptionAlert({
 interface IMedicationDetailsModal {
   selectedMedication?: IMedication
   setSelectedMedication?: (medication?: IMedication) => void
+  onEditMedication?: (medication: IMedication) => void
 }
 
 function MedicationDetailsModal({
   selectedMedication,
-  setSelectedMedication
+  setSelectedMedication,
+  onEditMedication
 }: IMedicationDetailsModal) {
   const { user } = useAuth()
   const canSeeUnits = MedicationModel.canSeeUnits(user?.level)
+  const canEditMedication = MedicationModel.canEditMedication(user?.level)
   const isOpen = Boolean(selectedMedication)
 
   function resetMedication() {
@@ -54,8 +58,11 @@ function MedicationDetailsModal({
     description,
     category,
     availabilityStatus,
-    stockQuantity
+    stockQuantity,
+    unitId
   } = selectedMedication
+  const canEditSelectedMedication =
+    canEditMedication && String(user?.unitId) === String(unitId)
 
   return (
     <Modal
@@ -96,6 +103,15 @@ function MedicationDetailsModal({
                 : `${masks(stockQuantity, 'number')} unidade${stockQuantity > 1 ? 's' : ''}`
             }
           />
+        )}
+
+        {canEditSelectedMedication && (
+          <Button
+            className='w-100 mt-1'
+            onClick={() => onEditMedication?.(selectedMedication)}
+          >
+            Editar medicamento
+          </Button>
         )}
       </div>
     </Modal>

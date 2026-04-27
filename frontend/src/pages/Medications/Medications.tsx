@@ -23,8 +23,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
 import MedicationDetailsModal from './components/MedicationDetailsModal/MedicationDetailsModal'
+import EditMedicationModal from './components/EditMedicationModal/EditMedicationModal'
 import MedicationModal from './components/MedicationModal/MedicationModal'
 import { MEDICATIONS_STATUS_MAP } from './medicationsConstants'
+import { message } from 'antd'
 
 function Medications() {
   const { user } = useAuth()
@@ -37,7 +39,11 @@ function Medications() {
   const [medicationsLoading, setMedicationsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedMedication, setSelectedMedication] = useState<
+    IMedication | undefined
+  >()
+  const [editingMedication, setEditingMedication] = useState<
     IMedication | undefined
   >()
 
@@ -98,6 +104,17 @@ function Medications() {
 
   function handleGoBack() {
     navigate(ROUTES.UNITS.path)
+  }
+
+  function handleEditMedication(medication: IMedication) {
+    if (String(user?.unitId) !== String(medication.unitId)) {
+      message.warning('Você só pode editar medicamentos da sua unidade.')
+      return
+    }
+
+    setEditingMedication(medication)
+    setSelectedMedication(undefined)
+    setIsEditModalOpen(true)
   }
 
   function content() {
@@ -163,6 +180,17 @@ function Medications() {
       <MedicationDetailsModal
         selectedMedication={selectedMedication}
         setSelectedMedication={setSelectedMedication}
+        onEditMedication={handleEditMedication}
+      />
+
+      <EditMedicationModal
+        medication={editingMedication}
+        isModalOpen={isEditModalOpen}
+        setIsModalOpen={(value) => {
+          setIsEditModalOpen(value)
+          if (!value) setEditingMedication(undefined)
+        }}
+        fetchMedications={fetchMedications}
       />
 
       <section>
