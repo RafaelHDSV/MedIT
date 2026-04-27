@@ -391,11 +391,11 @@ function elapsedDayFraction(now: Date): number {
 
 function riskStepMinutes(risk: AttendanceRisk): number {
   const base: Record<AttendanceRisk, number> = {
-    [AttendanceRisk.EMERGENCY]: 5,
-    [AttendanceRisk.VERY_URGENT]: 10,
-    [AttendanceRisk.URGENT]: 15,
-    [AttendanceRisk.LESS_URGENT]: 25,
-    [AttendanceRisk.NOT_URGENT]: 35
+    [AttendanceRisk.EMERGENCY]: 4,
+    [AttendanceRisk.VERY_URGENT]: 8,
+    [AttendanceRisk.URGENT]: 12,
+    [AttendanceRisk.LESS_URGENT]: 20,
+    [AttendanceRisk.NOT_URGENT]: 28
   }
   return base[risk] ?? 20
 }
