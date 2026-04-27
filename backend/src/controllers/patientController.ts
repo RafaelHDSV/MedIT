@@ -4,7 +4,7 @@ import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserGender, UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
-import { toCanonicalDiseaseKey } from '../constants/diseaseLabelsPt.js'
+import { toCanonicalDiseaseKey, toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import { Patient } from '../models/PatientModel.js'
 import { Unit } from '../models/UnitModel.js'
 import User from '../models/UserModel.js'
@@ -309,7 +309,6 @@ export const getAttendances = async (req: Request, res: Response) => {
           doctorId: 1,
           medicationsIds: 1,
           vitalSigns: 1,
-          iaConditionId: 1,
           diagnosisKey: 1,
           diagnosis: 1,
           createdAt: 1,
@@ -357,7 +356,9 @@ export const getAttendances = async (req: Request, res: Response) => {
 
         return {
           ...attendance,
-          iaTopSuggestion: topSuggestion,
+          iaTopSuggestion: topSuggestion
+            ? toDiseaseLabelPt(topSuggestion)
+            : undefined,
           isIaTopSuggestionMatchDiagnosis:
             Boolean(topSuggestion) &&
             toCanonicalDiseaseKey(topSuggestion) ===

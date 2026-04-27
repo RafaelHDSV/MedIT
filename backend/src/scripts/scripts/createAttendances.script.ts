@@ -247,7 +247,6 @@ type AttendanceSeed = {
   medicationsIds: Types.ObjectId[]
   changesHistory: { status: AttendanceStatus; changedAt: Date }[]
   vitalSigns: IVitalSigns
-  iaConditionId: Types.ObjectId
   createdAt: Date
   updatedAt: Date
   painLevel?: number
@@ -568,7 +567,7 @@ function buildPrescriptions(risk: AttendanceRisk): {
 function assembleSeed(
   base: Omit<
     AttendanceSeed,
-    'medicationsIds' | 'iaConditionId' | 'vitalSigns' | 'painLevel'
+    'medicationsIds' | 'vitalSigns' | 'painLevel'
   > &
     Partial<Pick<AttendanceSeed, 'vitalSigns' | 'painLevel'>>
 ): AttendanceSeed {
@@ -576,8 +575,7 @@ function assembleSeed(
     ...base,
     vitalSigns: base.vitalSigns ?? vitalSignsForRisk(base.risk),
     painLevel: base.painLevel ?? painLevelForRisk(base.risk),
-    medicationsIds: [],
-    iaConditionId: new Types.ObjectId()
+    medicationsIds: []
   }
 }
 

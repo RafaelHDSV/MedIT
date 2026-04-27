@@ -103,10 +103,6 @@ const AttendanceSchema = new Schema<IAttendance>(
     vitalSigns: {
       type: VitalSignsSchema
     },
-    iaConditionId: {
-      type: Schema.Types.ObjectId,
-      ref: 'IACondition'
-    },
     painLevel: { type: Number },
     selfMedicated: { type: Boolean },
     symptomStartDate: { type: Date },

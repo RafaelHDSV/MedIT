@@ -159,10 +159,11 @@ function PatientsDetails() {
               label: 'Pressão',
               value: `${attendances?.[0].vitalSigns?.bloodPressure} mmHg`
             },
-            // VIEIRA: Adicionar assertividade IA
             {
               label: 'Sugestão IA',
-              value: '0'
+              value: attendances?.[0]?.iaTopSuggestion
+                ? `${attendances[0].iaTopSuggestion}${attendances[0].isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}`
+                : 'n/a'
             },
             {
               label: 'Data',

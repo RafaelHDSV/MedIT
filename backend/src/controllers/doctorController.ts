@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import { toCanonicalDiseaseKey } from '../constants/diseaseLabelsPt.js'
+import { toCanonicalDiseaseKey, toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import { DoctorSpecializations } from '../interfaces/IDoctor.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
@@ -324,7 +324,6 @@ export const getAttendances = async (req: Request, res: Response) => {
           doctorId: 1,
           medicationsIds: 1,
           vitalSigns: 1,
-          iaConditionId: 1,
           diagnosisKey: 1,
           diagnosis: 1,
           createdAt: 1,
@@ -372,7 +371,9 @@ export const getAttendances = async (req: Request, res: Response) => {
 
         return {
           ...attendance,
-          iaTopSuggestion: topSuggestion,
+          iaTopSuggestion: topSuggestion
+            ? toDiseaseLabelPt(topSuggestion)
+            : undefined,
           isIaTopSuggestionMatchDiagnosis:
             Boolean(topSuggestion) &&
             toCanonicalDiseaseKey(topSuggestion) ===

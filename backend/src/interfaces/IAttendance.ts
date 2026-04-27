@@ -91,7 +91,6 @@ export interface IAttendance extends IBaseInterface {
     changedAt: Date
   }[]
   vitalSigns?: IVitalSigns
-  iaConditionId?: Types.ObjectId
   painLevel?: number
   selfMedicated?: boolean
   symptomStartDate?: Date

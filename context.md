@@ -315,7 +315,7 @@ MongoDB (Mongoose)
 
 O modelo de **atendimento** (`IAttendance` / `AttendanceSchema`) centraliza o fluxo na unidade:
 
-- **Relacionamentos**: paciente, unidade, enfermeiro(a), médico(a), medicamentos vinculados, referência opcional a condição sugerida pela IA (`iaConditionId`).
+- **Relacionamentos**: paciente, unidade, enfermeiro(a), médico(a), medicamentos vinculados.
 - **Sinais vitais** embutidos como subdocumento.
 - **Histórico de mudanças de status** em `changesHistory`.
 - **Dados do pré-atendimento pelo paciente** (opcionais quando o episódio não passou por essa etapa): campos na **raiz** do documento — por exemplo `painLevel`, `selfMedicated`, `symptomStartDate`, `symptoms[]`, `conditions[]`, `allergies[]`, `generalObservation` — complementam o texto curto da **`complaint`** (queixa principal).

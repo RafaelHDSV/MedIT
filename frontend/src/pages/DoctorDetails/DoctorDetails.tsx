@@ -138,12 +138,17 @@ function DoctorDetails() {
               label: 'Queixa do Paciente',
               value: attendances?.[0].complaint
             },
-            // VIEIRA: Adicionar assertividade IA
-            { label: 'Sugestão IA', value: '0' },
+            {
+              label: 'Sugestão IA',
+              value: attendances?.[0]?.iaTopSuggestion
+                ? `${attendances[0].iaTopSuggestion}${attendances[0].isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}`
+                : 'n/a'
+            },
             {
               label: 'Definição Médica',
-              // VIEIRA: Precisa adicionar o ✅ quando for o caso
-              value: attendances?.[0].diagnosis
+              value: attendances?.[0]?.diagnosis
+                ? `${attendances[0].diagnosis}`
+                : undefined
             },
             {
               label: 'Risco',

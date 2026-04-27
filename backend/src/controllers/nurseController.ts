@@ -5,7 +5,7 @@ import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { Nurse } from '../models/NurseModel.js'
 import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
-import { toCanonicalDiseaseKey } from '../constants/diseaseLabelsPt.js'
+import { toCanonicalDiseaseKey, toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import User from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
 
@@ -310,7 +310,6 @@ export const getAttendances = async (req: Request, res: Response) => {
           doctorId: 1,
           medicationsIds: 1,
           vitalSigns: 1,
-          iaConditionId: 1,
           diagnosisKey: 1,
           diagnosis: 1,
           createdAt: 1,
@@ -358,7 +357,9 @@ export const getAttendances = async (req: Request, res: Response) => {
 
         return {
           ...attendance,
-          iaTopSuggestion: topSuggestion,
+          iaTopSuggestion: topSuggestion
+            ? toDiseaseLabelPt(topSuggestion)
+            : undefined,
           isIaTopSuggestionMatchDiagnosis:
             Boolean(topSuggestion) &&
             toCanonicalDiseaseKey(topSuggestion) ===

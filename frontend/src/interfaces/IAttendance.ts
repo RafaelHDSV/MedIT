@@ -95,7 +95,6 @@ export interface IAttendance extends IBaseInterface {
   doctorId?: ObjectId
   medicationsIds?: ObjectId[]
   vitalSigns?: IVitalSigns
-  iaConditionId?: ObjectId
   painLevel?: number
   selfMedicated?: boolean
   symptomStartDate?: Date
