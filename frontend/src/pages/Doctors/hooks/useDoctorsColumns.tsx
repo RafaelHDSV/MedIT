@@ -40,7 +40,6 @@ export function useDoctorsColumns({
     [setEditingDoctor, setEditModalOpen]
   )
 
-  // VIEIRA: Centralizar no DeleteModal
   const handleDelete = useCallback(
     async (doctor: IDoctor) => {
       Modal.confirm({
