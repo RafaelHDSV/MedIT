@@ -87,6 +87,7 @@ function UserDetailsCard({
               key={item.key ? String(item.key) : String(index)}
               label={item.label}
               value={item.value ? item.value : 'n/a'}
+              checked={item.checked ?? false}
             />
           ))}
 

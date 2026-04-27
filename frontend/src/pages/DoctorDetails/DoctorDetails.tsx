@@ -141,8 +141,9 @@ function DoctorDetails() {
             {
               label: 'Sugestão IA',
               value: attendances?.[0]?.iaTopSuggestion
-                ? `${attendances[0].iaTopSuggestion}${attendances[0].isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}`
-                : 'n/a'
+                ? attendances[0].iaTopSuggestion
+                : 'n/a',
+              checked: attendances?.[0].isIaTopSuggestionMatchDiagnosis
             },
             {
               label: 'Definição Médica',

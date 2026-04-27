@@ -104,6 +104,7 @@ function PatientsDetails() {
           title='Dados Pessoais'
           className={styles.initialDataCard}
           useFullWidth={true}
+          loading={loading}
           itens={[
             { label: 'CPF', value: masks(patient?.cpf, 'cpf') },
             {
@@ -146,6 +147,7 @@ function PatientsDetails() {
           Icon={CalendarDotsIcon}
           title='Último Atendimento'
           className={styles.lastAttendanceCard}
+          loading={loading}
           itens={[
             {
               label: 'Principal Queixa',
@@ -162,8 +164,9 @@ function PatientsDetails() {
             {
               label: 'Sugestão IA',
               value: attendances?.[0]?.iaTopSuggestion
-                ? `${attendances[0].iaTopSuggestion}${attendances[0].isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}`
-                : 'n/a'
+                ? attendances?.[0].iaTopSuggestion
+                : 'n/a',
+              checked: attendances?.[0].isIaTopSuggestionMatchDiagnosis
             },
             {
               label: 'Data',

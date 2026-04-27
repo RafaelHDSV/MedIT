@@ -3,6 +3,7 @@ import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
 import { ROUTES } from '@/routes/constants'
+import { Flex } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
@@ -77,13 +78,10 @@ export function useAttendancesColumns({
         width: 220,
         ellipsis: true,
         render: (text: string, record: IAttendance) => (
-          <TooltipColumn
-            text={
-              text
-                ? `${text}${record.isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}`
-                : undefined
-            }
-          />
+          <Flex gap={4} align='center'>
+            <TooltipColumn text={text ? `${text}` : undefined} />
+            <span>{record.isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}</span>
+          </Flex>
         )
       },
       commonColumns.createdAt(),

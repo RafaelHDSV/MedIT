@@ -103,6 +103,7 @@ function NursesDetails() {
         <UserDetailsCard
           Icon={DatabaseIcon}
           title='Dados Pessoais'
+          loading={loading}
           itens={[
             { label: 'CPF', value: masks(nurse?.cpf, 'cpf') },
             { label: 'COREN', value: nurse?.coren },
@@ -123,6 +124,7 @@ function NursesDetails() {
         <UserDetailsCard
           Icon={CalendarDotsIcon}
           title='Último Atendimento'
+          loading={loading}
           itens={[
             {
               label: 'Queixa do Paciente',
@@ -139,8 +141,9 @@ function NursesDetails() {
             {
               label: 'Sugestão IA',
               value: attendances?.[0]?.iaTopSuggestion
-                ? `${attendances[0].iaTopSuggestion}${attendances[0].isIaTopSuggestionMatchDiagnosis ? ' ✅' : ''}`
-                : 'n/a'
+                ? attendances?.[0].iaTopSuggestion
+                : 'n/a',
+              checked: attendances?.[0].isIaTopSuggestionMatchDiagnosis
             },
             {
               label: 'Data',

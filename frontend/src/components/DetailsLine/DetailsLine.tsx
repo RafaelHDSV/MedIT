@@ -7,9 +7,10 @@ export interface IDetailsLineProps {
   key?: ObjectId | string | undefined
   label: string
   value: string | number | React.ReactElement | undefined
+  checked?: boolean
 }
 
-function DetailsLine({ label, value }: IDetailsLineProps) {
+function DetailsLine({ label, value, checked }: IDetailsLineProps) {
   const isObject = typeof value === 'object'
 
   return (
@@ -19,6 +20,7 @@ function DetailsLine({ label, value }: IDetailsLineProps) {
         <span className={`${styles.value} ${!isObject ? 'ellipsis' : ''}`}>
           {value}
         </span>
+        {checked && '✅'}
       </Tooltip>
     </div>
   )
