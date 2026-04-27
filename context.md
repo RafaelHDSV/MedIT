@@ -142,6 +142,9 @@ No repositório, a classificação segue **cinco níveis** compatíveis com uma 
 - Quando um item **não está disponível** na unidade atual, o sistema permite consultar **unidades parceiras** para localizar o medicamento em outro ponto da rede (apenas consulta / encaminhamento informativo, conforme regras de negócio e privacidade).
 - No modelo `IUnit` / `UnitSchema`, o campo **`partnerUnitIds`** (ObjectIds de outras unidades) materializa essa rede; pode ser preenchido pela interface administrativa ou, em ambientes de demonstração, por scripts de migração (ver [§5.12](#512-índice-adicional-de-scripts-do-backend)).
 - Rota de medicamentos no front: **`/auth/units/:unitId/medications`** (constante `ROUTES.MEDICAMENTS` em `frontend/src/routes/constants.ts` — o identificador interno mantém o histórico `MEDICAMENTS`).
+- Edição de medicamento no backend: **`PUT /auth/medications/:medicationId`**. A API recalcula `availabilityStatus` com base em `stockQuantity` e **bloqueia edição para paciente**.
+- Isolamento por unidade na edição: usuário autenticado só pode editar medicamento cuja `unitId` seja igual à sua `user.unitId`; tentativa cruzada entre unidades retorna **403**.
+- Dupla validação no front para edição: o botão **"Editar medicamento"** só aparece quando o item pertence à unidade do usuário logado e, no handler de abertura do modal, há nova checagem defensiva para impedir bypass por estado de tela.
 
 ### 5.6 Dashboard, período, ocupação e gráficos
 
@@ -436,6 +439,13 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 - O componente `VitalCard` (`frontend/src/pages/AttendanceDetails/components/VitalCard/VitalCard.tsx`) é um componente **controlado**: o valor exibido vem diretamente da prop `value` e alterações chamam `onChange` imediatamente (sem estado interno). Apenas enfermeiros (`UserLevels.NURSE`) podem editar; demais perfis veem o valor como texto.
 - Em `AttendanceDetails.tsx`, um `vitalDraft` (state) mantém os campos editáveis de sinais vitais (temperatura, pressão arterial, frequência cardíaca, saturação O₂, nível de dor). Ao **"Concluir triagem"**, os valores são enviados junto com risco, sintomas e observações via `AttendancesFlowRepository.completeTriage`.
 - No backend, `attendanceController.ts` sanitiza e valida cada campo de sinais vitais (`parseVitalSignsFromBody`) e atualiza o documento de atendimento com `$set`/`$unset` atômicos.
+
+**Medicamentos — edição e isolamento por unidade**
+
+- Frontend: adicionado `EditMedicationModal` (`frontend/src/pages/Medications/components/EditMedicationModal/EditMedicationModal.tsx`) e integração no fluxo da página `Medications`.
+- Frontend: `MedicationsRepository` ganhou `editMedication` (PUT), e `MedicationModel` ganhou `canEditMedication` para centralizar regra de permissão por perfil.
+- Frontend: o modal de detalhes (`MedicationDetailsModal`) exibe ação de editar apenas para níveis permitidos e quando `selectedMedication.unitId === user.unitId`.
+- Backend: nova rota `PUT /auth/medications/:medicationId` em `medicationRoutes.ts` com validação de payload, bloqueio para `UserLevels.PATIENT` e bloqueio de edição de medicamento de outra unidade.
 
 **Em evolução / parcial**
 
