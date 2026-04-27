@@ -2,7 +2,7 @@ import masks, { type MaskEnum } from '@/utils/masks'
 import { Input, Select, Table } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LayoutSpinner } from '../LayoutSpinner/LayoutSpinner'
 import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
 import {
@@ -69,6 +69,8 @@ function ListTable<T extends SearchableItem>({
     null,
     null
   ])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPageSize, setCurrentPageSize] = useState(pageSize)
 
   const isDateField = searchField === 'createdAt' || searchField === 'updatedAt'
 
@@ -106,6 +108,14 @@ function ListTable<T extends SearchableItem>({
 
   const currentFieldLabel =
     FIELD_OPTIONS.find((f) => f.value === searchField)?.label ?? ''
+
+  useEffect(() => {
+    setCurrentPageSize(pageSize)
+  }, [pageSize])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchField, search, dateRange, filteredData.length])
 
   if (loading) {
     return <LayoutSpinner />
@@ -163,7 +173,17 @@ function ListTable<T extends SearchableItem>({
           columns={columns}
           tableLayout='fixed'
           loading={loading}
-          pagination={{ pageSize, hideOnSinglePage: true }}
+          pagination={{
+            current: currentPage,
+            pageSize: currentPageSize,
+            hideOnSinglePage: true,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '15', '20', '30', '50', '100'],
+            onChange: (page, size) => {
+              setCurrentPage(page)
+              setCurrentPageSize(size)
+            }
+          }}
           size='middle'
           bordered={false}
           scroll={{ x: '100%' }}
