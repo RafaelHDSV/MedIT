@@ -1,6 +1,5 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import DeleteModal from '@/components/DeleteModal/DeleteModal'
-import { TagStatuses } from '@/components/Tag/Tag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import { handleApiError } from '@/helpers/handleApiError'
@@ -93,8 +92,6 @@ function PatientsDetails() {
         name={patient?.name}
         age={getAgeByBirthDate(patient?.birthDate)}
         gender={patient?.gender}
-        statusTag={TagStatuses.INFO}
-        statusTagText='Internado'
         loading={loading}
       />
 

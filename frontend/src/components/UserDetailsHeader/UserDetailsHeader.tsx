@@ -1,6 +1,5 @@
 import { UserGender, UserGendersLabels } from '@/interfaces/IUser'
 import { Skeleton } from 'antd'
-import { TagStatuses } from '../Tag/Tag'
 import UserBall from '../UserBall/UserBall'
 import styles from './UserDetailsHeader.module.scss'
 
@@ -8,8 +7,6 @@ interface IUserDetailsHeaderProps {
   name?: string
   age?: number
   gender?: UserGender
-  statusTag?: TagStatuses
-  statusTagText?: string
   loading?: boolean
 }
 
@@ -17,13 +14,8 @@ function UserDetailsHeader({
   name,
   age,
   gender,
-  statusTag,
-  statusTagText,
   loading = false
 }: IUserDetailsHeaderProps) {
-  console.log('statusTag', statusTag)
-  console.log('statusTagText', statusTagText)
-
   if (loading) {
     return (
       <header className={styles.header}>
@@ -53,11 +45,6 @@ function UserDetailsHeader({
           </p>
         </div>
       </div>
-
-      {/* VIEIRA: Validar tags */}
-      {/* {statusTag && statusTagText && (
-        <Tag status={statusTag}>{statusTagText}</Tag>
-      )} */}
     </header>
   )
 }
