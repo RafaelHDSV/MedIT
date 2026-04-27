@@ -183,7 +183,13 @@ const MEDICATION_FREQUENCIES = [
   '1x ao dia',
   '2x ao dia'
 ]
-const MEDICATION_DURATIONS = ['3 dias', '5 dias', '7 dias', '10 dias', '14 dias']
+const MEDICATION_DURATIONS = [
+  '3 dias',
+  '5 dias',
+  '7 dias',
+  '10 dias',
+  '14 dias'
+]
 
 const EXAM_POOL = [
   'Hemograma completo',
@@ -292,8 +298,7 @@ function pickRisk(): AttendanceRisk {
  * Realistic for an emergency room.
  */
 const HOUR_WEIGHTS = [
-  1, 1, 1, 1, 1, 2, 3, 5, 10, 12, 12, 11, 8, 9, 11, 12, 11, 10, 8, 7, 5, 4,
-  2, 1
+  1, 1, 1, 1, 1, 2, 3, 5, 10, 12, 12, 11, 8, 9, 11, 12, 11, 10, 8, 7, 5, 4, 2, 1
 ]
 
 function randomWeightedHour(): number {
@@ -307,35 +312,55 @@ function vitalSignsForRisk(risk: AttendanceRisk): IVitalSigns {
   switch (risk) {
     case AttendanceRisk.EMERGENCY:
       return {
-        temperature: faker.number.float({ min: 38.5, max: 40.5, fractionDigits: 1 }),
+        temperature: faker.number.float({
+          min: 38.5,
+          max: 40.5,
+          fractionDigits: 1
+        }),
         heartRate: faker.number.int({ min: 110, max: 160 }),
         oxygenSaturation: faker.number.int({ min: 85, max: 93 }),
         bloodPressure: `${faker.number.int({ min: 160, max: 200 })}/${faker.number.int({ min: 90, max: 120 })}`
       }
     case AttendanceRisk.VERY_URGENT:
       return {
-        temperature: faker.number.float({ min: 38.0, max: 39.5, fractionDigits: 1 }),
+        temperature: faker.number.float({
+          min: 38.0,
+          max: 39.5,
+          fractionDigits: 1
+        }),
         heartRate: faker.number.int({ min: 95, max: 135 }),
         oxygenSaturation: faker.number.int({ min: 90, max: 95 }),
         bloodPressure: `${faker.number.int({ min: 140, max: 180 })}/${faker.number.int({ min: 80, max: 110 })}`
       }
     case AttendanceRisk.URGENT:
       return {
-        temperature: faker.number.float({ min: 37.5, max: 39.0, fractionDigits: 1 }),
+        temperature: faker.number.float({
+          min: 37.5,
+          max: 39.0,
+          fractionDigits: 1
+        }),
         heartRate: faker.number.int({ min: 85, max: 115 }),
         oxygenSaturation: faker.number.int({ min: 93, max: 97 }),
         bloodPressure: `${faker.number.int({ min: 130, max: 160 })}/${faker.number.int({ min: 75, max: 100 })}`
       }
     case AttendanceRisk.LESS_URGENT:
       return {
-        temperature: faker.number.float({ min: 36.5, max: 38.0, fractionDigits: 1 }),
+        temperature: faker.number.float({
+          min: 36.5,
+          max: 38.0,
+          fractionDigits: 1
+        }),
         heartRate: faker.number.int({ min: 70, max: 100 }),
         oxygenSaturation: faker.number.int({ min: 95, max: 99 }),
         bloodPressure: `${faker.number.int({ min: 110, max: 140 })}/${faker.number.int({ min: 65, max: 90 })}`
       }
     default:
       return {
-        temperature: faker.number.float({ min: 36.0, max: 37.5, fractionDigits: 1 }),
+        temperature: faker.number.float({
+          min: 36.0,
+          max: 37.5,
+          fractionDigits: 1
+        }),
         heartRate: faker.number.int({ min: 60, max: 90 }),
         oxygenSaturation: faker.number.int({ min: 96, max: 100 }),
         bloodPressure: `${faker.number.int({ min: 100, max: 130 })}/${faker.number.int({ min: 60, max: 85 })}`
@@ -385,7 +410,10 @@ function isWeekend(d: Date): boolean {
 
 function elapsedDayFraction(now: Date): number {
   const sod = startOfLocalDay(now)
-  return Math.min(1, Math.max(0.1, (now.getTime() - sod.getTime()) / 86_400_000))
+  return Math.min(
+    1,
+    Math.max(0.1, (now.getTime() - sod.getTime()) / 86_400_000)
+  )
 }
 
 function riskStepMinutes(risk: AttendanceRisk): number {
@@ -418,7 +446,10 @@ function randomDateOnCalendarDay(dayStart: Date, now: Date): Date {
 function buildCompletedFlow(
   startedAt: Date,
   risk: AttendanceRisk
-): { status: AttendanceStatus; history: { status: AttendanceStatus; changedAt: Date }[] } {
+): {
+  status: AttendanceStatus
+  history: { status: AttendanceStatus; changedAt: Date }[]
+} {
   const baseStepMs = riskStepMinutes(risk) * 60_000
   let cursor = startedAt.getTime()
 
@@ -442,7 +473,8 @@ function buildActiveFlow(
   history: { status: AttendanceStatus; changedAt: Date }[]
 } {
   const idx = FULL_FLOW.indexOf(targetStatus)
-  const lastIdx = idx >= 0 ? idx : FULL_FLOW.indexOf(AttendanceStatus.IN_ATTENDANCE)
+  const lastIdx =
+    idx >= 0 ? idx : FULL_FLOW.indexOf(AttendanceStatus.IN_ATTENDANCE)
   const baseStepMs = riskStepMinutes(risk) * 60_000
   const slice = FULL_FLOW.slice(0, lastIdx + 1)
   const startedAt = new Date(endTime.getTime() - lastIdx * baseStepMs)
@@ -486,20 +518,18 @@ function buildSymptoms(
 ): string[] | undefined {
   const reachedTriage = TRIAGE_OR_LATER.has(status)
   if (reachedTriage) {
-    const pool =
-      diseaseProfile?.positiveSymptoms?.length
-        ? diseaseProfile.positiveSymptoms
-        : ['fever', 'fatigue', 'headache']
+    const pool = diseaseProfile?.positiveSymptoms?.length
+      ? diseaseProfile.positiveSymptoms
+      : ['fever', 'fatigue', 'headache']
     return faker.helpers.arrayElements(pool, {
       min: Math.max(1, Math.min(2, pool.length)),
       max: Math.max(1, Math.min(6, pool.length))
     })
   }
   if (faker.datatype.boolean({ probability: 0.25 })) {
-    const pool =
-      diseaseProfile?.positiveSymptoms?.length
-        ? diseaseProfile.positiveSymptoms
-        : ['fever', 'dryCough']
+    const pool = diseaseProfile?.positiveSymptoms?.length
+      ? diseaseProfile.positiveSymptoms
+      : ['fever', 'dryCough']
     return faker.helpers.arrayElements(pool, {
       min: 1,
       max: Math.min(3, pool.length)
@@ -565,10 +595,7 @@ function buildPrescriptions(risk: AttendanceRisk): {
 // ── Document Assembly ───────────────────────────────────────────────────────
 
 function assembleSeed(
-  base: Omit<
-    AttendanceSeed,
-    'medicationsIds' | 'vitalSigns' | 'painLevel'
-  > &
+  base: Omit<AttendanceSeed, 'medicationsIds' | 'vitalSigns' | 'painLevel'> &
     Partial<Pick<AttendanceSeed, 'vitalSigns' | 'painLevel'>>
 ): AttendanceSeed {
   return {
@@ -590,17 +617,18 @@ async function insertBatched(docs: AttendanceSeed[]): Promise<void> {
 
 // ── Patient Pool Management ─────────────────────────────────────────────────
 
-async function ensurePatients(
-  pool: UnitPool,
-  minCount: number
-): Promise<void> {
+async function ensurePatients(pool: UnitPool, minCount: number): Promise<void> {
   while (pool.patients.length < minCount) {
     const firstName = faker.person.firstName()
     const lastName = faker.person.lastName()
     const created = (await Patient.create({
       name: `${firstName} ${lastName}`,
       cpf: faker.string.numeric(11),
-      email: faker.internet.email({ firstName, lastName, provider: 'seed.med.br' }),
+      email: faker.internet.email({
+        firstName,
+        lastName,
+        provider: 'seed.med.br'
+      }),
       password: 'fastpass',
       gender: faker.helpers.arrayElement(['male', 'female']),
       birthDate: faker.date.birthdate({ min: 18, max: 80, mode: 'age' }),
@@ -666,7 +694,10 @@ const createAttendances: Script = {
 
       unitPools.push({
         unitId: new Types.ObjectId(String(unit._id)),
-        maxOccupancy: Math.max(1, Number((unit as { maxOccupancy?: number }).maxOccupancy) || 50),
+        maxOccupancy: Math.max(
+          1,
+          Number((unit as { maxOccupancy?: number }).maxOccupancy) || 50
+        ),
         unitName: String((unit as { name?: string }).name ?? ''),
         patients: patients.map((p) => p._id),
         nurses: nurses.map((n) => n._id),
@@ -681,27 +712,46 @@ const createAttendances: Script = {
 
     // ── Detect TCC members ──────────────────────────────────────────────
 
-    const TCC_SHORT_NAMES = ['brenda', 'evellin', 'jota', 'take', 'rafa', 'vieira', 'victor']
+    const TCC_SHORT_NAMES = [
+      'brenda',
+      'evellin',
+      'jota',
+      'take',
+      'rafa',
+      'vieira',
+      'victor'
+    ]
 
-    const tccEmailPattern = TCC_SHORT_NAMES.map((s) => `^\\w+\\.${s}@yopmail\\.com$`).join('|')
+    const tccEmailPattern = TCC_SHORT_NAMES.map(
+      (s) => `^\\w+\\.${s}@yopmail\\.com$`
+    ).join('|')
 
     const tccPatientIdSet = new Set(
-      (await Patient.find({ email: { $regex: tccEmailPattern, $options: 'i' } } as never)
-        .select('_id')
-        .lean<{ _id: Types.ObjectId }[]>())
-        .map((p) => String(p._id))
+      (
+        await Patient.find({
+          email: { $regex: tccEmailPattern, $options: 'i' }
+        } as never)
+          .select('_id')
+          .lean<{ _id: Types.ObjectId }[]>()
+      ).map((p) => String(p._id))
     )
     const tccNurseIdSet = new Set(
-      (await Nurse.find({ email: { $regex: tccEmailPattern, $options: 'i' } } as never)
-        .select('_id')
-        .lean<{ _id: Types.ObjectId }[]>())
-        .map((n) => String(n._id))
+      (
+        await Nurse.find({
+          email: { $regex: tccEmailPattern, $options: 'i' }
+        } as never)
+          .select('_id')
+          .lean<{ _id: Types.ObjectId }[]>()
+      ).map((n) => String(n._id))
     )
     const tccDoctorIdSet = new Set(
-      (await Doctor.find({ email: { $regex: tccEmailPattern, $options: 'i' } } as never)
-        .select('_id')
-        .lean<{ _id: Types.ObjectId }[]>())
-        .map((d) => String(d._id))
+      (
+        await Doctor.find({
+          email: { $regex: tccEmailPattern, $options: 'i' }
+        } as never)
+          .select('_id')
+          .lean<{ _id: Types.ObjectId }[]>()
+      ).map((d) => String(d._id))
     )
 
     console.log(
@@ -726,7 +776,9 @@ const createAttendances: Script = {
         ? (faker.helpers.arrayElement(diseaseProfiles) as DiseaseProfile)
         : undefined
 
-    console.log(`✅ ${unitPools.length} unidade(s), ${diseaseProfiles.length} perfis de doença\n`)
+    console.log(
+      `✅ ${unitPools.length} unidade(s), ${diseaseProfiles.length} perfis de doença\n`
+    )
 
     // ── Build calendar days ─────────────────────────────────────────────
 
@@ -750,9 +802,15 @@ const createAttendances: Script = {
     for (const pool of unitPools) {
       console.log(`🏥 Unidade "${pool.unitName}" (${pool.unitId})`)
 
-      const unitTccPatients = pool.patients.filter((id) => tccPatientIdSet.has(String(id)))
-      const unitTccNurses = pool.nurses.filter((id) => tccNurseIdSet.has(String(id)))
-      const unitTccDoctors = pool.doctors.filter((id) => tccDoctorIdSet.has(String(id)))
+      const unitTccPatients = pool.patients.filter((id) =>
+        tccPatientIdSet.has(String(id))
+      )
+      const unitTccNurses = pool.nurses.filter((id) =>
+        tccNurseIdSet.has(String(id))
+      )
+      const unitTccDoctors = pool.doctors.filter((id) =>
+        tccDoctorIdSet.has(String(id))
+      )
 
       // Shuffle pools for natural distribution while keeping round-robin fairness
       const shuffledPatients = faker.helpers.shuffle([...pool.patients])
@@ -762,7 +820,8 @@ const createAttendances: Script = {
       let pIdx = 0
       let nIdx = 0
       let dIdx = 0
-      const nextPatient = () => shuffledPatients[pIdx++ % shuffledPatients.length]
+      const nextPatient = () =>
+        shuffledPatients[pIdx++ % shuffledPatients.length]
       const nextNurse = () => shuffledNurses[nIdx++ % shuffledNurses.length]
       const nextDoctor = () => shuffledDoctors[dIdx++ % shuffledDoctors.length]
 
@@ -810,8 +869,9 @@ const createAttendances: Script = {
         const diseaseProfile = pickDiseaseProfile()
         const { status, history } = buildCompletedFlow(startDate, risk)
         const symptoms = buildSymptoms(status, diseaseProfile)
-        const complaint =
-          symptoms?.length ? pickComplaintFromSymptoms(symptoms) : faker.helpers.arrayElement(COMPLAINTS)
+        const complaint = symptoms?.length
+          ? pickComplaintFromSymptoms(symptoms)
+          : faker.helpers.arrayElement(COMPLAINTS)
 
         const diagnosis = diseaseProfile?.disease
           ? toDiseaseLabelPt(diseaseProfile.disease)
@@ -821,7 +881,8 @@ const createAttendances: Script = {
           probability: risk === AttendanceRisk.NOT_URGENT ? 0.4 : 0.15
         })
 
-        const lastHistoryAt = history[history.length - 1]?.changedAt ?? startDate
+        const lastHistoryAt =
+          history[history.length - 1]?.changedAt ?? startDate
 
         const doc = assembleSeed({
           number: attendanceNumber++,
@@ -841,7 +902,8 @@ const createAttendances: Script = {
           symptoms,
           selfMedicated,
           symptomStartDate: new Date(
-            startDate.getTime() - faker.number.int({ min: 1, max: 7 }) * 86_400_000
+            startDate.getTime() -
+              faker.number.int({ min: 1, max: 7 }) * 86_400_000
           ),
           generalObservation: faker.datatype.boolean({ probability: 0.35 })
             ? faker.helpers.arrayElement(OBSERVATIONS)
@@ -893,7 +955,9 @@ const createAttendances: Script = {
         }
       }
 
-      console.log(`   📊 Fase 1 (diário): ${unitDocs.length} atendimentos concluídos`)
+      console.log(
+        `   📊 Fase 1 (diário): ${unitDocs.length} atendimentos concluídos`
+      )
 
       // ── Phase 2: TCC minimums ────────────────────────────────────────
 
@@ -915,28 +979,58 @@ const createAttendances: Script = {
       let tccAdded = 0
 
       for (const patientId of unitTccPatients) {
-        while ((completedByPatient.get(String(patientId)) ?? 0) < TCC_MIN_COMPLETED_PER_PATIENT) {
+        while (
+          (completedByPatient.get(String(patientId)) ?? 0) <
+          TCC_MIN_COMPLETED_PER_PATIENT
+        ) {
           const day = pickLeastLoadedDay()
           if (!day) break
-          if (!pushCompleted(day, { patientId, nurseId: nextNurse(), doctorId: nextDoctor() })) break
+          if (
+            !pushCompleted(day, {
+              patientId,
+              nurseId: nextNurse(),
+              doctorId: nextDoctor()
+            })
+          )
+            break
           tccAdded++
         }
       }
 
       for (const doctorId of unitTccDoctors) {
-        while ((completedByDoctor.get(String(doctorId)) ?? 0) < TCC_MIN_COMPLETED_PER_DOCTOR) {
+        while (
+          (completedByDoctor.get(String(doctorId)) ?? 0) <
+          TCC_MIN_COMPLETED_PER_DOCTOR
+        ) {
           const day = pickLeastLoadedDay()
           if (!day) break
-          if (!pushCompleted(day, { patientId: nextPatient(), nurseId: nextNurse(), doctorId })) break
+          if (
+            !pushCompleted(day, {
+              patientId: nextPatient(),
+              nurseId: nextNurse(),
+              doctorId
+            })
+          )
+            break
           tccAdded++
         }
       }
 
       for (const nurseId of unitTccNurses) {
-        while ((completedByNurse.get(String(nurseId)) ?? 0) < TCC_MIN_COMPLETED_PER_NURSE) {
+        while (
+          (completedByNurse.get(String(nurseId)) ?? 0) <
+          TCC_MIN_COMPLETED_PER_NURSE
+        ) {
           const day = pickLeastLoadedDay()
           if (!day) break
-          if (!pushCompleted(day, { patientId: nextPatient(), doctorId: nextDoctor(), nurseId })) break
+          if (
+            !pushCompleted(day, {
+              patientId: nextPatient(),
+              doctorId: nextDoctor(),
+              nurseId
+            })
+          )
+            break
           tccAdded++
         }
       }
@@ -972,8 +1066,9 @@ const createAttendances: Script = {
         const patientId = opts.patientId ?? nextPatient()
         const diseaseProfile = pickDiseaseProfile()
         const symptoms = buildSymptoms(built.status, diseaseProfile)
-        const complaint =
-          symptoms?.length ? pickComplaintFromSymptoms(symptoms) : faker.helpers.arrayElement(COMPLAINTS)
+        const complaint = symptoms?.length
+          ? pickComplaintFromSymptoms(symptoms)
+          : faker.helpers.arrayElement(COMPLAINTS)
 
         const needsNurse =
           built.status !== AttendanceStatus.ON_THE_WAY &&
@@ -982,12 +1077,13 @@ const createAttendances: Script = {
           built.status === AttendanceStatus.IN_ATTENDANCE ||
           built.status === AttendanceStatus.ATTENDANCE_COMPLETED
 
-        const nurseId =
-          needsNurse ? (opts.nurseId ?? nextNurse()) : undefined
-        const doctorId =
-          needsDoctor ? (opts.doctorId ?? nextDoctor()) : undefined
+        const nurseId = needsNurse ? (opts.nurseId ?? nextNurse()) : undefined
+        const doctorId = needsDoctor
+          ? (opts.doctorId ?? nextDoctor())
+          : undefined
 
-        const lastAt = built.history[built.history.length - 1]?.changedAt ?? endTime
+        const lastAt =
+          built.history[built.history.length - 1]?.changedAt ?? endTime
 
         const selfMedicated = faker.datatype.boolean({
           probability: risk === AttendanceRisk.NOT_URGENT ? 0.4 : 0.15
@@ -1009,13 +1105,20 @@ const createAttendances: Script = {
           symptoms,
           selfMedicated,
           symptomStartDate: new Date(
-            built.date.getTime() - faker.number.int({ min: 1, max: 5 }) * 86_400_000
+            built.date.getTime() -
+              faker.number.int({ min: 1, max: 5 }) * 86_400_000
           ),
           generalObservation: faker.datatype.boolean({ probability: 0.3 })
             ? faker.helpers.arrayElement(OBSERVATIONS)
             : undefined,
-          conditions: faker.helpers.arrayElements(CONDITIONS_POOL, { min: 0, max: 2 }),
-          allergies: faker.helpers.arrayElements(ALLERGIES_POOL, { min: 0, max: 2 })
+          conditions: faker.helpers.arrayElements(CONDITIONS_POOL, {
+            min: 0,
+            max: 2
+          }),
+          allergies: faker.helpers.arrayElements(ALLERGIES_POOL, {
+            min: 0,
+            max: 2
+          })
         })
 
         unitDocs.push(doc)
@@ -1035,20 +1138,34 @@ const createAttendances: Script = {
         return nextPatient()
       }
 
-      if (pool.patients.length < MIN_QUEUE_WAITING_TRIAGE + MIN_QUEUE_WAITING_ATTENDANCE + 20) {
-        await ensurePatients(pool, MIN_QUEUE_WAITING_TRIAGE + MIN_QUEUE_WAITING_ATTENDANCE + 30)
+      if (
+        pool.patients.length <
+        MIN_QUEUE_WAITING_TRIAGE + MIN_QUEUE_WAITING_ATTENDANCE + 20
+      ) {
+        await ensurePatients(
+          pool,
+          MIN_QUEUE_WAITING_TRIAGE + MIN_QUEUE_WAITING_ATTENDANCE + 30
+        )
       }
 
       let activeCount = 0
 
       for (let i = 0; i < MIN_QUEUE_WAITING_TRIAGE; i++) {
-        if (pushActive(AttendanceStatus.WAITING_TRIAGE, { patientId: safeNextPatient() })) {
+        if (
+          pushActive(AttendanceStatus.WAITING_TRIAGE, {
+            patientId: safeNextPatient()
+          })
+        ) {
           activeCount++
         }
       }
 
       for (let i = 0; i < MIN_QUEUE_WAITING_ATTENDANCE; i++) {
-        if (pushActive(AttendanceStatus.WAITING_ATTENDANCE, { patientId: safeNextPatient() })) {
+        if (
+          pushActive(AttendanceStatus.WAITING_ATTENDANCE, {
+            patientId: safeNextPatient()
+          })
+        ) {
           activeCount++
         }
       }
@@ -1095,8 +1212,12 @@ const createAttendances: Script = {
         }
       }
 
-      console.log(`   🔄 Fase 3 (ativos hoje): ${activeCount} atendimentos em andamento`)
-      console.log(`   → Total unidade: ${unitDocs.length} — inserindo em lotes de ${INSERT_BATCH_SIZE}…`)
+      console.log(
+        `   🔄 Fase 3 (ativos hoje): ${activeCount} atendimentos em andamento`
+      )
+      console.log(
+        `   → Total unidade: ${unitDocs.length} — inserindo em lotes de ${INSERT_BATCH_SIZE}…`
+      )
 
       await insertBatched(unitDocs)
     }

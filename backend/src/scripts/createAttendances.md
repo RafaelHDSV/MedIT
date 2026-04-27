@@ -6,50 +6,50 @@ Este documento descreve **como o script de seed funciona** (`createAttendances.s
 
 ## Visão geral
 
-| Item                       | Comportamento                                                                                                                                                                                                                                                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Nome do script**         | `create-attendances`                                                                                                                                                                                                                                                             |
-| **Antes de inserir**       | `Attendance.deleteMany()` — remove **todos** os atendimentos.                                                                                                                                                                                                                    |
-| **Unidades**               | Carrega todas as `Unit`; para cada uma monta um _pool_ de pacientes, enfermeiros e médicos da mesma unidade. Unidades sem algum dos três são **ignoradas**.                                                                                                                      |
-| **Janela temporal**        | `windowStart` = meia-noite local do dia `(hoje − 364)`; `windowEnd` = instante `now` da execução. Ou seja, ~**365 dias** de histórico rolante até "agora".                                                                                                                       |
-| **Granularidade de datas** | A maior parte da lógica usa **meia-noite e aritmética em horário local** (`setHours`, `setDate`). O dashboard agrega com **UTC** em `getPeriodDateRange` — pode haver pequeno desvio de bucket dia/semana em bordas de fuso.                                                      |
-| **Inserção**               | Lotes de `INSERT_BATCH_SIZE` (300) com `insertMany(..., { ordered: false, timestamps: false })` — `createdAt` / `updatedAt` vêm explícitos do seed.                                                                                                                              |
+| Item                       | Comportamento                                                                                                                                                                                                                |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nome do script**         | `create-attendances`                                                                                                                                                                                                         |
+| **Antes de inserir**       | `Attendance.deleteMany()` — remove **todos** os atendimentos.                                                                                                                                                                |
+| **Unidades**               | Carrega todas as `Unit`; para cada uma monta um _pool_ de pacientes, enfermeiros e médicos da mesma unidade. Unidades sem algum dos três são **ignoradas**.                                                                  |
+| **Janela temporal**        | `windowStart` = meia-noite local do dia `(hoje − 364)`; `windowEnd` = instante `now` da execução. Ou seja, ~**365 dias** de histórico rolante até "agora".                                                                   |
+| **Granularidade de datas** | A maior parte da lógica usa **meia-noite e aritmética em horário local** (`setHours`, `setDate`). O dashboard agrega com **UTC** em `getPeriodDateRange` — pode haver pequeno desvio de bucket dia/semana em bordas de fuso. |
+| **Inserção**               | Lotes de `INSERT_BATCH_SIZE` (300) com `insertMany(..., { ordered: false, timestamps: false })` — `createdAt` / `updatedAt` vêm explícitos do seed.                                                                          |
 
 ---
 
 ## Modelo mental dos campos principais
 
-| Campo                | Uso no seed                                                                                                                                   |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`date`**           | Início do atendimento (entrada no fluxo). Usado no dashboard em agregações "por dia / hora" (`getAttendanceByTime`, `getEntries`, etc.).      |
-| **`status`**         | Estado atual do documento.                                                                                                                    |
-| **`changesHistory`** | Lista `{ status, changedAt }` do fluxo até o estado atual (concluído = fluxo completo; ativo = prefixo do fluxo até um status "ativo").       |
-| **`createdAt`**      | Em geral igual a `date` no seed.                                                                                                              |
-| **`updatedAt`**      | Concluídos: último `changedAt` do histórico. Ativos: último `changedAt` do histórico (última transição "simulada").                            |
-| **`diagnosis`**      | Preenchido em concluídos (texto + key da base `SymptomsDiseases`); **omitido** (`undefined`) nos ativos do dia atual.                          |
-| **`vitalSigns`**     | Subdocumento com `temperature`, `bloodPressure`, `heartRate`, `oxygenSaturation` — valores correlacionados ao `risk` do atendimento.           |
-| **`painLevel`**      | Escala 0–10, correlacionada ao risco.                                                                                                         |
+| Campo                | Uso no seed                                                                                                                              |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **`date`**           | Início do atendimento (entrada no fluxo). Usado no dashboard em agregações "por dia / hora" (`getAttendanceByTime`, `getEntries`, etc.). |
+| **`status`**         | Estado atual do documento.                                                                                                               |
+| **`changesHistory`** | Lista `{ status, changedAt }` do fluxo até o estado atual (concluído = fluxo completo; ativo = prefixo do fluxo até um status "ativo").  |
+| **`createdAt`**      | Em geral igual a `date` no seed.                                                                                                         |
+| **`updatedAt`**      | Concluídos: último `changedAt` do histórico. Ativos: último `changedAt` do histórico (última transição "simulada").                      |
+| **`diagnosis`**      | Preenchido em concluídos (texto + key da base `SymptomsDiseases`); **omitido** (`undefined`) nos ativos do dia atual.                    |
+| **`vitalSigns`**     | Subdocumento com `temperature`, `bloodPressure`, `heartRate`, `oxygenSaturation` — valores correlacionados ao `risk` do atendimento.     |
+| **`painLevel`**      | Escala 0–10, correlacionada ao risco.                                                                                                    |
 
 ---
 
 ## Constantes (valores atuais no código)
 
-| Constante                         | Valor (referência) | Papel                                                                                              |
-| --------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------- |
-| `DAYS_BACK`                       | 364                | Largura da janela para trás a partir de hoje 00h.                                                  |
-| `INSERT_BATCH_SIZE`               | 300                | Tamanho do lote de insert.                                                                         |
-| `WEEKDAY_TARGET_MIN/MAX`          | 21 / 26            | Faixa de meta diária para dias de semana (por unidade).                                            |
-| `WEEKEND_TARGET_MIN/MAX`          | 14 / 19            | Faixa de meta diária para fins de semana (por unidade).                                            |
-| `ABSOLUTE_MAX_PER_DAY`            | 30                 | **Regra suprema (histórico):** nunca mais que isto de documentos com o mesmo dia civil (por unidade). |
-| `TODAY_TOTAL_CAP`                 | 45                 | Teto do dia atual (concluídos + ativos + fila).                                                    |
-| `TCC_MIN_COMPLETED_PER_PATIENT`   | 10                 | Mínimo de concluídos para cada **paciente** TCC.                                                   |
-| `TCC_MIN_COMPLETED_PER_DOCTOR`    | 8                  | Mínimo de concluídos com `doctorId` para cada **médico** TCC.                                      |
-| `TCC_MIN_COMPLETED_PER_NURSE`     | 8                  | Mínimo de concluídos com `nurseId` para cada **enfermeiro** TCC.                                   |
-| `MIN_QUEUE_WAITING_TRIAGE`        | 5                  | Atendimentos `WAITING_TRIAGE` sem `nurseId` na fila (por unidade, dia atual).                      |
-| `MIN_QUEUE_WAITING_ATTENDANCE`    | 5                  | Atendimentos `WAITING_ATTENDANCE` sem `doctorId` na fila (por unidade, dia atual).                 |
-| `TCC_ACTIVE_PER_DOCTOR`           | 2                  | Ativos `IN_ATTENDANCE` atribuídos por médico TCC no dia atual.                                     |
-| `TCC_ACTIVE_PER_NURSE`            | 1                  | Ativos `IN_TRIAGE` atribuídos por enfermeiro TCC no dia atual.                                     |
-| `RISK_WEIGHTS`                    | NOT_URGENT 35, LESS_URGENT 30, URGENT 20, VERY_URGENT 10, EMERGENCY 5 | Distribuição ponderada de risco. |
+| Constante                       | Valor (referência)                                                    | Papel                                                                                                 |
+| ------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `DAYS_BACK`                     | 364                                                                   | Largura da janela para trás a partir de hoje 00h.                                                     |
+| `INSERT_BATCH_SIZE`             | 300                                                                   | Tamanho do lote de insert.                                                                            |
+| `WEEKDAY_TARGET_MIN/MAX`        | 21 / 26                                                               | Faixa de meta diária para dias de semana (por unidade).                                               |
+| `WEEKEND_TARGET_MIN/MAX`        | 14 / 19                                                               | Faixa de meta diária para fins de semana (por unidade).                                               |
+| `ABSOLUTE_MAX_PER_DAY`          | 30                                                                    | **Regra suprema (histórico):** nunca mais que isto de documentos com o mesmo dia civil (por unidade). |
+| `TODAY_TOTAL_CAP`               | 45                                                                    | Teto do dia atual (concluídos + ativos + fila).                                                       |
+| `TCC_MIN_COMPLETED_PER_PATIENT` | 10                                                                    | Mínimo de concluídos para cada **paciente** TCC.                                                      |
+| `TCC_MIN_COMPLETED_PER_DOCTOR`  | 8                                                                     | Mínimo de concluídos com `doctorId` para cada **médico** TCC.                                         |
+| `TCC_MIN_COMPLETED_PER_NURSE`   | 8                                                                     | Mínimo de concluídos com `nurseId` para cada **enfermeiro** TCC.                                      |
+| `MIN_QUEUE_WAITING_TRIAGE`      | 5                                                                     | Atendimentos `WAITING_TRIAGE` sem `nurseId` na fila (por unidade, dia atual).                         |
+| `MIN_QUEUE_WAITING_ATTENDANCE`  | 5                                                                     | Atendimentos `WAITING_ATTENDANCE` sem `doctorId` na fila (por unidade, dia atual).                    |
+| `TCC_ACTIVE_PER_DOCTOR`         | 2                                                                     | Ativos `IN_ATTENDANCE` atribuídos por médico TCC no dia atual.                                        |
+| `TCC_ACTIVE_PER_NURSE`          | 1                                                                     | Ativos `IN_TRIAGE` atribuídos por enfermeiro TCC no dia atual.                                        |
+| `RISK_WEIGHTS`                  | NOT_URGENT 35, LESS_URGENT 30, URGENT 20, VERY_URGENT 10, EMERGENCY 5 | Distribuição ponderada de risco.                                                                      |
 
 `maxOccupancy` por unidade vem do documento `Unit` (fallback **50** se ausente/inválido).
 

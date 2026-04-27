@@ -5,7 +5,10 @@ import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { Nurse } from '../models/NurseModel.js'
 import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
-import { toCanonicalDiseaseKey, toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
+import {
+  toCanonicalDiseaseKey,
+  toDiseaseLabelPt
+} from '../constants/diseaseLabelsPt.js'
 import User from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
 

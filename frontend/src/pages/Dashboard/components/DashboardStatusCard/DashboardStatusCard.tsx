@@ -37,7 +37,9 @@ function DashboardStatusCard({
       <div className={styles.texts}>
         <div className={styles.value}>
           <span>{value ?? '-'}</span>
-          {subValue && <span className={styles.subValue}>{`(${subValue})`}</span>}
+          {subValue && (
+            <span className={styles.subValue}>{`(${subValue})`}</span>
+          )}
         </div>
         <span className={styles.label}>{label}</span>
       </div>

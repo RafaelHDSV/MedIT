@@ -4,7 +4,10 @@ import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserGender, UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
-import { toCanonicalDiseaseKey, toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
+import {
+  toCanonicalDiseaseKey,
+  toDiseaseLabelPt
+} from '../constants/diseaseLabelsPt.js'
 import { Patient } from '../models/PatientModel.js'
 import { Unit } from '../models/UnitModel.js'
 import User from '../models/UserModel.js'

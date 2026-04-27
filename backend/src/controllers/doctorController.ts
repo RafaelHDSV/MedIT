@@ -1,6 +1,9 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import { toCanonicalDiseaseKey, toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
+import {
+  toCanonicalDiseaseKey,
+  toDiseaseLabelPt
+} from '../constants/diseaseLabelsPt.js'
 import { DoctorSpecializations } from '../interfaces/IDoctor.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
