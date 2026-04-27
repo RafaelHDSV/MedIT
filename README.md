@@ -3,336 +3,122 @@
 ![GitHub language count](https://img.shields.io/github/languages/count/RafaelHDSV/MedIT?style=for-the-badge)
 ![GitHub repo size](https://img.shields.io/github/repo-size/RafaelHDSV/MedIT?style=for-the-badge)
 
-# 🏥 MedIT
+# MedIT
 
-Plataforma Digital de Apoio à Triagem e Organização do Fluxo Hospitalar com Mecanismo Inteligente Baseado em Regras.
+Plataforma web de apoio a triagem e organizacao do fluxo hospitalar, com sugestoes clinicas baseadas em regras.
 
----
+> Este README traz uma visao rapida para uso do projeto.  
+> Para documentacao completa de produto, arquitetura, fluxos e regras de negocio, consulte o [`context.md`](./context.md).
 
-# 📌 Sobre o Projeto
+## Visao geral
 
-O **MedIT** é uma plataforma web desenvolvida como Trabalho de Conclusão de Curso (TCC) com o objetivo de **apoiar a organização do fluxo hospitalar e auxiliar o processo de triagem clínica** em unidades de saúde.
+O **MedIT** foi desenvolvido no contexto de TCC para apoiar unidades de saude em:
 
-A proposta do sistema é oferecer **uma solução digital para melhorar a organização do atendimento**, reduzir gargalos operacionais e fornecer **suporte informacional aos profissionais de saúde**.
+- organizar filas e fluxo de atendimento;
+- registrar triagem e historico de atendimentos;
+- acompanhar indicadores em dashboard;
+- consultar disponibilidade de medicamentos por unidade;
+- oferecer sugestoes por regras (IA simbolica) como apoio ao profissional.
 
-O sistema **não substitui profissionais da saúde**, nem realiza diagnóstico automatizado. Ele atua apenas como **ferramenta de apoio à decisão**, utilizando um mecanismo de inferência baseado em regras para sugerir possíveis associações entre sintomas e condições clínicas.
+O sistema **nao substitui profissionais de saude** e **nao realiza diagnostico automatico**.
 
----
+## Principais modulos
 
-# 🎯 Objetivo
+- **Paciente:** pre-atendimento, acompanhamento da jornada e consulta de informacoes do atendimento.
+- **Enfermagem:** triagem, sinais vitais, classificacao de risco e encaminhamento para atendimento medico.
+- **Medico:** atendimento clinico, consulta de historico, sugestoes e conclusao do caso.
+- **Administrador de unidade:** dashboard operacional, gestao de usuarios e medicamentos da propria unidade.
 
-Desenvolver uma plataforma digital que permita:
+## Stack tecnica
 
-* Organização do fluxo de atendimento hospitalar
-* Registro estruturado de triagem clínica
-* Histórico digital de pacientes
-* Consulta de medicamentos disponíveis
-* Dashboard gerencial com indicadores operacionais
-* Sistema de apoio inteligente baseado em regras
+- **Frontend:** React 19, Vite 7, TypeScript, Ant Design, Sass, React Router, Axios.
+- **Backend:** Node.js, Express 5, TypeScript.
+- **Banco de dados:** MongoDB com Mongoose.
+- **Seguranca:** JWT (access/refresh) e bcrypt.
 
----
+## Estrutura do repositorio
 
-# 🧠 Funcionamento do Mecanismo Inteligente
-
-O sistema utiliza **Inteligência Artificial simbólica baseada em regras determinísticas**.
-
-Fluxo de funcionamento:
-
-1. O paciente informa sintomas durante a triagem.
-2. O sistema consulta uma base estruturada de sintomas e doenças.
-3. Um algoritmo calcula a compatibilidade entre os sintomas informados.
-4. O sistema retorna as condições com maior correspondência.
-
-⚠️ Importante:
-
-* Não existe aprendizado de máquina.
-* Não há diagnóstico automático.
-* As sugestões servem apenas como **apoio informativo ao profissional de saúde**.
-
----
-
-# 👥 Perfis de Usuário
-
-O sistema possui diferentes níveis de acesso:
-
-### Paciente
-
-* Cadastro de dados
-* Consulta de atendimento
-* Acesso a orientações médicas
-
-### Enfermeira (Triagem)
-
-* Registro de sintomas
-* Inserção de sinais vitais
-* Classificação de risco
-
-### Médico
-
-* Acesso ao histórico do paciente
-* Registro de diagnóstico
-* Emissão de orientações e receitas
-
-### Administrador / Gerente
-
-* Gestão do sistema
-* Controle de estoque de medicamentos
-* Dashboard estatístico
-
----
-
-# 🏗 Arquitetura do Sistema
-
-O sistema foi desenvolvido utilizando **arquitetura em camadas**:
-
-```
-Frontend (Interface do Usuário)
-        │
-        ▼
-Backend (API e Regras de Negócio)
-        │
-        ▼
-Banco de Dados (Persistência)
+```text
+medit/
+  backend/
+  frontend/
+  context.md
+  README.md
 ```
 
-Camadas principais:
+## Pre-requisitos
 
-* **Apresentação** → Interface web
-* **Aplicação** → Regras de negócio
-* **Persistência** → Banco de dados
-* **Segurança** → Autenticação e autorização
-* **Mecanismo de Inferência** → Associação sintoma-doença
+- Node.js 18+
+- Yarn
+- MongoDB
 
----
+## Como executar
 
-# 🧩 Tecnologias Utilizadas
+Comandos na raiz do projeto:
 
-## Frontend
-
-* React
-* TypeScript
-* Vite
-* Ant Design
-* React Router
-* Axios
-* Sass
-
-## Backend
-
-* Node.js
-* Express
-* TypeScript
-* MongoDB
-* Mongoose
-* JWT (autenticação)
-* Bcrypt (criptografia de senha)
-
----
-
-# 📂 Estrutura do Projeto
-
-```
-medit
-│
-├── backend
-│   ├── src
-│   │   ├── config
-│   │   ├── controllers
-│   │   ├── middlewares
-│   │   ├── models
-│   │   ├── repositories
-│   │   ├── routes
-│   │   ├── types
-│   │   ├── utils
-│   │   └── server
-│
-├── frontend
-│   ├── src
-│   │   ├── api
-│   │   ├── contexts
-│   │   ├── hooks
-│   │   ├── interfaces
-│   │   ├── layouts
-│   │   ├── pages
-│   │   ├── routes
-│   │   ├── styles
-│   │   └── utils
-│
-└── README.md
+```bash
+yarn
+yarn dev
 ```
 
----
+Esse fluxo sobe frontend e backend em paralelo.
 
-# ⚙️ Pré-requisitos
+### Execucao separada (opcional)
 
-Antes de executar o projeto, é necessário ter instalado:
+Backend:
 
-* Node.js 18+
-* Yarn
-* MongoDB
-* Git
-
----
-
-# 🚀 Como Executar o Projeto
-
-## 1️⃣ Clonar o repositório
-
-```
-git clone https://github.com/RafaelHDSV/MedIT.git
-```
-
-```
-cd medit
-```
-
----
-
-# 🔧 Configuração do Backend
-
-## Acessar a pasta do backend
-
-```
+```bash
 cd backend
-```
-
-## Instalar dependências
-
-```
 yarn
-```
-
-## Criar arquivo de ambiente
-
-Copie o arquivo `.env.example`:
-
-```
-cp .env.example .env
-```
-
-## Executar o servidor
-
-```
 yarn dev
 ```
 
-O backend será iniciado em:
+Frontend (em outro terminal):
 
-```
-http://localhost:3693
-```
-
----
-
-# 💻 Configuração do Frontend
-
-Abra um novo terminal.
-
-## Acessar pasta do frontend
-
-```
+```bash
 cd frontend
-```
-
-## Instalar dependências
-
-```
 yarn
-```
-
-## Criar arquivo de ambiente
-
-Copie o exemplo:
-
-```
-cp .env.example .env
-```
-
-## Executar aplicação
-
-```
 yarn dev
 ```
 
-A aplicação será executada em:
+## Variaveis de ambiente
 
-```
-http://localhost:3333
-```
+1. Crie os arquivos `.env` no `backend` e no `frontend` com base nos respectivos `.env.example`.
+2. Ajuste principalmente:
+   - backend: conexao MongoDB e segredos JWT;
+   - frontend: URL da API (`VITE_BACKEND_URL`).
 
----
+## Scripts uteis
 
-# 🔐 Autenticação
+Na raiz:
 
-O sistema utiliza **JWT (JSON Web Token)** para autenticação.
+- `yarn dev`: instala dependencias base e sobe frontend + backend;
+- `yarn test`: validacao de tipos nos pacotes;
+- `yarn format`: formatacao com Prettier;
+- `yarn scripts`: abre o runner de scripts do backend (seeds e utilitarios).
 
-Fluxo:
+Para detalhes de cada seed/fluxo, use o [`context.md`](./context.md) e a pasta `backend/src/scripts/`.
 
-1. Usuário realiza login
-2. Backend gera um token JWT
-3. Token é enviado ao frontend
-4. Token é utilizado para acessar rotas protegidas
+## Limites e escopo
 
----
+- projeto academico/prototipo funcional;
+- dados de demonstracao em parte do fluxo;
+- sem integracao oficial com sistemas SUS;
+- foco em apoio a decisao e organizacao operacional.
 
-# 📊 Funcionalidades Implementadas
+## Contribuicao e conduta
 
-✔ Cadastro de usuários
-✔ Autenticação com JWT
-✔ Proteção de rotas
-✔ Estrutura de layout administrativo
-✔ Sistema de contexto de autenticação
-✔ Organização modular de rotas
-✔ Integração frontend com API
+- Guia de contribuicao: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+- Codigo de conduta: [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
 
----
+## Licenca
 
-# 🔒 Segurança
+Este projeto esta sob licenca MIT.
 
-O projeto aplica algumas práticas básicas de segurança:
+## Autores
 
-* Hash de senhas com bcrypt
-* Autenticação via JWT
-* Validação de dados no backend
-* Uso de variáveis de ambiente
-* Separação de responsabilidades na arquitetura
-
----
-
-# 📚 Contexto Acadêmico
-
-Este projeto foi desenvolvido como **Trabalho de Conclusão de Curso (TCC)** no curso de **Análise e Desenvolvimento de Sistemas**.
-
-O objetivo acadêmico é demonstrar a aplicação prática de conceitos de:
-
-* Engenharia de Software
-* Arquitetura de Sistemas
-* Segurança da Informação
-* Modelagem de Banco de Dados
-* Inteligência Artificial baseada em regras
-* Desenvolvimento Web Full Stack
-
----
-
-# ⚠️ Limitações do Projeto
-
-* O sistema utiliza **dados simulados**
-* Não possui integração com o SUS
-* Não substitui diagnóstico médico
-* Desenvolvido apenas para fins acadêmicos
-
----
-
-# 📜 Licença
-
-Este projeto está sob a licença MIT.
-
----
-
-# 👨‍💻 Autor
-
-- Jonatas Lima - https://github.com/jonataslimaads-byte
-- Matheus Chagas - https://github.com/MatheusTakenaka
-- Rafael Silva - https://github.com/Rafasouza03
-- Rafael Vieira - https://github.com/RafaelHDSV
-- Victor Campos - https://github.com/Gil015
+- Jonatas Lima - [github.com/jonataslimaads-byte](https://github.com/jonataslimaads-byte)
+- Matheus Chagas - [github.com/MatheusTakenaka](https://github.com/MatheusTakenaka)
+- Rafael Silva - [github.com/Rafasouza03](https://github.com/Rafasouza03)
+- Rafael Vieira - [github.com/RafaelHDSV](https://github.com/RafaelHDSV)
+- Victor Campos - [github.com/Gil015](https://github.com/Gil015)
