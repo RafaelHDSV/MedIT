@@ -15,10 +15,12 @@ import styles from '../../AttendanceQueueChart.module.scss'
 function AttendanceQueueChartDoctor({ item, loading }: IAttendanceItemProps) {
   const navigate = useNavigate()
   const [claiming, setClaiming] = useState(false)
+  const patientAge = getAgeByBirthDate(item?.patientBirthDate)
+  const ageLabel = Number.isFinite(patientAge) ? `${patientAge} anos` : '-'
 
   if (loading) {
     return (
-      <div className={styles.queueItem}>
+      <div className={`${styles.queueItem} ${styles.queueItemWithColumns}`}>
         <div className={styles.leftAside}>
           <div className={styles.avatarSkeleton} />
 
@@ -39,16 +41,14 @@ function AttendanceQueueChartDoctor({ item, loading }: IAttendanceItemProps) {
   }
 
   return (
-    <div className={styles.queueItem}>
+    <div className={`${styles.queueItem} ${styles.queueItemWithColumns}`}>
       <div className={styles.patientInfo}>
         <UserBall name={item?.patientName} />
         <TooltipColumn className={styles.name} text={item?.patientName} />
       </div>
 
       <div className={styles.detailsSecondary}>
-        <TooltipColumn
-          text={`${getAgeByBirthDate(item?.patientBirthDate)} anos`}
-        />
+        <TooltipColumn text={ageLabel} />
       </div>
       <div className={styles.detailsSecondary}>
         <TooltipColumn text={item?.complaint} />

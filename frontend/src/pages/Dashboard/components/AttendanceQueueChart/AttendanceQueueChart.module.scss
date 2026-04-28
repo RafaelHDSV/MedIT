@@ -63,12 +63,14 @@
   .patientInfo {
     max-width: 20rem;
     width: 100% !important;
+    min-width: 0;
   }
 
   .detailsSecondary,
   .detailsRisk {
     max-width: 10rem;
     width: 100% !important;
+    min-width: 0;
   }
 
   .detailsSecondary {
@@ -161,5 +163,37 @@
     100% {
       left: 150%;
     }
+  }
+}
+
+.queueItemWithColumns {
+  display: grid;
+  grid-template-columns: minmax(14rem, 2.2fr) minmax(5.25rem, 0.7fr) minmax(
+      7.5rem,
+      1.2fr
+    ) minmax(8.75rem, 1fr) minmax(7.5rem, 0.9fr) auto;
+  column-gap: 0.75rem;
+  align-items: center;
+
+  .patientInfo,
+  .detailsSecondary,
+  .detailsRisk {
+    max-width: none;
+    width: 100%;
+  }
+
+  .detailsRisk {
+    justify-self: start;
+  }
+
+  button {
+    justify-self: end;
+    white-space: nowrap;
+  }
+
+  @include max-md {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
   }
 }
