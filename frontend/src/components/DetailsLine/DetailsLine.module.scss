@@ -2,7 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
   width: 100%;
+  min-width: 0;
   height: 100%;
   border-bottom: 1px solid var(--border);
   padding: 0.5rem 0;
@@ -10,11 +12,21 @@
 
 .label {
   font-weight: bold;
+  flex: 0 0 auto;
 }
 
 .value {
   text-align: right;
   color: var(--gray);
-  max-width: 50%;
-  height: 100%;
+  width: 70%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.truncate {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

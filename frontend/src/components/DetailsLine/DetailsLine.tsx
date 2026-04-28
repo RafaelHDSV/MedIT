@@ -16,12 +16,12 @@ function DetailsLine({ label, value, checked }: IDetailsLineProps) {
   return (
     <div className={styles.container}>
       <span className={styles.label}>{label}</span>
-      <Tooltip title={!isObject ? String(value) : ''}>
-        <span className={`${styles.value} ${!isObject ? 'ellipsis' : ''}`}>
-          {value}
-        </span>
-        {checked && '✅'}
-      </Tooltip>
+      <div className={styles.value}>
+        <Tooltip title={!isObject ? String(value) : ''}>
+          <span className={!isObject ? styles.truncate : ''}>{value}</span>
+          {checked && '✅'}
+        </Tooltip>
+      </div>
     </div>
   )
 }
