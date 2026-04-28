@@ -71,25 +71,40 @@ function buildVitalSignsPayload(
   const { temperature, bloodPressure, heartRate, oxygenSaturation } =
     draftVitalSign
 
-  const temperatureNumber = parseFloat(temperature.replace(',', '.'))
-  if (temperature && isValidNumber(temperatureNumber)) {
+  const parseNumericField = (value?: string) => {
+    if (!value?.trim()) return undefined
+    const normalized = value
+      .replace(',', '.')
+      .replace(/[^\d.-]/g, '')
+      .trim()
+    if (!normalized) return undefined
+    const parsed = Number(normalized)
+    return Number.isFinite(parsed) ? parsed : undefined
+  }
+
+  const temperatureNumber = parseNumericField(temperature)
+  if (temperatureNumber !== undefined && isValidNumber(temperatureNumber)) {
     vitalSign.temperature = temperatureNumber
   }
 
   if (bloodPressure) vitalSign.bloodPressure = bloodPressure
 
-  const heartRateNumber = Number(heartRate)
-  if (heartRate && isValidNumber(heartRateNumber) && heartRateNumber > 0) {
-    vitalSign.heartRate = heartRateNumber
+  const heartRateNumber = parseNumericField(heartRate)
+  if (
+    heartRateNumber !== undefined &&
+    isValidNumber(heartRateNumber) &&
+    heartRateNumber > 0
+  ) {
+    vitalSign.heartRate = Math.round(heartRateNumber)
   }
 
-  const oxygenSaturationNumber = Number(oxygenSaturation)
+  const oxygenSaturationNumber = parseNumericField(oxygenSaturation)
   if (
-    oxygenSaturation &&
+    oxygenSaturationNumber !== undefined &&
     isValidNumber(oxygenSaturationNumber) &&
     oxygenSaturationNumber >= 0
   ) {
-    vitalSign.oxygenSaturation = oxygenSaturationNumber
+    vitalSign.oxygenSaturation = Math.round(oxygenSaturationNumber)
   }
 
   return Object.keys(vitalSign).length > 0 ? vitalSign : undefined
@@ -344,7 +359,7 @@ function AttendanceDetails() {
         risk,
         symptoms: selectedSymptoms,
         generalObservation: observation,
-        vitalSigns: vitalSignsPayload ?? {},
+        ...(vitalSignsPayload ? { vitalSigns: vitalSignsPayload } : {}),
         ...(finalPainLevel !== undefined ? { painLevel: finalPainLevel } : {})
       })
       setTriageModalOpen(false)
