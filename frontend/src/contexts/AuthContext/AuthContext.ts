@@ -6,6 +6,7 @@ export interface AuthContextType {
   user: IAuthUser | null
   login: (payload: LoginPayload) => void
   logout: (options?: { skipConfirm?: boolean }) => Promise<void>
+  updateUser: (patch: Partial<IAuthUser>) => void
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null)

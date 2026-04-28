@@ -35,6 +35,16 @@ export function AuthProvider({ children }: Props) {
     return true
   }
 
+  function updateUser(patch: Partial<IAuthUser>) {
+    setUser((previousUser) => {
+      if (!previousUser) return previousUser
+
+      const nextUser = { ...previousUser, ...patch }
+      localStorage.setItem('user', JSON.stringify(nextUser))
+      return nextUser
+    })
+  }
+
   function clearLocalSession() {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
@@ -104,7 +114,7 @@ export function AuthProvider({ children }: Props) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

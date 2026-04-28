@@ -21,7 +21,7 @@ import PreRegistrationModal from './components/PreRegistrationModal/PreRegistrat
 import SymptomsInfo from './components/SymptomsInfo/SymptomsInfo'
 
 function PreRegistration() {
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
   const navigate = useNavigate()
   const [form] = useForm()
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([])
@@ -88,6 +88,24 @@ function PreRegistration() {
           allergies: values.allergies,
           generalObservation: values.generalObservation
         }
+      })
+
+      const normalizedList = (value?: string) =>
+        value
+          ?.split(',')
+          .map((item) => item.trim())
+          .filter(Boolean)
+
+      updateUser({
+        ...(values.birthDate ? { birthDate: values.birthDate.toDate() } : {}),
+        ...(values.gender ? { gender: values.gender } : {}),
+        ...(values.conditions !== undefined
+          ? { conditions: normalizedList(values.conditions) }
+          : {}),
+        ...(values.allergies !== undefined
+          ? { allergies: normalizedList(values.allergies) }
+          : {}),
+        ...(unitId ? { unitId } : {})
       })
 
       setIsOpen(false)
