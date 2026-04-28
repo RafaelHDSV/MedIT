@@ -26,5 +26,6 @@ dist-ssr
 *.sw?
 .claude
 .claude/*
-.cursor
 .cursor/*
+*.cursor
+*.cursor/*
