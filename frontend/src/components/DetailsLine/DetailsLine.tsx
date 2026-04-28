@@ -12,15 +12,25 @@ export interface IDetailsLineProps {
 
 function DetailsLine({ label, value, checked }: IDetailsLineProps) {
   const isObject = typeof value === 'object'
+  const displayValue = value ?? '-'
 
   return (
     <div className={styles.container}>
       <span className={styles.label}>{label}</span>
       <div className={styles.value}>
-        <Tooltip title={!isObject ? String(value) : ''}>
-          <span className={!isObject ? styles.truncate : ''}>{value}</span>
-          {checked && '✅'}
-        </Tooltip>
+        {isObject ? (
+          <>
+            {value}
+            {checked && '✅'}
+          </>
+        ) : (
+          <Tooltip title={String(displayValue)}>
+            <span className={styles.tooltipTrigger}>
+              <span className={styles.truncate}>{displayValue}</span>
+              {checked && '✅'}
+            </span>
+          </Tooltip>
+        )}
       </div>
     </div>
   )

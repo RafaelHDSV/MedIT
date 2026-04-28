@@ -16,15 +16,25 @@
 }
 
 .value {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
   text-align: right;
   color: var(--gray);
   width: 70%;
   min-width: 0;
-  overflow: hidden;
+}
+
+.tooltipTrigger {
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
 }
 
 .truncate {
-  display: block;
+  display: inline-block;
   max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
