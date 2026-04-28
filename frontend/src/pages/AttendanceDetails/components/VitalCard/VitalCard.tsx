@@ -1,6 +1,7 @@
 import { InputText } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
 import { UserLevels } from '@/interfaces/IUser'
+import masks, { type MaskEnum } from '@/utils/masks'
 import styles from './VitalCard.module.scss'
 
 interface IVitalCard {
@@ -17,7 +18,7 @@ function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
   const isNurse = user?.level === UserLevels.NURSE
   const canEditVital = isNurse
 
-  const labelsToMasks = () => {
+  const labelsToMasks = (): MaskEnum | undefined => {
     switch (label) {
       case 'Temperatura':
         return 'temperature'
@@ -29,7 +30,12 @@ function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange?.(e.target.value)
+    const maskType = labelsToMasks()
+    const nextValue = maskType
+      ? masks(e.target.value, maskType) || e.target.value
+      : e.target.value
+
+    onChange?.(nextValue)
   }
 
   return (
