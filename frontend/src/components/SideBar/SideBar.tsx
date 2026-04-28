@@ -3,6 +3,7 @@ import SidebarModel from '@/models/SidebarModel'
 import { ROUTES } from '@/routes/constants'
 import routes, { type IRoute } from '@/routes/routes'
 import { CaretDownIcon, CaretUpIcon, ListIcon } from '@phosphor-icons/react'
+import { Tooltip } from 'antd'
 import { useState } from 'react'
 import { matchPath, NavLink, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
@@ -96,27 +97,31 @@ function SidebarItems({ isCompact }: ISidebarItemsProps) {
     }
 
     return (
-      <li key={route.path}>
-        <NavLink
-          to={route.path}
-          className={({ isActive }) => {
-            const isActiveWithParamsValidation = !!matchPath(
-              { path: route.path, end: true },
-              location.pathname
-            )
+      <Tooltip title={isCompact ? route.name : ''} placement='right'>
+        <li key={route.path}>
+          <NavLink
+            to={route.path}
+            className={({ isActive }) => {
+              const isActiveWithParamsValidation = !!matchPath(
+                { path: route.path, end: true },
+                location.pathname
+              )
 
-            return isActive || isActiveWithParamsValidation
-              ? styles.activeLink
-              : styles.link
-          }}
-          end={route.path === ROUTES.DASHBOARD.path}
-        >
-          <div className={styles.linkContent}>
-            {route.icon && <route.icon size={22} className={styles.linkIcon} />}
-            {!isCompact ? route.name : ''}
-          </div>
-        </NavLink>
-      </li>
+              return isActive || isActiveWithParamsValidation
+                ? styles.activeLink
+                : styles.link
+            }}
+            end={route.path === ROUTES.DASHBOARD.path}
+          >
+            <div className={styles.linkContent}>
+              {route.icon && (
+                <route.icon size={22} className={styles.linkIcon} />
+              )}
+              {!isCompact ? route.name : ''}
+            </div>
+          </NavLink>
+        </li>
+      </Tooltip>
     )
   }
 

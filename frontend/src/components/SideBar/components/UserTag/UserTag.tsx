@@ -19,35 +19,37 @@ function UserTag({ isCompact }: IUserTagProps) {
   const textColor = getContrastColor(bgColor)
 
   return (
-    <button
-      className={`${styles.user} ${isCompact ? styles.compact : ''}`}
-      onClick={() => logout()}
-    >
-      {!isCompact ? (
-        <div className={styles.userContent}>
-          <UserBall name={shortName} />
+    <Tooltip title={isCompact ? 'Sair da conta' : ''} placement='right'>
+      <button
+        className={`${styles.user} ${isCompact ? styles.compact : ''}`}
+        onClick={() => logout()}
+      >
+        {!isCompact ? (
+          <div className={styles.userContent}>
+            <UserBall name={shortName} />
 
-          <div className={styles.userInfo}>
-            <Tooltip
-              title={user?.name}
-              color={bgColor}
-              styles={{
-                container: {
-                  color: textColor
-                }
-              }}
-            >
-              <strong className='ellipsis'>{shortName}</strong>
-            </Tooltip>
-            {user?.level && <p>{UserLevelsLabels[user.level]}</p>}
+            <div className={styles.userInfo}>
+              <Tooltip
+                title={user?.name}
+                color={bgColor}
+                styles={{
+                  container: {
+                    color: textColor
+                  }
+                }}
+              >
+                <strong className='ellipsis'>{shortName}</strong>
+              </Tooltip>
+              {user?.level && <p>{UserLevelsLabels[user.level]}</p>}
+            </div>
           </div>
-        </div>
-      ) : (
-        <></>
-      )}
+        ) : (
+          <></>
+        )}
 
-      <SignOutIcon className={styles.icon} size={22} />
-    </button>
+        <SignOutIcon className={styles.icon} size={22} />
+      </button>
+    </Tooltip>
   )
 }
 
