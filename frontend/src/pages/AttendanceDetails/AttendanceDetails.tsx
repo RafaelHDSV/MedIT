@@ -130,6 +130,12 @@ function AttendanceDetails() {
   const [completeModalOpen, setCompleteModalOpen] = useState(false)
   const [completeModalKey, setCompleteModalKey] = useState(0)
   const [triageModalOpen, setTriageModalOpen] = useState(false)
+  const [triageSnapshot, setTriageSnapshot] = useState<{
+    risk?: AttendanceRisk
+    symptoms: string[]
+    observation: string
+    vitalDraft: VitalFieldDraft
+  } | null>(null)
   const [suggestionDetail, setSuggestionDetail] =
     useState<ISuggestionDetails | null>(null)
   const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
@@ -334,7 +340,14 @@ function AttendanceDetails() {
   async function handleCompleteTriage() {
     if (!attendanceId || !attendance) return
 
-    const risk = selectedRisk ?? attendance.risk
+    const source = triageSnapshot ?? {
+      risk: selectedRisk,
+      symptoms: selectedSymptoms,
+      observation,
+      vitalDraft
+    }
+
+    const risk = source.risk ?? attendance.risk
     if (!risk) {
       message.warning('Selecione a classificação de risco.')
       return
@@ -349,8 +362,8 @@ function AttendanceDetails() {
         })
       }
 
-      const vitalSignsPayload = buildVitalSignsPayload(vitalDraft)
-      const { painLevel } = vitalDraft
+      const vitalSignsPayload = buildVitalSignsPayload(source.vitalDraft)
+      const { painLevel } = source.vitalDraft
       let finalPainLevel: number | undefined
 
       const parsedPainLevel = parseFloat(painLevel?.replace(',', '.'))
@@ -365,12 +378,13 @@ function AttendanceDetails() {
       await AttendancesFlowRepository.completeTriage({
         attendanceId: String(attendanceId),
         risk,
-        symptoms: selectedSymptoms,
-        generalObservation: observation,
+        symptoms: source.symptoms,
+        generalObservation: source.observation,
         ...(vitalSignsPayload ? { vitalSigns: vitalSignsPayload } : {}),
         ...(finalPainLevel !== undefined ? { painLevel: finalPainLevel } : {})
       })
       setTriageModalOpen(false)
+      setTriageSnapshot(null)
       message.success(
         'Triagem concluída. O paciente foi encaminhado à fila médica.'
       )
@@ -397,13 +411,20 @@ function AttendanceDetails() {
   }
 
   function openTriageModal() {
-    if (!attendanceId || !isNurse) return
+    if (!attendanceId || !isNurse || !attendance) return
+    setTriageSnapshot({
+      risk: selectedRisk ?? attendance.risk,
+      symptoms: [...selectedSymptoms],
+      observation,
+      vitalDraft: { ...vitalDraft }
+    })
     setTriageModalOpen(true)
   }
 
   function closeTriageModal() {
     if (triageLoading) return
     setTriageModalOpen(false)
+    setTriageSnapshot(null)
   }
 
   async function handleCompleteAttendance(payload: ICompleteAttendancePayload) {
@@ -523,11 +544,19 @@ function AttendanceDetails() {
           loading={triageLoading}
           onClose={closeTriageModal}
           onConfirm={handleCompleteTriage}
-          risk={selectedRisk}
-          symptoms={selectedSymptoms}
+          risk={triageSnapshot?.risk}
+          symptoms={triageSnapshot?.symptoms ?? []}
           symptomLabelByKey={symptomLabelByKey}
-          observation={observation}
-          vitalDraft={vitalDraft}
+          observation={triageSnapshot?.observation ?? ''}
+          vitalDraft={
+            triageSnapshot?.vitalDraft ?? {
+              temperature: '',
+              bloodPressure: '',
+              heartRate: '',
+              oxygenSaturation: '',
+              painLevel: ''
+            }
+          }
         />
       ) : null}
 
