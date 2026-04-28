@@ -37,7 +37,7 @@ function UserTag({ isCompact }: IUserTagProps) {
                 }
               }}
             >
-              <strong>{shortName}</strong>
+              <strong className='ellipsis'>{shortName}</strong>
             </Tooltip>
             {user?.level && <p>{UserLevelsLabels[user.level]}</p>}
           </div>

@@ -21,13 +21,10 @@
     align-items: flex-start;
 
     strong {
-      display: flex;
       font-size: 14px;
       color: var(--black);
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-      width: 6.5rem;
+      max-width: 90%;
+      width: 100%;
     }
 
     p {
