@@ -33,6 +33,7 @@ import styles from './AttendanceDetails.module.scss'
 import CompleteAttendanceModal, {
   type ICompleteAttendancePayload
 } from './components/CompleteAttendanceModal/CompleteAttendanceModal'
+import ConfirmTriageModal from './components/ConfirmTriageModal/ConfirmTriageModal'
 import ConditionsCard from './components/ConditionsCard/ConditionsCard'
 import SuggestionDetailModal from './components/SuggestionDetailModal/SuggestionDetailModal'
 import VitalCard from './components/VitalCard/VitalCard'
@@ -112,6 +113,7 @@ function AttendanceDetails() {
   const [completeLoading, setCompleteLoading] = useState(false)
   const [completeModalOpen, setCompleteModalOpen] = useState(false)
   const [completeModalKey, setCompleteModalKey] = useState(0)
+  const [triageModalOpen, setTriageModalOpen] = useState(false)
   const [suggestionDetail, setSuggestionDetail] =
     useState<ISuggestionDetails | null>(null)
   const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
@@ -345,6 +347,7 @@ function AttendanceDetails() {
         vitalSigns: vitalSignsPayload ?? {},
         ...(finalPainLevel !== undefined ? { painLevel: finalPainLevel } : {})
       })
+      setTriageModalOpen(false)
       message.success(
         'Triagem concluída. O paciente foi encaminhado à fila médica.'
       )
@@ -368,6 +371,16 @@ function AttendanceDetails() {
   function closeCompleteModal() {
     if (completeLoading) return
     setCompleteModalOpen(false)
+  }
+
+  function openTriageModal() {
+    if (!attendanceId || !isNurse) return
+    setTriageModalOpen(true)
+  }
+
+  function closeTriageModal() {
+    if (triageLoading) return
+    setTriageModalOpen(false)
   }
 
   async function handleCompleteAttendance(payload: ICompleteAttendancePayload) {
@@ -428,7 +441,7 @@ function AttendanceDetails() {
   const headerActions = (
     <Flex gap={8} wrap='wrap' justify='flex-end'>
       {isNurse && attendanceId ? (
-        <Button loading={triageLoading} onClick={handleCompleteTriage}>
+        <Button loading={triageLoading} onClick={openTriageModal}>
           Concluir triagem
         </Button>
       ) : null}
@@ -473,6 +486,20 @@ function AttendanceDetails() {
         exams={suggestionDetail?.exams ?? []}
         symptomLabelByKey={symptomLabelByKey}
       />
+
+      {isNurse ? (
+        <ConfirmTriageModal
+          open={triageModalOpen}
+          loading={triageLoading}
+          onClose={closeTriageModal}
+          onConfirm={handleCompleteTriage}
+          risk={selectedRisk}
+          symptoms={selectedSymptoms}
+          symptomLabelByKey={symptomLabelByKey}
+          observation={observation}
+          vitalDraft={vitalDraft}
+        />
+      ) : null}
 
       {isDoctor ? (
         <CompleteAttendanceModal

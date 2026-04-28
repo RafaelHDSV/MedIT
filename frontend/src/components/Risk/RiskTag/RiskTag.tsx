@@ -6,15 +6,16 @@ import styles from './RiskTag.module.scss'
 interface IRiskTagProps {
   risk?: AttendanceRisk
   className?: string
+  useTooltip?: boolean
 }
 
-function RiskTag({ risk, className }: IRiskTagProps) {
+function RiskTag({ risk, className, useTooltip = true }: IRiskTagProps) {
   if (!risk) return
 
   const label = AttendanceRiskLabels[risk]
 
   return (
-    <Tooltip title={label} className={className ?? ''}>
+    <Tooltip title={useTooltip ? label : undefined} className={className ?? ''}>
       <span
         className={`${styles.tag} ellipsis ${className ?? ''}`}
         style={

@@ -1,0 +1,97 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.subtitle {
+  margin: 0.5rem 0 1.25rem;
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+
+  &:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+
+  @include max-sm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.8rem;
+  color: var(--light-gray);
+}
+
+.value {
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.muted {
+  color: var(--light-gray);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.observation {
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--background);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.footer {
+  margin-top: 1.25rem;
+}
