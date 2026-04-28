@@ -2,8 +2,6 @@ import Button from '@/components/Button/Button'
 import TooltipColumn from '@/components/ListTable/components/TooltipColumn/TooltipColumn'
 import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import UserBall from '@/components/UserBall/UserBall'
-import { handleApiError } from '@/helpers/handleApiError'
-import AttendancesFlowRepository from '@/repositories/AttendancesFlowRepository'
 import { ROUTES } from '@/routes/constants'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import { timeAgo } from '@/utils/timeAgo'
@@ -67,25 +65,14 @@ function AttendanceQueueChartDoctor({ item, loading }: IAttendanceItemProps) {
         loading={claiming}
         onClick={async () => {
           if (!item?._id) return
-          try {
-            setClaiming(true)
-            await AttendancesFlowRepository.claimConsultation({
-              attendanceId: String(item._id)
-            })
-            navigate(
-              ROUTES.ATTENDANCE_DETAILS.path.replace(
-                ':attendanceId',
-                String(item._id)
-              )
+          setClaiming(true)
+          navigate(
+            ROUTES.ATTENDANCE_DETAILS.path.replace(
+              ':attendanceId',
+              String(item._id)
             )
-          } catch (err) {
-            handleApiError({
-              err,
-              defaultMessage: 'Não foi possível assumir este atendimento.'
-            })
-          } finally {
-            setClaiming(false)
-          }
+          )
+          setClaiming(false)
         }}
       >
         Iniciar Atendimento

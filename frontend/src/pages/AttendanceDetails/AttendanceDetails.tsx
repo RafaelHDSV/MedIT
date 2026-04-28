@@ -8,6 +8,7 @@ import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import {
   AttendanceRisk,
+  AttendanceStatus,
   type IAttendanceDetails,
   type IVitalSigns,
   type VitalFieldDraft
@@ -341,6 +342,13 @@ function AttendanceDetails() {
 
     try {
       setTriageLoading(true)
+
+      if (attendance.status === AttendanceStatus.WAITING_TRIAGE) {
+        await AttendancesFlowRepository.claimTriage({
+          attendanceId: String(attendanceId)
+        })
+      }
+
       const vitalSignsPayload = buildVitalSignsPayload(vitalDraft)
       const { painLevel } = vitalDraft
       let finalPainLevel: number | undefined
@@ -406,6 +414,13 @@ function AttendanceDetails() {
     }
     try {
       setCompleteLoading(true)
+
+      if (attendance?.status === AttendanceStatus.WAITING_ATTENDANCE) {
+        await AttendancesFlowRepository.claimConsultation({
+          attendanceId: String(attendanceId)
+        })
+      }
+
       await AttendancesFlowRepository.completeAttendance({
         attendanceId: String(attendanceId),
         diagnosisKey: payload.diagnosisKey,
