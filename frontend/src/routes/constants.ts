@@ -87,6 +87,6 @@ export const ROUTES = {
   TRIAGES_DETAILS: {
     name: 'Detalhes da triagem',
     description: 'Visualize um resumo das informações completas da triagem.',
-    path: '/auth/triage/:id'
+    path: '/auth/triage/:attendanceId'
   }
 }
