@@ -56,7 +56,7 @@ function PatientsDetails() {
     } catch (err) {
       handleApiError({
         err,
-        defaultMessage: 'Erro ao carregar os atendimentos do enfermeiro(a)'
+        defaultMessage: 'Erro ao carregar os atendimentos do paciente'
       })
     } finally {
       setAttendancesLoading(false)
