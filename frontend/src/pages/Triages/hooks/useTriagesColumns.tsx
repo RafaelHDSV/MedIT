@@ -15,7 +15,9 @@ export function useTriagesColumns() {
   const handleNavigateToDetails = useCallback(
     (id: ObjectId | undefined) => {
       if (!id) return
-      navigate(ROUTES.TRIAGES_DETAILS.path.replace(':id', id.toString()))
+      navigate(
+        ROUTES.TRIAGES_DETAILS.path.replace(':attendanceId', id.toString())
+      )
     },
     [navigate]
   )
