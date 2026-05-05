@@ -1,16 +1,16 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
-import { UserGender, UserLevels } from '../interfaces/IUser.js'
-import { Attendance } from '../models/AttendanceModel.js'
-import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import {
   toCanonicalDiseaseKey,
   toDiseaseLabelPt
 } from '../constants/diseaseLabelsPt.js'
+import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
+import { UserGender, UserLevels } from '../interfaces/IUser.js'
+import { Attendance } from '../models/AttendanceModel.js'
 import { Patient } from '../models/PatientModel.js'
 import { Unit } from '../models/UnitModel.js'
 import User from '../models/UserModel.js'
+import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import capitalize from '../utils/capitalize.js'
 import normalizeStringArray from '../utils/normalizeStringArray.js'
 
@@ -20,6 +20,15 @@ const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
   if (pain >= 4) return AttendanceRisk.LESS_URGENT
   return AttendanceRisk.NOT_URGENT
 }
+
+const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
+  AttendanceStatus.ON_THE_WAY,
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE
+]
 
 const attendanceIdFromParams = (value: string | string[] | undefined) =>
   String(Array.isArray(value) ? value[0] : value)
@@ -507,6 +516,16 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
       return res.status(400).json({
         message: 'Unidade de saúde não encontrada.',
         errors: { unitId: 'Unidade inválida' }
+      })
+    }
+
+    const existingActive = await Attendance.findOne({
+      patientId: patient._id,
+      status: { $in: PATIENT_ACTIVE_ATTENDANCE_STATUSES }
+    })
+    if (existingActive) {
+      return res.status(409).json({
+        message: 'Você já possui um atendimento em andamento.'
       })
     }
 

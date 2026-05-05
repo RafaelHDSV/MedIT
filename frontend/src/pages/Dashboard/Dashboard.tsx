@@ -34,6 +34,15 @@ import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQu
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import styles from './Dashboard.module.scss'
 
+const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
+  AttendanceStatus.ON_THE_WAY,
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE
+]
+
 function Dashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -43,7 +52,7 @@ function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
   const [referenceDayjs, setReferenceDayjs] = useState(() => dayjs())
   const [reload, setReload] = useState(false)
-  const [onTheWayAttendance, setOnTheWayAttendance] =
+  const [patientActiveAttendance, setPatientActiveAttendance] =
     useState<IAttendance | null>(null)
   const [arrivalLoading, setArrivalLoading] = useState(false)
   const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
@@ -77,9 +86,9 @@ function Dashboard() {
     fetchDashboardStatus()
   }, [fetchDashboardStatus])
 
-  const fetchPatientOnTheWay = useCallback(async () => {
+  const fetchPatientActiveAttendance = useCallback(async () => {
     if (user?.level !== UserLevels.PATIENT || !user?._id) {
-      setOnTheWayAttendance(null)
+      setPatientActiveAttendance(null)
       return
     }
 
@@ -88,18 +97,23 @@ function Dashboard() {
         patientId: user._id
       })
       const list = response.data as IAttendance[]
-      const pending = list?.find(
-        (a) => a.status === AttendanceStatus.ON_THE_WAY
+      const actives = (list ?? []).filter((a) =>
+        PATIENT_ACTIVE_ATTENDANCE_STATUSES.includes(a.status)
       )
-      setOnTheWayAttendance(pending ?? null)
+      actives.sort((a, b) => {
+        const tb = dayjs(b.updatedAt ?? b.date).valueOf()
+        const ta = dayjs(a.updatedAt ?? a.date).valueOf()
+        return tb - ta
+      })
+      setPatientActiveAttendance(actives[0] ?? null)
     } catch {
-      setOnTheWayAttendance(null)
+      setPatientActiveAttendance(null)
     }
   }, [user?._id, user?.level])
 
   useEffect(() => {
-    void fetchPatientOnTheWay()
-  }, [fetchPatientOnTheWay])
+    fetchPatientActiveAttendance()
+  }, [fetchPatientActiveAttendance])
 
   const onReload = useCallback(() => {
     fetchDashboardStatus()
@@ -253,7 +267,9 @@ function Dashboard() {
       case UserLevels.PATIENT:
         return (
           <Flex vertical gap={12} align='flex-start'>
-            {onTheWayAttendance?._id ? (
+            {patientActiveAttendance?._id &&
+            patientActiveAttendance.status ===
+              AttendanceStatus.ON_THE_WAY ? (
               <Button
                 type='primary'
                 loading={arrivalLoading}
@@ -261,12 +277,12 @@ function Dashboard() {
                   try {
                     setArrivalLoading(true)
                     await PatientsRepository.confirmPatientArrival({
-                      attendanceId: String(onTheWayAttendance._id)
+                      attendanceId: String(patientActiveAttendance._id)
                     })
                     message.success(
                       'Chegada confirmada. Você entrou na fila de triagem da unidade.'
                     )
-                    setOnTheWayAttendance(null)
+                    setPatientActiveAttendance(null)
                     onReload()
                   } catch (err) {
                     handleApiError({
@@ -280,8 +296,9 @@ function Dashboard() {
               >
                 Confirmar chegada ao hospital
               </Button>
+            ) : patientActiveAttendance?._id ? (
+              <span>Você já tem um atendimento em andamento.</span>
             ) : (
-              // VIEIRA: Enquanto houver atendimento ativo, ele não pode criar outro
               <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
                 Clique para iniciar uma nova consulta
               </Button>
@@ -297,7 +314,7 @@ function Dashboard() {
     selectedPeriod,
     referenceDayjs,
     reload,
-    onTheWayAttendance,
+    patientActiveAttendance,
     arrivalLoading,
     onReload
   ])
