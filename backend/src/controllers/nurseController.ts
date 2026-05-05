@@ -1,15 +1,16 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import { NurseShifts } from '../interfaces/INurse.js'
-import { UserLevels } from '../interfaces/IUser.js'
-import { Attendance } from '../models/AttendanceModel.js'
-import { Nurse } from '../models/NurseModel.js'
-import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import {
   toCanonicalDiseaseKey,
   toDiseaseLabelPt
 } from '../constants/diseaseLabelsPt.js'
+import { AttendanceStatus } from '../interfaces/IAttendance.js'
+import { NurseShifts } from '../interfaces/INurse.js'
+import { UserLevels } from '../interfaces/IUser.js'
+import { Attendance } from '../models/AttendanceModel.js'
+import { Nurse } from '../models/NurseModel.js'
 import User from '../models/UserModel.js'
+import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import capitalize from '../utils/capitalize.js'
 
 export const getUsers = async (req: Request, res: Response) => {
@@ -267,16 +268,35 @@ export const deleteNurse = async (req: Request, res: Response) => {
 
 export const getAttendances = async (req: Request, res: Response) => {
   const { id } = req.params
+  const { completedTriage } = req.query
+  const isCompletedTriage = completedTriage === 'true'
 
   try {
+    const matchStage: Record<string, unknown> = {
+      nurseId: new Types.ObjectId(String(id))
+    }
+
+    if (isCompletedTriage) {
+      matchStage.status = {
+        $in: [
+          AttendanceStatus.WAITING_ATTENDANCE,
+          AttendanceStatus.IN_ATTENDANCE,
+          AttendanceStatus.ATTENDANCE_COMPLETED,
+          AttendanceStatus.CANCELED,
+          AttendanceStatus.COMPLETED
+        ]
+      }
+    }
+
     const attendances = await Attendance.aggregate<{
       _id: Types.ObjectId
       diagnosisKey?: string
       diagnosis?: string
       symptoms?: string[]
+      triagedAt?: Date | null
       [key: string]: unknown
     }>([
-      { $match: { nurseId: new Types.ObjectId(String(id)) } },
+      { $match: matchStage },
       {
         $lookup: {
           from: 'users',
@@ -305,6 +325,29 @@ export const getAttendances = async (req: Request, res: Response) => {
           conditions: 1,
           allergies: 1,
           date: 1,
+          triagedAt: {
+            $arrayElemAt: [
+              {
+                $map: {
+                  input: {
+                    $filter: {
+                      input: { $ifNull: ['$changesHistory', []] },
+                      as: 'history',
+                      cond: {
+                        $eq: [
+                          '$$history.status',
+                          AttendanceStatus.WAITING_ATTENDANCE
+                        ]
+                      }
+                    }
+                  },
+                  as: 'triageHistory',
+                  in: '$$triageHistory.changedAt'
+                }
+              },
+              0
+            ]
+          },
           risk: 1,
           status: 1,
           unitId: 1,

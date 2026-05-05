@@ -39,15 +39,15 @@ export function useTriagesColumns() {
       },
       {
         title: 'Triado em',
-        dataIndex: 'date',
-        key: 'date',
+        dataIndex: 'triagedAt',
+        key: 'triagedAt',
         width: 180,
         ellipsis: true,
-        render: (date: Date | string) => (
+        render: (triagedAt: Date | string, attendance: IAttendance) => (
           <TooltipColumn
             text={
-              date
-                ? `${dayjs(date).format('DD/MM/YYYY')} às ${dayjs(date).format('HH:mm')}`
+              (triagedAt ?? attendance.date)
+                ? `${dayjs(triagedAt ?? attendance.date).format('DD/MM/YYYY')} às ${dayjs(triagedAt ?? attendance.date).format('HH:mm')}`
                 : undefined
             }
           />

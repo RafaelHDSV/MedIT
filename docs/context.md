@@ -450,6 +450,12 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 - Frontend: o modal de detalhes (`MedicationDetailsModal`) exibe ação de editar apenas para níveis permitidos e quando `selectedMedication.unitId === user.unitId`.
 - Backend: nova rota `PUT /auth/medications/:medicationId` em `medicationRoutes.ts` com validação de payload, bloqueio para `UserLevels.PATIENT` e bloqueio de edição de medicamento de outra unidade.
 
+**Histórico de triagens (filtro e data correta)**
+
+- Endpoint de enfermagem `GET /auth/nurses/:id/attendances` passou a aceitar `completedTriage=true`; quando presente, a API retorna apenas triagens concluídas pelo enfermeiro (status `waitingAttendance` e posteriores: `inAttendance`, `attendanceCompleted`, `canceled`, `completed`).
+- Na projeção da API, o campo `triagedAt` é derivado de `changesHistory` (primeira transição para `waitingAttendance`).
+- A página `frontend/src/pages/Triages/Triages.tsx` envia `completedTriage=true` e a coluna **"Triado em"** usa `triagedAt` (com fallback para `date` quando necessário em dados legados).
+
 **Em evolução / parcial**
 
 - Algumas áreas ainda podem usar **placeholders** ou integração incompleta em relação à visão completa do TCC (ex.: relatórios exportáveis, notificações push).

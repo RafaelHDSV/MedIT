@@ -87,6 +87,7 @@ export interface IAttendance extends IBaseInterface {
   diagnosis?: string
   diagnosisText?: string
   date: Date
+  triagedAt?: Date
   risk: AttendanceRisk
   status: AttendanceStatus
   unitId: ObjectId
