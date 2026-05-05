@@ -13,16 +13,40 @@
 }
 
 .card {
+  position: relative;
+  overflow: hidden;
   background: var(--white);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  transition: all ease-in-out 200ms;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  &.isActive {
+    border-color: var(--primary-color);
+    background-color: var(--primary-opaque);
+    box-shadow: 0 0.25rem 0.5rem var(--secondary-color);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: var(--primary-color);
+    }
+
+    .cardHeader h3 {
+      font-weight: 700;
+      color: var(--primary-color);
+    }
   }
 
   .cardHeader {
@@ -35,15 +59,13 @@
       font-size: 18px;
       font-weight: 600;
       color: var(--black);
+      transition: color 0.3s ease;
     }
   }
 
   .address {
     font-size: 14px;
     color: var(--light-gray);
+ 
   }
-}
-
-.isActive {
-  border: 2px solid var(--primary-color);
 }
