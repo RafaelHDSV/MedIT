@@ -117,6 +117,7 @@ function ModalContent({
         setFieldErrors
       })
     } finally {
+      setFieldErrors({})
       setLoading(false)
     }
   }
@@ -137,6 +138,7 @@ function ModalContent({
       open={isModalOpen}
       onCancel={handleClose}
       footer={null}
+      destroyOnHidden
       centered
     >
       <h2>

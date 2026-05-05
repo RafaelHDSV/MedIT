@@ -11,6 +11,7 @@ import {
   type InputRef,
   type SelectProps
 } from 'antd'
+import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { useState, type RefObject } from 'react'
 import MultiDatepicker from '../MultiDatepicker/MultiDatepicker'
@@ -20,7 +21,6 @@ import {
   type DayjsValue,
   type RangeValue
 } from '../MultiDatepicker/types'
-import type { Dayjs } from 'dayjs'
 import styles from './FormComponents.module.scss'
 
 interface IFormItemProps extends FormItemProps {
@@ -90,6 +90,7 @@ function InputSelect({ className, inputHeight, ...rest }: IInputSelectProps) {
     <Select
       className={`${styles.select} ${className || ''}`}
       style={{ '--input-height': inputHeight || '3rem' } as React.CSSProperties}
+      showSearch={{ optionFilterProp: 'label' }}
       {...rest}
     />
   )
@@ -197,3 +198,4 @@ function InputDate({
 }
 
 export { FormItem, InputDashboardPeriodDate, InputDate, InputSelect, InputText }
+

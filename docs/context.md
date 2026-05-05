@@ -411,6 +411,7 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 
 - API Express com rotas de autenticação, usuários, médicos, enfermeiros, pacientes, unidades, medicamentos e dashboard.
 - Frontend com áreas: autenticação, dashboard, pacientes, enfermeiros, médicos, unidades, medicamentos, atendimentos, triagens, pré-cadastro (`PreRegistration`), detalhes de atendimento.
+- Páginas de detalhe de usuários (`DoctorDetails`, `NursesDetails`, `PatientsDetails`) com fallback seguro para **sem atendimentos**: o card "Último Atendimento" exibe "Sem atendimentos registrados" sem `TypeError`, e sinais vitais ausentes não mostram `undefined`.
 - Modelos Mongoose alinhados ao domínio (atendimento com status, risco, vitais, vínculos).
 - Base extensa de **doenças × sintomas** para experimentação do mecanismo de regras (seed no backend).
 

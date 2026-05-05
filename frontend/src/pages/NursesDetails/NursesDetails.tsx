@@ -24,7 +24,7 @@ import styles from './NursesDetails.module.scss'
 function NursesDetails() {
   const params = useParams<{ id: string }>()
   const [nurse, setNurse] = useState<INurse | null>(null)
-  const [attendances, setAttendances] = useState<IAttendance[]>()
+  const [attendances, setAttendances] = useState<IAttendance[]>([])
   const [detailsLoading, setDetailsLoading] = useState(true)
   const [attendancesLoading, setAttendancesLoading] = useState(true)
   const loading = detailsLoading || attendancesLoading
@@ -52,7 +52,7 @@ function NursesDetails() {
       const response = await NursesRepository.getAttendances({
         nurseId: params.id
       })
-      setAttendances(response.data)
+      setAttendances(response.data ?? [])
     } catch (err) {
       handleApiError({
         err,
@@ -67,6 +67,50 @@ function NursesDetails() {
     fetchNurseDetails()
     fetchNursesAttendances()
   }, [fetchNurseDetails, fetchNursesAttendances])
+
+  const lastAttendance = attendances?.[0]
+  const lastAttendanceItems = lastAttendance
+    ? [
+        {
+          label: 'Queixa do Paciente',
+          value: lastAttendance.complaint ?? '-'
+        },
+        {
+          label: 'Temperatura',
+          value:
+            lastAttendance.vitalSigns?.temperature != null
+              ? `${lastAttendance.vitalSigns.temperature} °C`
+              : '-'
+        },
+        {
+          label: 'Pressão',
+          value:
+            lastAttendance.vitalSigns?.bloodPressure != null
+              ? `${lastAttendance.vitalSigns.bloodPressure} mmHg`
+              : '-'
+        },
+        {
+          label: 'Sugestão IA',
+          value: lastAttendance.iaTopSuggestion ?? 'n/a',
+          checked: lastAttendance.isIaTopSuggestionMatchDiagnosis
+        },
+        {
+          label: 'Data',
+          value: lastAttendance.date
+            ? dayjs(lastAttendance.date).format('DD/MM/YYYY')
+            : '-'
+        }
+      ]
+    : [{ label: 'Sem atendimentos registrados', value: '-' }]
+
+  const historyItems =
+    attendances.length > 0
+      ? attendances?.map((attendance) => ({
+          key: attendance._id,
+          label: dayjs(attendance.date).format('DD/MM/YYYY'),
+          value: attendance.complaint
+        }))
+      : [{ label: 'Sem atendimentos registrados', value: '-' }]
 
   return (
     <section>
@@ -122,40 +166,12 @@ function NursesDetails() {
           Icon={CalendarDotsIcon}
           title='Último Atendimento'
           loading={loading}
-          itens={[
-            {
-              label: 'Queixa do Paciente',
-              value: attendances?.[0].complaint
-            },
-            {
-              label: 'Temperatura',
-              value: `${attendances?.[0].vitalSigns?.temperature} °C`
-            },
-            {
-              label: 'Pressão',
-              value: `${attendances?.[0].vitalSigns?.bloodPressure} mmHg`
-            },
-            {
-              label: 'Sugestão IA',
-              value: attendances?.[0]?.iaTopSuggestion
-                ? attendances?.[0].iaTopSuggestion
-                : 'n/a',
-              checked: attendances?.[0].isIaTopSuggestionMatchDiagnosis
-            },
-            {
-              label: 'Data',
-              value: dayjs(attendances?.[0].date).format('DD/MM/YYYY')
-            }
-          ]}
+          itens={lastAttendanceItems}
         />
         <UserDetailsCard
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
-          itens={attendances?.map((attendance) => ({
-            key: attendance._id,
-            label: dayjs(attendance.date).format('DD/MM/YYYY'),
-            value: attendance.complaint
-          }))}
+          itens={historyItems}
           loading={loading}
           userId={String(nurse?._id)}
           userType='nurse'
