@@ -10,6 +10,8 @@ Plataforma web de apoio a triagem e organizacao do fluxo hospitalar, com sugesto
 > Este README traz uma visao rapida para uso do projeto.  
 > Para documentacao completa de produto, arquitetura, fluxos e regras de negocio, consulte o [`context.md`](./context.md).
 
+## [Siga para o repositório da faculdade 💼](https://github.com/AthonEdu/2026-1-triagem)
+
 ## Visao geral
 
 O **MedIT** foi desenvolvido no contexto de TCC para apoiar unidades de saude em:
