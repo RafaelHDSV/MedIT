@@ -1,4 +1,7 @@
 import type { IBaseInterface } from './IBaseInterface'
+import type { IDoctor } from './IDoctor'
+import type { INurse } from './INurse'
+import type { IPatient } from './IPatient'
 
 export const UserLevels = {
   ADMIN: 'admin',
@@ -25,6 +28,8 @@ export const UserGendersLabels = {
   [UserGender.FEMALE]: 'Feminino',
   [UserGender.OTHER]: 'Outro'
 } as const
+
+export type IAuthUser = IBaseUser & IDoctor & INurse & IPatient
 
 export interface IBaseUser extends IBaseInterface {
   name: string
