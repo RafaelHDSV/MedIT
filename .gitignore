@@ -25,6 +25,14 @@ dist-ssr
 *.sln
 *.sw?
 
+# Issues
+issues
+.issues
+.issues/
+.issues/*
+*.issues
+*.issues/*
+
 # AI Tools
 cursor
 .cursor
