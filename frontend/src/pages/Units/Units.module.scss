@@ -1,3 +1,12 @@
+// Variáveis de exemplo (caso não as tenha definido globalmente)
+:root {
+  --primary-color: #ff6400; // O laranja do MedIT
+  --primary-light: rgba(255, 100, 0, 0.05);
+  --white: #ffffff;
+  --black: #1a1a1a;
+  --light-gray: #757575;
+}
+
 .skeleton {
   :global(.ant-skeleton-button) {
     width: 100% !important;
@@ -10,6 +19,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   gap: 1rem;
+  padding: 1rem;
 }
 
 .card {
@@ -18,11 +28,37 @@
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  transition: all ease-in-out 200ms;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent; // Borda invisível por padrão para evitar "pulo" no layout
+  position: relative;
+  overflow: hidden; // Garante que a barra lateral não saia do card
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  // ESTADO ATIVO (Unidade Selecionada)
+  &.isActive {
+    border-color: var(--primary-color);
+    background-color: var(--primary-light);
+    box-shadow: 0 8px 30px rgba(255, 100, 0, 0.15);
+    transform: translateY(-4px);
+
+    // Barra lateral de destaque
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: var(--primary-color);
+    }
+
+    .cardHeader h3 {
+      color: var(--primary-color);
+    }
   }
 
   .cardHeader {
@@ -35,15 +71,20 @@
       font-size: 18px;
       font-weight: 600;
       color: var(--black);
+      transition: color 0.3s ease;
     }
   }
 
   .address {
     font-size: 14px;
     color: var(--light-gray);
+    line-height: 1.4;
   }
 }
 
-.isActive {
-  border: 2px solid var(--primary-color);
+// Estilização da Badge "Aberto" para combinar
+:global(.ant-tag-green) { // Se estiver usando Ant Design
+  background: #e6fffb;
+  border-color: #87e8de;
+  color: #08979c;
 }
