@@ -21,7 +21,7 @@ export const getUnits = async (req: Request, res: Response) => {
 
     const units = await Unit.find({
       _id: { $in: partnerUnitIds }
-    } as any).sort({ createdAt: -1 })
+    } as any).sort({ name: 1 })
     if (!units || units.length === 0) {
       return res.status(404).json({ message: 'Nenhuma unidade encontrada' })
     }
