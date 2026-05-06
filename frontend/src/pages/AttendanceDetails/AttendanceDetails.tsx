@@ -638,6 +638,7 @@ function AttendanceDetails() {
 
               <div className={styles.grid}>
                 <VitalCard
+                  field='temperature'
                   label='Temperatura'
                   value={vitalDraft.temperature}
                   suffix='°'
@@ -646,6 +647,7 @@ function AttendanceDetails() {
                   }
                 />
                 <VitalCard
+                  field='bloodPressure'
                   label='Pressão Arterial'
                   value={vitalDraft.bloodPressure}
                   onChange={(bloodPressure) =>
@@ -653,6 +655,7 @@ function AttendanceDetails() {
                   }
                 />
                 <VitalCard
+                  field='heartRate'
                   label='Fre. Cardíaca'
                   value={vitalDraft.heartRate}
                   suffix=' bpm'
@@ -661,6 +664,7 @@ function AttendanceDetails() {
                   }
                 />
                 <VitalCard
+                  field='oxygenSaturation'
                   label='Saturação O2'
                   value={vitalDraft.oxygenSaturation}
                   suffix='%'
@@ -672,6 +676,7 @@ function AttendanceDetails() {
                   }
                 />
                 <VitalCard
+                  field='painLevel'
                   label='Escala de Dor'
                   value={vitalDraft.painLevel}
                   suffix='/10'

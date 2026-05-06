@@ -439,7 +439,7 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 
 **Triagem — sinais vitais editáveis pela enfermeira**
 
-- O componente `VitalCard` (`frontend/src/pages/AttendanceDetails/components/VitalCard/VitalCard.tsx`) é um componente **controlado**: o valor exibido vem diretamente da prop `value` e alterações chamam `onChange` imediatamente (sem estado interno). Apenas enfermeiros (`UserLevels.NURSE`) podem editar; demais perfis veem o valor como texto.
+- O componente `VitalCard` (`frontend/src/pages/AttendanceDetails/components/VitalCard/VitalCard.tsx`) é um componente **controlado**: o valor exibido vem diretamente da prop `value` e alterações chamam `onChange` imediatamente (sem estado interno). A prop **`field`** (chave alinhada a `VitalFieldDraft` em `IAttendance.ts`) define máscaras de entrada; o **`label`** é só texto de UI — evita acoplamento frágil por rótulo. Apenas enfermeiros (`UserLevels.NURSE`) podem editar; demais perfis veem o valor como texto.
 - Em `AttendanceDetails.tsx`, um `vitalDraft` (state) mantém os campos editáveis de sinais vitais (temperatura, pressão arterial, frequência cardíaca, saturação O₂, nível de dor). Ao **"Concluir triagem"**, os valores são enviados junto com risco, sintomas e observações via `AttendancesFlowRepository.completeTriage`.
 - No backend, `attendanceController.ts` sanitiza e valida cada campo de sinais vitais (`parseVitalSignsFromBody`) e atualiza o documento de atendimento com `$set`/`$unset` atômicos.
 
