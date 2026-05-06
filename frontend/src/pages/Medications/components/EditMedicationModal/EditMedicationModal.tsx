@@ -5,7 +5,10 @@ import {
   InputText
 } from '@/components/FormComponents/FormComponents'
 import { handleApiError } from '@/helpers/handleApiError'
-import type { IMedication, IMedicationFormErrors } from '@/interfaces/IMedication'
+import type {
+  IMedication,
+  IMedicationFormErrors
+} from '@/interfaces/IMedication'
 import { MedicationCategoriesLabels } from '@/interfaces/IMedication'
 import type { MedicationFormValues } from '@/interfaces/IMedication'
 import MedicationsRepository from '@/repositories/MedicationsRepository'

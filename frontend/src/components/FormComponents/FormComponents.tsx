@@ -198,4 +198,3 @@ function InputDate({
 }
 
 export { FormItem, InputDashboardPeriodDate, InputDate, InputSelect, InputText }
-

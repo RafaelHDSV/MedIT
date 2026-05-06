@@ -147,7 +147,10 @@ export const editMedication = async (req: Request, res: Response) => {
     errors.category = 'Categoria inválida'
   if (description && description.length < 3)
     errors.description = 'Descrição deve ter pelo menos 3 caracteres'
-  if (requiresPrescription !== undefined && typeof requiresPrescription !== 'boolean')
+  if (
+    requiresPrescription !== undefined &&
+    typeof requiresPrescription !== 'boolean'
+  )
     errors.requiresPrescription =
       'Necessita de receita médica deve ser um booleano'
   if (stockQuantity !== undefined && typeof stockQuantity !== 'number')

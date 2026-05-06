@@ -268,8 +268,7 @@ function Dashboard() {
         return (
           <Flex vertical gap={12} align='flex-start'>
             {patientActiveAttendance?._id &&
-            patientActiveAttendance.status ===
-              AttendanceStatus.ON_THE_WAY ? (
+            patientActiveAttendance.status === AttendanceStatus.ON_THE_WAY ? (
               <Button
                 type='primary'
                 loading={arrivalLoading}
