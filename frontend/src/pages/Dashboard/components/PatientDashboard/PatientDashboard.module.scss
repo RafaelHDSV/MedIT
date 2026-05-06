@@ -1,0 +1,471 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
+// ─── Layout principal ──────────────────────────────────────────────────────────
+.wrapper {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    'alert       alert       alert'
+    'queuePos    statusCard  currentConsult'
+    'queueList   queueList   currentConsult'
+    'queueList   queueList   lastAttendance';
+  gap: 1rem;
+  align-items: start;
+
+  @include max-lg {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'alert         alert'
+      'queuePos      statusCard'
+      'currentConsult currentConsult'
+      'queueList     queueList'
+      'lastAttendance lastAttendance';
+  }
+
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'alert'
+      'queuePos'
+      'statusCard'
+      'currentConsult'
+      'queueList'
+      'lastAttendance';
+  }
+}
+
+// ─── Alert de notificação ──────────────────────────────────────────────────────
+.alertBanner {
+  grid-area: alert;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid var(--warning-color);
+  background: var(--warning-opaque);
+  color: #7c5000;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--warning-color);
+  }
+}
+
+// ─── Card base reutilizável ────────────────────────────────────────────────────
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem 1.5rem;
+  height: 100%;
+}
+
+// ─── Posição na fila ───────────────────────────────────────────────────────────
+.queuePositionCard {
+  grid-area: queuePos;
+  composes: card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  text-align: center;
+
+  .queuePosLabel {
+    font-size: 0.8rem;
+    color: var(--light-gray);
+    font-weight: 500;
+  }
+
+  .queuePosNumber {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--primary-color);
+  }
+
+  .queuePosEmpty {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+  }
+
+  .queuePosSubInfo {
+    font-size: 0.78rem;
+    color: var(--light-gray);
+    margin-top: 0.25rem;
+  }
+
+  strong {
+    color: var(--black);
+  }
+}
+
+// ─── Status atual ──────────────────────────────────────────────────────────────
+.statusCard {
+  grid-area: statusCard;
+  composes: card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-align: center;
+
+  .statusLabel {
+    font-size: 0.8rem;
+    color: var(--light-gray);
+    font-weight: 500;
+  }
+
+  .statusValue {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  .statusEmpty {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  .statusNext {
+    font-size: 0.75rem;
+    color: var(--light-gray);
+    margin-top: 0.15rem;
+
+    span {
+      font-weight: 600;
+      color: var(--black);
+    }
+  }
+}
+
+// ─── Consulta atual ────────────────────────────────────────────────────────────
+.currentConsultCard {
+  grid-area: currentConsult;
+  composes: card;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.currentConsultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.1rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--black);
+  }
+
+  .editBtn {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.6rem;
+    background: var(--primary-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+}
+
+.currentConsultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 0.5rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .rowLabel {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--black);
+    flex-shrink: 0;
+  }
+
+  .rowValue {
+    font-size: 0.85rem;
+    color: var(--light-gray);
+    text-align: right;
+  }
+}
+
+// ─── Nova consulta (empty state) ───────────────────────────────────────────────
+.newConsultCard {
+  grid-area: currentConsult;
+  composes: card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+  text-align: center;
+  min-height: 14rem;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(232, 87, 63, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .plusBtn {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover .plusBtn {
+    transform: scale(1.07);
+  }
+
+  p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--black);
+    max-width: 14rem;
+  }
+}
+
+// ─── Fila de atendimento ───────────────────────────────────────────────────────
+.queueCard {
+  grid-area: queueList;
+  composes: card;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 0.5rem;
+}
+
+.queueCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--black);
+  }
+
+  .queueCount {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    color: var(--light-gray);
+    font-weight: 500;
+  }
+}
+
+.queueItem {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.65rem;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--gray-2);
+  }
+
+  &.currentUser {
+    background: var(--primary-color);
+    color: #fff;
+
+    .queueItemName {
+      color: #fff;
+    }
+
+    .queueItemStatus {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .positionBall {
+      background: #fff;
+      color: var(--primary-color);
+    }
+  }
+}
+
+.positionBall {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.queueItemInfo {
+  flex: 1;
+  min-width: 0;
+
+  .queueItemName {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--black);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .queueItemStatus {
+    font-size: 0.75rem;
+    color: var(--light-gray);
+  }
+}
+
+.queueShowMore {
+  margin-top: 0.5rem;
+  width: 100%;
+  background: var(--gray-2);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--light-gray);
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--gray-3);
+  }
+}
+
+// ─── Último atendimento ────────────────────────────────────────────────────────
+.lastAttendanceCard {
+  grid-area: lastAttendance;
+  composes: card;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+}
+
+.lastAttendanceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  .infoRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--black);
+
+    svg {
+      color: var(--light-gray);
+      flex-shrink: 0;
+    }
+  }
+}
+
+.diagnosisRow {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--black);
+
+  .diagnosisCode {
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+}
+
+.lastMedication {
+  font-size: 0.85rem;
+  color: var(--black);
+
+  span {
+    font-weight: 600;
+  }
+}
+
+.lastObservation {
+  font-size: 0.85rem;
+  color: var(--black);
+
+  span {
+    font-weight: 600;
+  }
+}
+
+// ─── Skeleton loader ───────────────────────────────────────────────────────────
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  border-radius: 0.4rem;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeletonText {
+  composes: skeleton;
+  height: 1rem;
+  width: 70%;
+  margin: 0.25rem 0;
+}
+
+.skeletonLarge {
+  composes: skeleton;
+  height: 2.5rem;
+  width: 40%;
+  margin: 0.5rem auto;
+}
