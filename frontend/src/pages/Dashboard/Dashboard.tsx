@@ -6,14 +6,14 @@ import {
 } from '@/components/FormComponents/FormComponents'
 import ReloadButton from '@/components/ReloadButton/ReloadButton'
 
+import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import { Periods, PeriodsLabels } from '@/interfaces/globals'
-import type { IAttendance } from '@/interfaces/IAttendance'
+import { AttendanceStatus, type IAttendance } from '@/interfaces/IAttendance'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import PatientsRepository from '@/repositories/PatientsRepository'
-import { ROUTES } from '@/routes/constants'
 import masks from '@/utils/masks'
 import { timeFormatter } from '@/utils/timeFormatter'
 import {
@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
+import PatientDashboard from './components/PatientDashboard/PatientDashboard'
 import styles from './Dashboard.module.scss'
 
 const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
@@ -106,15 +107,15 @@ function Dashboard() {
         return tb - ta
       })
       setPatientActiveAttendance(actives[0] ?? null)
-      
+
       // VIEIRA: Parte do VICTOR
       // PatientsRepository.handle() retorna response.data do axios, mas
       // o backend envelopa em { data: [] }, então precisamos extrair
-      const raw = response as unknown as { data: IAttendance[] } | IAttendance[]
-      const list: IAttendance[] = Array.isArray(raw)
-        ? raw
-        : (raw as { data: IAttendance[] }).data ?? []
-      setPatientAttendances(list)
+      // const raw = response as unknown as { data: IAttendance[] } | IAttendance[]
+      // const list: IAttendance[] = Array.isArray(raw)
+      //   ? raw
+      //   : (raw as { data: IAttendance[] }).data ?? []
+      // setPatientAttendances(list)
     } catch {
       setPatientActiveAttendance(null)
     }
@@ -126,9 +127,9 @@ function Dashboard() {
 
   const onReload = useCallback(() => {
     fetchDashboardStatus()
-    void fetchPatientAttendances()
+    fetchPatientActiveAttendance()
     setReload((prev) => !prev)
-  }, [fetchDashboardStatus, fetchPatientAttendances])
+  }, [fetchDashboardStatus, fetchPatientActiveAttendance])
 
   const cardsData = useMemo(() => {
     const highRiskPercentage =
@@ -277,49 +278,48 @@ function Dashboard() {
       case UserLevels.PATIENT:
         return (
           // VIEIRA: Parte do VICTOR
-          // <PatientDashboard
-          //   attendances={patientAttendances}
-          //   parentLoading={loading}
-          //   onReload={onReload}
-          // />
+          <PatientDashboard
+            attendances={
+              patientActiveAttendance ? [patientActiveAttendance] : []
+            }
+            parentLoading={arrivalLoading}
+            onReload={onReload}
+          />
 
-          <Flex vertical gap={12} align='flex-start'>
-            {patientActiveAttendance?._id &&
-            patientActiveAttendance.status === AttendanceStatus.ON_THE_WAY ? (
-              <Button
-                type='primary'
-                loading={arrivalLoading}
-                onClick={async () => {
-                  try {
-                    setArrivalLoading(true)
-                    await PatientsRepository.confirmPatientArrival({
-                      attendanceId: String(patientActiveAttendance._id)
-                    })
-                    message.success(
-                      'Chegada confirmada. Você entrou na fila de triagem da unidade.'
-                    )
-                    setPatientActiveAttendance(null)
-                    onReload()
-                  } catch (err) {
-                    handleApiError({
-                      err,
-                      defaultMessage: 'Não foi possível confirmar sua chegada.'
-                    })
-                  } finally {
-                    setArrivalLoading(false)
-                  }
-                }}
-              >
-                Confirmar chegada ao hospital
-              </Button>
-            ) : patientActiveAttendance?._id ? (
-              <span>Você já tem um atendimento em andamento.</span>
-            ) : (
-              <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
-                Clique para iniciar uma nova consulta
-              </Button>
-            )}
-          </Flex>
+          // <Flex vertical gap={12} align='flex-start'>
+          //   {patientActiveAttendance?._id &&
+          //   patientActiveAttendance.status === AttendanceStatus.ON_THE_WAY ? (<Button
+          //       type='primary'
+          //       loading={arrivalLoading}
+          //       onClick={async () => {
+          //         try {
+          //             attendanceId: String(patientActiveAttendance._id)
+          //           })
+          //           message.success(
+          //             'Chegada confirmada. Você entrou na fila de triagem da unidade.'
+          //           )
+          //           setPatientActiveAttendance(null)
+          //           onReload()
+          //         } catch (err) {
+          //           handleApiError({
+          //             err,
+          //             defaultMessage: 'Não foi possível confirmar sua chegada.'
+          //           })
+          //         } finally {
+          //           setArrivalLoading(false)
+          //         }
+          //       }}
+          //     >
+          //       Confirmar chegada ao hospital
+          //     </Button>
+          //   ) : patientActiveAttendance?._id ? (
+          //     <span>Você já tem um atendimento em andamento.</span>
+          //   ) : (
+          //     <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
+          //       Clique para iniciar uma nova consulta
+          //     </Button>
+          //   )}
+          // </Flex>
         )
       default:
         return <></>
