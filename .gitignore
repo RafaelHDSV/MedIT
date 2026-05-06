@@ -24,8 +24,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.claude
-.claude/*
+
+# Issues
+issues
+.issues
+.issues/
+.issues/*
+*.issues
+*.issues/*
+
+# AI Tools
+cursor
+.cursor
+.cursor/
 .cursor/*
 *.cursor
 *.cursor/*

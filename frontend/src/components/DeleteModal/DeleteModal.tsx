@@ -23,6 +23,10 @@ function DeleteModal({ user, label, apiName, buttonText }: IDeleteModalProps) {
   const navigate = useNavigate()
   const idToDelete = user?._id || params.id
   const isDeleteUserLogged = label === 'usuário'
+  const normalizedApiName = apiName.replace(/^\/+/, '')
+  const endpoint = normalizedApiName.startsWith('auth/')
+    ? `/${normalizedApiName}/${idToDelete}`
+    : `/auth/${normalizedApiName}/${idToDelete}`
 
   const title = useMemo(() => {
     let actor
@@ -65,7 +69,7 @@ function DeleteModal({ user, label, apiName, buttonText }: IDeleteModalProps) {
         })
 
         try {
-          await api.delete(`/${apiName}/${idToDelete}`)
+          await api.delete(endpoint)
           message.success(
             `${label.charAt(0).toUpperCase() + label.slice(1)} deletado com sucesso!`
           )

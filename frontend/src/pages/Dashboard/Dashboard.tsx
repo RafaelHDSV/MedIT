@@ -32,8 +32,16 @@ import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
-import PatientDashboard from './components/PatientDashboard/PatientDashboard'
 import styles from './Dashboard.module.scss'
+
+const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
+  AttendanceStatus.ON_THE_WAY,
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE
+]
 
 function Dashboard() {
   const { user } = useAuth()
@@ -44,7 +52,9 @@ function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
   const [referenceDayjs, setReferenceDayjs] = useState(() => dayjs())
   const [reload, setReload] = useState(false)
-  const [patientAttendances, setPatientAttendances] = useState<IAttendance[]>([])  
+  const [patientActiveAttendance, setPatientActiveAttendance] =
+    useState<IAttendance | null>(null)
+  const [arrivalLoading, setArrivalLoading] = useState(false)
   const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
 
   const fetchDashboardStatus = useCallback(async () => {
@@ -76,9 +86,9 @@ function Dashboard() {
     fetchDashboardStatus()
   }, [fetchDashboardStatus])
 
-  const fetchPatientAttendances = useCallback(async () => {
+  const fetchPatientActiveAttendance = useCallback(async () => {
     if (user?.level !== UserLevels.PATIENT || !user?._id) {
-      setPatientAttendances([])
+      setPatientActiveAttendance(null)
       return
     }
 
@@ -86,6 +96,18 @@ function Dashboard() {
       const response = await PatientsRepository.getAttendances({
         patientId: user._id
       })
+      const list = response.data as IAttendance[]
+      const actives = (list ?? []).filter((a) =>
+        PATIENT_ACTIVE_ATTENDANCE_STATUSES.includes(a.status)
+      )
+      actives.sort((a, b) => {
+        const tb = dayjs(b.updatedAt ?? b.date).valueOf()
+        const ta = dayjs(a.updatedAt ?? a.date).valueOf()
+        return tb - ta
+      })
+      setPatientActiveAttendance(actives[0] ?? null)
+      
+      // VIEIRA: Parte do VICTOR
       // PatientsRepository.handle() retorna response.data do axios, mas
       // o backend envelopa em { data: [] }, então precisamos extrair
       const raw = response as unknown as { data: IAttendance[] } | IAttendance[]
@@ -94,13 +116,13 @@ function Dashboard() {
         : (raw as { data: IAttendance[] }).data ?? []
       setPatientAttendances(list)
     } catch {
-      setPatientAttendances([])
+      setPatientActiveAttendance(null)
     }
   }, [user?._id, user?.level])
 
   useEffect(() => {
-    void fetchPatientAttendances()
-  }, [fetchPatientAttendances])
+    fetchPatientActiveAttendance()
+  }, [fetchPatientActiveAttendance])
 
   const onReload = useCallback(() => {
     fetchDashboardStatus()
@@ -254,11 +276,50 @@ function Dashboard() {
         )
       case UserLevels.PATIENT:
         return (
-          <PatientDashboard
-            attendances={patientAttendances}
-            parentLoading={loading}
-            onReload={onReload}
-          />
+          // VIEIRA: Parte do VICTOR
+          // <PatientDashboard
+          //   attendances={patientAttendances}
+          //   parentLoading={loading}
+          //   onReload={onReload}
+          // />
+
+          <Flex vertical gap={12} align='flex-start'>
+            {patientActiveAttendance?._id &&
+            patientActiveAttendance.status === AttendanceStatus.ON_THE_WAY ? (
+              <Button
+                type='primary'
+                loading={arrivalLoading}
+                onClick={async () => {
+                  try {
+                    setArrivalLoading(true)
+                    await PatientsRepository.confirmPatientArrival({
+                      attendanceId: String(patientActiveAttendance._id)
+                    })
+                    message.success(
+                      'Chegada confirmada. Você entrou na fila de triagem da unidade.'
+                    )
+                    setPatientActiveAttendance(null)
+                    onReload()
+                  } catch (err) {
+                    handleApiError({
+                      err,
+                      defaultMessage: 'Não foi possível confirmar sua chegada.'
+                    })
+                  } finally {
+                    setArrivalLoading(false)
+                  }
+                }}
+              >
+                Confirmar chegada ao hospital
+              </Button>
+            ) : patientActiveAttendance?._id ? (
+              <span>Você já tem um atendimento em andamento.</span>
+            ) : (
+              <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
+                Clique para iniciar uma nova consulta
+              </Button>
+            )}
+          </Flex>
         )
       default:
         return <></>
@@ -269,8 +330,8 @@ function Dashboard() {
     selectedPeriod,
     referenceDayjs,
     reload,
-    patientAttendances,
-    loading,
+    patientActiveAttendance,
+    arrivalLoading,
     onReload
   ])
 

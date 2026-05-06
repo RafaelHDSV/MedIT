@@ -19,7 +19,8 @@ function ITriages() {
 
     try {
       const response = await NursesRepository.getAttendances({
-        nurseId: user?._id
+        nurseId: user?._id,
+        completedTriage: true
       })
       setTriages(response.data)
     } catch (err) {

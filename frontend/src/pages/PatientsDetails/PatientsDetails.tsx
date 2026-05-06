@@ -56,7 +56,7 @@ function PatientsDetails() {
     } catch (err) {
       handleApiError({
         err,
-        defaultMessage: 'Erro ao carregar os atendimentos do enfermeiro(a)'
+        defaultMessage: 'Erro ao carregar os atendimentos do paciente'
       })
     } finally {
       setAttendancesLoading(false)
@@ -67,6 +67,50 @@ function PatientsDetails() {
     fetchPatientDetails()
     fetchPatientsAttendances()
   }, [fetchPatientDetails, fetchPatientsAttendances])
+
+  const lastAttendance = attendances?.[0]
+  const lastAttendanceItems = lastAttendance
+    ? [
+        {
+          label: 'Principal Queixa',
+          value: lastAttendance.complaint ?? '-'
+        },
+        {
+          label: 'Temperatura',
+          value:
+            lastAttendance.vitalSigns?.temperature != null
+              ? `${lastAttendance.vitalSigns.temperature} °C`
+              : '-'
+        },
+        {
+          label: 'Pressão',
+          value:
+            lastAttendance.vitalSigns?.bloodPressure != null
+              ? `${lastAttendance.vitalSigns.bloodPressure} mmHg`
+              : '-'
+        },
+        {
+          label: 'Sugestão IA',
+          value: lastAttendance.iaTopSuggestion ?? 'n/a',
+          checked: lastAttendance.isIaTopSuggestionMatchDiagnosis
+        },
+        {
+          label: 'Data',
+          value: lastAttendance.date
+            ? dayjs(lastAttendance.date).format('DD/MM/YYYY')
+            : '-'
+        }
+      ]
+    : [{ label: 'Sem atendimentos registrados', value: '-' }]
+
+  const historyItems =
+    attendances && attendances?.length > 0
+      ? attendances?.map((attendance) => ({
+          key: attendance._id,
+          label: dayjs(attendance.date).format('DD/MM/YYYY'),
+          value: attendance.complaint
+        }))
+      : [{ label: 'Sem atendimentos registrados', value: '-' }]
 
   return (
     <section className={styles.container}>
@@ -111,7 +155,9 @@ function PatientsDetails() {
             { label: 'Nome', value: patient?.name },
             {
               label: 'Peso',
-              value: `${patient?.weight?.toString()} kg`
+              value: patient?.weight
+                ? `${patient?.weight?.toString()} kg`
+                : undefined
             },
             {
               label: 'E-mail',
@@ -119,7 +165,9 @@ function PatientsDetails() {
             },
             {
               label: 'Altura',
-              value: `${patient?.height?.toString()} m`
+              value: patient?.height
+                ? `${patient?.height?.toString()} m`
+                : undefined
             },
             {
               label: 'Telefone',
@@ -145,42 +193,14 @@ function PatientsDetails() {
           title='Último Atendimento'
           className={styles.lastAttendanceCard}
           loading={loading}
-          itens={[
-            {
-              label: 'Principal Queixa',
-              value: attendances?.[0].complaint
-            },
-            {
-              label: 'Temperatura',
-              value: `${attendances?.[0].vitalSigns?.temperature} °C`
-            },
-            {
-              label: 'Pressão',
-              value: `${attendances?.[0].vitalSigns?.bloodPressure} mmHg`
-            },
-            {
-              label: 'Sugestão IA',
-              value: attendances?.[0]?.iaTopSuggestion
-                ? attendances?.[0].iaTopSuggestion
-                : 'n/a',
-              checked: attendances?.[0].isIaTopSuggestionMatchDiagnosis
-            },
-            {
-              label: 'Data',
-              value: dayjs(attendances?.[0].date).format('DD/MM/YYYY')
-            }
-          ]}
+          itens={lastAttendanceItems}
         />
 
         <UserDetailsCard
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
           className={styles.attendanceHistoryCard}
-          itens={attendances?.map((attendance) => ({
-            key: attendance._id,
-            label: dayjs(attendance.date).format('DD/MM/YYYY'),
-            value: attendance.complaint
-          }))}
+          itens={historyItems}
           loading={loading}
           userId={String(patient?._id)}
           userType='patient'

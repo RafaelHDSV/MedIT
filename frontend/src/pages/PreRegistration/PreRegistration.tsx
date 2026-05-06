@@ -114,7 +114,8 @@ function PreRegistration() {
     } catch (err) {
       handleApiError({
         err,
-        defaultMessage: 'Erro ao finalizar pré-cadastro. ',
+        defaultMessage:
+          'Não foi possível registrar a solicitação. Verifique se você já possui um atendimento em andamento.',
         setFieldErrors
       })
     } finally {

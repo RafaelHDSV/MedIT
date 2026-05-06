@@ -1,9 +1,0 @@
----
-alwaysApply: true
----
-
-# Em todas as solicitações, verifique o arquivo `context.md` localizado no diretório root do projeto.
-
-# Se esse arquivo existir, utilize o seu conteúdo como contexto primário adicional para interpretar, responder ou executar a tarefa solicitada,
-
-# a menos que explicitamente instruído a ignorá-lo.

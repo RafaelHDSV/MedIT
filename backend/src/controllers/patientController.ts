@@ -1,18 +1,19 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
-import { UserGender, UserLevels } from '../interfaces/IUser.js'
-import { Attendance } from '../models/AttendanceModel.js'
-import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import {
   toCanonicalDiseaseKey,
   toDiseaseLabelPt
 } from '../constants/diseaseLabelsPt.js'
+import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
+import { UserGender, UserLevels } from '../interfaces/IUser.js'
+import { Attendance } from '../models/AttendanceModel.js'
 import { Patient } from '../models/PatientModel.js'
 import { Unit } from '../models/UnitModel.js'
 import User from '../models/UserModel.js'
+import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import capitalize from '../utils/capitalize.js'
 import normalizeStringArray from '../utils/normalizeStringArray.js'
+import { parseFiniteNumber } from '../utils/parseNumbers.js'
 
 const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
   if (pain >= 9) return AttendanceRisk.VERY_URGENT
@@ -20,6 +21,15 @@ const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
   if (pain >= 4) return AttendanceRisk.LESS_URGENT
   return AttendanceRisk.NOT_URGENT
 }
+
+const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
+  AttendanceStatus.ON_THE_WAY,
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE
+]
 
 const attendanceIdFromParams = (value: string | string[] | undefined) =>
   String(Array.isArray(value) ? value[0] : value)
@@ -455,8 +465,8 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
       unitId: bodyUnitId
     } = req.body as {
       mainComplaint?: string
-      painLevel?: number
-      selfMedicated?: boolean
+      painLevel?: unknown
+      selfMedicated?: unknown
       symptomStartDate?: string
       conditions?: string | string[]
       allergies?: string | string[]
@@ -472,15 +482,18 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
     if (!mainComplaint?.trim()) {
       errors.mainComplaint = 'Informe sua queixa principal'
     }
+    const painLevelNumber = parseFiniteNumber(painLevel)
     if (
-      painLevel === undefined ||
-      painLevel === null ||
-      Number.isNaN(painLevel)
+      painLevelNumber === undefined ||
+      painLevelNumber < 0 ||
+      painLevelNumber > 10
     ) {
-      errors.painLevel = 'Informe seu nível de dor'
+      errors.painLevel =
+        'Informe um nível de dor válido entre 0 e 10 (número finito).'
     }
-    if (selfMedicated === undefined || selfMedicated === null) {
-      errors.selfMedicated = 'Informe se você se automedicou'
+    if (typeof selfMedicated !== 'boolean') {
+      errors.selfMedicated =
+        'Informe se você se automedicou (valor booleano: verdadeiro ou falso).'
     }
     if (!symptomStartDate) {
       errors.symptomStartDate = 'Informe quando os sintomas começaram'
@@ -507,6 +520,16 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
       return res.status(400).json({
         message: 'Unidade de saúde não encontrada.',
         errors: { unitId: 'Unidade inválida' }
+      })
+    }
+
+    const existingActive = await Attendance.findOne({
+      patientId: patient._id,
+      status: { $in: PATIENT_ACTIVE_ATTENDANCE_STATUSES }
+    })
+    if (existingActive) {
+      return res.status(409).json({
+        message: 'Você já possui um atendimento em andamento.'
       })
     }
 
@@ -549,7 +572,7 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
 
     await patient.save()
 
-    const risk = provisionalRiskFromPain(Number(painLevel))
+    const risk = provisionalRiskFromPain(painLevelNumber!)
     const now = new Date()
 
     const numberAgg = await Attendance.aggregate<{ max: number | null }>([
@@ -560,8 +583,8 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
     const attendance = await Attendance.create({
       number: nextNumber,
       complaint: mainComplaint!.trim(),
-      painLevel: Number(painLevel),
-      selfMedicated: Boolean(selfMedicated),
+      painLevel: painLevelNumber!,
+      selfMedicated: selfMedicated as boolean,
       symptomStartDate: symptomStart,
       symptoms: normalizedSymptoms,
       conditions: normalizedConditions,

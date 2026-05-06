@@ -1,3 +1,4 @@
+import Alert from '@/components/Alert/Alert'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import ListTable from '@/components/ListTable/ListTable'
 import { handleApiError } from '@/helpers/handleApiError'
@@ -58,6 +59,10 @@ function Patients() {
 
       <div className={styles.tableContent}>
         <Flex vertical className={styles.container}>
+          <Alert
+            type='info'
+            message='O cadastro de pacientes é realizado exclusivamente pelo próprio paciente na página de SignUp.'
+          />
           <AuthLayoutHeader />
 
           <ListTable<IPatient>

@@ -37,12 +37,16 @@ class NursesRepositoy extends Repository {
   }
 
   async getAttendances({
-    nurseId
+    nurseId,
+    completedTriage
   }: {
     nurseId: ObjectId | string | undefined
+    completedTriage?: boolean
   }) {
     return this.handle(() => {
-      return this.api.get(`${this.path}/${nurseId}/attendances`)
+      return this.api.get(`${this.path}/${nurseId}/attendances`, {
+        params: { completedTriage }
+      })
     })
   }
 }

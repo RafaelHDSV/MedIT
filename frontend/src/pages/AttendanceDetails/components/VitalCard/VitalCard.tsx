@@ -1,36 +1,30 @@
 import { InputText } from '@/components/FormComponents/FormComponents'
 import { useAuth } from '@/hooks/useAuth'
+import type { VitalFieldDraft } from '@/interfaces/IAttendance'
 import { UserLevels } from '@/interfaces/IUser'
 import masks, { type MaskEnum } from '@/utils/masks'
 import styles from './VitalCard.module.scss'
 
+export type VitalCardField = keyof VitalFieldDraft
+
 interface IVitalCard {
+  field: VitalCardField
   value: string | number
   label: string
   suffix?: string
   onChange?: (value: string) => void
 }
 
-function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
+function VitalCard({ field, value, label, suffix, onChange }: IVitalCard) {
   const { user } = useAuth()
   const stringValue =
     value !== undefined && value !== null && value !== '—' ? String(value) : ''
   const isNurse = user?.level === UserLevels.NURSE
   const canEditVital = isNurse
 
-  const labelsToMasks = (): MaskEnum | undefined => {
-    switch (label) {
-      case 'Temperatura':
-        return 'temperature'
-      case 'Pressão Arterial':
-        return 'bloodPressure'
-      default:
-        return
-    }
-  }
+  const maskType = field as MaskEnum
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const maskType = labelsToMasks()
     const nextValue = maskType
       ? masks(e.target.value, maskType) || e.target.value
       : e.target.value
@@ -44,7 +38,7 @@ function VitalCard({ value, label, suffix, onChange }: IVitalCard) {
         <InputText
           className={styles.input}
           value={stringValue}
-          mask={labelsToMasks()}
+          mask={maskType}
           onChange={handleChange}
           placeholder='0'
           suffix={suffix}

@@ -53,7 +53,7 @@ function UserDetailsCard({
           <Skeleton.Button key={index} className={styles.itemSkeleton} active />
         ))}
 
-        {isAttendanceHistory && (
+        {isAttendanceHistory && moreItens && moreItens > 0 && (
           <Skeleton.Button className={styles.itemSkeleton} active />
         )}
       </section>
@@ -91,7 +91,7 @@ function UserDetailsCard({
             />
           ))}
 
-          {isAttendanceHistory && (
+          {isAttendanceHistory && moreItens && moreItens > 0 && (
             <Button mode='secondary' onClick={openModal}>
               {`+ ${masks(moreItens, 'number')} atendimentos`}
             </Button>

@@ -70,6 +70,46 @@ function DoctorDetails() {
     fetchDoctorsAttendances()
   }, [fetchDoctorDetails, fetchDoctorsAttendances])
 
+  const lastAttendance = attendances?.[0]
+  const lastAttendanceItems = lastAttendance
+    ? [
+        {
+          label: 'Queixa do Paciente',
+          value: lastAttendance.complaint ?? '-'
+        },
+        {
+          label: 'Sugestão IA',
+          value: lastAttendance.iaTopSuggestion ?? 'n/a',
+          checked: lastAttendance.isIaTopSuggestionMatchDiagnosis
+        },
+        {
+          label: 'Definição Médica',
+          value: lastAttendance.diagnosis
+            ? `${lastAttendance.diagnosis}`
+            : undefined
+        },
+        {
+          label: 'Risco',
+          value: <RiskTag risk={lastAttendance.risk} />
+        },
+        {
+          label: 'Data',
+          value: lastAttendance.date
+            ? dayjs(lastAttendance.date).format('DD/MM/YYYY')
+            : '-'
+        }
+      ]
+    : [{ label: 'Sem atendimentos registrados', value: '-' }]
+
+  const historyItems =
+    attendances && attendances?.length > 0
+      ? attendances?.map((attendance) => ({
+          key: attendance._id,
+          label: dayjs(attendance.date).format('DD/MM/YYYY'),
+          value: attendance.complaint
+        }))
+      : [{ label: 'Sem atendimentos registrados', value: '-' }]
+
   return (
     <section>
       <AuthLayoutHeader
@@ -130,43 +170,13 @@ function DoctorDetails() {
         <UserDetailsCard
           Icon={CalendarDotsIcon}
           title='Último Atendimento'
-          itens={[
-            {
-              label: 'Queixa do Paciente',
-              value: attendances?.[0].complaint
-            },
-            {
-              label: 'Sugestão IA',
-              value: attendances?.[0]?.iaTopSuggestion
-                ? attendances[0].iaTopSuggestion
-                : 'n/a',
-              checked: attendances?.[0].isIaTopSuggestionMatchDiagnosis
-            },
-            {
-              label: 'Definição Médica',
-              value: attendances?.[0]?.diagnosis
-                ? `${attendances[0].diagnosis}`
-                : undefined
-            },
-            {
-              label: 'Risco',
-              value: <RiskTag risk={attendances?.[0].risk} />
-            },
-            {
-              label: 'Data',
-              value: dayjs(attendances?.[0].date).format('DD/MM/YYYY')
-            }
-          ]}
+          itens={lastAttendanceItems}
           loading={loading}
         />
         <UserDetailsCard
           Icon={ChartBarIcon}
           title='Histórico de Atendimentos'
-          itens={attendances?.map((attendance) => ({
-            key: attendance._id,
-            label: dayjs(attendance.date).format('DD/MM/YYYY'),
-            value: attendance.complaint
-          }))}
+          itens={historyItems}
           loading={loading}
           userId={String(doctor?._id)}
           userType='doctor'

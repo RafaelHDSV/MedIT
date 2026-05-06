@@ -1,0 +1,124 @@
+erDiagram
+    USER ||--o| ADMIN     : "discriminator (admin)"
+    USER ||--o| DOCTOR    : "discriminator (doctor)"
+    USER ||--o| NURSE     : "discriminator (nurse)"
+    USER ||--o| PATIENT   : "discriminator (patient)"
+
+    UNIT  ||--o{ USER       : "unitId"
+    UNIT  ||--o{ ATTENDANCE : "unitId"
+    UNIT  ||--o{ MEDICATION : "unitId"
+    UNIT  ||--o{ UNIT       : "partnerUnitIds[]"
+
+    PATIENT ||--o{ ATTENDANCE : "patientId"
+    NURSE   ||--o{ ATTENDANCE : "nurseId"
+    DOCTOR  ||--o{ ATTENDANCE : "doctorId"
+
+    ATTENDANCE }o--o{ MEDICATION : "medicationsIds[]"
+
+    USER {
+        ObjectId _id PK
+        int      number
+        string   name
+        string   cpf UK
+        string   email UK
+        string   password
+        string   level "enum admin doctor nurse patient"
+        string   gender "enum male female other"
+        int      cellphone
+        Date     birthDate
+        ObjectId unitId FK
+        string   refreshToken
+        Date     createdAt
+        Date     updatedAt
+    }
+
+    ADMIN {
+        ObjectId _id PK
+    }
+
+    DOCTOR {
+        ObjectId _id PK
+        string   crm UK
+        string   specialization "enum"
+    }
+
+    NURSE {
+        ObjectId _id PK
+        string   coren UK
+        string   shift "enum morning afternoon night"
+    }
+
+    PATIENT {
+        ObjectId _id PK
+        float    weight
+        float    height
+        string   bloodType "enum tipo sanguineo"
+        string[] conditions
+        string[] allergies
+    }
+
+    UNIT {
+        ObjectId   _id PK
+        string     name
+        Address    address "subdoc embutido"
+        int        maxOccupancy
+        OpeningHrs openingHours "subdoc embutido"
+        string     phone
+        ObjectId[] partnerUnitIds FK
+        Date       createdAt
+        Date       updatedAt
+    }
+
+    ATTENDANCE {
+        ObjectId   _id PK
+        int        number UK
+        string     complaint
+        string     diagnosisKey
+        string     diagnosis
+        string     diagnosisText
+        Date       date
+        string     risk "enum"
+        string     status "enum"
+        ObjectId   unitId FK
+        ObjectId   patientId FK
+        ObjectId   nurseId FK
+        ObjectId   doctorId FK
+        ObjectId[] medicationsIds FK
+        Object[]   changesHistory "subdoc embutido"
+        VitalSigns vitalSigns "subdoc embutido"
+        int        painLevel
+        bool       selfMedicated
+        Date       symptomStartDate
+        string[]   symptoms
+        string     generalObservation
+        string[]   conditions
+        string[]   allergies
+        string     patientDisposition "enum"
+        Object[]   prescribedMedications "subdoc embutido"
+        string[]   prescribedExams
+        Date       createdAt
+        Date       updatedAt
+    }
+
+    MEDICATION {
+        ObjectId _id PK
+        string   name
+        string   category "enum"
+        string   description
+        bool     requiresPrescription
+        string   availabilityStatus "enum"
+        int      stockQuantity
+        ObjectId unitId FK
+        Date     createdAt
+        Date     updatedAt
+    }
+
+    SYMPTOMSDISEASES {
+        ObjectId _id PK
+        string   disease UK
+        Map      symptoms "Map string number"
+        string[] medications
+        string[] exams
+        Date     createdAt
+        Date     updatedAt
+    }

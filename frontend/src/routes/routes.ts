@@ -52,6 +52,7 @@ const dashboard: IRoute = {
   meta: {
     hidden: false,
     levels: [
+      UserLevels.MEDIT,
       UserLevels.ADMIN,
       UserLevels.DOCTOR,
       UserLevels.NURSE,
@@ -68,7 +69,7 @@ const doctors: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    levels: [UserLevels.ADMIN]
+    levels: [UserLevels.MEDIT, UserLevels.ADMIN]
   }
 }
 
@@ -78,7 +79,7 @@ const doctorDetails: IRoute = {
   path: ROUTES.DOCTORS_DETAILS.path,
   meta: {
     hidden: true,
-    levels: [UserLevels.ADMIN],
+    levels: [UserLevels.MEDIT, UserLevels.ADMIN],
     canGoBack: true
   }
 }
@@ -91,7 +92,7 @@ const nurses: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    levels: [UserLevels.ADMIN]
+    levels: [UserLevels.MEDIT, UserLevels.ADMIN]
   }
 }
 
@@ -101,7 +102,7 @@ const nurseDetails: IRoute = {
   path: ROUTES.NURSES_DETAILS.path,
   meta: {
     hidden: true,
-    levels: [UserLevels.ADMIN],
+    levels: [UserLevels.MEDIT, UserLevels.ADMIN],
     canGoBack: true
   }
 }
@@ -114,7 +115,12 @@ const patients: IRoute = {
   meta: {
     group: ROUTE_GROUP.USERS,
     hidden: false,
-    levels: [UserLevels.ADMIN, UserLevels.DOCTOR, UserLevels.NURSE]
+    levels: [
+      UserLevels.MEDIT,
+      UserLevels.ADMIN,
+      UserLevels.DOCTOR,
+      UserLevels.NURSE
+    ]
   }
 }
 
@@ -124,7 +130,12 @@ const patientDetails: IRoute = {
   path: ROUTES.PATIENTS_DETAILS.path,
   meta: {
     hidden: true,
-    levels: [UserLevels.ADMIN, UserLevels.DOCTOR, UserLevels.NURSE],
+    levels: [
+      UserLevels.MEDIT,
+      UserLevels.ADMIN,
+      UserLevels.DOCTOR,
+      UserLevels.NURSE
+    ],
     canGoBack: true
   }
 }
@@ -136,6 +147,7 @@ const units: IRoute = {
   meta: {
     hidden: true,
     levels: [
+      UserLevels.MEDIT,
       UserLevels.ADMIN,
       UserLevels.DOCTOR,
       UserLevels.NURSE,
@@ -153,6 +165,7 @@ const medications: IRoute = {
     canGoBack: true,
     hidden: false,
     levels: [
+      UserLevels.MEDIT,
       UserLevels.ADMIN,
       UserLevels.DOCTOR,
       UserLevels.NURSE,
