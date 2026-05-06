@@ -3,6 +3,7 @@ import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
 import { ROUTES } from '@/routes/constants'
+import { sorterFunctionByDate } from '@/utils/sorterFunction'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
@@ -45,6 +46,7 @@ export function useTriagesColumns() {
         key: 'triagedAt',
         width: 180,
         ellipsis: true,
+        sorter: sorterFunctionByDate('triagedAt'),
         render: (triagedAt: Date | string, attendance: IAttendance) => (
           <TooltipColumn
             text={
