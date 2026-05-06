@@ -176,7 +176,7 @@ O **dashboard administrativo** (`frontend/src/pages/Dashboard`, API em `backend/
 ### 5.7 Nível MedIT e administrador de unidade
 
 - **Situação atual (protótipo):** perfis com nível administrativo podem existir sem fluxo completo na UI; em muitos cenários de teste o **administrador é criado diretamente no banco de dados** ou via script `create-tcc-admins` (ver [§5.12](#512-índice-adicional-de-scripts-do-backend)).
-- **No código hoje:** o enum `UserLevels` (`backend/src/interfaces/IUser.ts`) define apenas **`admin`**, **`doctor`**, **`nurse`**, **`patient`**; o administrador é um **discriminator** Mongoose (`Admin` em `backend/src/models/AdminModel.ts`) sobre a coleção de usuários. O rótulo **“nível MedIT”** no documento descreve a **evolução de produto** (operador da plataforma acima do admin de unidade), ainda **sem** valor distinto nesse enum.
+- **No código hoje:** o enum `UserLevels` (`backend/src/interfaces/IUser.ts` e espelho no frontend) inclui **`medit`** (`UserLevels.MEDIT`) além de **`admin`**, **`doctor`**, **`nurse`**, **`patient`**. O administrador continua sendo um **discriminator** Mongoose (`Admin` em `backend/src/models/AdminModel.ts`); usuários **MedIT** usam o modelo base `User` com `level: 'medit'` até haver discriminator ou script dedicado (ver ISSUE-0020). O rótulo **“nível MedIT”** no documento descreve o **operador da plataforma** acima do administrador de unidade; a UI já condiciona ações globais (ex.: **Adicionar unidade** em `Units.tsx`) a `user.level === medit`.
 - **Situação desejada:** existe um nível **MedIT** (superior ao administrador de unidade), responsável por:
   - cadastrar e manter **unidades**;
   - criar e associar **administradores** a uma unidade específica.

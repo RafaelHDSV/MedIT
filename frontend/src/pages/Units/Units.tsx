@@ -5,6 +5,7 @@ import Tag from '@/components/Tag/Tag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { IUnit } from '@/interfaces/IUnit'
+import { UserLevels } from '@/interfaces/IUser'
 import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
 import getFullAddress from '@/utils/getFullAddress'
@@ -24,8 +25,7 @@ function Units() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const activeUnitId = user?.unitId
 
-  // VIEIRA: Verificar possibilidade de nível Medit
-  const isMedit = false
+  const isMedit = user?.level === UserLevels.MEDIT
 
   const fetchUnits = useCallback(async () => {
     setLoading(true)

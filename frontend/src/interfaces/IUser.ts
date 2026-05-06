@@ -4,6 +4,7 @@ import type { INurse } from './INurse'
 import type { IPatient } from './IPatient'
 
 export const UserLevels = {
+  MEDIT: 'medit',
   ADMIN: 'admin',
   DOCTOR: 'doctor',
   NURSE: 'nurse',
@@ -11,12 +12,13 @@ export const UserLevels = {
 } as const
 export type UserLevels = (typeof UserLevels)[keyof typeof UserLevels]
 export const UserLevelsLabels = {
+  [UserLevels.MEDIT]: 'MedIT',
   [UserLevels.ADMIN]: 'Administrador(a)',
   [UserLevels.DOCTOR]: 'Médico(a)',
   [UserLevels.NURSE]: 'Enfermeiro(a)',
   [UserLevels.PATIENT]: 'Paciente'
 } as const
-export type LevelsTypes = 'admin' | 'doctor' | 'nurse' | 'patient'
+export type LevelsTypes = 'medit' | 'admin' | 'doctor' | 'nurse' | 'patient'
 
 export const UserGender = {
   MALE: 'male',

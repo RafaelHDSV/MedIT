@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose'
 import { IBaseInterface } from './IBaseInterface.js'
 
 export const UserLevels = {
+  MEDIT: 'medit',
   ADMIN: 'admin',
   DOCTOR: 'doctor',
   NURSE: 'nurse',
