@@ -175,9 +175,9 @@ function PatientDashboard({
   const activeAttendance: IActiveAttendance | null = useMemo(() => {
     if (!attendances.length) return null
     return (
-      (attendances.find((a) =>
-        ACTIVE_STATUSES.includes(a.status)
-      ) as IActiveAttendance | undefined) ?? null
+      (attendances.find((a) => ACTIVE_STATUSES.includes(a.status)) as
+        | IActiveAttendance
+        | undefined) ?? null
     )
   }, [attendances])
 
@@ -260,10 +260,9 @@ function PatientDashboard({
           patientName: item.patientName,
           status: item.status,
           risk: item.risk,
-          isCurrentUser:
-            activeAttendance
-              ? String(item._id) === String(activeAttendance._id)
-              : false
+          isCurrentUser: activeAttendance
+            ? String(item._id) === String(activeAttendance._id)
+            : false
         })
       )
 
@@ -401,14 +400,15 @@ function PatientDashboard({
             </span>
           </div>
 
-          {activeAttendance.symptoms && activeAttendance.symptoms.length > 0 && (
-            <div className={styles.currentConsultRow}>
-              <span className={styles.rowLabel}>Sintomas</span>
-              <span className={styles.rowValue}>
-                {activeAttendance.symptoms.join(', ')}
-              </span>
-            </div>
-          )}
+          {activeAttendance.symptoms &&
+            activeAttendance.symptoms.length > 0 && (
+              <div className={styles.currentConsultRow}>
+                <span className={styles.rowLabel}>Sintomas</span>
+                <span className={styles.rowValue}>
+                  {activeAttendance.symptoms.join(', ')}
+                </span>
+              </div>
+            )}
         </div>
       ) : (
         /* Card de nova consulta */

@@ -1,4 +1,8 @@
-import type { AttendanceRisk, AttendanceStatus, IAttendance } from '@/interfaces/IAttendance'
+import type {
+  AttendanceRisk,
+  AttendanceStatus,
+  IAttendance
+} from '@/interfaces/IAttendance'
 
 // ─── Fila de atendimento da unidade ────────────────────────────────────────────
 export interface IPatientQueueItem {
@@ -41,7 +45,9 @@ export interface ILastAttendance {
 // ─── Status seguinte no fluxo de atendimento ──────────────────────────────────
 import { AttendanceStatus as AS } from '@/interfaces/IAttendance'
 
-export const nextStatusMap: Partial<Record<AttendanceStatus, AttendanceStatus>> = {
+export const nextStatusMap: Partial<
+  Record<AttendanceStatus, AttendanceStatus>
+> = {
   [AS.ON_THE_WAY]: AS.WAITING_TRIAGE,
   [AS.WAITING_TRIAGE]: AS.IN_TRIAGE,
   [AS.IN_TRIAGE]: AS.WAITING_ATTENDANCE,

@@ -505,8 +505,7 @@ function AttendanceDetails() {
     statusForActions === AttendanceStatus.WAITING_ATTENDANCE ||
     statusForActions === AttendanceStatus.IN_ATTENDANCE
 
-  const showCompleteTriage =
-    isNurse && !!attendanceId && isTriageActive
+  const showCompleteTriage = isNurse && !!attendanceId && isTriageActive
   const showCompleteAttendance =
     isDoctor && !!attendanceId && isAttendanceActive
 
