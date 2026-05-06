@@ -489,14 +489,37 @@ function AttendanceDetails() {
     }
   }, [attendanceId, isDoctor, topSuggestionDisease])
 
+  const headerActionsReady =
+    !pageLoading &&
+    attendance != null &&
+    attendanceId != null &&
+    String(attendance._id) === String(attendanceId)
+
+  const statusForActions = headerActionsReady ? attendance.status : null
+
+  const isTriageActive =
+    statusForActions === AttendanceStatus.WAITING_TRIAGE ||
+    statusForActions === AttendanceStatus.IN_TRIAGE
+
+  const isAttendanceActive =
+    statusForActions === AttendanceStatus.WAITING_ATTENDANCE ||
+    statusForActions === AttendanceStatus.IN_ATTENDANCE
+
+  const showCompleteTriage =
+    isNurse && !!attendanceId && isTriageActive
+  const showCompleteAttendance =
+    isDoctor && !!attendanceId && isAttendanceActive
+
+  const hasHeaderActions = showCompleteTriage || showCompleteAttendance
+
   const headerActions = (
     <Flex gap={8} wrap='wrap' justify='flex-end'>
-      {isNurse && attendanceId ? (
+      {showCompleteTriage ? (
         <Button loading={triageLoading} onClick={openTriageModal}>
           Concluir triagem
         </Button>
       ) : null}
-      {isDoctor ? (
+      {showCompleteAttendance ? (
         <Button disabled={!attendanceId} onClick={openCompleteModal}>
           Finalizar atendimento
         </Button>
@@ -508,7 +531,7 @@ function AttendanceDetails() {
     return (
       <section className={styles.page}>
         <AuthLayoutHeader
-          actionComponent={isNurse || isDoctor ? headerActions : undefined}
+          actionComponent={hasHeaderActions ? headerActions : undefined}
         />
         <Flex justify='center' align='center' style={{ minHeight: 240 }}>
           <Spin size='large' />
@@ -579,7 +602,7 @@ function AttendanceDetails() {
 
       <section>
         <AuthLayoutHeader
-          actionComponent={isNurse || isDoctor ? headerActions : undefined}
+          actionComponent={hasHeaderActions ? headerActions : undefined}
         />
 
         <div
