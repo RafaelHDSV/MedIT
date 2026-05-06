@@ -100,11 +100,32 @@ function AttendanceInfo({ form, onFinish, fieldErrors }: IAttendanceInfoProps) {
           label='Nível de dor'
           name='painLevel'
           inputHeight={INPUT_HEIGHT}
-          rules={[{ required: true, message: 'Informe seu nível de dor' }]}
+          rules={[
+            { required: true, message: 'Informe seu nível de dor' },
+            {
+              validator: (_, value) => {
+                if (value === undefined || value === null) {
+                  return Promise.resolve()
+                }
+                const n = Number(value)
+                if (!Number.isFinite(n) || n < 0 || n > 10) {
+                  return Promise.reject(
+                    new Error('Informe um nível de dor entre 0 e 10.')
+                  )
+                }
+                return Promise.resolve()
+              }
+            }
+          ]}
           validateStatus={fieldErrors.painLevel ? 'error' : undefined}
           help={fieldErrors.painLevel}
         >
-          <Slider min={0} max={10} dots />
+          <Slider
+            min={0}
+            max={10}
+            step={0.5}
+            tooltip={{ formatter: (v) => (v != null ? String(v) : '') }}
+          />
         </FormItem>
 
         <FormItem

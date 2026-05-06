@@ -13,6 +13,7 @@ import User from '../models/UserModel.js'
 import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import capitalize from '../utils/capitalize.js'
 import normalizeStringArray from '../utils/normalizeStringArray.js'
+import { parseFiniteNumber } from '../utils/parseNumbers.js'
 
 const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
   if (pain >= 9) return AttendanceRisk.VERY_URGENT
@@ -464,8 +465,8 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
       unitId: bodyUnitId
     } = req.body as {
       mainComplaint?: string
-      painLevel?: number
-      selfMedicated?: boolean
+      painLevel?: unknown
+      selfMedicated?: unknown
       symptomStartDate?: string
       conditions?: string | string[]
       allergies?: string | string[]
@@ -481,15 +482,18 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
     if (!mainComplaint?.trim()) {
       errors.mainComplaint = 'Informe sua queixa principal'
     }
+    const painLevelNumber = parseFiniteNumber(painLevel)
     if (
-      painLevel === undefined ||
-      painLevel === null ||
-      Number.isNaN(painLevel)
+      painLevelNumber === undefined ||
+      painLevelNumber < 0 ||
+      painLevelNumber > 10
     ) {
-      errors.painLevel = 'Informe seu nível de dor'
+      errors.painLevel =
+        'Informe um nível de dor válido entre 0 e 10 (número finito).'
     }
-    if (selfMedicated === undefined || selfMedicated === null) {
-      errors.selfMedicated = 'Informe se você se automedicou'
+    if (typeof selfMedicated !== 'boolean') {
+      errors.selfMedicated =
+        'Informe se você se automedicou (valor booleano: verdadeiro ou falso).'
     }
     if (!symptomStartDate) {
       errors.symptomStartDate = 'Informe quando os sintomas começaram'
@@ -568,7 +572,7 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
 
     await patient.save()
 
-    const risk = provisionalRiskFromPain(Number(painLevel))
+    const risk = provisionalRiskFromPain(painLevelNumber!)
     const now = new Date()
 
     const numberAgg = await Attendance.aggregate<{ max: number | null }>([
@@ -579,8 +583,8 @@ export const createPatientAttendance = async (req: Request, res: Response) => {
     const attendance = await Attendance.create({
       number: nextNumber,
       complaint: mainComplaint!.trim(),
-      painLevel: Number(painLevel),
-      selfMedicated: Boolean(selfMedicated),
+      painLevel: painLevelNumber!,
+      selfMedicated: selfMedicated as boolean,
       symptomStartDate: symptomStart,
       symptoms: normalizedSymptoms,
       conditions: normalizedConditions,
