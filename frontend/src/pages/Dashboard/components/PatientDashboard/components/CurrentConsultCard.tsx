@@ -49,7 +49,13 @@ function CurrentConsultCard({
         <h3>Consulta atual</h3>
         <button
           className={styles.editBtn}
-          onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}
+          onClick={() => {
+            if (!attendance._id) return
+            
+            navigate(
+              `${ROUTES.PRE_REGISTRATION.path}?mode=edit&attendanceId=${String(attendance._id)}`
+            )
+          }}
           title='Editar pré-atendimento'
           aria-label='Editar pré-atendimento'
         >

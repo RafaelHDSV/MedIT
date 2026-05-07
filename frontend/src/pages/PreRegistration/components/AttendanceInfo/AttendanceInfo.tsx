@@ -23,9 +23,15 @@ interface IAttendanceInfoProps {
   form: FormInstance<PreRegistrationFormValues>
   onFinish: (values: PreRegistrationFormValues) => void
   fieldErrors: IPreRegistrationErrors
+  unitOptions: { label: string; value: string }[]
 }
 
-function AttendanceInfo({ form, onFinish, fieldErrors }: IAttendanceInfoProps) {
+function AttendanceInfo({
+  form,
+  onFinish,
+  fieldErrors,
+  unitOptions
+}: IAttendanceInfoProps) {
   const { user } = useAuth()
 
   return (
@@ -84,6 +90,21 @@ function AttendanceInfo({ form, onFinish, fieldErrors }: IAttendanceInfoProps) {
             />
           </FormItem>
         )}
+
+        <FormItem
+          label='Unidade de atendimento'
+          name='unitId'
+          inputHeight={INPUT_HEIGHT}
+          rules={[{ required: true, message: 'Selecione a unidade de atendimento' }]}
+          validateStatus={fieldErrors.unitId ? 'error' : undefined}
+          help={fieldErrors.unitId}
+        >
+          <InputSelect
+            inputHeight={INPUT_HEIGHT}
+            placeholder='Selecione a unidade'
+            options={unitOptions}
+          />
+        </FormItem>
 
         <FormItem
           label='Queixa principal'
