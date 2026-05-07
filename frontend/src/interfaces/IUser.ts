@@ -34,6 +34,29 @@ export const UserGendersLabels = {
 
 export type IAuthUser = IBaseUser & IDoctor & INurse & IPatient
 
+export interface ConfigFormValues {
+  name?: string
+  cpf?: string
+  email?: string
+  gender?: UserGender
+  birthDate?: string | Date
+  cellphone?: string
+  crm?: string
+  specialization?: string
+  corenUf?: string
+  coren?: string
+  corenType?: string
+  shift?: string
+  weight?: number | string
+  height?: number | string
+  bloodType?: string
+  conditions?: string
+  allergies?: string
+  currentPassword?: string
+  newPassword?: string
+  confirmPassword?: string
+}
+
 export interface IBaseUser extends IBaseInterface {
   name: string
   cpf: string
