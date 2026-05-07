@@ -9,11 +9,9 @@ import ReloadButton from '@/components/ReloadButton/ReloadButton'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import { Periods, PeriodsLabels } from '@/interfaces/globals'
-import { AttendanceStatus, type IAttendance } from '@/interfaces/IAttendance'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
-import PatientsRepository from '@/repositories/PatientsRepository'
 import masks from '@/utils/masks'
 import { timeFormatter } from '@/utils/timeFormatter'
 import {
@@ -28,34 +26,20 @@ import {
 import { Flex } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
 import PatientDashboard from './components/PatientDashboard/PatientDashboard'
 import styles from './Dashboard.module.scss'
 
-const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
-  AttendanceStatus.ON_THE_WAY,
-  AttendanceStatus.WAITING_TRIAGE,
-  AttendanceStatus.IN_TRIAGE,
-  AttendanceStatus.TRIAGE_COMPLETED,
-  AttendanceStatus.WAITING_ATTENDANCE,
-  AttendanceStatus.IN_ATTENDANCE
-]
-
 function Dashboard() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const [dashboardStatusData, setDashboardStatusData] =
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState<Periods>(Periods.WEEK)
   const [referenceDayjs, setReferenceDayjs] = useState(() => dayjs())
   const [reload, setReload] = useState(false)
-  const [patientActiveAttendance, setPatientActiveAttendance] =
-    useState<IAttendance | null>(null)
-  const [arrivalLoading, setArrivalLoading] = useState(false)
   const shouldShowPeriodSelect = user?.level !== UserLevels.PATIENT
 
   const fetchDashboardStatus = useCallback(async () => {
@@ -87,49 +71,10 @@ function Dashboard() {
     fetchDashboardStatus()
   }, [fetchDashboardStatus])
 
-  const fetchPatientActiveAttendance = useCallback(async () => {
-    if (user?.level !== UserLevels.PATIENT || !user?._id) {
-      setPatientActiveAttendance(null)
-      return
-    }
-
-    try {
-      const response = await PatientsRepository.getAttendances({
-        patientId: user._id
-      })
-      const list = response.data as IAttendance[]
-      const actives = (list ?? []).filter((a) =>
-        PATIENT_ACTIVE_ATTENDANCE_STATUSES.includes(a.status)
-      )
-      actives.sort((a, b) => {
-        const tb = dayjs(b.updatedAt ?? b.date).valueOf()
-        const ta = dayjs(a.updatedAt ?? a.date).valueOf()
-        return tb - ta
-      })
-      setPatientActiveAttendance(actives[0] ?? null)
-
-      // VIEIRA: Parte do VICTOR
-      // PatientsRepository.handle() retorna response.data do axios, mas
-      // o backend envelopa em { data: [] }, então precisamos extrair
-      // const raw = response as unknown as { data: IAttendance[] } | IAttendance[]
-      // const list: IAttendance[] = Array.isArray(raw)
-      //   ? raw
-      //   : (raw as { data: IAttendance[] }).data ?? []
-      // setPatientAttendances(list)
-    } catch {
-      setPatientActiveAttendance(null)
-    }
-  }, [user?._id, user?.level])
-
-  useEffect(() => {
-    fetchPatientActiveAttendance()
-  }, [fetchPatientActiveAttendance])
-
   const onReload = useCallback(() => {
     fetchDashboardStatus()
-    fetchPatientActiveAttendance()
     setReload((prev) => !prev)
-  }, [fetchDashboardStatus, fetchPatientActiveAttendance])
+  }, [fetchDashboardStatus])
 
   const cardsData = useMemo(() => {
     const highRiskPercentage =
@@ -277,14 +222,7 @@ function Dashboard() {
         )
       case UserLevels.PATIENT:
         return (
-          // VIEIRA: Parte do VICTOR
-          <PatientDashboard
-            attendances={
-              patientActiveAttendance ? [patientActiveAttendance] : []
-            }
-            parentLoading={arrivalLoading}
-            onReload={onReload}
-          />
+          <PatientDashboard reload={reload} />
 
           // <Flex vertical gap={12} align='flex-start'>
           //   {patientActiveAttendance?._id &&
@@ -324,16 +262,7 @@ function Dashboard() {
       default:
         return <></>
     }
-  }, [
-    user?.level,
-    navigate,
-    selectedPeriod,
-    referenceDayjs,
-    reload,
-    patientActiveAttendance,
-    arrivalLoading,
-    onReload
-  ])
+  }, [user?.level, selectedPeriod, referenceDayjs, reload])
 
   return (
     <>

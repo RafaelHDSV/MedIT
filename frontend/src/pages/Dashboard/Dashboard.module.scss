@@ -125,13 +125,29 @@
 }
 
 .patient {
-  // O PatientDashboard já cuida de seu próprio layout interno (grid 3 colunas).
-  // O container pai precisa apenas expor uma única célula que ocupa toda a largura.
-  grid-template-columns: 1fr;
-  grid-template-areas: 'patientDashboard';
-  grid-template-rows: auto;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-areas:
+    'positionQueue status currentAttendance currentAttendance'
+    'attendanceQueueChart attendanceQueueChart currentAttendance currentAttendance'
+    'attendanceQueueChart attendanceQueueChart currentAttendance currentAttendance'
+    'attendanceQueueChart attendanceQueueChart lastAttendance lastAttendance';
 
-  > :first-child {
-    grid-area: patientDashboard;
+  @include max-lg {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'positionQueue status'
+      'attendanceQueueChart attendanceQueueChart'
+      'currentAttendance currentAttendance'
+      'lastAttendance lastAttendance';
+  }
+
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'positionQueue'
+      'status'
+      'attendanceQueueChart'
+      'currentAttendance'
+      'lastAttendance';
   }
 }
