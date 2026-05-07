@@ -156,8 +156,8 @@ function PatientDashboard({
           patientName: item.patientName,
           status: item.status,
           risk: item.risk,
-          isCurrentUser: activeAttendance
-            ? String(item._id) === String(activeAttendance._id)
+          isCurrentUser: item.patientId
+            ? String(item.patientId) === String(user?._id)
             : false
         })
       )
@@ -168,7 +168,7 @@ function PatientDashboard({
     } finally {
       setQueueLoading(false)
     }
-  }, [user?.unitId, activeAttendance])
+  }, [user?._id, user?.unitId])
 
   const fetchPatientActiveAttendance = useCallback(async () => {
     if (user?.level !== UserLevels.PATIENT || !user?._id) return
