@@ -7,6 +7,7 @@ import type { IAttendance } from '@/interfaces/IAttendance'
 import type { IPatient } from '@/interfaces/IPatient'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import UserRepository from '@/repositories/UserRepository'
+import { formatDate } from '@/utils/formatDate'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
@@ -15,7 +16,6 @@ import {
   DatabaseIcon
 } from '@phosphor-icons/react'
 import { Flex } from 'antd'
-import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import PatientModal from '../Patients/components/PatientModal/PatientModal'
@@ -97,7 +97,7 @@ function PatientsDetails() {
         {
           label: 'Data',
           value: lastAttendance.date
-            ? dayjs(lastAttendance.date).format('DD/MM/YYYY')
+            ? formatDate({ date: lastAttendance.date, mode: 'date' })
             : '-'
         }
       ]
@@ -107,7 +107,7 @@ function PatientsDetails() {
     attendances && attendances?.length > 0
       ? attendances?.map((attendance) => ({
           key: attendance._id,
-          label: dayjs(attendance.date).format('DD/MM/YYYY'),
+          label: formatDate({ date: attendance.date, mode: 'date' }),
           value: attendance.complaint
         }))
       : [{ label: 'Sem atendimentos registrados', value: '-' }]
@@ -150,7 +150,10 @@ function PatientsDetails() {
             { label: 'CPF', value: masks(patient?.cpf, 'cpf') },
             {
               label: 'Data de Nascimento',
-              value: dayjs(patient?.birthDate).format('DD/MM/YYYY')
+              value: formatDate({
+                date: patient?.birthDate,
+                mode: 'date'
+              })
             },
             { label: 'Nome', value: patient?.name },
             {

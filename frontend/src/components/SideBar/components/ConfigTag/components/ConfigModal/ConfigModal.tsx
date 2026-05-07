@@ -11,11 +11,11 @@ import {
   UserLevels,
   UserLevelsLabels
 } from '@/interfaces/IUser'
+import { formatDate } from '@/utils/formatDate'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import { Checkbox, Divider, Input, message, Modal, Typography } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import styles from './ConfigModal.module.scss'
 
@@ -161,7 +161,7 @@ function ConfigBaseContent() {
         {user.birthDate && (
           <DetailsLine
             label='Data de nascimento'
-            value={`${dayjs(user.birthDate).format('DD/MM/YYYY')} (${getAgeByBirthDate(user.birthDate)} anos)`}
+            value={`${formatDate({ date: user.birthDate, mode: 'date' })} (${getAgeByBirthDate(user.birthDate)} anos)`}
           />
         )}
         {user.cellphone && (

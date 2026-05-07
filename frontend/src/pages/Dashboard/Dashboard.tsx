@@ -12,6 +12,7 @@ import { Periods, PeriodsLabels } from '@/interfaces/globals'
 import type { IDashboardStatusCards } from '@/interfaces/IDashboard'
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
+import { formatDate } from '@/utils/formatDate'
 import masks from '@/utils/masks'
 import { timeFormatter } from '@/utils/timeFormatter'
 import {
@@ -52,7 +53,10 @@ function Dashboard() {
           unitId: user?.unitId,
           level: user?.level,
           period: selectedPeriod,
-          referenceDate: referenceDayjs.format('YYYY-MM-DD')
+          referenceDate: formatDate({
+            date: referenceDayjs,
+            mode: 'serverCompleteDate'
+          })
         }
       })
       const data = response.data
@@ -194,13 +198,19 @@ function Dashboard() {
           <>
             <AttendanceByTimeChart
               selectedPeriod={selectedPeriod}
-              referenceDate={referenceDayjs.format('YYYY-MM-DD')}
+              referenceDate={formatDate({
+                date: referenceDayjs,
+                mode: 'serverCompleteDate'
+              })}
               reload={reload}
             />
             <AttendanceQueueChart
               reload={reload}
               selectedPeriod={selectedPeriod}
-              referenceDate={referenceDayjs.format('YYYY-MM-DD')}
+              referenceDate={formatDate({
+                date: referenceDayjs,
+                mode: 'serverCompleteDate'
+              })}
             />
           </>
         )
@@ -209,7 +219,10 @@ function Dashboard() {
           <AttendanceQueueChart
             reload={reload}
             selectedPeriod={selectedPeriod}
-            referenceDate={referenceDayjs.format('YYYY-MM-DD')}
+            referenceDate={formatDate({
+              date: referenceDayjs,
+              mode: 'serverCompleteDate'
+            })}
           />
         )
       case UserLevels.NURSE:
@@ -217,7 +230,10 @@ function Dashboard() {
           <AttendanceQueueChart
             reload={reload}
             selectedPeriod={selectedPeriod}
-            referenceDate={referenceDayjs.format('YYYY-MM-DD')}
+            referenceDate={formatDate({
+              date: referenceDayjs,
+              mode: 'serverCompleteDate'
+            })}
           />
         )
       case UserLevels.PATIENT:

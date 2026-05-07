@@ -3,9 +3,9 @@ import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
 import { ROUTES } from '@/routes/constants'
+import { formatDate } from '@/utils/formatDate'
 import { Flex } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -55,9 +55,7 @@ export function useAttendancesColumns({
         render: (date: Date | string) => (
           <TooltipColumn
             text={
-              date
-                ? `${dayjs(date).format('DD/MM/YYYY')} às ${dayjs(date).format('HH:mm')}`
-                : undefined
+              date ? formatDate({ date, mode: 'datetimeWithAt' }) : undefined
             }
           />
         )

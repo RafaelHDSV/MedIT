@@ -24,9 +24,9 @@ import AttendancesFlowRepository from '@/repositories/AttendancesFlowRepository'
 import SymptomsDiseasesRepository from '@/repositories/SymptomsDiseasesRepository'
 import { ROUTES } from '@/routes/constants'
 import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
+import { formatDate } from '@/utils/formatDate'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import { Flex, message, Spin } from 'antd'
-import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import RiskSelector from '../../components/Risk/RiskSelector/RiskSelector'
@@ -34,8 +34,8 @@ import styles from './AttendanceDetails.module.scss'
 import CompleteAttendanceModal, {
   type ICompleteAttendancePayload
 } from './components/CompleteAttendanceModal/CompleteAttendanceModal'
-import ConfirmTriageModal from './components/ConfirmTriageModal/ConfirmTriageModal'
 import ConditionsCard from './components/ConditionsCard/ConditionsCard'
+import ConfirmTriageModal from './components/ConfirmTriageModal/ConfirmTriageModal'
 import SuggestionDetailModal from './components/SuggestionDetailModal/SuggestionDetailModal'
 import VitalCard from './components/VitalCard/VitalCard'
 
@@ -309,7 +309,7 @@ function AttendanceDetails() {
       patient.gender)
     : '—'
   const arrivalLabel = attendance?.date
-    ? dayjs(attendance.date).format('DD/MM/YYYY HH:mm')
+    ? formatDate({ date: attendance.date, mode: 'datetime' })
     : '—'
   const allergiesText = useMemo(() => {
     const allergies = patient?.allergies?.length
