@@ -344,8 +344,6 @@ function PatientDashboard({
         </div>
       )}
 
-      {/* ── Fila de atendimento ── */}
-      {/* <QueueList items={queueItems} loading={queueLoading} /> */}
       <AttendanceQueueChart
         reload={reload}
         selectedPeriod={selectedPeriod}
@@ -355,7 +353,6 @@ function PatientDashboard({
         })}
       />
 
-      {/* ── Último atendimento ── */}
       {lastAttendance && (
         <div
           className={styles.lastAttendanceCard}
