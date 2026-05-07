@@ -58,13 +58,11 @@ const FULL_FLOW: AttendanceStatus[] = [
   AttendanceStatus.TRIAGE_COMPLETED,
   AttendanceStatus.WAITING_ATTENDANCE,
   AttendanceStatus.IN_ATTENDANCE,
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED
+  AttendanceStatus.ATTENDANCE_COMPLETED
 ]
 
 const COMPLETED_STATUSES = new Set<AttendanceStatus>([
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED
+  AttendanceStatus.ATTENDANCE_COMPLETED
 ])
 
 const TRIAGE_OR_LATER = new Set<AttendanceStatus>([
@@ -73,8 +71,7 @@ const TRIAGE_OR_LATER = new Set<AttendanceStatus>([
   AttendanceStatus.TRIAGE_COMPLETED,
   AttendanceStatus.WAITING_ATTENDANCE,
   AttendanceStatus.IN_ATTENDANCE,
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED
+  AttendanceStatus.ATTENDANCE_COMPLETED
 ])
 
 // ── Static Data ─────────────────────────────────────────────────────────────
@@ -252,7 +249,7 @@ type AttendanceSeed = {
   doctorId?: Types.ObjectId
   medicationsIds: Types.ObjectId[]
   changesHistory: { status: AttendanceStatus; changedAt: Date }[]
-  vitalSigns: IVitalSigns
+  vitalSigns?: IVitalSigns
   createdAt: Date
   updatedAt: Date
   painLevel?: number
@@ -460,7 +457,7 @@ function buildCompletedFlow(
     return entry
   })
 
-  return { status: AttendanceStatus.COMPLETED, history }
+  return { status: AttendanceStatus.ATTENDANCE_COMPLETED, history }
 }
 
 function buildActiveFlow(
@@ -598,9 +595,20 @@ function assembleSeed(
   base: Omit<AttendanceSeed, 'medicationsIds' | 'vitalSigns' | 'painLevel'> &
     Partial<Pick<AttendanceSeed, 'vitalSigns' | 'painLevel'>>
 ): AttendanceSeed {
+  const includeVitalSignsStatuses: AttendanceStatus[] = [
+    AttendanceStatus.IN_TRIAGE,
+    AttendanceStatus.TRIAGE_COMPLETED,
+    AttendanceStatus.WAITING_ATTENDANCE,
+    AttendanceStatus.IN_ATTENDANCE,
+    AttendanceStatus.ATTENDANCE_COMPLETED
+  ]
+  const includeVitalSigns = includeVitalSignsStatuses.includes(base.status)
+
   return {
     ...base,
-    vitalSigns: base.vitalSigns ?? vitalSignsForRisk(base.risk),
+    ...(includeVitalSigns
+      ? { vitalSigns: base.vitalSigns ?? vitalSignsForRisk(base.risk) }
+      : {}),
     painLevel: base.painLevel ?? painLevelForRisk(base.risk),
     medicationsIds: []
   }
@@ -1074,6 +1082,7 @@ const createAttendances: Script = {
           built.status !== AttendanceStatus.ON_THE_WAY &&
           built.status !== AttendanceStatus.WAITING_TRIAGE
         const needsDoctor =
+          built.status === AttendanceStatus.WAITING_ATTENDANCE ||
           built.status === AttendanceStatus.IN_ATTENDANCE ||
           built.status === AttendanceStatus.ATTENDANCE_COMPLETED
 
@@ -1173,9 +1182,8 @@ const createAttendances: Script = {
       for (const doctorId of unitTccDoctors) {
         for (let i = 0; i < TCC_ACTIVE_PER_DOCTOR; i++) {
           if (
-            pushActive(AttendanceStatus.IN_ATTENDANCE, {
+            pushActive(AttendanceStatus.WAITING_ATTENDANCE, {
               patientId: safeNextPatient(),
-              nurseId: nextNurse(),
               doctorId
             })
           ) {
@@ -1187,7 +1195,7 @@ const createAttendances: Script = {
       for (const nurseId of unitTccNurses) {
         for (let i = 0; i < TCC_ACTIVE_PER_NURSE; i++) {
           if (
-            pushActive(AttendanceStatus.IN_TRIAGE, {
+            pushActive(AttendanceStatus.TRIAGE_COMPLETED, {
               patientId: safeNextPatient(),
               nurseId
             })
@@ -1201,10 +1209,9 @@ const createAttendances: Script = {
         AttendanceStatus.ON_THE_WAY,
         AttendanceStatus.ON_THE_WAY,
         AttendanceStatus.WAITING_TRIAGE,
-        AttendanceStatus.IN_TRIAGE,
         AttendanceStatus.WAITING_ATTENDANCE,
-        AttendanceStatus.IN_ATTENDANCE,
-        AttendanceStatus.IN_ATTENDANCE
+        AttendanceStatus.WAITING_ATTENDANCE,
+        AttendanceStatus.TRIAGE_COMPLETED
       ]
       for (const st of extraActiveTargets) {
         if (pushActive(st, { patientId: safeNextPatient() })) {
