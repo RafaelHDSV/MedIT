@@ -37,6 +37,13 @@ const COMPLETED_STATUSES: AttendanceStatus[] = [
   AttendanceStatus.COMPLETED,
   AttendanceStatus.CANCELED
 ]
+const OPERATIONAL_QUEUE_STATUSES: AttendanceStatus[] = [
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE
+]
 
 interface IPatientDashboardProps {
   reload: boolean
@@ -52,12 +59,17 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
   const [patientAttendancesLoading, setPatientAttendancesLoading] =
     useState(true)
   const [queueItems, setQueueItems] = useState<IPatientQueueItem[]>([])
+  const [onTheWayQueueItems, setOnTheWayQueueItems] = useState<
+    IPatientQueueItem[]
+  >([])
   const [queueLoading, setQueueLoading] = useState(true)
   const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
   const [arrivalLoading, setArrivalLoading] = useState(false)
 
   const fetchQueue = useCallback(async () => {
     if (user?.level !== UserLevels.PATIENT || !user?.unitId) {
+      setQueueItems([])
+      setOnTheWayQueueItems([])
       setQueueLoading(false)
       return
     }
@@ -85,13 +97,29 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
         })
       )
 
-      setQueueItems(mapped)
+      const operationalItems = mapped
+        .filter((item) => OPERATIONAL_QUEUE_STATUSES.includes(item.status))
+        .map((item, index) => ({
+          ...item,
+          queuePosition: index + 1
+        }))
+
+      const preQueueItems = mapped
+        .filter((item) => item.status === AttendanceStatus.ON_THE_WAY)
+        .map((item, index) => ({
+          ...item,
+          queuePosition: index + 1
+        }))
+
+      setQueueItems(operationalItems)
+      setOnTheWayQueueItems(preQueueItems)
     } catch (err) {
       handleApiError({
         err,
         defaultMessage: 'Erro ao pegar fila de atendimento'
       })
       setQueueItems([])
+      setOnTheWayQueueItems([])
     } finally {
       setQueueLoading(false)
     }
@@ -254,7 +282,12 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
         />
       )}
 
-      <PatientQueueList queueItems={queueItems} loading={isLoading} />
+      <PatientQueueList
+        operationalQueueItems={queueItems}
+        onTheWayQueueItems={onTheWayQueueItems}
+        totalActiveCount={queueItems.length + onTheWayQueueItems.length}
+        loading={isLoading}
+      />
 
       {lastAttendance && (
         <LastAttendanceCard attendance={lastAttendance} loading={isLoading} />

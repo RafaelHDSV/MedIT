@@ -18,6 +18,31 @@
   }
 }
 
+.queueSection {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.15rem 0.25rem 0.35rem;
+}
+
+.sectionTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--black);
+  text-transform: uppercase;
+}
+
+.sectionHint {
+  font-size: 0.7rem;
+  color: var(--light-gray);
+}
+
 .queueItem {
   display: flex;
   align-items: center;

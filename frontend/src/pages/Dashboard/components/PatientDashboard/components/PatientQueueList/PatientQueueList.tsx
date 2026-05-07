@@ -7,7 +7,9 @@ import type { IPatientQueueItem } from '../../IPatientDashboard'
 import styles from './PatientQueueList.module.scss'
 
 interface IPatientQueueListProps {
-  queueItems: IPatientQueueItem[]
+  operationalQueueItems: IPatientQueueItem[]
+  onTheWayQueueItems: IPatientQueueItem[]
+  totalActiveCount: number
   loading: boolean
 }
 
@@ -24,12 +26,54 @@ function QueueItemSkeleton() {
   )
 }
 
-function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
+function PatientQueueList({
+  operationalQueueItems,
+  onTheWayQueueItems,
+  totalActiveCount,
+  loading
+}: IPatientQueueListProps) {
+  const renderItem = (item: IPatientQueueItem) => {
+    const riskColor = item.risk ? riskColors[item.risk] : undefined
+
+    return (
+      <div
+        key={item._id}
+        className={`${styles.queueItem} ${item.isCurrentUser ? styles.currentUser : ''}`}
+      >
+        <div
+          className={styles.numberBadge}
+          style={
+            riskColor
+              ? ({
+                  '--badge-bg': riskColor.color,
+                  '--badge-color': 'var(--white)'
+                } as React.CSSProperties & Record<string, string>)
+              : undefined
+          }
+        >
+          {item.queuePosition}
+        </div>
+
+        <div className={styles.itemInfo}>
+          <span className={styles.itemName}>{item.patientName}</span>
+          <span className={styles.itemStatus}>
+            {AttendanceStatusLabels[item.status]}
+          </span>
+        </div>
+
+        <RiskTag
+          risk={item.risk}
+          className={item.isCurrentUser ? styles.currentUserRiskTag : ''}
+        />
+      </div>
+    )
+  }
+
   return (
     <DashboardCard
       title='Fila de Atendimento'
       icon={StethoscopeIcon}
-      asideText={`${queueItems.length} ${queueItems.length !== 1 ? 'atendimentos' : 'atendimento'}`}
+      asideText={`${totalActiveCount} ${totalActiveCount !== 1 ? 'atendimentos' : 'atendimento'}`}
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>
@@ -37,44 +81,32 @@ function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
           ? Array.from({ length: 5 }).map((_, i) => (
               <QueueItemSkeleton key={i} />
             ))
-          : queueItems.map((item) => {
-              const riskColor = item.risk ? riskColors[item.risk] : undefined
-
-              return (
-                <div
-                  key={item._id}
-                  className={`${styles.queueItem} ${item.isCurrentUser ? styles.currentUser : ''}`}
-                >
-                  <div
-                    className={styles.numberBadge}
-                    style={
-                      riskColor
-                        ? ({
-                            '--badge-bg': riskColor.color,
-                            '--badge-color': 'var(--white)'
-                          } as React.CSSProperties & Record<string, string>)
-                        : undefined
-                    }
-                  >
-                    {item.queuePosition}
-                  </div>
-
-                  <div className={styles.itemInfo}>
-                    <span className={styles.itemName}>{item.patientName}</span>
-                    <span className={styles.itemStatus}>
-                      {AttendanceStatusLabels[item.status]}
+          : (
+              <>
+                <section className={styles.queueSection}>
+                  <div className={styles.sectionHeader}>
+                    <span className={styles.sectionTitle}>Fila operacional</span>
+                    <span className={styles.sectionHint}>
+                      Apenas pacientes presentes no hospital
                     </span>
                   </div>
+                  {operationalQueueItems.map(renderItem)}
+                </section>
 
-                  <RiskTag
-                    risk={item.risk}
-                    className={
-                      item.isCurrentUser ? styles.currentUserRiskTag : ''
-                    }
-                  />
-                </div>
-              )
-            })}
+                {onTheWayQueueItems.length > 0 && (
+                  <section className={styles.queueSection}>
+                    <div className={styles.sectionHeader}>
+                      <span className={styles.sectionTitle}>A caminho</span>
+                      <span className={styles.sectionHint}>
+                        Pré-fila com vantagem de tempo limitada a 30 min no mesmo
+                        risco
+                      </span>
+                    </div>
+                    {onTheWayQueueItems.map(renderItem)}
+                  </section>
+                )}
+              </>
+            )}
       </div>
     </DashboardCard>
   )
