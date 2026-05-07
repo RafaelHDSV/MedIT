@@ -110,6 +110,7 @@ function CurrentConsultCard({
       {isOnTheWay && onConfirmArrival && (
         <div className={styles.confirmArrivalRow}>
           <Button
+            className='w-100'
             type='primary'
             loading={arrivalLoading}
             onClick={onConfirmArrival}

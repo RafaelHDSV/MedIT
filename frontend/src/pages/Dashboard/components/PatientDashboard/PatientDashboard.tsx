@@ -207,7 +207,7 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
     }
   }
 
-  const isLoading = patientAttendancesLoading || queueLoading
+  const isLoading = patientAttendancesLoading || queueLoading || arrivalLoading
 
   return (
     <>
@@ -245,10 +245,11 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
               ? handleConfirmArrival
               : undefined
           }
-          arrivalLoading={arrivalLoading}
+          arrivalLoading={isLoading}
         />
       ) : (
         <NewConsultCard
+          loading={isLoading}
           onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}
         />
       )}
