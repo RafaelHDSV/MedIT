@@ -18,6 +18,7 @@ import {
   getEntries,
   getHighRisk,
   getInAttendance,
+  getRecentCompletedForTv,
   getTriageAverageTime,
   getTriaged,
   getWaitingForDoctor,
@@ -341,6 +342,34 @@ export const getDashboardAttendanceQueue = async (
   } catch (errors) {
     res.status(500).json({
       message: 'Erro ao buscar fila de atendimento',
+      errors
+    })
+  }
+}
+
+export const getDashboardRecentCompletedQueue = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const unitIdStr = parseOptionalUnitId(req.query.unitId)
+
+    if (!unitIdStr) {
+      return res.json({
+        message: 'Sem unidade: nenhum histórico recente',
+        data: []
+      })
+    }
+
+    const data = await getRecentCompletedForTv({ unitId: unitIdStr })
+
+    res.json({
+      message: 'Últimos atendimentos concluídos carregados',
+      data
+    })
+  } catch (errors) {
+    res.status(500).json({
+      message: 'Erro ao buscar últimos atendimentos concluídos',
       errors
     })
   }

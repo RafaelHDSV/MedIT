@@ -56,6 +56,20 @@ class AuthRepository extends Repository {
       })
     })
   }
+
+  async getRecentCompletedQueue({
+    params
+  }: {
+    params: {
+      unitId: ObjectId | string
+    }
+  }) {
+    return this.handle(() => {
+      return this.api.get(`${this.path}/recent-completed-queue`, {
+        params
+      })
+    })
+  }
 }
 
 export default new AuthRepository({

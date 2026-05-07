@@ -37,6 +37,13 @@ export interface IDashboardStatusCards
     Partial<IDoctorStatusCard>,
     Partial<INurseStatusCard> {}
 
+export interface IDashboardRecentCompletedItem {
+  _id: string
+  number?: number
+  patientName: string
+  complaint?: string
+}
+
 export interface IDashboardQueueItem {
   _id: string
   number?: number

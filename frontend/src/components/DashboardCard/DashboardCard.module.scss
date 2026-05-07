@@ -39,6 +39,14 @@
       }
     }
 
+    .headerMeta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
     .asideInfo {
       display: flex;
       align-items: center;
@@ -50,6 +58,11 @@
       @include max-md {
         font-size: 12px;
       }
+    }
+
+    .headerExtra {
+      display: flex;
+      align-items: center;
     }
   }
 }

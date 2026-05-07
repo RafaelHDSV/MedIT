@@ -930,3 +930,81 @@ export const getAttendanceQueue = async ({
     return []
   }
 }
+
+export const getRecentCompletedForTv = async ({
+  unitId
+}: {
+  unitId?: string
+}) => {
+  if (!unitId) {
+    return []
+  }
+
+  try {
+    const { start, end } = getPeriodDateRange('day')
+
+    const data = await Attendance.aggregate([
+      {
+        $match: {
+          unitId: new Types.ObjectId(unitId),
+          status: AttendanceStatus.ATTENDANCE_COMPLETED,
+          date: { $gte: start, $lte: end }
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'patientId',
+          foreignField: '_id',
+          as: 'patient'
+        }
+      },
+      {
+        $unwind: {
+          path: '$patient',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $addFields: {
+          completedAt: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: { $ifNull: ['$changesHistory', []] },
+                  as: 'h',
+                  cond: {
+                    $eq: ['$$h.status', AttendanceStatus.ATTENDANCE_COMPLETED]
+                  }
+                }
+              },
+              -1
+            ]
+          }
+        }
+      },
+      {
+        $addFields: {
+          sortTime: {
+            $ifNull: ['$completedAt.changedAt', '$updatedAt']
+          }
+        }
+      },
+      { $sort: { sortTime: -1 } },
+      { $limit: 5 },
+      {
+        $project: {
+          _id: 1,
+          number: 1,
+          patientName: { $ifNull: ['$patient.name', 'Paciente'] },
+          complaint: 1
+        }
+      }
+    ])
+
+    return data
+  } catch (err) {
+    console.error(err)
+    return []
+  }
+}

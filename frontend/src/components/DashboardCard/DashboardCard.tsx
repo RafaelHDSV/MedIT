@@ -1,4 +1,5 @@
 import type { Icon } from '@phosphor-icons/react'
+import type { ReactNode } from 'react'
 import styles from './DashboardCard.module.scss'
 
 interface IDashboardCardProps {
@@ -6,7 +7,8 @@ interface IDashboardCardProps {
   title: string
   asideText: string
   gridArea?: string
-  children: React.ReactNode
+  headerExtra?: ReactNode
+  children: ReactNode
 }
 
 function DashboardCard({
@@ -14,6 +16,7 @@ function DashboardCard({
   title,
   asideText,
   gridArea,
+  headerExtra,
   children
 }: IDashboardCardProps) {
   return (
@@ -21,9 +24,14 @@ function DashboardCard({
       <div className={styles.header}>
         <h3>{title}</h3>
 
-        <div className={styles.asideInfo}>
-          <Icon size={22} />
-          <span>{asideText}</span>
+        <div className={styles.headerMeta}>
+          <div className={styles.asideInfo}>
+            <Icon size={22} />
+            <span>{asideText}</span>
+          </div>
+          {headerExtra ? (
+            <div className={styles.headerExtra}>{headerExtra}</div>
+          ) : null}
         </div>
       </div>
 
