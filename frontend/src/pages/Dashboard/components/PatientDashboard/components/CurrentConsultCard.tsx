@@ -1,4 +1,5 @@
-import type { IAttendance } from '@/interfaces/IAttendance'
+import Button from '@/components/Button/Button'
+import { AttendanceStatus, type IAttendance } from '@/interfaces/IAttendance'
 import type { ISymptomOption } from '@/interfaces/ISymptomDiseases'
 import { ROUTES } from '@/routes/constants'
 import { formatDate } from '@/utils/formatDate'
@@ -9,6 +10,8 @@ import styles from '../PatientDashboard.module.scss'
 interface ICurrentConsultCardProps {
   attendance: Partial<IAttendance>
   symptomOptions: ISymptomOption[]
+  onConfirmArrival?: () => void
+  arrivalLoading?: boolean
 }
 
 function translateSymptoms(
@@ -29,13 +32,16 @@ function translateSymptoms(
 
 function CurrentConsultCard({
   attendance,
-  symptomOptions
+  symptomOptions,
+  onConfirmArrival,
+  arrivalLoading
 }: ICurrentConsultCardProps) {
   const navigate = useNavigate()
   const translatedSymptoms = translateSymptoms(
     attendance.symptoms,
     symptomOptions
   )
+  const isOnTheWay = attendance.status === AttendanceStatus.ON_THE_WAY
 
   return (
     <div className={styles.currentConsultCard}>
@@ -61,15 +67,6 @@ function CurrentConsultCard({
         <span className={styles.rowValue}>{attendance.complaint ?? '-'}</span>
       </div>
 
-      {translatedSymptoms.length > 0 && (
-        <div className={styles.currentConsultRow}>
-          <span className={styles.rowLabel}>Sintomas</span>
-          <span className={styles.rowValue}>
-            {translatedSymptoms.join(', ')}
-          </span>
-        </div>
-      )}
-
       <div className={styles.currentConsultRow}>
         <span className={styles.rowLabel}>Se automedicou?</span>
         <span className={styles.rowValue}>
@@ -94,9 +91,30 @@ function CurrentConsultCard({
       <div className={styles.currentConsultRow}>
         <span className={styles.rowLabel}>Chegada</span>
         <span className={styles.rowValue}>
-          {formatDate({ date: attendance.date as Date, mode: 'datetimeWithAt' })}
+          {formatDate({ date: attendance.date as Date, mode: 'date' })}
         </span>
       </div>
+
+      {translatedSymptoms.length > 0 && (
+        <div className={styles.currentConsultRow}>
+          <span className={styles.rowLabel}>Sintomas</span>
+          <span className={styles.rowValue}>
+            {translatedSymptoms.join(', ')}
+          </span>
+        </div>
+      )}
+
+      {isOnTheWay && onConfirmArrival && (
+        <div className={styles.confirmArrivalRow}>
+          <Button
+            type='primary'
+            loading={arrivalLoading}
+            onClick={onConfirmArrival}
+          >
+            Confirmar chegada ao hospital
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

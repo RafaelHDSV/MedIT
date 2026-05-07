@@ -9,6 +9,7 @@ import DashboardRepository from '@/repositories/DashboardRepository'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import SymptomsDiseasesRepository from '@/repositories/SymptomsDiseasesRepository'
 import { ROUTES } from '@/routes/constants'
+import { message } from 'antd'
 import dayjs from 'dayjs'
 import 'dayjs/locale/pt-br'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -41,9 +42,7 @@ interface IPatientDashboardProps {
   reload: boolean
 }
 
-function PatientDashboard({
-  reload
-}: IPatientDashboardProps) {
+function PatientDashboard({ reload }: IPatientDashboardProps) {
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -55,6 +54,7 @@ function PatientDashboard({
   const [queueItems, setQueueItems] = useState<IPatientQueueItem[]>([])
   const [queueLoading, setQueueLoading] = useState(true)
   const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
+  const [arrivalLoading, setArrivalLoading] = useState(false)
 
   const fetchQueue = useCallback(async () => {
     if (user?.level !== UserLevels.PATIENT || !user?.unitId) {
@@ -66,7 +66,7 @@ function PatientDashboard({
       setQueueLoading(true)
 
       const response = await DashboardRepository.getAttendanceQueue({
-        params: { unitId: user.unitId }
+        params: { unitId: user.unitId, level: user.level }
       })
       const mapped: IPatientQueueItem[] = response.data.map(
         (item: Partial<IDashboardQueueItem & { patientId?: string }>) => ({
@@ -122,13 +122,9 @@ function PatientDashboard({
   const fetchSymptomOptions = useCallback(async () => {
     try {
       const response = await SymptomsDiseasesRepository.getSymptomOptions()
-      const symptoms = response?.data?.symptoms ?? []
-      setSymptomOptions(symptoms)
-    } catch (err) {
-      handleApiError({
-        err,
-        defaultMessage: 'Erro ao pegar opções de sintomas'
-      })
+      setSymptomOptions(response?.data?.symptoms ?? [])
+    } catch {
+      // fallback silencioso — sintomas serão exibidos sem tradução
     }
   }, [])
 
@@ -155,6 +151,10 @@ function PatientDashboard({
     return {
       _id: last._id,
       date: last.date,
+      doctorId: last.doctorId,
+      doctorName: last.doctorName,
+      unitId: last.unitId,
+      unitName: last.unitName,
       diagnosisKey: last.diagnosisKey,
       generalObservation: last.generalObservation,
       prescribedMedications: last.prescribedMedications
@@ -181,6 +181,27 @@ function PatientDashboard({
     if (!activeAttendance?.status) return null
     return NEXT_STATUS_MAP[activeAttendance.status as AttendanceStatus] ?? null
   }, [activeAttendance])
+
+  const handleConfirmArrival = async () => {
+    if (!activeAttendance?._id) return
+    try {
+      setArrivalLoading(true)
+      await PatientsRepository.confirmPatientArrival({
+        attendanceId: String(activeAttendance._id)
+      })
+      message.success(
+        'Chegada confirmada. Você entrou na fila de triagem da unidade.'
+      )
+      await Promise.all([fetchQueue(), fetchPatientAttendances()])
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Não foi possível confirmar sua chegada.'
+      })
+    } finally {
+      setArrivalLoading(false)
+    }
+  }
 
   const isLoading = patientAttendancesLoading || queueLoading
 
@@ -215,6 +236,12 @@ function PatientDashboard({
         <CurrentConsultCard
           attendance={activeAttendance}
           symptomOptions={symptomOptions}
+          onConfirmArrival={
+            activeAttendance.status === AttendanceStatus.ON_THE_WAY
+              ? handleConfirmArrival
+              : undefined
+          }
+          arrivalLoading={arrivalLoading}
         />
       ) : (
         <NewConsultCard

@@ -1,12 +1,9 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
-import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import { riskColors } from '@/components/Risk/riskConstants'
+import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import { StethoscopeIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
 import type { IPatientQueueItem } from '../../IPatientDashboard'
 import styles from './PatientQueueList.module.scss'
-
-const INITIAL_VISIBLE = 7
 
 interface IPatientQueueListProps {
   queueItems: IPatientQueueItem[]
@@ -27,12 +24,6 @@ function QueueItemSkeleton() {
 }
 
 function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
-  const [expanded, setExpanded] = useState(false)
-
-  const visibleItems =
-    expanded ? queueItems : queueItems.slice(0, INITIAL_VISIBLE)
-  const hiddenCount = queueItems.length - INITIAL_VISIBLE
-
   return (
     <DashboardCard
       title='Fila de Atendimento'
@@ -45,7 +36,7 @@ function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
           ? Array.from({ length: 5 }).map((_, i) => (
               <QueueItemSkeleton key={i} />
             ))
-          : visibleItems.map((item) => {
+          : queueItems.map((item) => {
               const riskColor = item.risk ? riskColors[item.risk] : undefined
 
               return (
@@ -59,7 +50,7 @@ function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
                       riskColor
                         ? ({
                             '--badge-bg': riskColor.color,
-                            '--badge-color': '#fff'
+                            '--badge-color': 'var(--white)'
                           } as React.CSSProperties & Record<string, string>)
                         : undefined
                     }
@@ -85,7 +76,9 @@ function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
                         : undefined
                     }
                   >
-                    {item.risk === 'emergency' || item.risk === 'veryUrgent' || item.risk === 'urgent'
+                    {item.risk === 'emergency' ||
+                    item.risk === 'veryUrgent' ||
+                    item.risk === 'urgent'
                       ? 'Alto'
                       : item.risk === 'lessUrgent'
                         ? 'Médio'
@@ -94,17 +87,6 @@ function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
                 </div>
               )
             })}
-
-        {!loading && hiddenCount > 0 && (
-          <button
-            className={styles.expandBtn}
-            onClick={() => setExpanded((prev) => !prev)}
-          >
-            {expanded
-              ? 'Mostrar menos'
-              : `+ ${hiddenCount} atendimento${hiddenCount !== 1 ? 's' : ''}`}
-          </button>
-        )}
       </div>
     </DashboardCard>
   )

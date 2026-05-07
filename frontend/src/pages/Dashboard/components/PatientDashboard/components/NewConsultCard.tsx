@@ -7,21 +7,16 @@ interface INewConsultCardProps {
 
 function NewConsultCard({ onClick }: INewConsultCardProps) {
   return (
-    <div
+    <button
       className={styles.newConsultCard}
       onClick={onClick}
-      role='button'
-      tabIndex={0}
       id='patient-new-consult-btn'
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onClick()
-      }}
     >
       <div className={styles.plusBtn}>
         <PlusIcon size={40} weight='bold' />
       </div>
       <p>Clique para iniciar uma nova consulta</p>
-    </div>
+    </button>
   )
 }
 

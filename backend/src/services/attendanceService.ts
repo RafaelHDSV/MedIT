@@ -688,9 +688,9 @@ export const getAttendanceQueue = async ({
       case UserLevels.NURSE:
         return [AttendanceStatus.WAITING_TRIAGE]
       case UserLevels.PATIENT:
-        return []
+        return ACTIVE_STATUSES
       default:
-        return []
+        return ACTIVE_STATUSES
     }
   }
 
@@ -759,6 +759,7 @@ export const getAttendanceQueue = async ({
         $project: {
           _id: 1,
           number: 1,
+          patientId: 1,
           patientName: { $ifNull: ['$patient.name', 'Paciente'] },
           patientBirthDate: { $ifNull: ['$patient.birthDate', 'Paciente'] },
           complaint: 1,

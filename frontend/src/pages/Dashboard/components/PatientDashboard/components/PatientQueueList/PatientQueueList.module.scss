@@ -3,7 +3,7 @@
 .queueList {
   display: flex;
   flex-direction: column;
-  max-height: 24rem;
+  max-height: 22rem;
   overflow-y: auto;
   width: 100%;
   scrollbar-color: var(--secondary-color) transparent;
@@ -18,7 +18,6 @@
   }
 }
 
-// ─── Item base ──────────────────────────────────────────────────────────────
 .queueItem {
   display: flex;
   align-items: center;
@@ -39,23 +38,22 @@
 
     .itemName,
     .itemStatus {
-      color: #fff;
+      color: var(--white);
     }
 
     .riskTag {
       background: rgba(255, 255, 255, 0.25);
-      color: #fff;
+      color: var(--white);
     }
   }
 }
 
-// ─── Número do paciente ──────────────────────────────────────────────────────
 .numberBadge {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
   background: var(--badge-bg, var(--primary-color));
-  color: var(--badge-color, #fff);
+  color: var(--badge-color, var(--white));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,7 +62,6 @@
   flex-shrink: 0;
 }
 
-// ─── Info do item ────────────────────────────────────────────────────────────
 .itemInfo {
   display: flex;
   flex-direction: column;
@@ -87,38 +84,17 @@
   color: var(--light-gray);
 }
 
-// ─── Tag de risco ────────────────────────────────────────────────────────────
 .riskTag {
   font-size: 0.72rem;
   font-weight: 600;
   padding: 0.2rem 0.6rem;
   border-radius: 1rem;
   color: var(--tag-color, var(--primary-color));
-  background: var(--tag-bg, rgba(232, 87, 63, 0.1));
+  background: var(--tag-bg, var(--primary-opaque));
   flex-shrink: 0;
   white-space: nowrap;
 }
 
-// ─── Botão expandir ──────────────────────────────────────────────────────────
-.expandBtn {
-  width: 100%;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border: none;
-  background: var(--gray-3, #f5f5f5);
-  border-radius: 0.5rem;
-  font-size: 0.82rem;
-  color: var(--light-gray);
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.15s;
-
-  &:hover {
-    background: var(--border);
-  }
-}
-
-// ─── Skeletons ───────────────────────────────────────────────────────────────
 @keyframes shimmer {
   100% {
     left: 150%;
@@ -126,7 +102,7 @@
 }
 
 %shimmerBase {
-  background: var(--gray-3, #efefef);
+  background: var(--gray-3);
   border-radius: 4px;
   position: relative;
   overflow: hidden;

@@ -237,44 +237,7 @@ function Dashboard() {
           />
         )
       case UserLevels.PATIENT:
-        return (
-          <PatientDashboard reload={reload} />
-
-          // <Flex vertical gap={12} align='flex-start'>
-          //   {patientActiveAttendance?._id &&
-          //   patientActiveAttendance.status === AttendanceStatus.ON_THE_WAY ? (<Button
-          //       type='primary'
-          //       loading={arrivalLoading}
-          //       onClick={async () => {
-          //         try {
-          //             attendanceId: String(patientActiveAttendance._id)
-          //           })
-          //           message.success(
-          //             'Chegada confirmada. Você entrou na fila de triagem da unidade.'
-          //           )
-          //           setPatientActiveAttendance(null)
-          //           onReload()
-          //         } catch (err) {
-          //           handleApiError({
-          //             err,
-          //             defaultMessage: 'Não foi possível confirmar sua chegada.'
-          //           })
-          //         } finally {
-          //           setArrivalLoading(false)
-          //         }
-          //       }}
-          //     >
-          //       Confirmar chegada ao hospital
-          //     </Button>
-          //   ) : patientActiveAttendance?._id ? (
-          //     <span>Você já tem um atendimento em andamento.</span>
-          //   ) : (
-          //     <Button onClick={() => navigate(ROUTES.PRE_REGISTRATION.path)}>
-          //       Clique para iniciar uma nova consulta
-          //     </Button>
-          //   )}
-          // </Flex>
-        )
+        return <PatientDashboard reload={reload} />
       default:
         return <></>
     }

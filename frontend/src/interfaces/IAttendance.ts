@@ -94,6 +94,8 @@ export interface IAttendance extends IBaseInterface {
   patientId: ObjectId
   nurseId?: ObjectId
   doctorId?: ObjectId
+  doctorName?: string
+  unitName?: string
   medicationsIds?: ObjectId[]
   vitalSigns?: IVitalSigns
   painLevel?: number

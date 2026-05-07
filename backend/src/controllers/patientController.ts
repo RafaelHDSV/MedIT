@@ -295,6 +295,24 @@ export const getAttendances = async (req: Request, res: Response) => {
       },
       { $unwind: { path: '$patient', preserveNullAndEmptyArrays: true } },
       {
+        $lookup: {
+          from: 'users',
+          localField: 'doctorId',
+          foreignField: '_id',
+          as: 'doctor'
+        }
+      },
+      { $unwind: { path: '$doctor', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'units',
+          localField: 'unitId',
+          foreignField: '_id',
+          as: 'unit'
+        }
+      },
+      { $unwind: { path: '$unit', preserveNullAndEmptyArrays: true } },
+      {
         $sort: {
           createdAt: -1
         }
@@ -305,6 +323,8 @@ export const getAttendances = async (req: Request, res: Response) => {
           number: 1,
           name: { $ifNull: ['$patient.name', null] },
           birthDate: { $ifNull: ['$patient.birthDate', null] },
+          doctorName: { $ifNull: ['$doctor.name', null] },
+          unitName: { $ifNull: ['$unit.name', null] },
           complaint: 1,
           painLevel: 1,
           selfMedicated: 1,

@@ -1,11 +1,9 @@
 @use '../../../../styles/abstract/breakpoints' as *;
 
-// ─── Alert de notificação ──────────────────────────────────────────────────────
 .alertBanner {
   grid-area: alert;
 }
 
-// ─── Card base reutilizável ────────────────────────────────────────────────────
 .card {
   background: var(--white);
   border: 1px solid var(--border);
@@ -15,7 +13,6 @@
   height: 100%;
 }
 
-// ─── Posição na fila ───────────────────────────────────────────────────────────
 .queuePositionCard {
   @extend .card;
   grid-area: positionQueue;
@@ -56,7 +53,6 @@
   }
 }
 
-// ─── Status atual ──────────────────────────────────────────────────────────────
 .statusCard {
   @extend .card;
   grid-area: status;
@@ -97,7 +93,6 @@
   }
 }
 
-// ─── Consulta atual ────────────────────────────────────────────────────────────
 .currentConsultCard {
   @extend .card;
   grid-area: currentAttendance;
@@ -164,7 +159,12 @@
   }
 }
 
-// ─── Nova consulta (empty state) ───────────────────────────────────────────────
+.confirmArrivalRow {
+  padding-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .newConsultCard {
   @extend .card;
   grid-area: currentAttendance;
@@ -179,6 +179,8 @@
     transform 0.15s ease;
   text-align: center;
   min-height: 14rem;
+  width: 100%;
+  font-family: inherit;
 
   &:hover {
     box-shadow: 0 6px 20px rgba(232, 87, 63, 0.15);
@@ -190,7 +192,7 @@
     height: 5rem;
     border-radius: 50%;
     background: var(--primary-color);
-    color: #fff;
+    color: var(--white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -199,7 +201,7 @@
   }
 
   &:hover .plusBtn {
-    transform: scale(1.07);
+    transform: scale(1.1);
   }
 
   p {
@@ -210,7 +212,6 @@
   }
 }
 
-// ─── Último atendimento ────────────────────────────────────────────────────────
 .lastAttendanceCard {
   @extend .card;
   grid-area: lastAttendance;
@@ -274,7 +275,6 @@
   }
 }
 
-// ─── Skeleton loader ───────────────────────────────────────────────────────────
 @keyframes shimmer {
   0% {
     background-position: -400px 0;
@@ -286,7 +286,12 @@
 
 .skeleton {
   border-radius: 0.4rem;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--white) 25%,
+    var(--white) 50%,
+    var(--white) 75%
+  );
   background-size: 800px 100%;
   animation: shimmer 1.4s infinite;
 }
