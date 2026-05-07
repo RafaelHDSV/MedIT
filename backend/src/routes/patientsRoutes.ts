@@ -24,6 +24,10 @@ router.post(
   confirmPatientArrival
 )
 router.post('/attendances', authMiddleware, createPatientAttendance)
-router.put('/attendances/:attendanceId', authMiddleware, updatePatientAttendance)
+router.put(
+  '/attendances/:attendanceId',
+  authMiddleware,
+  updatePatientAttendance
+)
 
 export default router

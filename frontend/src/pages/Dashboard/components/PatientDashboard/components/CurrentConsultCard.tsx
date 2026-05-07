@@ -51,7 +51,7 @@ function CurrentConsultCard({
           className={styles.editBtn}
           onClick={() => {
             if (!attendance._id) return
-            
+
             navigate(
               `${ROUTES.PRE_REGISTRATION.path}?mode=edit&attendanceId=${String(attendance._id)}`
             )

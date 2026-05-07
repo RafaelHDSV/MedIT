@@ -77,36 +77,34 @@ function PatientQueueList({
       gridArea='attendanceQueueChart'
     >
       <div className={styles.queueList}>
-        {loading
-          ? Array.from({ length: 5 }).map((_, i) => (
-              <QueueItemSkeleton key={i} />
-            ))
-          : (
-              <>
-                <section className={styles.queueSection}>
-                  <div className={styles.sectionHeader}>
-                    <span className={styles.sectionTitle}>Fila operacional</span>
-                    <span className={styles.sectionHint}>
-                      Apenas pacientes presentes no hospital
-                    </span>
-                  </div>
-                  {operationalQueueItems.map(renderItem)}
-                </section>
+        {loading ? (
+          Array.from({ length: 5 }).map((_, i) => <QueueItemSkeleton key={i} />)
+        ) : (
+          <>
+            <section className={styles.queueSection}>
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionTitle}>Fila operacional</span>
+                <span className={styles.sectionHint}>
+                  Apenas pacientes presentes no hospital
+                </span>
+              </div>
+              {operationalQueueItems.map(renderItem)}
+            </section>
 
-                {onTheWayQueueItems.length > 0 && (
-                  <section className={styles.queueSection}>
-                    <div className={styles.sectionHeader}>
-                      <span className={styles.sectionTitle}>A caminho</span>
-                      <span className={styles.sectionHint}>
-                        Pré-fila com vantagem de tempo limitada a 30 min no mesmo
-                        risco
-                      </span>
-                    </div>
-                    {onTheWayQueueItems.map(renderItem)}
-                  </section>
-                )}
-              </>
+            {onTheWayQueueItems.length > 0 && (
+              <section className={styles.queueSection}>
+                <div className={styles.sectionHeader}>
+                  <span className={styles.sectionTitle}>A caminho</span>
+                  <span className={styles.sectionHint}>
+                    Pré-fila com vantagem de tempo limitada a 30 min no mesmo
+                    risco
+                  </span>
+                </div>
+                {onTheWayQueueItems.map(renderItem)}
+              </section>
             )}
+          </>
+        )}
       </div>
     </DashboardCard>
   )
