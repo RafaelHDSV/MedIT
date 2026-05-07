@@ -27,6 +27,7 @@ import {
 import { Flex } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import AttendanceByTimeChart from './components/AttendanceByTimeChart/AttendanceByTimeChart'
 import AttendanceQueueChart from './components/AttendanceQueueChart/AttendanceQueueChart'
 import DashboardStatusCard from './components/DashboardStatusCard/DashboardStatusCard'
@@ -35,6 +36,8 @@ import styles from './Dashboard.module.scss'
 
 function Dashboard() {
   const { user } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [dashboardStatusData, setDashboardStatusData] =
     useState<IDashboardStatusCards>()
   const [loading, setLoading] = useState(true)
@@ -79,6 +82,17 @@ function Dashboard() {
     fetchDashboardStatus()
     setReload((prev) => !prev)
   }, [fetchDashboardStatus])
+
+  useEffect(() => {
+    const navState = location.state as { refreshQueueAt?: number } | null
+    if (!navState?.refreshQueueAt) return
+
+    onReload()
+    navigate(location.pathname, {
+      replace: true,
+      state: {}
+    })
+  }, [location.pathname, location.state, navigate, onReload])
 
   const cardsData = useMemo(() => {
     const highRiskPercentage =

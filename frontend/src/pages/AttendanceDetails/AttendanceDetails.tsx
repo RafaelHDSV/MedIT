@@ -26,7 +26,7 @@ import { ROUTES } from '@/routes/constants'
 import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
 import { formatDate } from '@/utils/formatDate'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
-import { Flex, message, Spin } from 'antd'
+import { Flex, Modal, message, Spin } from 'antd'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import RiskSelector from '../../components/Risk/RiskSelector/RiskSelector'
@@ -181,22 +181,31 @@ function AttendanceDetails() {
     }
   }, [attendanceId])
 
-  const releaseActiveClaim = useCallback(async () => {
-    if (!attendanceId || !shouldReleaseOnExitRef.current || !attendance) return
-
+  const releaseActiveClaim = useCallback(async (): Promise<boolean> => {
+    if (!attendanceId || !shouldReleaseOnExitRef.current || !attendance)
+      return false
     if (isNurse && attendance.status === AttendanceStatus.IN_TRIAGE) {
       await AttendancesFlowRepository.releaseTriage({
         attendanceId: String(attendanceId)
       })
-      return
+      return true
     }
 
     if (isDoctor && attendance.status === AttendanceStatus.IN_ATTENDANCE) {
       await AttendancesFlowRepository.releaseConsultation({
         attendanceId: String(attendanceId)
       })
+      return true
     }
+    return false
   }, [attendanceId, attendance, isNurse, isDoctor])
+
+  const canReleaseCurrentCase = useMemo(() => {
+    if (!attendance) return false
+    if (isNurse) return attendance.status === AttendanceStatus.IN_TRIAGE
+    if (isDoctor) return attendance.status === AttendanceStatus.IN_ATTENDANCE
+    return false
+  }, [attendance, isNurse, isDoctor])
 
   const loadSuggestions = useCallback(async () => {
     if (!attendanceId || !isDoctor) return
@@ -250,6 +259,37 @@ function AttendanceDetails() {
       void releaseActiveClaim()
     }
   }, [releaseActiveClaim])
+
+  const handleAttemptLeave = useCallback(() => {
+    if (!canReleaseCurrentCase) {
+      navigate(-1)
+      return
+    }
+
+    const roleLabel = isNurse ? 'triagem' : 'atendimento'
+    Modal.confirm({
+      title: 'Confirmar saída',
+      content: `Se você sair agora, esta ${roleLabel} será devolvida para a fila e outro profissional poderá assumir.`,
+      okText: 'Sair e devolver para fila',
+      cancelText: 'Continuar nesta tela',
+      okButtonProps: { danger: true },
+      async onOk() {
+        try {
+          await releaseActiveClaim()
+          shouldReleaseOnExitRef.current = false
+          navigate(ROUTES.DASHBOARD.path, {
+            state: { refreshQueueAt: Date.now() }
+          })
+          message.success('Atendimento devolvido para a fila.')
+        } catch (err) {
+          handleApiError({
+            err,
+            defaultMessage: 'Não foi possível devolver o atendimento para a fila.'
+          })
+        }
+      }
+    })
+  }, [canReleaseCurrentCase, isNurse, navigate, releaseActiveClaim])
 
   useEffect(() => {
     if (!attendance) return
@@ -630,6 +670,7 @@ function AttendanceDetails() {
 
       <section>
         <AuthLayoutHeader
+          handleGoBack={handleAttemptLeave}
           actionComponent={hasHeaderActions ? headerActions : undefined}
         />
 
