@@ -231,7 +231,7 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
       />
 
       <StatusCard
-        loading={patientAttendancesLoading}
+        loading={isLoading}
         status={activeAttendance?.status}
         nextStatus={nextStatus}
       />
@@ -253,9 +253,11 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
         />
       )}
 
-      <PatientQueueList queueItems={queueItems} loading={queueLoading} />
+      <PatientQueueList queueItems={queueItems} loading={isLoading} />
 
-      {lastAttendance && <LastAttendanceCard attendance={lastAttendance} />}
+      {lastAttendance && (
+        <LastAttendanceCard attendance={lastAttendance} loading={isLoading} />
+      )}
     </>
   )
 }

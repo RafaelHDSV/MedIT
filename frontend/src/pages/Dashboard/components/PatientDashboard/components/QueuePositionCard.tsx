@@ -1,4 +1,5 @@
 import { AttendanceStatus } from '@/interfaces/IAttendance'
+import { Skeleton } from 'antd'
 import type { IPatientQueueItem } from '../IPatientDashboard'
 import styles from '../PatientDashboard.module.scss'
 
@@ -26,7 +27,7 @@ function QueuePositionCard({
       <span className={styles.queuePosLabel}>Sua posição na fila</span>
 
       {loading ? (
-        <div className={styles.skeletonLarge} />
+        <Skeleton active title={false} paragraph={{ rows: 1 }} />
       ) : myQueueItem?.queuePosition ? (
         <span className={styles.queuePosNumber}>
           {myQueueItem.queuePosition}º
@@ -38,8 +39,7 @@ function QueuePositionCard({
       <span className={styles.queuePosSubInfo}>
         {inAttendanceCount > 0 ? (
           <>
-            Atendendo paciente n°{' '}
-            <strong>{inAttendancePosition ?? '?'}</strong>
+            Atendendo paciente n° <strong>{inAttendancePosition ?? '?'}</strong>
           </>
         ) : (
           'Nenhum paciente em atendimento'

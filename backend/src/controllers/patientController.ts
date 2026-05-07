@@ -343,6 +343,8 @@ export const getAttendances = async (req: Request, res: Response) => {
           medicationsIds: 1,
           vitalSigns: 1,
           diagnosisKey: 1,
+          prescribedMedications: 1,
+          prescribedExams: 1,
           diagnosis: 1,
           createdAt: 1,
           updatedAt: 1

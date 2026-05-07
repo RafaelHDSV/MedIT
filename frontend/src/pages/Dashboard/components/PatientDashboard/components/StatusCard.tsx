@@ -1,4 +1,8 @@
-import { AttendanceStatusLabels, type AttendanceStatus } from '@/interfaces/IAttendance'
+import {
+  AttendanceStatusLabels,
+  type AttendanceStatus
+} from '@/interfaces/IAttendance'
+import { Skeleton } from 'antd'
 import styles from '../PatientDashboard.module.scss'
 
 interface IStatusCardProps {
@@ -13,7 +17,7 @@ function StatusCard({ loading, status, nextStatus }: IStatusCardProps) {
       <span className={styles.statusLabel}>Seu status atual é</span>
 
       {loading ? (
-        <div className={styles.skeletonLarge} />
+        <Skeleton active title={false} paragraph={{ rows: 1 }} />
       ) : status ? (
         <>
           <span className={styles.statusValue}>
