@@ -127,6 +127,7 @@
 .patient {
   grid-template-columns: repeat(3, 1fr);
   grid-template-areas:
+    'alert alert alert alert'
     'positionQueue status currentAttendance currentAttendance'
     'attendanceQueueChart attendanceQueueChart currentAttendance currentAttendance'
     'attendanceQueueChart attendanceQueueChart currentAttendance currentAttendance'
@@ -135,6 +136,7 @@
   @include max-lg {
     grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
+      'alert alert'
       'positionQueue status'
       'attendanceQueueChart attendanceQueueChart'
       'currentAttendance currentAttendance'
@@ -144,6 +146,7 @@
   @include max-md {
     grid-template-columns: 1fr;
     grid-template-areas:
+      'alert'
       'positionQueue'
       'status'
       'attendanceQueueChart'

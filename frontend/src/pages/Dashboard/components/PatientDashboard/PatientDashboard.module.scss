@@ -3,21 +3,6 @@
 // ─── Alert de notificação ──────────────────────────────────────────────────────
 .alertBanner {
   grid-area: alert;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.75rem;
-  border: 1.5px solid var(--warning-color);
-  background: var(--warning-opaque);
-  color: #7c5000;
-  font-size: 0.9rem;
-  font-weight: 500;
-
-  svg {
-    flex-shrink: 0;
-    color: var(--warning-color);
-  }
 }
 
 // ─── Card base reutilizável ────────────────────────────────────────────────────

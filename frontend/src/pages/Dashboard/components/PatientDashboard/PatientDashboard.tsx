@@ -1,3 +1,4 @@
+import Alert from '@/components/Alert/Alert'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { Periods } from '@/interfaces/globals'
@@ -6,13 +7,13 @@ import {
   AttendanceStatusLabels,
   type IAttendance
 } from '@/interfaces/IAttendance'
+import type { IDashboardQueueItem } from '@/interfaces/IDashboard'
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
 import { formatDate } from '@/utils/formatDate'
 import {
-  BellSimpleRingingIcon,
   BuildingsIcon,
   CalendarBlankIcon,
   PencilSimpleIcon,
@@ -24,12 +25,7 @@ import 'dayjs/locale/pt-br'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AttendanceQueueChart from '../AttendanceQueueChart/AttendanceQueueChart'
-import type {
-  IActiveAttendance,
-  ILastAttendance,
-  IPatientQueueItem
-} from './IPatientDashboard'
-import { nextStatusMap } from './IPatientDashboard'
+import { NEXT_STATUS_MAP, type IPatientQueueItem } from './IPatientDashboard'
 import styles from './PatientDashboard.module.scss'
 
 const ACTIVE_STATUSES: AttendanceStatus[] = [
@@ -67,90 +63,20 @@ function PatientDashboard({
   const [queueItems, setQueueItems] = useState<IPatientQueueItem[]>([])
   const [queueLoading, setQueueLoading] = useState(true)
 
-  // ── Consulta ativa (não concluída e não cancelada) ──
-  const activeAttendance: IActiveAttendance | null = useMemo(() => {
-    if (!patientAttendances.length) return null
-    return (
-      (patientAttendances.find((a) => ACTIVE_STATUSES.includes(a.status)) as
-        | IActiveAttendance
-        | undefined) ?? null
-    )
-  }, [patientAttendances])
-
-  // ── Último atendimento concluído ──
-  const lastAttendance: ILastAttendance | null = useMemo(() => {
-    if (!patientAttendances.length) return null
-    const completed = patientAttendances.filter((a) =>
-      COMPLETED_STATUSES.includes(a.status)
-    )
-    if (!completed.length) return null
-    const last = completed[0] // já ordenado por createdAt desc no backend
-    return {
-      _id: String(last._id),
-      date: last.date,
-      diagnosisKey: last.diagnosisKey,
-      generalObservation: last.generalObservation,
-      prescribedMedications: last.prescribedMedications
-    }
-  }, [patientAttendances])
-
-  // ── Posição do paciente na fila ──
-  const myQueueItem = useMemo(
-    () => queueItems.find((q) => q.isCurrentUser),
-    [queueItems]
-  )
-
-  // ── Status seguinte ──
-  const nextStatus = useMemo(() => {
-    if (!activeAttendance?.status) return null
-    return nextStatusMap[activeAttendance.status] ?? null
-  }, [activeAttendance])
-
-  // ── Quantos pacientes estão sendo atendidos ──
-  const inAttendanceCount = useMemo(
-    () =>
-      queueItems.filter((q) => q.status === AttendanceStatus.IN_ATTENDANCE)
-        .length,
-    [queueItems]
-  )
-
-  // ── Banner de aviso (faltam N pacientes) ──
-  const patientsAheadCount = useMemo(() => {
-    if (!myQueueItem?.number) return null
-    const ahead = queueItems.filter(
-      (q) =>
-        !q.isCurrentUser &&
-        (q.number ?? 0) < (myQueueItem.number ?? 0) &&
-        !COMPLETED_STATUSES.includes(q.status)
-    ).length
-    return ahead
-  }, [myQueueItem, queueItems])
-
-  // ── Fetch fila da unidade ──
   const fetchQueue = useCallback(async () => {
-    if (!user?.unitId) {
+    if (user?.level !== UserLevels.PATIENT || !user?.unitId) {
       setQueueLoading(false)
       return
     }
-    setQueueLoading(true)
+
     try {
+      setQueueLoading(true)
+
       const response = await DashboardRepository.getAttendanceQueue({
         params: { unitId: user.unitId }
       })
-
-      // A API retorna IDashboardQueueItem[] dentro de response.data
-      const raw = (response as unknown as { data: unknown }).data
-      const list = Array.isArray(raw) ? raw : []
-
-      const mapped: IPatientQueueItem[] = list.map(
-        (item: {
-          _id: string
-          number?: number
-          patientName: string
-          status: AttendanceStatus
-          risk: import('@/interfaces/IAttendance').AttendanceRisk
-          patientId?: string
-        }) => ({
+      const mapped: IPatientQueueItem[] = response.data.map(
+        (item: Partial<IDashboardQueueItem & { patientId?: string }>) => ({
           _id: item._id,
           number: item.number,
           patientName: item.patientName,
@@ -163,12 +89,16 @@ function PatientDashboard({
       )
 
       setQueueItems(mapped)
-    } catch {
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao pegar fila de atendimento'
+      })
       setQueueItems([])
     } finally {
       setQueueLoading(false)
     }
-  }, [user?._id, user?.unitId])
+  }, [user?._id, user?.level, user?.unitId])
 
   const fetchPatientActiveAttendance = useCallback(async () => {
     if (user?.level !== UserLevels.PATIENT || !user?._id) return
@@ -201,22 +131,71 @@ function PatientDashboard({
     fetchPatientActiveAttendance()
   }, [fetchQueue, fetchPatientActiveAttendance, reload])
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
+  const activeAttendance: Partial<IAttendance> | null = useMemo(() => {
+    if (!patientAttendances.length) return null
+
+    return (
+      patientAttendances.find((a) => ACTIVE_STATUSES.includes(a.status)) || null
+    )
+  }, [patientAttendances])
+
+  const lastAttendance: Partial<IAttendance> | null = useMemo(() => {
+    if (!patientAttendances.length) return null
+
+    const completed = patientAttendances.filter((a) =>
+      COMPLETED_STATUSES.includes(a.status)
+    )
+    if (!completed.length) return null
+
+    const last = completed[0]
+
+    return {
+      _id: last._id,
+      date: last.date,
+      diagnosisKey: last.diagnosisKey,
+      generalObservation: last.generalObservation,
+      prescribedMedications: last.prescribedMedications
+    }
+  }, [patientAttendances])
+
+  const { myQueueItem, inAttendanceCount, patientsAheadCount } = useMemo(() => {
+    const myQueueItem = queueItems.find((q) => q.isCurrentUser)
+
+    return {
+      myQueueItem,
+      inAttendanceCount: queueItems.filter(
+        (q) => q.status === AttendanceStatus.IN_ATTENDANCE
+      ).length,
+      patientsAheadCount: queueItems.filter(
+        (q) =>
+          !q.isCurrentUser &&
+          (q.number ?? 0) < (myQueueItem?.number ?? 0) &&
+          !COMPLETED_STATUSES.includes(q.status)
+      ).length
+    }
+  }, [queueItems])
+
+  const nextStatus: AttendanceStatus | null = useMemo(() => {
+    if (!activeAttendance?.status) return null
+    return NEXT_STATUS_MAP[activeAttendance.status as AttendanceStatus] ?? null
+  }, [activeAttendance])
+
   const hasActiveAttendance = Boolean(activeAttendance)
 
   return (
     <>
-      {/* ── Banner de notificação ── */}
-      {patientsAheadCount !== null && patientsAheadCount <= 3 && (
-        <div className={styles.alertBanner}>
-          <BellSimpleRingingIcon size={20} weight='fill' />
-          {patientsAheadCount === 0
-            ? 'É a sua vez! Dirija-se ao guichê de atendimento.'
-            : `Faltam ${patientsAheadCount} paciente${patientsAheadCount !== 1 ? 's' : ''} para sua consulta`}
-        </div>
+      {patientsAheadCount <= 3 && (
+        <Alert
+          className={styles.alertBanner}
+          message={
+            patientsAheadCount === 0
+              ? 'Chegou a sua vez! Dirija-se para a sua consulta.'
+              : `Faltam ${patientsAheadCount} paciente${patientsAheadCount !== 1 ? 's' : ''} para sua consulta`
+          }
+          type='info'
+        />
       )}
 
-      {/* ── Posição na fila ── */}
       <div
         className={styles.queuePositionCard}
         style={{ gridArea: 'positionQueue' }}
@@ -397,19 +376,19 @@ function PatientDashboard({
                 </span>
               </div>
             )}
-            {lastAttendance.doctorName && (
+            {lastAttendance.doctorId && (
               <div className={styles.infoRow}>
                 <UserIcon size={16} />
                 <span>
-                  <strong>Médico:</strong> {lastAttendance.doctorName}
+                  <strong>Médico:</strong> {lastAttendance.doctorId.toString()}
                 </span>
               </div>
             )}
-            {lastAttendance.unitName && (
+            {lastAttendance.unitId && (
               <div className={styles.infoRow}>
                 <BuildingsIcon size={16} />
                 <span>
-                  <strong>Unidade:</strong> {lastAttendance.unitName}
+                  <strong>Unidade:</strong> {lastAttendance.unitId.toString()}
                 </span>
               </div>
             )}
