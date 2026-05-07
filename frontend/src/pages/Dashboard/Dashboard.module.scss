@@ -44,6 +44,37 @@
   }
 }
 
+.medit {
+  grid-template-areas:
+    'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'
+    'dashboardCard5 dashboardCard6 attendanceQueueChart attendanceQueueChart'
+    'attendanceByTimeChart attendanceByTimeChart attendanceQueueChart attendanceQueueChart';
+  grid-template-rows: repeat(2, auto) 1fr;
+
+  @include max-lg {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'dashboardCard1 dashboardCard2'
+      'dashboardCard3 dashboardCard4'
+      'dashboardCard5 dashboardCard6'
+      'attendanceByTimeChart attendanceByTimeChart';
+    grid-template-rows: repeat(3, auto) 1fr;
+  }
+
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'dashboardCard1'
+      'dashboardCard2'
+      'dashboardCard3'
+      'dashboardCard4'
+      'dashboardCard5'
+      'dashboardCard6'
+      'attendanceByTimeChart';
+    grid-template-rows: repeat(4, auto) 1fr;
+  }
+}
+
 .admin {
   grid-template-areas:
     'dashboardCard1 dashboardCard2 dashboardCard3 dashboardCard4'

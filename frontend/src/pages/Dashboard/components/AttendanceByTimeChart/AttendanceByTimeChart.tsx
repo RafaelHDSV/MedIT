@@ -3,6 +3,7 @@ import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { Periods } from '@/interfaces/globals'
 import type { IDashboardAttendanceByTime } from '@/interfaces/IDashboard'
+import type { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import masks from '@/utils/masks'
 import { ClockCountdownIcon } from '@phosphor-icons/react'
@@ -34,12 +35,22 @@ function AttendanceByTimeChart({
     async function fetchAttendanceByTime() {
       setLoading(true)
       try {
+        const params: {
+          period: typeof selectedPeriod
+          referenceDate: string
+          level?: UserLevels
+          unitId?: string
+        } = {
+          period: selectedPeriod,
+          referenceDate,
+          level: user?.level
+        }
+        if (user?.unitId) {
+          params.unitId = String(user.unitId)
+        }
+
         const response = await DashboardRepository.getAttendanceByTime({
-          params: {
-            unitId: user?.unitId,
-            period: selectedPeriod,
-            referenceDate
-          }
+          params
         })
         const data = response.data
         setData(data)
@@ -54,7 +65,7 @@ function AttendanceByTimeChart({
     }
 
     fetchAttendanceByTime()
-  }, [selectedPeriod, referenceDate, user?.unitId, reload])
+  }, [selectedPeriod, referenceDate, user?.unitId, user?.level, reload])
 
   function getPeriodConfig(period: string) {
     switch (period) {

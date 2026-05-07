@@ -105,6 +105,44 @@ function Dashboard() {
         : 0
 
     switch (user?.level) {
+      case UserLevels.MEDIT:
+        return [
+          {
+            Icon: DoorOpenIcon,
+            value: dashboardStatusData?.entries
+              ? masks(dashboardStatusData?.entries, 'number')
+              : undefined,
+            label: 'Entradas'
+          },
+          {
+            Icon: HourglassIcon,
+            value: dashboardStatusData?.inAttendance,
+            label: 'Em atendimento'
+          },
+          {
+            Icon: CheckCircleIcon,
+            value: dashboardStatusData?.attended
+              ? masks(dashboardStatusData?.attended, 'number')
+              : undefined,
+            subValue: masks(attendedPercentage, 'percentage'),
+            label: 'Atendidos'
+          },
+          {
+            Icon: TimerIcon,
+            value: dashboardStatusData?.averageTime
+              ? timeFormatter(dashboardStatusData.averageTime)
+              : undefined,
+            label: 'Tempo médio'
+          },
+          {
+            Icon: BombIcon,
+            value: dashboardStatusData?.highRisk
+              ? masks(dashboardStatusData?.highRisk, 'number')
+              : undefined,
+            subValue: masks(highRiskPercentage, 'percentage'),
+            label: 'Risco alto'
+          }
+        ]
       case UserLevels.ADMIN:
         return [
           {
@@ -207,6 +245,7 @@ function Dashboard() {
 
   const content = useMemo(() => {
     switch (user?.level) {
+      case UserLevels.MEDIT:
       case UserLevels.ADMIN:
         return (
           <>

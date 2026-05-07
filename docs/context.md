@@ -179,7 +179,7 @@ O **dashboard administrativo** (`frontend/src/pages/Dashboard`, API em `backend/
 - **Capacidades do nível MedIT:**
   - **Gestão de unidades:** cria, edita e lista **todas** as unidades via rota exclusiva `GET /auth/units/all` e `POST /auth/units` / `PUT /auth/units/:id` (protegidas por `roleMiddleware(UserLevels.MEDIT)`).
   - **Gestão de administradores:** cria, edita e lista administradores de unidade via `GET /auth/users/admins`, `POST /auth/users/admins`, `PUT /auth/users/admins/:id` (restritas ao `medit`). Payload de criação: `name`, `cpf`, `email`, `password`, `unitId`.
-  - **Dashboard e fila global:** dashboard e fila de atendimentos tratam `medit` como equivalente ao `admin` em indicadores, com filtro opcional por `unitId` ou dados consolidados de todas as unidades.
+  - **Dashboard e fila global:** indicadores do MedIT são **consolidados em todas as unidades** (entradas, em atendimento, atendidos, tempo médio, risco alto). **Não há card de ocupação** ligado a `maxOccupancy` de uma unidade, pois o operador da plataforma não possui unidade. Gráficos e fila aceitam requisição sem `unitId` apenas para o nível `medit`, via parâmetro `level`.
   - **Visão resumida:** a visão global do `medit` expõe dados operacionais sem detalhes clínicos sensíveis.
 - **Middleware de autorização:** `backend/src/middlewares/roleMiddleware.ts` valida papéis permitidos nas rotas críticas, retornando **403** quando o nível do usuário não é autorizado.
 - **Administrador de unidade:** está ligado a **uma** unidade. Enxerga e gerencia **apenas** o que pertence a essa unidade: atendimentos, médicos, enfermeiros, pacientes no contexto da unidade, medicamentos, dashboard e demais dados operacionais **sem visibilidade cruzada** para outras unidades.

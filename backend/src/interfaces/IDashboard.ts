@@ -1,3 +1,11 @@
+export interface IMeditStatusCard {
+  entries: number
+  inAttendance: number
+  attended: number
+  averageTime: number
+  highRisk: number
+}
+
 export interface IAdminStatusCard {
   entries: number
   inAttendance: number
@@ -22,6 +30,7 @@ export interface INurseStatusCard {
 
 export interface IDashboardStatusCards
   extends
+    Partial<IMeditStatusCard>,
     Partial<IAdminStatusCard>,
     Partial<IDoctorStatusCard>,
     Partial<INurseStatusCard> {}

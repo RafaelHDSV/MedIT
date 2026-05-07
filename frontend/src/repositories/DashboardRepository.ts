@@ -27,7 +27,8 @@ class AuthRepository extends Repository {
     params
   }: {
     params: {
-      unitId: ObjectId | string | undefined
+      unitId?: ObjectId | string
+      level?: UserLevels
       period: Periods
       referenceDate?: string
     }
@@ -43,7 +44,7 @@ class AuthRepository extends Repository {
     params
   }: {
     params: {
-      unitId: ObjectId | string | undefined
+      unitId?: ObjectId | string
       level?: UserLevels
       period?: Periods
       referenceDate?: string

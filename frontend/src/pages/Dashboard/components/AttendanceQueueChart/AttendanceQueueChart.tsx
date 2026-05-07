@@ -22,6 +22,7 @@ function AttendanceItem({ item, loading }: IAttendanceItemProps) {
   const { user } = useAuth()
 
   switch (user?.level) {
+    case 'medit':
     case 'admin':
       return <AttendanceQueueChartAdmin item={item} loading={loading} />
     case 'doctor':
@@ -53,13 +54,22 @@ function AttendanceQueueChart({
       setLoading(true)
 
       try {
+        const params: {
+          period?: Periods
+          referenceDate?: string
+          level?: UserLevels
+          unitId?: string
+        } = {
+          level: user?.level
+        }
+        if (user?.unitId) {
+          params.unitId = String(user.unitId)
+        }
+        if (selectedPeriod !== undefined) params.period = selectedPeriod
+        if (referenceDate !== undefined) params.referenceDate = referenceDate
+
         const response = await DashboardRepository.getAttendanceQueue({
-          params: {
-            unitId: user?.unitId,
-            level: user?.level,
-            period: selectedPeriod,
-            referenceDate
-          }
+          params
         })
         const data = response.data
         setData(data)

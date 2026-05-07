@@ -1,11 +1,11 @@
 import { Types } from 'mongoose'
+import { toCanonicalDiseaseKey } from '../constants/diseaseLabelsPt.js'
 import { AttendanceRisk, AttendanceStatus } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
-import { toCanonicalDiseaseKey } from '../constants/diseaseLabelsPt.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
-import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
+import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
 
 const ACTIVE_STATUSES = [
   AttendanceStatus.ON_THE_WAY,
@@ -38,23 +38,24 @@ function scoreDiseaseFromProfile(
   return Math.round((100 * matchedWeight) / totalWeight)
 }
 
-// ADMIN
 export const getEntries = async ({
   unitId,
   period,
   referenceDate
 }: {
-  unitId: string
+  unitId?: string
   period: string
   referenceDate?: string
 }) => {
   try {
     const { start, end } = getPeriodDateRange(period, referenceDate)
 
-    return await Attendance.countDocuments({
-      unitId,
+    const match: Record<string, unknown> = {
       date: { $gte: start, $lte: end }
-    })
+    }
+    if (unitId) match.unitId = unitId
+
+    return await Attendance.countDocuments(match)
   } catch (err) {
     console.error(err)
   }
@@ -65,15 +66,15 @@ export const getInAttendance = async ({
   period,
   referenceDate
 }: {
-  unitId: string
+  unitId?: string
   period?: string
   referenceDate?: string
 }) => {
   try {
     const match: Record<string, unknown> = {
-      unitId,
       status: { $in: ACTIVE_STATUSES }
     }
+    if (unitId) match.unitId = unitId
     if (period) {
       const { start, end } = getPeriodDateRange(period, referenceDate)
       match.date = { $gte: start, $lte: end }
@@ -90,7 +91,7 @@ export const getAttended = async ({
   doctorId,
   referenceDate
 }: {
-  unitId: string
+  unitId?: string
   period: string
   doctorId?: string
   referenceDate?: string
@@ -98,14 +99,16 @@ export const getAttended = async ({
   try {
     const { start, end } = getPeriodDateRange(period, referenceDate)
 
-    return await Attendance.countDocuments({
-      unitId,
+    const match: Record<string, unknown> = {
       ...(doctorId ? { doctorId: new Types.ObjectId(doctorId) } : {}),
       status: {
         $in: [AttendanceStatus.ATTENDANCE_COMPLETED]
       },
       date: { $gte: start, $lte: end }
-    })
+    }
+    if (unitId) match.unitId = unitId
+
+    return await Attendance.countDocuments(match)
   } catch (err) {
     console.error(err)
   }
@@ -149,20 +152,22 @@ export const getAverageTime = async ({
   period,
   referenceDate
 }: {
-  unitId: string
+  unitId?: string
   period: string
   referenceDate?: string
 }) => {
   try {
     const { start, end } = getPeriodDateRange(period, referenceDate)
 
+    const match: Record<string, unknown> = {
+      status: AttendanceStatus.ATTENDANCE_COMPLETED,
+      date: { $gte: start, $lte: end }
+    }
+    if (unitId) match.unitId = new Types.ObjectId(unitId)
+
     const result = await Attendance.aggregate([
       {
-        $match: {
-          unitId: new Types.ObjectId(unitId),
-          status: AttendanceStatus.ATTENDANCE_COMPLETED,
-          date: { $gte: start, $lte: end }
-        }
+        $match: match
       },
       {
         $addFields: {
@@ -213,15 +218,14 @@ export const getHighRisk = async ({
   period,
   referenceDate
 }: {
-  unitId: string
+  unitId?: string
   period: string
   referenceDate?: string
 }) => {
   try {
     const { start, end } = getPeriodDateRange(period, referenceDate)
 
-    const highRiskAttendances = await Attendance.countDocuments({
-      unitId: unitId,
+    const match: Record<string, unknown> = {
       risk: {
         $in: [AttendanceRisk.EMERGENCY, AttendanceRisk.VERY_URGENT]
       },
@@ -229,7 +233,10 @@ export const getHighRisk = async ({
         $gte: start,
         $lte: end
       }
-    })
+    }
+    if (unitId) match.unitId = unitId
+
+    const highRiskAttendances = await Attendance.countDocuments(match)
     return highRiskAttendances
   } catch (err) {
     console.error(err)
@@ -575,7 +582,7 @@ export const getAttendanceByTime = async ({
   period,
   referenceDate
 }: {
-  unitId: string
+  unitId?: string
   period: string
   referenceDate?: string
 }) => {
@@ -593,12 +600,14 @@ export const getAttendanceByTime = async ({
               ? { $month: '$date' }
               : { $hour: '$date' }
 
+    const baseMatch: Record<string, unknown> = {
+      date: { $gte: start, $lte: end }
+    }
+    if (unitId) baseMatch.unitId = new Types.ObjectId(unitId)
+
     const result = await Attendance.aggregate([
       {
-        $match: {
-          unitId: new Types.ObjectId(unitId),
-          date: { $gte: start, $lte: end }
-        }
+        $match: baseMatch
       },
       {
         $group: {
@@ -673,7 +682,7 @@ export const getAttendanceQueue = async ({
   period,
   referenceDate
 }: {
-  unitId: string
+  unitId?: string
   level?: UserLevels
   period?: string
   referenceDate?: string
@@ -882,6 +891,10 @@ export const getAttendanceQueue = async ({
         }
       }
     ])
+
+    if (!unitId) {
+      return data
+    }
 
     const { start: dayStart, end: dayEnd } = getPeriodDateRange('day')
     const completedTodayCount = await Attendance.countDocuments({

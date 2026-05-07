@@ -3,6 +3,7 @@ import {
   IAdminStatusCard,
   IDashboardStatusCards,
   IDoctorStatusCard,
+  IMeditStatusCard,
   INurseStatusCard
 } from '../interfaces/IDashboard.js'
 import { UserLevels } from '../interfaces/IUser.js'
@@ -23,6 +24,11 @@ import {
   getWaitingForTriage
 } from '../services/attendanceService.js'
 import { getUnitService } from '../services/unitService.js'
+
+function parseOptionalUnitId(unitId: unknown): string | undefined {
+  if (typeof unitId !== 'string' || unitId.trim() === '') return undefined
+  return unitId.trim()
+}
 
 export const getDashboardStatusCards = async (req: Request, res: Response) => {
   const { unitId, userId, level, period, referenceDate } = req.query
@@ -187,8 +193,58 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
     }
   }
 
+  async function getMeditData(): Promise<IMeditStatusCard | undefined> {
+    try {
+      const [entries, inAttendance, attended, averageTime, highRisk] =
+        await Promise.all([
+          getEntries({
+            period: String(period),
+            referenceDate: ref
+          }),
+          getInAttendance({
+            period: String(period),
+            referenceDate: ref
+          }),
+          getAttended({
+            period: String(period),
+            referenceDate: ref
+          }),
+          getAverageTime({
+            period: String(period),
+            referenceDate: ref
+          }),
+          getHighRisk({
+            period: String(period),
+            referenceDate: ref
+          })
+        ])
+
+      if (
+        entries === undefined ||
+        inAttendance === undefined ||
+        attended === undefined ||
+        averageTime === undefined ||
+        highRisk === undefined
+      ) {
+        throw new Error('Erro ao buscar dados do dashboard')
+      }
+
+      return {
+        entries,
+        inAttendance,
+        attended,
+        averageTime,
+        highRisk
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const data: () => Promise<IDashboardStatusCards | undefined> = async () => {
     switch (level) {
+      case UserLevels.MEDIT:
+        return await getMeditData()
       case UserLevels.ADMIN:
         return await getAdminData()
       case UserLevels.DOCTOR:
@@ -218,14 +274,23 @@ export const getDashboardAttendanceByTime = async (
   res: Response
 ) => {
   try {
-    const { unitId, period, referenceDate } = req.query
+    const { unitId, period, referenceDate, level } = req.query
     const ref =
       typeof referenceDate === 'string' && referenceDate.length > 0
         ? referenceDate
         : undefined
 
+    const unitIdStr = parseOptionalUnitId(unitId)
+    const levelStr = typeof level === 'string' ? level : undefined
+
+    if (!unitIdStr && levelStr !== UserLevels.MEDIT) {
+      return res.status(400).json({
+        message: 'ID da unidade é obrigatório para este perfil'
+      })
+    }
+
     const data = await getAttendanceByTime({
-      unitId: String(unitId),
+      unitId: unitIdStr,
       period: String(period),
       referenceDate: ref
     })
@@ -253,9 +318,18 @@ export const getDashboardAttendanceQueue = async (
         ? referenceDate
         : undefined
 
+    const unitIdStr = parseOptionalUnitId(unitId)
+    const levelValue = level ? (level as UserLevels) : undefined
+
+    if (!unitIdStr && levelValue !== UserLevels.MEDIT) {
+      return res.status(400).json({
+        message: 'ID da unidade é obrigatório para este perfil'
+      })
+    }
+
     const data = await getAttendanceQueue({
-      unitId: String(unitId),
-      level: level ? (level as UserLevels) : undefined,
+      unitId: unitIdStr,
+      level: levelValue,
       period: typeof period === 'string' ? period : undefined,
       referenceDate: ref
     })
