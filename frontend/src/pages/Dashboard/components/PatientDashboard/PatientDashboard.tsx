@@ -6,9 +6,11 @@ import {
   AttendanceStatusLabels,
   type IAttendance
 } from '@/interfaces/IAttendance'
+import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import { ROUTES } from '@/routes/constants'
+import { formatDate } from '@/utils/formatDate'
 import {
   BellSimpleRingingIcon,
   BuildingsIcon,
@@ -30,26 +32,13 @@ import type {
 import { nextStatusMap } from './IPatientDashboard'
 import styles from './PatientDashboard.module.scss'
 
-dayjs.locale('pt-br')
-
-interface IPatientDashboardProps {
-  /** Lista completa de atendimentos do paciente, já carregada pelo Dashboard pai */
-  attendances: IAttendance[]
-  /** Sinaliza quando o pai está recarregando dados */
-  parentLoading: boolean
-  /** Callback para forçar reload no pai */
-  onReload: () => void
-}
-
-// ─── Helpers ────────────────────────────────────────────────────────────────────
 const ACTIVE_STATUSES: AttendanceStatus[] = [
   AttendanceStatus.ON_THE_WAY,
   AttendanceStatus.WAITING_TRIAGE,
   AttendanceStatus.IN_TRIAGE,
   AttendanceStatus.TRIAGE_COMPLETED,
   AttendanceStatus.WAITING_ATTENDANCE,
-  AttendanceStatus.IN_ATTENDANCE,
-  AttendanceStatus.ATTENDANCE_COMPLETED
+  AttendanceStatus.IN_ATTENDANCE
 ]
 
 const COMPLETED_STATUSES: AttendanceStatus[] = [
@@ -58,11 +47,6 @@ const COMPLETED_STATUSES: AttendanceStatus[] = [
 ]
 
 const QUEUE_VISIBLE_LIMIT = 7
-
-function formatDate(date: Date | string | undefined): string {
-  if (!date) return '-'
-  return dayjs(date).format('DD/MM/YYYY')
-}
 
 // ─── Sub-componente: Fila de atendimento ────────────────────────────────────────
 function QueueList({
@@ -159,32 +143,65 @@ function QueueList({
   )
 }
 
-// ─── Componente principal ────────────────────────────────────────────────────────
-function PatientDashboard({
-  attendances,
-  parentLoading,
-  onReload
-}: IPatientDashboardProps) {
+interface IPatientDashboardProps {
+  reload: boolean
+}
+
+function PatientDashboard({ reload }: IPatientDashboardProps) {
   const { user } = useAuth()
   const navigate = useNavigate()
-
+  const [patientAttendances, setPatientAttendances] = useState<IAttendance[]>(
+    []
+  )
+  const [patientAttendancesLoading, setPatientAttendancesLoading] =
+    useState(true)
   const [queueItems, setQueueItems] = useState<IPatientQueueItem[]>([])
   const [queueLoading, setQueueLoading] = useState(true)
 
+  const fetchPatientActiveAttendance = useCallback(async () => {
+    if (user?.level !== UserLevels.PATIENT || !user?._id) {
+      setPatientAttendances([])
+      return
+    }
+
+    try {
+      setPatientAttendancesLoading(true)
+
+      const response = await PatientsRepository.getAttendances({
+        patientId: user._id
+      })
+      const list = response.data as IAttendance[]
+      const actives = list ?? []
+      actives.sort((a, b) => {
+        const tb = dayjs(b.updatedAt ?? b.date).valueOf()
+        const ta = dayjs(a.updatedAt ?? a.date).valueOf()
+        return tb - ta
+      })
+      setPatientAttendances(actives)
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao pegar atendimentos do paciente'
+      })
+    } finally {
+      setPatientAttendancesLoading(false)
+    }
+  }, [user?._id, user?.level])
+
   // ── Consulta ativa (não concluída e não cancelada) ──
   const activeAttendance: IActiveAttendance | null = useMemo(() => {
-    if (!attendances.length) return null
+    if (!patientAttendances.length) return null
     return (
-      (attendances.find((a) => ACTIVE_STATUSES.includes(a.status)) as
+      (patientAttendances.find((a) => ACTIVE_STATUSES.includes(a.status)) as
         | IActiveAttendance
         | undefined) ?? null
     )
-  }, [attendances])
+  }, [patientAttendances])
 
   // ── Último atendimento concluído ──
   const lastAttendance: ILastAttendance | null = useMemo(() => {
-    if (!attendances.length) return null
-    const completed = attendances.filter((a) =>
+    if (!patientAttendances.length) return null
+    const completed = patientAttendances.filter((a) =>
       COMPLETED_STATUSES.includes(a.status)
     )
     if (!completed.length) return null
@@ -196,7 +213,7 @@ function PatientDashboard({
       generalObservation: last.generalObservation,
       prescribedMedications: last.prescribedMedications
     }
-  }, [attendances])
+  }, [patientAttendances])
 
   // ── Posição do paciente na fila ──
   const myQueueItem = useMemo(
@@ -275,8 +292,9 @@ function PatientDashboard({
   }, [user?.unitId, activeAttendance])
 
   useEffect(() => {
-    void fetchQueue()
-  }, [fetchQueue])
+    fetchPatientActiveAttendance()
+    fetchQueue()
+  }, [fetchPatientActiveAttendance, fetchQueue, reload])
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   const hasActiveAttendance = Boolean(activeAttendance)
@@ -297,7 +315,7 @@ function PatientDashboard({
       <div className={styles.queuePositionCard}>
         <span className={styles.queuePosLabel}>Sua posição na fila</span>
 
-        {parentLoading || queueLoading ? (
+        {patientAttendancesLoading || queueLoading ? (
           <div className={styles.skeletonLarge} />
         ) : myQueueItem?.number ? (
           <span className={styles.queuePosNumber}>{myQueueItem.number}º</span>
@@ -325,7 +343,7 @@ function PatientDashboard({
       <div className={styles.statusCard}>
         <span className={styles.statusLabel}>Seu status atual é</span>
 
-        {parentLoading ? (
+        {patientAttendancesLoading ? (
           <div className={styles.skeletonLarge} />
         ) : activeAttendance?.status ? (
           <>
@@ -389,14 +407,20 @@ function PatientDashboard({
               Quando os sintomas começaram?
             </span>
             <span className={styles.rowValue}>
-              {formatDate(activeAttendance.symptomStartDate as Date)}
+              {formatDate({
+                date: activeAttendance.symptomStartDate as Date,
+                mode: 'date'
+              })}
             </span>
           </div>
 
           <div className={styles.currentConsultRow}>
             <span className={styles.rowLabel}>Chegada</span>
             <span className={styles.rowValue}>
-              {formatDate(activeAttendance.date as Date)}
+              {formatDate({
+                date: activeAttendance.date as Date,
+                mode: 'date'
+              })}
             </span>
           </div>
 
@@ -443,7 +467,11 @@ function PatientDashboard({
               <div className={styles.infoRow}>
                 <CalendarBlankIcon size={16} />
                 <span>
-                  <strong>Data:</strong> {formatDate(lastAttendance.date)}
+                  <strong>Data:</strong>{' '}
+                  {formatDate({
+                    date: lastAttendance.date as Date,
+                    mode: 'date'
+                  })}
                 </span>
               </div>
             )}
