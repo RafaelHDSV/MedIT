@@ -15,6 +15,10 @@ const ACTIVE_STATUSES = [
   AttendanceStatus.WAITING_ATTENDANCE,
   AttendanceStatus.IN_ATTENDANCE
 ]
+const QUEUE_NUMBER_COMPLETED_STATUSES = [
+  AttendanceStatus.ATTENDANCE_COMPLETED,
+  AttendanceStatus.COMPLETED
+]
 const ON_THE_WAY_ADVANTAGE_CAP_MINUTES = 30
 
 function scoreDiseaseFromProfile(
@@ -759,6 +763,13 @@ export const getAttendanceQueue = async ({
       },
       {
         $addFields: {
+          localDayKey: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$date',
+              timezone: 'America/Sao_Paulo'
+            }
+          },
           waitingTriageChangedAt: {
             $arrayElemAt: [
               {
@@ -795,12 +806,67 @@ export const getAttendanceQueue = async ({
         }
       },
       {
+        $lookup: {
+          from: 'attendances',
+          let: {
+            attendanceDate: '$date',
+            attendanceId: '$_id',
+            attendanceUnitId: '$unitId',
+            localDayKey: '$localDayKey'
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$unitId', '$$attendanceUnitId'] },
+                    {
+                      $eq: [
+                        {
+                          $dateToString: {
+                            format: '%Y-%m-%d',
+                            date: '$date',
+                            timezone: 'America/Sao_Paulo'
+                          }
+                        },
+                        '$$localDayKey'
+                      ]
+                    },
+                    {
+                      $or: [
+                        { $lt: ['$date', '$$attendanceDate'] },
+                        {
+                          $and: [
+                            { $eq: ['$date', '$$attendanceDate'] },
+                            { $lte: ['$_id', '$$attendanceId'] }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            { $count: 'total' }
+          ],
+          as: 'dailyPositionAggregate'
+        }
+      },
+      {
+        $addFields: {
+          dailyNumber: {
+            $ifNull: [{ $arrayElemAt: ['$dailyPositionAggregate.total', 0] }, 1]
+          }
+        }
+      },
+      {
         $sort: { riskPriority: 1, queueSortDate: 1, date: 1 }
       },
       {
         $project: {
           _id: 1,
           number: 1,
+          dailyNumber: 1,
           patientId: 1,
           patientName: { $ifNull: ['$patient.name', 'Paciente'] },
           patientBirthDate: { $ifNull: ['$patient.birthDate', 'Paciente'] },
@@ -819,7 +885,35 @@ export const getAttendanceQueue = async ({
       }
     ])
 
-    return data
+    const { start: dayStart, end: dayEnd } = getPeriodDateRange('day')
+    const completedTodayCount = await Attendance.countDocuments({
+      unitId: new Types.ObjectId(unitId),
+      status: { $in: QUEUE_NUMBER_COMPLETED_STATUSES },
+      date: { $gte: dayStart, $lte: dayEnd }
+    })
+
+    const operationalTotal = data.filter(
+      (item) => item.status !== AttendanceStatus.ON_THE_WAY
+    ).length
+
+    let operationalCursor = 0
+    let onTheWayCursor = 0
+
+    return data.map((item) => {
+      if (item.status === AttendanceStatus.ON_THE_WAY) {
+        onTheWayCursor += 1
+        return {
+          ...item,
+          dailyNumber: completedTodayCount + operationalTotal + onTheWayCursor
+        }
+      }
+
+      operationalCursor += 1
+      return {
+        ...item,
+        dailyNumber: completedTodayCount + operationalCursor
+      }
+    })
   } catch (err) {
     console.error(err)
     return []

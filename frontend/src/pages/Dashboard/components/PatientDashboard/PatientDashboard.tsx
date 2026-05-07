@@ -87,6 +87,7 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
         ) => ({
           _id: item._id,
           number: item.number,
+          dailyNumber: item.dailyNumber,
           queuePosition: index + 1,
           patientName: item.patientName,
           status: item.status,

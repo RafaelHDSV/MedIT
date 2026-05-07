@@ -51,7 +51,7 @@ function PatientQueueList({
               : undefined
           }
         >
-          {item.queuePosition}
+          {item.dailyNumber ?? '?'}
         </div>
 
         <div className={styles.itemInfo}>
