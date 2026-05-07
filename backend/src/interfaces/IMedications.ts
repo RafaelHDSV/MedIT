@@ -43,11 +43,6 @@ export const MedicationCategoriesLabels = {
 
 export interface IMedication extends IBaseInterface {
   name: string
-  // VIEIRA: Adicionar novos campos para atribuição de medicamento a pacientes
-  // dosage: string
-  // frequency: string
-  // route: string
-  // duration: string
   category: MedicationCategories
   description: string
   requiresPrescription: boolean
