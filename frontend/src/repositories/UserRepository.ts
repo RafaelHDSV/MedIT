@@ -7,6 +7,12 @@ class UserRepository extends Repository {
       return this.api.get(`${this.path}/${userId}`)
     })
   }
+
+  async updateMe({ body }: { body: Record<string, unknown> }) {
+    return this.handle(() => {
+      return this.api.patch(`${this.path}/me`, body)
+    })
+  }
 }
 
 export default new UserRepository({

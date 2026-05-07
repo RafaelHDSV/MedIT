@@ -307,6 +307,7 @@ MongoDB (Mongoose)
 - **`hooks/`** — hooks reutilizáveis (`useAuth`, colunas de tabelas por página em `pages/.../hooks`).
 - **`pages/`** — telas por domínio (`Dashboard` com `AttendanceByTimeChart`, `AttendanceQueueChart` e variantes admin/médico/enfermeiro; `PreRegistration`; `AttendanceDetails` compartilhado com triagens; CRUDs de médicos, enfermeiros, pacientes, unidades, medicamentos; listagens de atendimentos).
 - **`components/`** — UI transversal (`FormComponents`, `MultiDatepicker`, `ListTable`, `SideBar`, `AuthLayoutHeader`, `RiskTag` / constantes de risco, etc.).
+- **`components/SideBar/.../ConfigModal`** — modal de configuração do usuário com visualização e autoedição dos dados válidos por perfil (nome, contato, dados profissionais/paciente e alteração de senha com `currentPassword` + `newPassword`).
 - **`helpers/handleApiError.ts`** — tratamento uniforme de erros de API (mensagens ao utilizador).
 - **`interfaces/`** — tipos alinhados ao backend (`IAttendance`, `IUser`, `IDashboard`, `Periods`, etc.).
 
