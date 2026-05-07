@@ -1082,7 +1082,6 @@ const createAttendances: Script = {
           built.status !== AttendanceStatus.ON_THE_WAY &&
           built.status !== AttendanceStatus.WAITING_TRIAGE
         const needsDoctor =
-          built.status === AttendanceStatus.WAITING_ATTENDANCE ||
           built.status === AttendanceStatus.IN_ATTENDANCE ||
           built.status === AttendanceStatus.ATTENDANCE_COMPLETED
 
@@ -1182,7 +1181,7 @@ const createAttendances: Script = {
       for (const doctorId of unitTccDoctors) {
         for (let i = 0; i < TCC_ACTIVE_PER_DOCTOR; i++) {
           if (
-            pushActive(AttendanceStatus.WAITING_ATTENDANCE, {
+            pushActive(AttendanceStatus.IN_ATTENDANCE, {
               patientId: safeNextPatient(),
               doctorId
             })
