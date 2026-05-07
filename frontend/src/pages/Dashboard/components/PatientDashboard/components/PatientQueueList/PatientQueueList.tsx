@@ -1,5 +1,6 @@
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { riskColors } from '@/components/Risk/riskConstants'
+import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import type { IPatientQueueItem } from '../../IPatientDashboard'
@@ -55,7 +56,7 @@ function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
                         : undefined
                     }
                   >
-                    {item.number ?? '?'}
+                    {item.queuePosition}
                   </div>
 
                   <div className={styles.itemInfo}>
@@ -65,25 +66,12 @@ function PatientQueueList({ queueItems, loading }: IPatientQueueListProps) {
                     </span>
                   </div>
 
-                  <span
-                    className={styles.riskTag}
-                    style={
-                      riskColor
-                        ? ({
-                            '--tag-color': riskColor.color,
-                            '--tag-bg': riskColor.bgColor
-                          } as React.CSSProperties & Record<string, string>)
-                        : undefined
+                  <RiskTag
+                    risk={item.risk}
+                    className={
+                      item.isCurrentUser ? styles.currentUserRiskTag : ''
                     }
-                  >
-                    {item.risk === 'emergency' ||
-                    item.risk === 'veryUrgent' ||
-                    item.risk === 'urgent'
-                      ? 'Alto'
-                      : item.risk === 'lessUrgent'
-                        ? 'Médio'
-                        : 'Baixo'}
-                  </span>
+                  />
                 </div>
               )
             })}

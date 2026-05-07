@@ -3,6 +3,7 @@ import { AttendanceStatus, type AttendanceRisk } from '@/interfaces/IAttendance'
 export interface IPatientQueueItem {
   _id: string
   number?: number
+  queuePosition: number
   patientName: string
   status: AttendanceStatus
   risk: AttendanceRisk

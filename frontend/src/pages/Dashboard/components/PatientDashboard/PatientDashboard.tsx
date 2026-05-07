@@ -69,9 +69,13 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
         params: { unitId: user.unitId, level: user.level }
       })
       const mapped: IPatientQueueItem[] = response.data.map(
-        (item: Partial<IDashboardQueueItem & { patientId?: string }>) => ({
+        (
+          item: Partial<IDashboardQueueItem & { patientId?: string }>,
+          index: number
+        ) => ({
           _id: item._id,
           number: item.number,
+          queuePosition: index + 1,
           patientName: item.patientName,
           status: item.status,
           risk: item.risk,
@@ -171,7 +175,7 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
       patientsAheadCount: queueItems.filter(
         (q) =>
           !q.isCurrentUser &&
-          (q.number ?? 0) < (myQueueItem?.number ?? 0) &&
+          q.queuePosition < (myQueueItem?.queuePosition ?? Infinity) &&
           !COMPLETED_STATUSES.includes(q.status)
       ).length
     }

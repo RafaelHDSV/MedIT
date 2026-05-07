@@ -17,9 +17,9 @@ function QueuePositionCard({
   queueItems,
   estimatedWaitMinutes
 }: IQueuePositionCardProps) {
-  const inAttendanceNumber = queueItems.find(
+  const inAttendancePosition = queueItems.find(
     (q) => q.status === AttendanceStatus.IN_ATTENDANCE
-  )?.number
+  )?.queuePosition
 
   return (
     <div className={styles.queuePositionCard}>
@@ -27,8 +27,10 @@ function QueuePositionCard({
 
       {loading ? (
         <div className={styles.skeletonLarge} />
-      ) : myQueueItem?.number ? (
-        <span className={styles.queuePosNumber}>{myQueueItem.number}º</span>
+      ) : myQueueItem?.queuePosition ? (
+        <span className={styles.queuePosNumber}>
+          {myQueueItem.queuePosition}º
+        </span>
       ) : (
         <span className={styles.queuePosEmpty}>—</span>
       )}
@@ -36,15 +38,15 @@ function QueuePositionCard({
       <span className={styles.queuePosSubInfo}>
         {inAttendanceCount > 0 ? (
           <>
-            Atendendo paciente n°
-            <strong>{inAttendanceNumber ?? '?'}</strong>
+            Atendendo paciente n°{' '}
+            <strong>{inAttendancePosition ?? '?'}</strong>
           </>
         ) : (
           'Nenhum paciente em atendimento'
         )}
       </span>
 
-      {estimatedWaitMinutes !== undefined && myQueueItem?.number && (
+      {estimatedWaitMinutes !== undefined && myQueueItem?.queuePosition && (
         <span className={styles.queuePosSubInfo}>
           ~ {estimatedWaitMinutes} minuto{estimatedWaitMinutes !== 1 ? 's' : ''}
           de espera

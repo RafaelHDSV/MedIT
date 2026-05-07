@@ -84,15 +84,9 @@
   color: var(--light-gray);
 }
 
-.riskTag {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.2rem 0.6rem;
-  border-radius: 1rem;
-  color: var(--tag-color, var(--primary-color));
-  background: var(--tag-bg, var(--primary-opaque));
-  flex-shrink: 0;
-  white-space: nowrap;
+.currentUserRiskTag {
+  background: rgba(255, 255, 255, 0.25);
+  color: var(--white);
 }
 
 @keyframes shimmer {
