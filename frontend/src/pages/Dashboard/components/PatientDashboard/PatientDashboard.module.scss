@@ -1,41 +1,5 @@
 @use '../../../../styles/abstract/breakpoints' as *;
 
-// ─── Layout principal ──────────────────────────────────────────────────────────
-.wrapper {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: auto auto 1fr;
-  grid-template-areas:
-    'alert       alert       alert'
-    'queuePos    statusCard  currentConsult'
-    'queueList   queueList   currentConsult'
-    'queueList   queueList   lastAttendance';
-  gap: 1rem;
-  align-items: start;
-
-  @include max-lg {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      'alert         alert'
-      'queuePos      statusCard'
-      'currentConsult currentConsult'
-      'queueList     queueList'
-      'lastAttendance lastAttendance';
-  }
-
-  @include max-md {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'alert'
-      'queuePos'
-      'statusCard'
-      'currentConsult'
-      'queueList'
-      'lastAttendance';
-  }
-}
-
 // ─── Alert de notificação ──────────────────────────────────────────────────────
 .alertBanner {
   grid-area: alert;

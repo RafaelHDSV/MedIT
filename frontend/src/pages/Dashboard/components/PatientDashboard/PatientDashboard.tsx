@@ -1,6 +1,6 @@
-import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
+import type { Periods } from '@/interfaces/globals'
 import {
   AttendanceStatus,
   AttendanceStatusLabels,
@@ -17,13 +17,13 @@ import {
   CalendarBlankIcon,
   PencilSimpleIcon,
   PlusIcon,
-  UserIcon,
-  UsersThreeIcon
+  UserIcon
 } from '@phosphor-icons/react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/pt-br'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AttendanceQueueChart from '../AttendanceQueueChart/AttendanceQueueChart'
 import type {
   IActiveAttendance,
   ILastAttendance,
@@ -46,108 +46,17 @@ const COMPLETED_STATUSES: AttendanceStatus[] = [
   AttendanceStatus.CANCELED
 ]
 
-const QUEUE_VISIBLE_LIMIT = 7
-
-// ─── Sub-componente: Fila de atendimento ────────────────────────────────────────
-function QueueList({
-  items,
-  loading
-}: {
-  items: IPatientQueueItem[]
-  loading: boolean
-}) {
-  const [showAll, setShowAll] = useState(false)
-
-  const visible = useMemo(
-    () => (showAll ? items : items.slice(0, QUEUE_VISIBLE_LIMIT)),
-    [items, showAll]
-  )
-
-  const hiddenCount = items.length - QUEUE_VISIBLE_LIMIT
-
-  if (loading) {
-    return (
-      <div className={styles.queueCard}>
-        <div className={styles.queueCardHeader}>
-          <h3>Fila de Atendimento</h3>
-        </div>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className={styles.queueItem} style={{ opacity: 0.4 }}>
-            <div
-              className={styles.positionBall}
-              style={{ background: '#e0e0e0' }}
-            />
-            <div className={styles.queueItemInfo}>
-              <div className={`${styles.skeletonText}`} />
-              <div
-                className={`${styles.skeletonText}`}
-                style={{ width: '50%' }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className={styles.queueCard}>
-      <div className={styles.queueCardHeader}>
-        <h3>Fila de Atendimento</h3>
-        {items.length > 0 && (
-          <span className={styles.queueCount}>
-            <UsersThreeIcon size={16} />
-            {items.length} atendimento{items.length !== 1 ? 's' : ''}
-          </span>
-        )}
-      </div>
-
-      {items.length === 0 ? (
-        <p style={{ fontSize: '0.85rem', color: 'var(--light-gray)' }}>
-          Nenhum paciente na fila no momento.
-        </p>
-      ) : (
-        <>
-          {visible.map((item) => (
-            <div
-              key={item._id}
-              className={`${styles.queueItem} ${item.isCurrentUser ? styles.currentUser : ''}`}
-            >
-              {/* Bolinha com número */}
-              <span className={styles.positionBall}>{item.number ?? '?'}</span>
-
-              {/* Nome + status */}
-              <div className={styles.queueItemInfo}>
-                <p className={styles.queueItemName}>{item.patientName}</p>
-                <p className={styles.queueItemStatus}>
-                  {AttendanceStatusLabels[item.status]}
-                </p>
-              </div>
-
-              {/* RiskTag */}
-              <RiskTag risk={item.risk} useTooltip={false} />
-            </div>
-          ))}
-
-          {!showAll && hiddenCount > 0 && (
-            <button
-              className={styles.queueShowMore}
-              onClick={() => setShowAll(true)}
-            >
-              + {hiddenCount} atendimento{hiddenCount !== 1 ? 's' : ''}
-            </button>
-          )}
-        </>
-      )}
-    </div>
-  )
-}
-
 interface IPatientDashboardProps {
   reload: boolean
+  selectedPeriod: Periods
+  referenceDate: string
 }
 
-function PatientDashboard({ reload }: IPatientDashboardProps) {
+function PatientDashboard({
+  reload,
+  selectedPeriod,
+  referenceDate
+}: IPatientDashboardProps) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [patientAttendances, setPatientAttendances] = useState<IAttendance[]>(
@@ -157,36 +66,6 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
     useState(true)
   const [queueItems, setQueueItems] = useState<IPatientQueueItem[]>([])
   const [queueLoading, setQueueLoading] = useState(true)
-
-  const fetchPatientActiveAttendance = useCallback(async () => {
-    if (user?.level !== UserLevels.PATIENT || !user?._id) {
-      setPatientAttendances([])
-      return
-    }
-
-    try {
-      setPatientAttendancesLoading(true)
-
-      const response = await PatientsRepository.getAttendances({
-        patientId: user._id
-      })
-      const list = response.data as IAttendance[]
-      const actives = list ?? []
-      actives.sort((a, b) => {
-        const tb = dayjs(b.updatedAt ?? b.date).valueOf()
-        const ta = dayjs(a.updatedAt ?? a.date).valueOf()
-        return tb - ta
-      })
-      setPatientAttendances(actives)
-    } catch (err) {
-      handleApiError({
-        err,
-        defaultMessage: 'Erro ao pegar atendimentos do paciente'
-      })
-    } finally {
-      setPatientAttendancesLoading(false)
-    }
-  }, [user?._id, user?.level])
 
   // ── Consulta ativa (não concluída e não cancelada) ──
   const activeAttendance: IActiveAttendance | null = useMemo(() => {
@@ -291,16 +170,42 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
     }
   }, [user?.unitId, activeAttendance])
 
+  const fetchPatientActiveAttendance = useCallback(async () => {
+    if (user?.level !== UserLevels.PATIENT || !user?._id) return
+
+    try {
+      setPatientAttendancesLoading(true)
+
+      const response = await PatientsRepository.getAttendances({
+        patientId: user._id
+      })
+      const list = response.data as IAttendance[]
+      list.sort((a, b) => {
+        const tb = dayjs(b.updatedAt ?? b.date).valueOf()
+        const ta = dayjs(a.updatedAt ?? a.date).valueOf()
+        return tb - ta
+      })
+      setPatientAttendances(list)
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Erro ao pegar atendimentos do paciente'
+      })
+    } finally {
+      setPatientAttendancesLoading(false)
+    }
+  }, [user?._id, user?.level])
+
   useEffect(() => {
-    fetchPatientActiveAttendance()
     fetchQueue()
-  }, [fetchPatientActiveAttendance, fetchQueue, reload])
+    fetchPatientActiveAttendance()
+  }, [fetchQueue, fetchPatientActiveAttendance, reload])
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   const hasActiveAttendance = Boolean(activeAttendance)
 
   return (
-    <div className={styles.wrapper}>
+    <>
       {/* ── Banner de notificação ── */}
       {patientsAheadCount !== null && patientsAheadCount <= 3 && (
         <div className={styles.alertBanner}>
@@ -312,7 +217,10 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
       )}
 
       {/* ── Posição na fila ── */}
-      <div className={styles.queuePositionCard}>
+      <div
+        className={styles.queuePositionCard}
+        style={{ gridArea: 'positionQueue' }}
+      >
         <span className={styles.queuePosLabel}>Sua posição na fila</span>
 
         {patientAttendancesLoading || queueLoading ? (
@@ -340,7 +248,7 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
       </div>
 
       {/* ── Status atual ── */}
-      <div className={styles.statusCard}>
+      <div className={styles.statusCard} style={{ gridArea: 'status' }}>
         <span className={styles.statusLabel}>Seu status atual é</span>
 
         {patientAttendancesLoading ? (
@@ -364,7 +272,10 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
 
       {/* ── Consulta atual OU botão nova consulta ── */}
       {hasActiveAttendance && activeAttendance ? (
-        <div className={styles.currentConsultCard}>
+        <div
+          className={styles.currentConsultCard}
+          style={{ gridArea: 'currentAttendance' }}
+        >
           <div className={styles.currentConsultHeader}>
             <h3>Consulta atual</h3>
             <button
@@ -455,11 +366,22 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
       )}
 
       {/* ── Fila de atendimento ── */}
-      <QueueList items={queueItems} loading={queueLoading} />
+      {/* <QueueList items={queueItems} loading={queueLoading} /> */}
+      <AttendanceQueueChart
+        reload={reload}
+        selectedPeriod={selectedPeriod}
+        referenceDate={formatDate({
+          date: referenceDate,
+          mode: 'serverCompleteDate'
+        })}
+      />
 
       {/* ── Último atendimento ── */}
       {lastAttendance && (
-        <div className={styles.lastAttendanceCard}>
+        <div
+          className={styles.lastAttendanceCard}
+          style={{ gridArea: 'lastAttendance' }}
+        >
           <h3>Último atendimento</h3>
 
           <div className={styles.lastAttendanceInfo}>
@@ -519,7 +441,7 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
           )}
         </div>
       )}
-    </div>
+    </>
   )
 }
 

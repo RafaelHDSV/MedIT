@@ -238,7 +238,14 @@ function Dashboard() {
         )
       case UserLevels.PATIENT:
         return (
-          <PatientDashboard reload={reload} />
+          <PatientDashboard
+            reload={reload}
+            selectedPeriod={selectedPeriod}
+            referenceDate={formatDate({
+              date: referenceDayjs,
+              mode: 'serverCompleteDate'
+            })}
+          />
 
           // <Flex vertical gap={12} align='flex-start'>
           //   {patientActiveAttendance?._id &&
