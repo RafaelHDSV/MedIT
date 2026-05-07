@@ -292,15 +292,16 @@
 }
 
 .skeletonText {
-  @extend .card;
+  @extend .skeleton;
   height: 1rem;
   width: 70%;
   margin: 0.25rem 0;
 }
 
 .skeletonLarge {
-  @extend .card;
+  @extend .skeleton;
   height: 2.5rem;
   width: 40%;
   margin: 0.5rem auto;
+  border-radius: 0.4rem;
 }
