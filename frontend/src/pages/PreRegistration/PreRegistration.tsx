@@ -297,7 +297,6 @@ function PreRegistration() {
           form={form}
           onFinish={onFinish}
           fieldErrors={fieldErrors}
-          unitOptions={unitOptions}
         />
         <SymptomsInfo
           options={symptomOptions}
