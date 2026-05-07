@@ -217,7 +217,7 @@ Documentação detalhada da regra de negócio do seed de atendimentos: [`backend
 - **Membros do TCC com minimos garantidos:** deteccao por email (`{level}.{shortName}@yopmail.com`, short names: brenda, evellin, jota, take, rafa, vieira, victor). Pacientes TCC: >=**10 concluidos**; medicos TCC: >=**8 concluidos** atribuidos + **2 ativos** `IN_ATTENDANCE`; enfermeiros TCC: >=**8 concluidos** atribuidos + **1 ativo** `IN_TRIAGE`. Minimos adicionados ao dia com menor carga.
 - **Fila ativa por unidade (dia atual):** **5** `WAITING_TRIAGE` sem `nurseId` (fila do enfermeiro) + **5** `WAITING_ATTENDANCE` sem `doctorId` (fila do medico) + ativos atribuidos para profissionais TCC + ~7 extras variados (ON_THE_WAY, IN_TRIAGE, IN_ATTENDANCE, etc.).
 - **Distribuicao justa (round-robin shuffled):** pacientes, enfermeiros e medicos sao atribuidos por round-robin com shuffle previo, garantindo cobertura minima para todos sem concentrar atendimentos em poucos.
-- **Fluxo completo** no historico: desde `onTheWay` ate `completed` com timing variavel (+/-30% jitter por passo); `nurseId` omitido em `onTheWay`/`waitingTriage`; `doctorId` omitido ate `inAttendance`.
+- **Fluxo completo** no historico: desde `onTheWay` ate `attendanceCompleted` com timing variavel (+/-30% jitter por passo); `nurseId` omitido em `onTheWay`/`waitingTriage`; `doctorId` omitido ate `inAttendance`.
 - **Batches seguros para MongoDB Free:** lotes de **300** com `insertMany(..., { ordered: false, timestamps: false })`; processamento sequencial por unidade.
 - **Granularidade:** o seed usa horario local na montagem dos dias; `getPeriodDateRange` devolve `start`/`end` como instantes `Date` em UTC -- ainda pode haver pequeno desvio nas bordas do dia entre seed e agregacao.
 
@@ -325,7 +325,7 @@ O modelo de **atendimento** (`IAttendance` / `AttendanceSchema`) centraliza o fl
 - **Histórico de mudanças de status** em `changesHistory`.
 - **Dados do pré-atendimento pelo paciente** (opcionais quando o episódio não passou por essa etapa): campos na **raiz** do documento — por exemplo `painLevel`, `selfMedicated`, `symptomStartDate`, `symptoms[]`, `conditions[]`, `allergies[]`, `generalObservation` — complementam o texto curto da **`complaint`** (queixa principal).
 
-**Status possíveis** (ordem lógica do fluxo): a caminho → aguardando triagem → em triagem → triagem concluída → aguardando atendimento → em atendimento → atendimento concluído / concluído / cancelado (valores exatos nos enums em `backend/src/interfaces/IAttendance.ts` e espelhados no frontend).
+**Status possíveis** (ordem lógica do fluxo): a caminho → aguardando triagem → em triagem → triagem concluída → aguardando atendimento → em atendimento → atendimento concluído (valores exatos nos enums em `backend/src/interfaces/IAttendance.ts` e espelhados no frontend).
 
 **Transições implementadas no protótipo** entre estados chave:
 
@@ -442,6 +442,7 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 - O componente `VitalCard` (`frontend/src/pages/AttendanceDetails/components/VitalCard/VitalCard.tsx`) é um componente **controlado**: o valor exibido vem diretamente da prop `value` e alterações chamam `onChange` imediatamente (sem estado interno). A prop **`field`** (chave alinhada a `VitalFieldDraft` em `IAttendance.ts`) define máscaras de entrada; o **`label`** é só texto de UI — evita acoplamento frágil por rótulo. Apenas enfermeiros (`UserLevels.NURSE`) podem editar; demais perfis veem o valor como texto.
 - Em `AttendanceDetails.tsx`, um `vitalDraft` (state) mantém os campos editáveis de sinais vitais (temperatura, pressão arterial, frequência cardíaca, saturação O₂, nível de dor). Ao **"Concluir triagem"**, os valores são enviados junto com risco, sintomas e observações via `AttendancesFlowRepository.completeTriage`.
 - No backend, `attendanceController.ts` sanitiza e valida cada campo de sinais vitais (`parseVitalSignsFromBody`) e atualiza o documento de atendimento com `$set`/`$unset` atômicos.
+- Em `AttendanceDetails`, quando o status é `attendanceCompleted`, a UI exibe a seção **"Resumo do atendimento"** (`components/SummaryCard`) consolidando diagnóstico, observação diagnóstica, destino do paciente, prescrições, exames e data/hora de conclusão. A data prioriza o evento em `changesHistory` para `attendanceCompleted`, com fallback final em `updatedAt` e depois `date`.
 
 **Medicamentos — edição e isolamento por unidade**
 
@@ -452,7 +453,7 @@ Esta secção amarra a visão do documento ao que já existe no código (ponto e
 
 **Histórico de triagens (filtro e data correta)**
 
-- Endpoint de enfermagem `GET /auth/nurses/:id/attendances` passou a aceitar `completedTriage=true`; quando presente, a API retorna apenas triagens concluídas pelo enfermeiro (status `waitingAttendance` e posteriores: `inAttendance`, `attendanceCompleted`, `canceled`, `completed`).
+- Endpoint de enfermagem `GET /auth/nurses/:id/attendances` passou a aceitar `completedTriage=true`; quando presente, a API retorna apenas triagens concluídas pelo enfermeiro (status `waitingAttendance` e posteriores: `inAttendance`, `attendanceCompleted`).
 - Na projeção da API, o campo `triagedAt` é derivado de `changesHistory` (primeira transição para `waitingAttendance`).
 - A página `frontend/src/pages/Triages/Triages.tsx` envia `completedTriage=true` e a coluna **"Triado em"** usa `triagedAt` (com fallback para `date` quando necessário em dados legados).
 

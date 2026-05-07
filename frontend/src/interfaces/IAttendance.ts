@@ -139,6 +139,11 @@ export interface IAttendanceDetails {
   patientDisposition?: PatientDisposition
   prescribedMedications?: IPrescribedMedication[]
   prescribedExams?: string[]
+  changesHistory?: {
+    status: AttendanceStatus | string
+    changedAt: string | Date
+  }[]
+  updatedAt?: string | Date
   patient?: IAttendancePatient
 }
 

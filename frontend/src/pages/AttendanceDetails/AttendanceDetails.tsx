@@ -37,6 +37,7 @@ import CompleteAttendanceModal, {
 import ConditionsCard from './components/ConditionsCard/ConditionsCard'
 import ConfirmTriageModal from './components/ConfirmTriageModal/ConfirmTriageModal'
 import SuggestionDetailModal from './components/SuggestionDetailModal/SuggestionDetailModal'
+import SummaryCard from './components/SummaryCard/SummaryCard'
 import VitalCard from './components/VitalCard/VitalCard'
 
 function isValidNumber(value: number | undefined): boolean {
@@ -548,6 +549,14 @@ function AttendanceDetails() {
     )
   }
 
+  const isCompletedStatus =
+    attendance.status === AttendanceStatus.ATTENDANCE_COMPLETED
+  const completedHistory = attendance.changesHistory?.find(
+    (entry) => entry.status === AttendanceStatus.ATTENDANCE_COMPLETED
+  )
+  const completedAt =
+    completedHistory?.changedAt ?? attendance.updatedAt ?? attendance.date
+
   return (
     <>
       <SuggestionDetailModal
@@ -701,6 +710,17 @@ function AttendanceDetails() {
                 ))}
               </div>
             </section>
+
+            {isCompletedStatus ? (
+              <SummaryCard
+                diagnosis={attendance.diagnosis}
+                diagnosisText={attendance.diagnosisText}
+                patientDisposition={attendance.patientDisposition}
+                prescribedMedications={attendance.prescribedMedications}
+                prescribedExams={attendance.prescribedExams}
+                completedAt={completedAt}
+              />
+            ) : null}
           </div>
 
           {!isNurse && (
