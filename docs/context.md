@@ -175,11 +175,13 @@ O **dashboard administrativo** (`frontend/src/pages/Dashboard`, API em `backend/
 
 ### 5.7 Nível MedIT e administrador de unidade
 
-- **Situação atual (protótipo):** perfis com nível administrativo podem existir sem fluxo completo na UI; em muitos cenários de teste o **administrador é criado diretamente no banco de dados** ou via script `create-tcc-admins` (ver [§5.12](#512-índice-adicional-de-scripts-do-backend)).
-- **No código hoje:** o enum `UserLevels` (`backend/src/interfaces/IUser.ts` e espelho no frontend) inclui **`medit`** (`UserLevels.MEDIT`) além de **`admin`**, **`doctor`**, **`nurse`**, **`patient`**. O administrador continua sendo um **discriminator** Mongoose (`Admin` em `backend/src/models/AdminModel.ts`); usuários **MedIT** usam o modelo base `User` com `level: 'medit'` até haver discriminator ou script dedicado (ver ISSUE-0020). O rótulo **“nível MedIT”** no documento descreve o **operador da plataforma** acima do administrador de unidade; a UI já condiciona ações globais (ex.: **Adicionar unidade** em `Units.tsx`) a `user.level === medit`.
-- **Situação desejada:** existe um nível **MedIT** (superior ao administrador de unidade), responsável por:
-  - cadastrar e manter **unidades**;
-  - criar e associar **administradores** a uma unidade específica.
+- **Implementado (ISSUE-0020):** o nível **MedIT** (`UserLevels.MEDIT`) é o **operador da plataforma**, acima do administrador de unidade. Existe **apenas um** usuário MedIT no sistema, criado via script técnico `create-medit-user` (`backend/src/scripts/scripts/createMeditUser.script.ts`), disponível no runner de scripts (`yarn scripts`).
+- **Capacidades do nível MedIT:**
+  - **Gestão de unidades:** cria, edita e lista **todas** as unidades via rota exclusiva `GET /auth/units/all` e `POST /auth/units` / `PUT /auth/units/:id` (protegidas por `roleMiddleware(UserLevels.MEDIT)`).
+  - **Gestão de administradores:** cria, edita e lista administradores de unidade via `GET /auth/users/admins`, `POST /auth/users/admins`, `PUT /auth/users/admins/:id` (restritas ao `medit`). Payload de criação: `name`, `cpf`, `email`, `password`, `unitId`.
+  - **Dashboard e fila global:** dashboard e fila de atendimentos tratam `medit` como equivalente ao `admin` em indicadores, com filtro opcional por `unitId` ou dados consolidados de todas as unidades.
+  - **Visão resumida:** a visão global do `medit` expõe dados operacionais sem detalhes clínicos sensíveis.
+- **Middleware de autorização:** `backend/src/middlewares/roleMiddleware.ts` valida papéis permitidos nas rotas críticas, retornando **403** quando o nível do usuário não é autorizado.
 - **Administrador de unidade:** está ligado a **uma** unidade. Enxerga e gerencia **apenas** o que pertence a essa unidade: atendimentos, médicos, enfermeiros, pacientes no contexto da unidade, medicamentos, dashboard e demais dados operacionais **sem visibilidade cruzada** para outras unidades.
 
 ### 5.8 Visibilidade de atendimentos por perfil

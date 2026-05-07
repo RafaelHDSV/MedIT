@@ -706,6 +706,7 @@ export const getAttendanceQueue = async ({
     : '$date'
   const status = () => {
     switch (level) {
+      case UserLevels.MEDIT:
       case UserLevels.ADMIN:
         return ACTIVE_STATUSES
       case UserLevels.DOCTOR:
@@ -721,11 +722,14 @@ export const getAttendanceQueue = async ({
 
   try {
     const poolMatch: Record<string, unknown> = {
-      unitId: new Types.ObjectId(unitId),
       status: { $in: status() }
     }
 
-    if (level === UserLevels.ADMIN && period) {
+    if (unitId) {
+      poolMatch.unitId = new Types.ObjectId(unitId)
+    }
+
+    if ((level === UserLevels.ADMIN || level === UserLevels.MEDIT) && period) {
       const { start, end } = getPeriodDateRange(period, referenceDate)
       poolMatch.date = { $gte: start, $lte: end }
     }

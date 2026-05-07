@@ -31,7 +31,9 @@ function Units() {
     setLoading(true)
 
     try {
-      const response = await UnitsRepository.getUnits({ activeUnitId })
+      const response = isMedit
+        ? await UnitsRepository.getAllUnits()
+        : await UnitsRepository.getUnits({ activeUnitId })
 
       const formatResponse = response?.data?.map((unit: IUnit) => {
         return {
@@ -40,13 +42,13 @@ function Units() {
         }
       })
 
-      setUnits(formatResponse)
+      setUnits(formatResponse ?? [])
     } catch (err) {
       handleApiError({ err, defaultMessage: 'Erro ao buscar unidades' })
     } finally {
       setLoading(false)
     }
-  }, [activeUnitId])
+  }, [activeUnitId, isMedit])
 
   useEffect(() => {
     fetchUnits()

@@ -8,9 +8,21 @@ class UnitsRepository extends Repository {
     })
   }
 
+  async getAllUnits({ search }: { search?: string } = {}) {
+    return this.handle(() => {
+      return this.api.get(`${this.path}/all`, { params: { search } })
+    })
+  }
+
   async getUnit({ id }: { id?: string }) {
     return this.handle(() => {
       return this.api.get(`${this.path}/${id}`)
+    })
+  }
+
+  async editUnit({ id, body }: { id: string; body: Record<string, unknown> }) {
+    return this.handle(() => {
+      return this.api.put(`${this.path}/${id}`, body)
     })
   }
 }
