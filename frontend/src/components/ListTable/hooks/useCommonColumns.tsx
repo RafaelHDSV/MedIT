@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button'
+import { formatDate } from '@/utils/formatDate'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
@@ -8,7 +9,6 @@ import {
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { Flex, Tooltip } from 'antd'
 import type { ColumnType } from 'antd/es/table'
-import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import TooltipColumn from '../components/TooltipColumn/TooltipColumn'
 import styles from '../ListTable.module.scss'
@@ -92,7 +92,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
         <TooltipColumn
           text={
             date
-              ? `${dayjs(date).format('DD/MM/YYYY')} (${getAgeByBirthDate(date)} anos)`
+              ? `${formatDate({ date, mode: 'date' })} (${getAgeByBirthDate(date)} anos)`
               : undefined
           }
         />
@@ -119,7 +119,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       sorter: sorterFunctionByDate('createdAt'),
       render: (date: Date | string) => (
         <TooltipColumn
-          text={date ? dayjs(date).format('DD/MM/YYYY HH:mm') : undefined}
+          text={date ? formatDate({ date, mode: 'datetime' }) : undefined}
         />
       )
     }),
@@ -132,7 +132,7 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       sorter: sorterFunctionByDate('updatedAt'),
       render: (date: Date | string) => (
         <TooltipColumn
-          text={date ? dayjs(date).format('DD/MM/YYYY HH:mm') : undefined}
+          text={date ? formatDate({ date, mode: 'datetime' }) : undefined}
         />
       )
     }),

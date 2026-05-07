@@ -9,6 +9,7 @@ import { DoctorSpecializationsLabels, type IDoctor } from '@/interfaces/IDoctor'
 import DoctorsRepository from '@/repositories/DoctorsRepository'
 import UserRepository from '@/repositories/UserRepository'
 import capitalize from '@/utils/capitalize'
+import { formatDate } from '@/utils/formatDate'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import masks from '@/utils/masks'
 import {
@@ -17,7 +18,6 @@ import {
   DatabaseIcon
 } from '@phosphor-icons/react'
 import { Flex } from 'antd'
-import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import DoctorModal from '../Doctors/components/DoctorModal/DoctorModal'
@@ -95,7 +95,7 @@ function DoctorDetails() {
         {
           label: 'Data',
           value: lastAttendance.date
-            ? dayjs(lastAttendance.date).format('DD/MM/YYYY')
+            ? formatDate({ date: lastAttendance.date, mode: 'date' })
             : '-'
         }
       ]
@@ -105,7 +105,7 @@ function DoctorDetails() {
     attendances && attendances?.length > 0
       ? attendances?.map((attendance) => ({
           key: attendance._id,
-          label: dayjs(attendance.date).format('DD/MM/YYYY'),
+          label: formatDate({ date: attendance.date, mode: 'date' }),
           value: attendance.complaint
         }))
       : [{ label: 'Sem atendimentos registrados', value: '-' }]
@@ -153,7 +153,10 @@ function DoctorDetails() {
             },
             {
               label: 'Data de Nascimento',
-              value: dayjs(doctor?.birthDate).format('DD/MM/YYYY')
+              value: formatDate({
+                date: doctor?.birthDate,
+                mode: 'date'
+              })
             },
             {
               label: 'Especialidade',

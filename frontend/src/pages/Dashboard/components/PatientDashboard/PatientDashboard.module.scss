@@ -1,0 +1,312 @@
+@use '../../../../styles/abstract/breakpoints' as *;
+
+.alertBanner {
+  grid-area: alert;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem 1.5rem;
+  height: 100%;
+}
+
+.queuePositionCard {
+  @extend .card;
+  grid-area: positionQueue;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  text-align: center;
+
+  .queuePosLabel {
+    font-size: 0.8rem;
+    color: var(--light-gray);
+    font-weight: 500;
+  }
+
+  .queuePosNumber {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--primary-color);
+  }
+
+  .queuePosEmpty {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+  }
+
+  .queuePosSubInfo {
+    font-size: 0.78rem;
+    color: var(--light-gray);
+    margin-top: 0.25rem;
+  }
+
+  strong {
+    color: var(--black);
+  }
+}
+
+.statusCard {
+  @extend .card;
+  grid-area: status;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-align: center;
+
+  .statusLabel {
+    font-size: 0.8rem;
+    color: var(--light-gray);
+    font-weight: 500;
+  }
+
+  .statusValue {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  .statusEmpty {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  .statusNext {
+    font-size: 0.75rem;
+    color: var(--light-gray);
+    margin-top: 0.15rem;
+
+    span {
+      font-weight: 600;
+      color: var(--black);
+    }
+  }
+}
+
+.currentConsultCard {
+  @extend .card;
+  grid-area: currentAttendance;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.currentConsultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.1rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--black);
+  }
+
+  .editBtn {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.6rem;
+    background: var(--primary-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+}
+
+.currentConsultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 0.5rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .rowLabel {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--black);
+    flex-shrink: 0;
+  }
+
+  .rowValue {
+    font-size: 0.85rem;
+    color: var(--light-gray);
+    text-align: right;
+  }
+}
+
+.confirmArrivalRow {
+  padding-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.newConsultCard {
+  @extend .card;
+  grid-area: currentAttendance;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+  text-align: center;
+  min-height: 14rem;
+  width: 100%;
+  font-family: inherit;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(232, 87, 63, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .plusBtn {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover .plusBtn {
+    transform: scale(1.1);
+  }
+
+  p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--black);
+    max-width: 14rem;
+  }
+}
+
+.lastAttendanceCard {
+  @extend .card;
+  grid-area: lastAttendance;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+}
+
+.lastAttendanceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  .infoRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--black);
+
+    svg {
+      color: var(--light-gray);
+      flex-shrink: 0;
+    }
+  }
+}
+
+.diagnosisRow {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--black);
+
+  .diagnosisCode {
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+}
+
+.lastMedication {
+  font-size: 0.85rem;
+  color: var(--black);
+
+  span {
+    font-weight: 600;
+  }
+}
+
+.lastObservation {
+  font-size: 0.85rem;
+  color: var(--black);
+
+  span {
+    font-weight: 600;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  border-radius: 0.4rem;
+  background: linear-gradient(
+    90deg,
+    var(--white) 25%,
+    var(--white) 50%,
+    var(--white) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeletonText {
+  @extend .skeleton;
+  height: 1rem;
+  width: 70%;
+  margin: 0.25rem 0;
+}
+
+.skeletonLarge {
+  @extend .skeleton;
+  height: 2.5rem;
+  width: 40%;
+  margin: 0.5rem auto;
+  border-radius: 0.4rem;
+}

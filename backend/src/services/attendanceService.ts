@@ -15,6 +15,7 @@ const ACTIVE_STATUSES = [
   AttendanceStatus.WAITING_ATTENDANCE,
   AttendanceStatus.IN_ATTENDANCE
 ]
+const ON_THE_WAY_ADVANTAGE_CAP_MINUTES = 30
 
 function scoreDiseaseFromProfile(
   profile: Record<string, number>,
@@ -679,6 +680,32 @@ export const getAttendanceQueue = async ({
   period?: string
   referenceDate?: string
 }) => {
+  const isPatientLevel = level === UserLevels.PATIENT
+  const queueSortDateExpression = isPatientLevel
+    ? {
+        $cond: [
+          {
+            $and: [
+              { $ne: ['$status', AttendanceStatus.ON_THE_WAY] },
+              { $ne: ['$waitingTriageChangedAt', null] }
+            ]
+          },
+          {
+            $max: [
+              '$date',
+              {
+                $dateSubtract: {
+                  startDate: '$waitingTriageChangedAt.changedAt',
+                  unit: 'minute',
+                  amount: ON_THE_WAY_ADVANTAGE_CAP_MINUTES
+                }
+              }
+            ]
+          },
+          '$date'
+        ]
+      }
+    : '$date'
   const status = () => {
     switch (level) {
       case UserLevels.ADMIN:
@@ -688,9 +715,9 @@ export const getAttendanceQueue = async ({
       case UserLevels.NURSE:
         return [AttendanceStatus.WAITING_TRIAGE]
       case UserLevels.PATIENT:
-        return []
+        return ACTIVE_STATUSES
       default:
-        return []
+        return ACTIVE_STATUSES
     }
   }
 
@@ -732,6 +759,20 @@ export const getAttendanceQueue = async ({
       },
       {
         $addFields: {
+          waitingTriageChangedAt: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$changesHistory',
+                  as: 'history',
+                  cond: {
+                    $eq: ['$$history.status', AttendanceStatus.WAITING_TRIAGE]
+                  }
+                }
+              },
+              -1
+            ]
+          },
           riskPriority: {
             $switch: {
               branches: [
@@ -749,16 +790,18 @@ export const getAttendanceQueue = async ({
               ],
               default: 6
             }
-          }
+          },
+          queueSortDate: queueSortDateExpression
         }
       },
       {
-        $sort: { riskPriority: 1, date: 1 }
+        $sort: { riskPriority: 1, queueSortDate: 1, date: 1 }
       },
       {
         $project: {
           _id: 1,
           number: 1,
+          patientId: 1,
           patientName: { $ifNull: ['$patient.name', 'Paciente'] },
           patientBirthDate: { $ifNull: ['$patient.birthDate', 'Paciente'] },
           complaint: 1,

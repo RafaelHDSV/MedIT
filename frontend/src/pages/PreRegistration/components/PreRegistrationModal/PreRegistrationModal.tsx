@@ -2,9 +2,9 @@ import Button from '@/components/Button/Button'
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import type { ISymptomOption } from '@/interfaces/ISymptomDiseases'
 import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
+import { formatDate } from '@/utils/formatDate'
 import masks from '@/utils/masks'
 import { Flex, Modal } from 'antd'
-import dayjs from 'dayjs'
 import type { PreRegistrationFormValues } from '../../IPreRegistration'
 import styles from './PreRegistrationModal.module.scss'
 
@@ -57,7 +57,7 @@ function PreRegistrationModal({
           <DetailsLine label='Queixa principal' value={mainComplaint} />
           <DetailsLine
             label='Os sintomas começaram'
-            value={dayjs(symptomStartDate).format('DD/MM/YYYY')}
+            value={formatDate({ date: symptomStartDate, mode: 'date' })}
           />
           <DetailsLine
             label='Se automedicou?'

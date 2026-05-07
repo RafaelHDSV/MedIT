@@ -6,7 +6,8 @@ import {
   deletePatient,
   editPatient,
   getAttendances,
-  getUsers
+  getUsers,
+  updatePatientAttendance
 } from '../controllers/patientController.js'
 import { authMiddleware } from '../middlewares/authMiddleware.js'
 
@@ -23,5 +24,6 @@ router.post(
   confirmPatientArrival
 )
 router.post('/attendances', authMiddleware, createPatientAttendance)
+router.put('/attendances/:attendanceId', authMiddleware, updatePatientAttendance)
 
 export default router

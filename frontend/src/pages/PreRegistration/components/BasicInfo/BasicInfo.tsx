@@ -1,9 +1,9 @@
 import DetailsLine from '@/components/DetailsLine/DetailsLine'
 import { useAuth } from '@/hooks/useAuth'
 import { UserGendersLabels } from '@/interfaces/IUser'
+import { formatDate } from '@/utils/formatDate'
 import masks from '@/utils/masks'
 import { Flex } from 'antd'
-import dayjs from 'dayjs'
 import parentStyles from '../../PreRegistration.module.scss'
 import styles from './BasicInfo.module.scss'
 
@@ -21,7 +21,7 @@ function BasicInfo() {
         {user?.birthDate && (
           <DetailsLine
             label='Data de nascimento'
-            value={dayjs(user?.birthDate).format('DD/MM/YYYY')}
+            value={formatDate({ date: user?.birthDate, mode: 'date' })}
           />
         )}
         {user?.gender && (

@@ -3,9 +3,9 @@ import { getCommonColumns } from '@/components/ListTable/hooks/useCommonColumns'
 import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import type { AttendanceRisk, IAttendance } from '@/interfaces/IAttendance'
 import { ROUTES } from '@/routes/constants'
+import { formatDate } from '@/utils/formatDate'
 import { sorterFunctionByDate } from '@/utils/sorterFunction'
 import type { ColumnsType } from 'antd/es/table'
-import dayjs from 'dayjs'
 import type { ObjectId } from 'mongoose'
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -51,7 +51,10 @@ export function useTriagesColumns() {
           <TooltipColumn
             text={
               (triagedAt ?? attendance.date)
-                ? `${dayjs(triagedAt ?? attendance.date).format('DD/MM/YYYY')} às ${dayjs(triagedAt ?? attendance.date).format('HH:mm')}`
+                ? formatDate({
+                    date: triagedAt ?? attendance.date,
+                    mode: 'datetimeWithAt'
+                  })
                 : undefined
             }
           />

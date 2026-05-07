@@ -1,0 +1,171 @@
+@use '../../../../../../styles/abstract/breakpoints' as *;
+
+.queueList {
+  display: flex;
+  flex-direction: column;
+  max-height: 22rem;
+  overflow-y: auto;
+  width: 100%;
+  scrollbar-color: var(--secondary-color) transparent;
+
+  &::-webkit-scrollbar {
+    width: 0.4rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 0.5rem;
+  }
+}
+
+.queueSection {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.15rem 0.25rem 0.35rem;
+}
+
+.sectionTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--black);
+  text-transform: uppercase;
+}
+
+.sectionHint {
+  font-size: 0.7rem;
+  color: var(--light-gray);
+}
+
+.queueItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0.5rem;
+  transition: background 0.15s;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  &.currentUser {
+    background: var(--primary-color);
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+
+    .itemName,
+    .itemStatus {
+      color: var(--white);
+    }
+
+    .riskTag {
+      background: rgba(255, 255, 255, 0.25);
+      color: var(--white);
+    }
+  }
+}
+
+.numberBadge {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--badge-bg, var(--primary-color));
+  color: var(--badge-color, var(--white));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemStatus {
+  font-size: 0.75rem;
+  color: var(--light-gray);
+}
+
+.currentUserRiskTag {
+  background: rgba(255, 255, 255, 0.25);
+  color: var(--white);
+}
+
+@keyframes shimmer {
+  100% {
+    left: 150%;
+  }
+}
+
+%shimmerBase {
+  background: var(--gray-3);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    height: 100%;
+    width: 150%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    animation: shimmer 1.2s infinite;
+  }
+}
+
+.numberBadgeSkeleton {
+  @extend %shimmerBase;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton {
+  @extend %shimmerBase;
+  height: 14px;
+  width: 120px;
+  display: block;
+}
+
+.skeletonShort {
+  width: 70px;
+}
+
+.tagSkeleton {
+  @extend %shimmerBase;
+  width: 60px;
+  height: 22px;
+  border-radius: 1rem;
+  flex-shrink: 0;
+}

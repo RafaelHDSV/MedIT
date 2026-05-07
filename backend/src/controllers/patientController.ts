@@ -295,6 +295,24 @@ export const getAttendances = async (req: Request, res: Response) => {
       },
       { $unwind: { path: '$patient', preserveNullAndEmptyArrays: true } },
       {
+        $lookup: {
+          from: 'users',
+          localField: 'doctorId',
+          foreignField: '_id',
+          as: 'doctor'
+        }
+      },
+      { $unwind: { path: '$doctor', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'units',
+          localField: 'unitId',
+          foreignField: '_id',
+          as: 'unit'
+        }
+      },
+      { $unwind: { path: '$unit', preserveNullAndEmptyArrays: true } },
+      {
         $sort: {
           createdAt: -1
         }
@@ -305,6 +323,8 @@ export const getAttendances = async (req: Request, res: Response) => {
           number: 1,
           name: { $ifNull: ['$patient.name', null] },
           birthDate: { $ifNull: ['$patient.birthDate', null] },
+          doctorName: { $ifNull: ['$doctor.name', null] },
+          unitName: { $ifNull: ['$unit.name', null] },
           complaint: 1,
           painLevel: 1,
           selfMedicated: 1,
@@ -323,6 +343,8 @@ export const getAttendances = async (req: Request, res: Response) => {
           medicationsIds: 1,
           vitalSigns: 1,
           diagnosisKey: 1,
+          prescribedMedications: 1,
+          prescribedExams: 1,
           diagnosis: 1,
           createdAt: 1,
           updatedAt: 1
@@ -439,6 +461,160 @@ export const confirmPatientArrival = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err)
     return res.status(500).json({ message: 'Erro ao confirmar chegada.' })
+  }
+}
+
+export const updatePatientAttendance = async (req: Request, res: Response) => {
+  const { userId } = req
+  const { attendanceId } = req.params
+  const {
+    mainComplaint,
+    painLevel,
+    selfMedicated,
+    symptomStartDate,
+    conditions,
+    allergies,
+    generalObservation,
+    symptoms,
+    birthDate,
+    gender,
+    unitId: bodyUnitId
+  } = req.body
+
+  try {
+    const rawId = attendanceIdFromParams(attendanceId)
+    if (!Types.ObjectId.isValid(rawId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+
+    const patient = await Patient.findById(userId)
+    if (!patient || patient.level !== UserLevels.PATIENT) {
+      return res.status(403).json({
+        message: 'Apenas pacientes podem editar atendimento por esta rota.'
+      })
+    }
+
+    const attendance = await Attendance.findOne({
+      _id: new Types.ObjectId(rawId),
+      patientId: patient._id
+    } as never)
+    if (!attendance) {
+      return res.status(404).json({ message: 'Atendimento não encontrado.' })
+    }
+
+    const editableStatuses: AttendanceStatus[] = [
+      AttendanceStatus.ON_THE_WAY,
+      AttendanceStatus.WAITING_TRIAGE
+    ]
+    if (!editableStatuses.includes(attendance.status)) {
+      return res.status(409).json({
+        message: 'Este atendimento não pode mais ser editado.'
+      })
+    }
+
+    const errors: Record<string, string> = {}
+    if (!mainComplaint?.trim()) {
+      errors.mainComplaint = 'Informe sua queixa principal'
+    }
+    const painLevelNumber = parseFiniteNumber(painLevel)
+    if (
+      painLevelNumber === undefined ||
+      painLevelNumber < 0 ||
+      painLevelNumber > 10
+    ) {
+      errors.painLevel =
+        'Informe um nível de dor válido entre 0 e 10 (número finito).'
+    }
+    if (typeof selfMedicated !== 'boolean') {
+      errors.selfMedicated =
+        'Informe se você se automedicou (valor booleano: verdadeiro ou falso).'
+    }
+    if (!symptomStartDate) {
+      errors.symptomStartDate = 'Informe quando os sintomas começaram'
+    }
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        message: 'Corrija os campos obrigatórios antes de continuar.',
+        errors
+      })
+    }
+
+    const symptomStart = new Date(symptomStartDate!)
+    if (Number.isNaN(symptomStart.getTime())) {
+      return res.status(400).json({
+        message: 'Data de início dos sintomas inválida.',
+        errors: { symptomStartDate: 'Data inválida' }
+      })
+    }
+
+    const normalizedSymptoms = Array.isArray(symptoms)
+      ? symptoms.map((s) => String(s).trim()).filter(Boolean)
+      : []
+    const normalizedConditions = normalizeStringArray(conditions)
+    const normalizedAllergies = normalizeStringArray(allergies)
+
+    if (birthDate) {
+      const bd = new Date(birthDate)
+      if (!Number.isNaN(bd.getTime())) {
+        patient.birthDate = bd
+      }
+    }
+    if (gender && Object.values(UserGender).includes(gender as UserGender)) {
+      patient.gender = gender as UserGender
+    }
+    if (conditions !== undefined && conditions !== null) {
+      patient.conditions = normalizedConditions
+    }
+    if (allergies !== undefined && allergies !== null) {
+      patient.allergies = normalizedAllergies
+    }
+    await patient.save()
+
+    const nextUnitId = bodyUnitId ? String(bodyUnitId).trim() : ''
+    if (nextUnitId && nextUnitId !== String(attendance.unitId)) {
+      if (attendance.status !== AttendanceStatus.ON_THE_WAY) {
+        return res.status(409).json({
+          message:
+            'A unidade só pode ser alterada enquanto o status for "a caminho".'
+        })
+      }
+      if (!Types.ObjectId.isValid(nextUnitId)) {
+        return res.status(400).json({
+          message: 'Unidade de saúde inválida.',
+          errors: { unitId: 'Unidade inválida' }
+        })
+      }
+      const unit = await Unit.findById(nextUnitId)
+      if (!unit) {
+        return res.status(400).json({
+          message: 'Unidade de saúde não encontrada.',
+          errors: { unitId: 'Unidade inválida' }
+        })
+      }
+      attendance.unitId = new Types.ObjectId(nextUnitId)
+    }
+
+    attendance.complaint = mainComplaint!.trim()
+    attendance.painLevel = painLevelNumber!
+    attendance.selfMedicated = selfMedicated as boolean
+    attendance.symptomStartDate = symptomStart
+    attendance.symptoms = normalizedSymptoms
+    attendance.conditions = normalizedConditions
+    attendance.allergies = normalizedAllergies
+    attendance.generalObservation = generalObservation?.trim() || undefined
+    attendance.risk = provisionalRiskFromPain(painLevelNumber!)
+
+    await (attendance as any).save()
+
+    return res.json({
+      message: 'Atendimento atualizado com sucesso!',
+      data: attendance
+    })
+  } catch (error: unknown) {
+    console.error(error)
+    return res.status(500).json({
+      message: 'Erro ao atualizar atendimento'
+    })
   }
 }
 

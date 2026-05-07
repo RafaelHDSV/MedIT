@@ -56,6 +56,18 @@ class PatientsRepositoy extends Repository {
     })
   }
 
+  async updatePatientAttendance({
+    attendanceId,
+    body
+  }: {
+    attendanceId: string
+    body: PreRegistrationFormValues
+  }) {
+    return this.handle(() => {
+      return this.api.put(`${this.path}/attendances/${attendanceId}`, body)
+    })
+  }
+
   async confirmPatientArrival({ attendanceId }: { attendanceId: string }) {
     return this.handle(() =>
       this.api.post(`${this.path}/attendances/${attendanceId}/confirm-arrival`)

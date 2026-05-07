@@ -123,3 +123,34 @@
       'attendanceQueueChart';
   }
 }
+
+.patient {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-areas:
+    'alert alert alert alert'
+    'positionQueue status currentAttendance currentAttendance'
+    'attendanceQueueChart attendanceQueueChart currentAttendance currentAttendance'
+    'attendanceQueueChart attendanceQueueChart currentAttendance currentAttendance'
+    'attendanceQueueChart attendanceQueueChart lastAttendance lastAttendance';
+
+  @include max-lg {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'alert alert'
+      'positionQueue status'
+      'attendanceQueueChart attendanceQueueChart'
+      'currentAttendance currentAttendance'
+      'lastAttendance lastAttendance';
+  }
+
+  @include max-md {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'alert'
+      'positionQueue'
+      'status'
+      'attendanceQueueChart'
+      'currentAttendance'
+      'lastAttendance';
+  }
+}
