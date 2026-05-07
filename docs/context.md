@@ -201,7 +201,7 @@ No repositório, a jornada do **paciente** foi desenhada para refletir quem inic
 
 Rotas de referência no backend: criação e chegada sob **`/auth/patients/...`**; captura de triagem / conclusão de triagem / captura médica sob **`/auth/attendances/...`**. Os contadores do dashboard (ex.: pacientes aguardando triagem ou médico) consideram apenas os itens **ainda não atribuídos** ao profissional, quando aplicável.
 
-> **Nota sobre claim/release:** no código atual, as rotas de `claim-triage` e `claim-consultation` são chamadas de forma **lazy** dentro de `AttendanceDetails` (no momento de concluir a etapa), não no clique da fila. A evolução planejada é antecipar esse claim para o clique da fila e adicionar contrapartidas `release-triage` / `release-consultation` para devolver o caso ao pool caso o profissional saia sem concluir. Ver detalhes em [`.issues/ISSUE-006-claim-nao-feito-na-fila.md`](../.issues/ISSUE-006-claim-nao-feito-na-fila.md).
+> **Nota sobre claim/release:** no código atual, o claim é feito **no clique da fila** (`claim-triage` / `claim-consultation`) antes da navegação ao detalhe, evitando dupla captura. Ao sair de `AttendanceDetails` sem concluir, a UI tenta liberar automaticamente o caso (`release-triage` / `release-consultation`) em modo *best effort*, devolvendo o atendimento para `waitingTriage`/`waitingAttendance`.
 
 ### 5.10 Seeds de demonstração (atendimentos e medicamentos)
 

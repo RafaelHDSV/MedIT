@@ -27,7 +27,7 @@ import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
 import { formatDate } from '@/utils/formatDate'
 import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import { Flex, message, Spin } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import RiskSelector from '../../components/Risk/RiskSelector/RiskSelector'
 import styles from './AttendanceDetails.module.scss'
@@ -156,6 +156,7 @@ function AttendanceDetails() {
 
   const isNurse = user?.level === UserLevels.NURSE
   const isDoctor = user?.level === UserLevels.DOCTOR
+  const shouldReleaseOnExitRef = useRef(true)
 
   const loadAttendance = useCallback(async () => {
     if (!attendanceId) return
@@ -179,6 +180,23 @@ function AttendanceDetails() {
       setPageLoading(false)
     }
   }, [attendanceId])
+
+  const releaseActiveClaim = useCallback(async () => {
+    if (!attendanceId || !shouldReleaseOnExitRef.current || !attendance) return
+
+    if (isNurse && attendance.status === AttendanceStatus.IN_TRIAGE) {
+      await AttendancesFlowRepository.releaseTriage({
+        attendanceId: String(attendanceId)
+      })
+      return
+    }
+
+    if (isDoctor && attendance.status === AttendanceStatus.IN_ATTENDANCE) {
+      await AttendancesFlowRepository.releaseConsultation({
+        attendanceId: String(attendanceId)
+      })
+    }
+  }, [attendanceId, attendance, isNurse, isDoctor])
 
   const loadSuggestions = useCallback(async () => {
     if (!attendanceId || !isDoctor) return
@@ -220,6 +238,18 @@ function AttendanceDetails() {
   useEffect(() => {
     loadAttendance()
   }, [loadAttendance])
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      void releaseActiveClaim()
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      void releaseActiveClaim()
+    }
+  }, [releaseActiveClaim])
 
   useEffect(() => {
     if (!attendance) return
@@ -357,12 +387,6 @@ function AttendanceDetails() {
     try {
       setTriageLoading(true)
 
-      if (attendance.status === AttendanceStatus.WAITING_TRIAGE) {
-        await AttendancesFlowRepository.claimTriage({
-          attendanceId: String(attendanceId)
-        })
-      }
-
       const vitalSignsPayload = buildVitalSignsPayload(source.vitalDraft)
       const { painLevel } = source.vitalDraft
       let finalPainLevel: number | undefined
@@ -389,6 +413,7 @@ function AttendanceDetails() {
       message.success(
         'Triagem concluída. O paciente foi encaminhado à fila médica.'
       )
+      shouldReleaseOnExitRef.current = false
       navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
       handleApiError({
@@ -437,12 +462,6 @@ function AttendanceDetails() {
     try {
       setCompleteLoading(true)
 
-      if (attendance?.status === AttendanceStatus.WAITING_ATTENDANCE) {
-        await AttendancesFlowRepository.claimConsultation({
-          attendanceId: String(attendanceId)
-        })
-      }
-
       await AttendancesFlowRepository.completeAttendance({
         attendanceId: String(attendanceId),
         diagnosisKey: payload.diagnosisKey,
@@ -453,6 +472,7 @@ function AttendanceDetails() {
       })
       message.success('Atendimento finalizado com sucesso.')
       setCompleteModalOpen(false)
+      shouldReleaseOnExitRef.current = false
       navigate(ROUTES.DASHBOARD.path)
     } catch (err) {
       handleApiError({

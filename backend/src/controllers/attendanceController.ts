@@ -329,6 +329,108 @@ export const claimDoctorConsult = async (req: Request, res: Response) => {
   }
 }
 
+export const releaseTriage = async (req: Request, res: Response) => {
+  try {
+    const attendanceId = paramId(req.params.attendanceId)
+    if (!Types.ObjectId.isValid(attendanceId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+
+    const user = await User.findById(req.userId)
+    if (!user || user.level !== UserLevels.NURSE) {
+      return res
+        .status(403)
+        .json({ message: 'Apenas enfermeiros podem liberar a triagem.' })
+    }
+    if (!user.unitId) {
+      return res.status(400).json({ message: 'Usuário sem unidade vinculada.' })
+    }
+
+    const updated = await Attendance.findOneAndUpdate(
+      {
+        _id: new Types.ObjectId(attendanceId),
+        unitId: user.unitId,
+        nurseId: user._id,
+        status: AttendanceStatus.IN_TRIAGE
+      } as never,
+      {
+        $set: { status: AttendanceStatus.WAITING_TRIAGE },
+        $unset: { nurseId: '' },
+        $push: {
+          changesHistory: historyEntry(AttendanceStatus.WAITING_TRIAGE)
+        }
+      },
+      { new: true }
+    )
+
+    if (!updated) {
+      return res.status(409).json({
+        message:
+          'Não foi possível liberar a triagem. Verifique se você é a enfermeira responsável e se o atendimento está em triagem.'
+      })
+    }
+
+    return res.json({
+      message: 'Triagem devolvida para a fila com sucesso.',
+      data: updated
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao liberar a triagem.' })
+  }
+}
+
+export const releaseDoctorConsult = async (req: Request, res: Response) => {
+  try {
+    const attendanceId = paramId(req.params.attendanceId)
+    if (!Types.ObjectId.isValid(attendanceId)) {
+      return res.status(400).json({ message: 'ID do atendimento inválido.' })
+    }
+
+    const user = await User.findById(req.userId)
+    if (!user || user.level !== UserLevels.DOCTOR) {
+      return res
+        .status(403)
+        .json({ message: 'Apenas médicos podem liberar o atendimento.' })
+    }
+    if (!user.unitId) {
+      return res.status(400).json({ message: 'Usuário sem unidade vinculada.' })
+    }
+
+    const updated = await Attendance.findOneAndUpdate(
+      {
+        _id: new Types.ObjectId(attendanceId),
+        unitId: user.unitId,
+        doctorId: user._id,
+        status: AttendanceStatus.IN_ATTENDANCE
+      } as never,
+      {
+        $set: { status: AttendanceStatus.WAITING_ATTENDANCE },
+        $unset: { doctorId: '' },
+        $push: {
+          changesHistory: historyEntry(AttendanceStatus.WAITING_ATTENDANCE)
+        }
+      },
+      { new: true }
+    )
+
+    if (!updated) {
+      return res.status(409).json({
+        message:
+          'Não foi possível liberar o atendimento. Verifique se você é o médico responsável e se o atendimento está em andamento.'
+      })
+    }
+
+    return res.json({
+      message: 'Atendimento devolvido para a fila com sucesso.',
+      data: updated
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao liberar o atendimento.' })
+  }
+}
+
 export const completeAttendance = async (req: Request, res: Response) => {
   try {
     const attendanceId = paramId(req.params.attendanceId)

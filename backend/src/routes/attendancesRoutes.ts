@@ -4,6 +4,8 @@ import {
   claimTriage,
   completeAttendance,
   completeTriage,
+  releaseDoctorConsult,
+  releaseTriage,
   getStaffAttendanceDetails,
   getSuggestedDiseases,
   getSuggestionDetail
@@ -13,11 +15,17 @@ import { authMiddleware } from '../middlewares/authMiddleware.js'
 const router = express.Router()
 
 router.post('/:attendanceId/claim-triage', authMiddleware, claimTriage)
+router.post('/:attendanceId/release-triage', authMiddleware, releaseTriage)
 router.post('/:attendanceId/complete-triage', authMiddleware, completeTriage)
 router.post(
   '/:attendanceId/claim-consultation',
   authMiddleware,
   claimDoctorConsult
+)
+router.post(
+  '/:attendanceId/release-consultation',
+  authMiddleware,
+  releaseDoctorConsult
 )
 router.post(
   '/:attendanceId/complete-attendance',

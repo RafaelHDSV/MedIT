@@ -49,6 +49,12 @@ class AttendancesFlowRepository extends Repository {
     })
   }
 
+  async releaseTriage({ attendanceId }: { attendanceId: string }) {
+    return this.handle(() => {
+      return this.api.post(`${this.path}/${attendanceId}/release-triage`)
+    })
+  }
+
   async completeTriage({
     attendanceId,
     risk,
@@ -97,6 +103,12 @@ class AttendancesFlowRepository extends Repository {
   async claimConsultation({ attendanceId }: { attendanceId: string }) {
     return this.handle(() => {
       return this.api.post(`${this.path}/${attendanceId}/claim-consultation`)
+    })
+  }
+
+  async releaseConsultation({ attendanceId }: { attendanceId: string }) {
+    return this.handle(() => {
+      return this.api.post(`${this.path}/${attendanceId}/release-consultation`)
     })
   }
 }
