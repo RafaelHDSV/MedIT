@@ -91,7 +91,10 @@ function CurrentConsultCard({
       <div className={styles.currentConsultRow}>
         <span className={styles.rowLabel}>Chegada</span>
         <span className={styles.rowValue}>
-          {formatDate({ date: attendance.date as Date, mode: 'date' })}
+          {formatDate({
+            date: attendance.date as Date,
+            mode: 'datetimeWithAt'
+          })}
         </span>
       </div>
 
