@@ -4,7 +4,6 @@ import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import { AttendanceStatus, type IAttendance } from '@/interfaces/IAttendance'
 import type { ISymptomOption } from '@/interfaces/ISymptomDiseases'
-import AuthRepository from '@/repositories/AuthRepository'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import SymptomsDiseasesRepository from '@/repositories/SymptomsDiseasesRepository'
 import { ROUTES } from '@/routes/constants'
@@ -34,9 +33,6 @@ function PreRegistration() {
   const [initialLoading, setInitialLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<IPreRegistrationErrors>({})
   const [symptomOptions, setSymptomOptions] = useState<ISymptomOption[]>([])
-  const [unitOptions, setUnitOptions] = useState<
-    { label: string; value: string }[]
-  >([])
   const [didPrefillEdit, setDidPrefillEdit] = useState(false)
 
   const editAttendanceId = searchParams.get('attendanceId')
@@ -51,23 +47,14 @@ function PreRegistration() {
   useEffect(() => {
     async function bootstrapPage() {
       try {
-        const [symptomResponse, unitsResponse] = await Promise.all([
-          SymptomsDiseasesRepository.getSymptomOptions(),
-          AuthRepository.getSignupUnits()
-        ])
+        const symptomResponse =
+          await SymptomsDiseasesRepository.getSymptomOptions()
 
         setSymptomOptions(
           symptomResponse?.data?.symptoms.sort(
             (a: ISymptomOption, b: ISymptomOption) =>
               a.label.localeCompare(b.label)
           ) ?? []
-        )
-
-        setUnitOptions(
-          (unitsResponse?.data ?? []).map((unit) => ({
-            label: unit.name,
-            value: unit._id
-          }))
         )
       } catch (err) {
         handleApiError({
