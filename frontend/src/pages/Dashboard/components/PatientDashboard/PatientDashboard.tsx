@@ -38,6 +38,7 @@ const ACTIVE_STATUSES: AttendanceStatus[] = [
 ]
 
 const COMPLETED_STATUSES: AttendanceStatus[] = [
+  AttendanceStatus.ATTENDANCE_COMPLETED,
   AttendanceStatus.COMPLETED,
   AttendanceStatus.CANCELED
 ]
@@ -196,10 +197,7 @@ function PatientDashboard({
         />
       )}
 
-      <div
-        className={styles.queuePositionCard}
-        style={{ gridArea: 'positionQueue' }}
-      >
+      <div className={styles.queuePositionCard}>
         <span className={styles.queuePosLabel}>Sua posição na fila</span>
 
         {patientAttendancesLoading || queueLoading ? (
@@ -227,7 +225,7 @@ function PatientDashboard({
       </div>
 
       {/* ── Status atual ── */}
-      <div className={styles.statusCard} style={{ gridArea: 'status' }}>
+      <div className={styles.statusCard}>
         <span className={styles.statusLabel}>Seu status atual é</span>
 
         {patientAttendancesLoading ? (
@@ -251,10 +249,7 @@ function PatientDashboard({
 
       {/* ── Consulta atual OU botão nova consulta ── */}
       {hasActiveAttendance && activeAttendance ? (
-        <div
-          className={styles.currentConsultCard}
-          style={{ gridArea: 'currentAttendance' }}
-        >
+        <div className={styles.currentConsultCard}>
           <div className={styles.currentConsultHeader}>
             <h3>Consulta atual</h3>
             <button
@@ -354,10 +349,7 @@ function PatientDashboard({
       />
 
       {lastAttendance && (
-        <div
-          className={styles.lastAttendanceCard}
-          style={{ gridArea: 'lastAttendance' }}
-        >
+        <div className={styles.lastAttendanceCard}>
           <h3>Último atendimento</h3>
 
           <div className={styles.lastAttendanceInfo}>

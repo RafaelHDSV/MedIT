@@ -17,8 +17,8 @@
 
 // ─── Posição na fila ───────────────────────────────────────────────────────────
 .queuePositionCard {
-  grid-area: queuePos;
-  composes: card;
+  @extend .card;
+  grid-area: positionQueue;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -58,8 +58,8 @@
 
 // ─── Status atual ──────────────────────────────────────────────────────────────
 .statusCard {
-  grid-area: statusCard;
-  composes: card;
+  @extend .card;
+  grid-area: status;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -99,8 +99,8 @@
 
 // ─── Consulta atual ────────────────────────────────────────────────────────────
 .currentConsultCard {
-  grid-area: currentConsult;
-  composes: card;
+  @extend .card;
+  grid-area: currentAttendance;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -166,8 +166,8 @@
 
 // ─── Nova consulta (empty state) ───────────────────────────────────────────────
 .newConsultCard {
-  grid-area: currentConsult;
-  composes: card;
+  @extend .card;
+  grid-area: currentAttendance;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -210,124 +210,10 @@
   }
 }
 
-// ─── Fila de atendimento ───────────────────────────────────────────────────────
-.queueCard {
-  grid-area: queueList;
-  composes: card;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding-bottom: 0.5rem;
-}
-
-.queueCardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.85rem;
-
-  h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--black);
-  }
-
-  .queueCount {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.78rem;
-    color: var(--light-gray);
-    font-weight: 500;
-  }
-}
-
-.queueItem {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.65rem 0.75rem;
-  border-radius: 0.65rem;
-  transition: background 0.15s;
-
-  &:hover {
-    background: var(--gray-2);
-  }
-
-  &.currentUser {
-    background: var(--primary-color);
-    color: #fff;
-
-    .queueItemName {
-      color: #fff;
-    }
-
-    .queueItemStatus {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .positionBall {
-      background: #fff;
-      color: var(--primary-color);
-    }
-  }
-}
-
-.positionBall {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--primary-color);
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.queueItemInfo {
-  flex: 1;
-  min-width: 0;
-
-  .queueItemName {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--black);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .queueItemStatus {
-    font-size: 0.75rem;
-    color: var(--light-gray);
-  }
-}
-
-.queueShowMore {
-  margin-top: 0.5rem;
-  width: 100%;
-  background: var(--gray-2);
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.6rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--light-gray);
-  cursor: pointer;
-  transition: background 0.15s;
-
-  &:hover {
-    background: var(--gray-3);
-  }
-}
-
 // ─── Último atendimento ────────────────────────────────────────────────────────
 .lastAttendanceCard {
+  @extend .card;
   grid-area: lastAttendance;
-  composes: card;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -406,14 +292,14 @@
 }
 
 .skeletonText {
-  composes: skeleton;
+  @extend .card;
   height: 1rem;
   width: 70%;
   margin: 0.25rem 0;
 }
 
 .skeletonLarge {
-  composes: skeleton;
+  @extend .card;
   height: 2.5rem;
   width: 40%;
   margin: 0.5rem auto;

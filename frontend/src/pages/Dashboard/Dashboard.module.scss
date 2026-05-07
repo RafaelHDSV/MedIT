@@ -125,7 +125,7 @@
 }
 
 .patient {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-template-areas:
     'alert alert alert alert'
     'positionQueue status currentAttendance currentAttendance'
