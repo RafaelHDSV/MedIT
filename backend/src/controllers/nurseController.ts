@@ -281,9 +281,7 @@ export const getAttendances = async (req: Request, res: Response) => {
         $in: [
           AttendanceStatus.WAITING_ATTENDANCE,
           AttendanceStatus.IN_ATTENDANCE,
-          AttendanceStatus.ATTENDANCE_COMPLETED,
-          AttendanceStatus.CANCELED,
-          AttendanceStatus.COMPLETED
+          AttendanceStatus.ATTENDANCE_COMPLETED
         ]
       }
     }

@@ -33,9 +33,7 @@ const ACTIVE_STATUSES: AttendanceStatus[] = [
 ]
 
 const COMPLETED_STATUSES: AttendanceStatus[] = [
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED,
-  AttendanceStatus.CANCELED
+  AttendanceStatus.ATTENDANCE_COMPLETED
 ]
 const OPERATIONAL_QUEUE_STATUSES: AttendanceStatus[] = [
   AttendanceStatus.WAITING_TRIAGE,

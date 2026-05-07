@@ -25,9 +25,7 @@ export const AttendanceStatus = {
   TRIAGE_COMPLETED: 'triageCompleted',
   WAITING_ATTENDANCE: 'waitingAttendance',
   IN_ATTENDANCE: 'inAttendance',
-  ATTENDANCE_COMPLETED: 'attendanceCompleted',
-  CANCELED: 'canceled',
-  COMPLETED: 'completed'
+  ATTENDANCE_COMPLETED: 'attendanceCompleted'
 } as const
 export type AttendanceStatus =
   (typeof AttendanceStatus)[keyof typeof AttendanceStatus]
@@ -38,9 +36,7 @@ export const AttendanceStatusLabels = {
   [AttendanceStatus.TRIAGE_COMPLETED]: 'Triagem concluída',
   [AttendanceStatus.WAITING_ATTENDANCE]: 'Aguardando atendimento',
   [AttendanceStatus.IN_ATTENDANCE]: 'Em atendimento',
-  [AttendanceStatus.ATTENDANCE_COMPLETED]: 'Atendimento concluído',
-  [AttendanceStatus.CANCELED]: 'Cancelado',
-  [AttendanceStatus.COMPLETED]: 'Concluído'
+  [AttendanceStatus.ATTENDANCE_COMPLETED]: 'Atendimento concluído'
 } as const
 
 export interface IVitalSigns {

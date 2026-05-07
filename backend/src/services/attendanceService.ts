@@ -16,8 +16,7 @@ const ACTIVE_STATUSES = [
   AttendanceStatus.IN_ATTENDANCE
 ]
 const QUEUE_NUMBER_COMPLETED_STATUSES = [
-  AttendanceStatus.ATTENDANCE_COMPLETED,
-  AttendanceStatus.COMPLETED
+  AttendanceStatus.ATTENDANCE_COMPLETED
 ]
 const ON_THE_WAY_ADVANTAGE_CAP_MINUTES = 30
 
@@ -103,7 +102,7 @@ export const getAttended = async ({
       unitId,
       ...(doctorId ? { doctorId: new Types.ObjectId(doctorId) } : {}),
       status: {
-        $in: [AttendanceStatus.ATTENDANCE_COMPLETED, AttendanceStatus.COMPLETED]
+        $in: [AttendanceStatus.ATTENDANCE_COMPLETED]
       },
       date: { $gte: start, $lte: end }
     })
@@ -161,7 +160,7 @@ export const getAverageTime = async ({
       {
         $match: {
           unitId: new Types.ObjectId(unitId),
-          status: AttendanceStatus.COMPLETED,
+          status: AttendanceStatus.ATTENDANCE_COMPLETED,
           date: { $gte: start, $lte: end }
         }
       },
@@ -173,7 +172,9 @@ export const getAverageTime = async ({
                 $filter: {
                   input: '$changesHistory',
                   as: 'c',
-                  cond: { $eq: ['$$c.status', AttendanceStatus.COMPLETED] }
+                  cond: {
+                    $eq: ['$$c.status', AttendanceStatus.ATTENDANCE_COMPLETED]
+                  }
                 }
               },
               -1
@@ -268,10 +269,7 @@ export const getDoctorAverageTime = async ({
           unitId: new Types.ObjectId(unitId),
           doctorId: new Types.ObjectId(doctorId),
           status: {
-            $in: [
-              AttendanceStatus.ATTENDANCE_COMPLETED,
-              AttendanceStatus.COMPLETED
-            ]
+            $in: [AttendanceStatus.ATTENDANCE_COMPLETED]
           },
           date: { $gte: start, $lte: end }
         }
@@ -362,10 +360,7 @@ export const getDoctorIAAssertiveness = async ({
         unitId: new Types.ObjectId(unitId),
         doctorId: new Types.ObjectId(doctorId),
         status: {
-          $in: [
-            AttendanceStatus.ATTENDANCE_COMPLETED,
-            AttendanceStatus.COMPLETED
-          ]
+          $in: [AttendanceStatus.ATTENDANCE_COMPLETED]
         },
         date: { $gte: start, $lte: end },
         $or: [
@@ -475,8 +470,7 @@ export const getTriaged = async ({
           AttendanceStatus.TRIAGE_COMPLETED,
           AttendanceStatus.WAITING_ATTENDANCE,
           AttendanceStatus.IN_ATTENDANCE,
-          AttendanceStatus.ATTENDANCE_COMPLETED,
-          AttendanceStatus.COMPLETED
+          AttendanceStatus.ATTENDANCE_COMPLETED
         ]
       },
       date: { $gte: start, $lte: end }
