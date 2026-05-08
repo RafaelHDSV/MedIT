@@ -624,16 +624,19 @@ function ConfigContent({
   validDevelopmerEmail,
   devClicked,
   isEditing,
-  setIsEditing
+  setIsEditing,
+  showDevUi
 }: {
   validDevelopmerEmail: string[]
   devClicked: number
   isEditing: boolean
   setIsEditing: (bool: boolean) => void
+  showDevUi: boolean
 }) {
   const { user } = useAuth()
 
   if (
+    showDevUi &&
     validDevelopmerEmail.some((email) => user?.email?.includes(email)) &&
     devClicked > 0
   ) {
@@ -653,6 +656,7 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   const [devClicked, setDevClicked] = useState(5)
   const [isEditing, setIsEditing] = useState(false)
   const validDevelopmerEmail = ['vieira', 'rafa', 'take']
+  const showDevUi = import.meta.env.DEV
   const isBiggerModal = user?.level !== UserLevels.ADMIN
 
   function closeModal() {
@@ -670,12 +674,18 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
         <div>
           <Typography.Title
             level={3}
-            onClick={() => setDevClicked((prev) => (prev > 0 ? prev - 1 : 5))}
+            onClick={
+              showDevUi
+                ? () => setDevClicked((prev) => (prev > 0 ? prev - 1 : 5))
+                : undefined
+            }
           >
             {title}{' '}
-            {validDevelopmerEmail.some((email) =>
+            {showDevUi &&
+            validDevelopmerEmail.some((email) =>
               user?.email?.includes(email)
-            ) && devClicked > 0
+            ) &&
+            devClicked > 0
               ? `Contador: (${devClicked})`
               : ''}
           </Typography.Title>
@@ -695,6 +705,7 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
         devClicked={devClicked}
         isEditing={isEditing}
         setIsEditing={setIsEditing}
+        showDevUi={showDevUi}
       />
     </Modal>
   )
