@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import styles from './Button.module.scss'
 
 interface IButtonProps extends ButtonProps {
-  mode?: 'primary' | 'secondary' | 'outline' | 'icon'
+  mode?: 'primary' | 'secondary' | 'outline' | 'outline-icon' | 'icon'
   fontSize?: number
   buttonHeight?: string
 }
@@ -27,6 +27,8 @@ function Button({
       case 'secondary':
         return 'text'
       case 'outline':
+        return 'default'
+      case 'outline-icon':
         return 'default'
       case 'icon':
         return 'default'

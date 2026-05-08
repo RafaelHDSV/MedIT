@@ -15,6 +15,7 @@ import type {
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { ArrowsOutIcon, StethoscopeIcon } from '@phosphor-icons/react'
+import { Tooltip } from 'antd'
 import {
   useCallback,
   useEffect,
@@ -343,9 +344,11 @@ function AttendanceQueueChart({
         asideText={`${data?.length} ${cardConfig.asideText}`}
         gridArea='attendanceQueueChart'
         headerExtra={
-          <Button mode='icon' onClick={openTv}>
-            <ArrowsOutIcon size={22} />
-          </Button>
+          <Tooltip title='Abrir painel público' placement='top'>
+            <Button mode='outline-icon' onClick={openTv}>
+              <ArrowsOutIcon size={22} />
+            </Button>
+          </Tooltip>
         }
       >
         <div className={styles.queueList}>{content}</div>
