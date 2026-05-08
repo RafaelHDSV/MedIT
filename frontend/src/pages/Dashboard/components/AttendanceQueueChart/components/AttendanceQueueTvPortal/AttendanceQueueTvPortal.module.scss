@@ -105,8 +105,16 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
+.tvHeroTopRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 1rem;
+  margin-bottom: 0.45rem;
+}
+
 .tvHeroCaption {
-  margin: 0 0 0.35rem;
+  margin: 0;
   font-size: clamp(0.95rem, 2vmin, 1.2rem);
   font-weight: 700;
   color: #38bdf8;
@@ -123,12 +131,26 @@
   letter-spacing: -0.03em;
 }
 
+.tvHeroMainRow {
+  display: grid;
+  grid-template-columns: 10% minmax(0, 1fr);
+  align-items: center;
+  column-gap: 1.25rem;
+}
+
+.tvHeroMainInfo {
+  min-width: 0;
+}
+
 .tvHeroName {
-  margin: 0.5rem 0 0;
+  margin: 0;
   font-size: clamp(1.35rem, 3.8vmin, 2.25rem);
   font-weight: 700;
   color: #f1f5f9;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tvHeroSub {
@@ -138,7 +160,7 @@
 }
 
 .tvHeroRisk {
-  margin-top: 0.65rem;
+  justify-self: end;
 }
 
 .tvHeroComplaint {
@@ -171,11 +193,12 @@
   border: 1px solid rgba(248, 250, 252, 0.08);
   border-radius: 0.65rem;
   padding: 0.65rem 0.85rem;
+  gap: 1rem;
   overflow: hidden;
 }
 
 .tvPanelTitle {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.95rem;
   font-size: clamp(0.9rem, 1.8vmin, 1.1rem);
   font-weight: 700;
   color: #e2e8f0;
@@ -184,7 +207,7 @@
 }
 
 .tvPanelTitleAccent {
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.95rem;
   padding: 0.45rem 0.6rem;
   font-size: clamp(0.82rem, 1.6vmin, 1rem);
   font-weight: 700;
@@ -215,16 +238,12 @@
 
 .tvMiniRow {
   display: grid;
-  grid-template-columns: 3.5rem 1fr;
-  gap: 0.5rem 0.75rem;
-  align-items: baseline;
-  padding: 0.35rem 0.4rem;
+  grid-template-columns: 1rem minmax(0, 1fr) minmax(9rem, auto);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem;
   border-radius: 0.35rem;
   background: rgba(30, 41, 59, 0.5);
-
-  .tvMiniMuted {
-    grid-column: 1 / -1;
-  }
 }
 
 .tvMiniTicket {
@@ -246,6 +265,10 @@
 .tvMiniMuted {
   font-size: clamp(0.78rem, 1.5vmin, 0.92rem);
   color: #64748b;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tvRecentAside {
@@ -260,10 +283,11 @@
 }
 
 .tvMiniRowRecent {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.45rem 0.45rem;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.65rem;
+  padding: 1rem 0.45rem;
   border-bottom: 1px solid rgba(248, 250, 252, 0.08);
 
   &:last-child {
@@ -281,6 +305,9 @@
   font-weight: 600;
   font-size: clamp(0.88rem, 1.75vmin, 1.05rem);
   color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tvRecentComplaint {

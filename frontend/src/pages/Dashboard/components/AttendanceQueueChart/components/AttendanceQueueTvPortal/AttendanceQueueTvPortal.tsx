@@ -81,18 +81,26 @@ function tvPortal({
                 </div>
               ) : board.hero ? (
                 <>
-                  <p className={styles.tvHeroCaption}>{board.hero.caption}</p>
-                  <p className={styles.tvHeroTicket}>
-                    {ticketLabel(board.hero.item)}
-                  </p>
-                  <p className={styles.tvHeroName}>
-                    {board.hero.item.patientName}
-                  </p>
-                  {board.hero.sub ? (
-                    <p className={styles.tvHeroSub}>{board.hero.sub}</p>
-                  ) : null}
-                  <div className={styles.tvHeroRisk}>
-                    <RiskTag risk={board.hero.item.risk} />
+                  <div className={styles.tvHeroTopRow}>
+                    <p className={styles.tvHeroCaption}>{board.hero.caption}</p>
+                    <div className={styles.tvHeroRisk}>
+                      <RiskTag risk={board.hero.item.risk} />
+                    </div>
+                  </div>
+
+                  <div className={styles.tvHeroMainRow}>
+                    <p className={styles.tvHeroTicket}>
+                      {ticketLabel(board.hero.item)}
+                    </p>
+
+                    <div className={styles.tvHeroMainInfo}>
+                      <p className={styles.tvHeroName}>
+                        {board.hero.item.patientName}
+                      </p>
+                      {board.hero.sub ? (
+                        <p className={styles.tvHeroSub}>{board.hero.sub}</p>
+                      ) : null}
+                    </div>
                   </div>
                 </>
               ) : (
