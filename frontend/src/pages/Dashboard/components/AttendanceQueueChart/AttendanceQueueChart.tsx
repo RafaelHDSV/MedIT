@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import Empty from '@/components/Empty/Empty'
-import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { Periods } from '@/interfaces/globals'
@@ -24,11 +23,11 @@ import {
   useRef,
   useState
 } from 'react'
-import { createPortal } from 'react-dom'
 import styles from './AttendanceQueueChart.module.scss'
 import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/AttendanceQueueChartAdmin'
 import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 import AttendanceQueueChartNurse from './components/AttendanceQueueChartNurse/AttendanceQueueChartNurse'
+import tvPortal from './components/AttendanceQueueTvPortal/AttendanceQueueTvPortal'
 
 export interface IAttendanceItemProps {
   item?: IDashboardQueueItem
@@ -43,10 +42,6 @@ const WAITING_PIPELINE: AttendanceStatus[] = [
   AttendanceStatus.TRIAGE_COMPLETED,
   AttendanceStatus.WAITING_ATTENDANCE
 ]
-
-function ticketLabel(item: IDashboardQueueItem) {
-  return item.dailyNumber != null ? String(item.dailyNumber) : '—'
-}
 
 function AttendanceItem({ item, loading }: IAttendanceItemProps) {
   const { user } = useAuth()
@@ -328,149 +323,20 @@ function AttendanceQueueChart({
     ))
   }, [loading, data, user?.level])
 
-  const tvPortal =
-    tvOpen &&
-    createPortal(
-      <div ref={tvRootRef} className={styles.tvShell}>
-        <header className={styles.tvHeader}>
-          <div>
-            <h1 className={styles.tvTitle}>{cardConfig.title}</h1>
-            <p className={styles.tvSubtitle}>
-              {loading
-                ? 'Carregando…'
-                : `Painel público · atualização automática a cada ${TV_POLL_MS / 1000} s`}
-            </p>
-          </div>
-          <div className={styles.tvHeaderActions}>
-            <Button
-              mode='outline'
-              buttonHeight='2.5rem'
-              onClick={() => void closeTv()}
-            >
-              Sair da tela cheia
-            </Button>
-          </div>
-        </header>
-
-        <div className={styles.tvBody}>
-          <div className={styles.tvMainColumn}>
-            <section className={styles.tvHero} aria-live='polite'>
-              {loading ? (
-                <div className={styles.tvHeroSkeleton}>
-                  <span className={styles.skeletonTvBarWide} />
-                  <span className={styles.skeletonTvBarHero} />
-                  <span className={styles.skeletonTvBarMed} />
-                </div>
-              ) : tvBoard.hero ? (
-                <>
-                  <p className={styles.tvHeroCaption}>{tvBoard.hero.caption}</p>
-                  <p className={styles.tvHeroTicket}>
-                    {ticketLabel(tvBoard.hero.item)}
-                  </p>
-                  <p className={styles.tvHeroName}>
-                    {tvBoard.hero.item.patientName}
-                  </p>
-                  {tvBoard.hero.sub ? (
-                    <p className={styles.tvHeroSub}>{tvBoard.hero.sub}</p>
-                  ) : null}
-                  <div className={styles.tvHeroRisk}>
-                    <RiskTag risk={tvBoard.hero.item.risk} />
-                  </div>
-                  {tvBoard.hero.item.complaint ? (
-                    <p
-                      className={styles.tvHeroComplaint}
-                      title={tvBoard.hero.item.complaint}
-                    >
-                      {tvBoard.hero.item.complaint}
-                    </p>
-                  ) : null}
-                </>
-              ) : (
-                <div className={styles.tvHeroEmpty}>
-                  <p className={styles.tvHeroCaption}>Fila</p>
-                  <p className={styles.tvHeroSub}>
-                    Nenhum caso ativo na fila no momento
-                  </p>
-                </div>
-              )}
-            </section>
-
-            <section className={styles.tvNextSection}>
-              <h2 className={styles.tvPanelTitle}>Próximos</h2>
-              {loading ? (
-                <ul className={styles.tvMiniList}>
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <li key={i} className={styles.tvMiniRow}>
-                      <span className={styles.skeletonTvBar} />
-                    </li>
-                  ))}
-                </ul>
-              ) : tvBoard.next.length === 0 ? (
-                <p className={styles.tvPanelEmpty}>Sem próximos na fila</p>
-              ) : (
-                <ul className={styles.tvMiniList}>
-                  {tvBoard.next.map((item) => (
-                    <li key={String(item._id)} className={styles.tvMiniRow}>
-                      <span className={styles.tvMiniTicket}>
-                        {ticketLabel(item)}
-                      </span>
-                      <span className={styles.tvMiniName}>
-                        {item.patientName}
-                      </span>
-                      <span className={styles.tvMiniMuted}>
-                        {AttendanceStatusLabels[item.status]}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          </div>
-
-          <aside className={styles.tvRecentAside}>
-            <h2 className={styles.tvPanelTitleAccent}>Últimos concluídos</h2>
-            {loading ? (
-              <ul className={styles.tvMiniList}>
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <li key={i} className={styles.tvMiniRowRecent}>
-                    <span className={styles.skeletonTvBar} />
-                  </li>
-                ))}
-              </ul>
-            ) : recentCompleted.length === 0 ? (
-              <p className={styles.tvPanelEmpty}>
-                {user?.unitId
-                  ? 'Nenhum atendimento concluído hoje'
-                  : 'Histórico disponível por unidade'}
-              </p>
-            ) : (
-              <ul className={styles.tvMiniList}>
-                {recentCompleted.map((item) => (
-                  <li key={String(item._id)} className={styles.tvMiniRowRecent}>
-                    <span className={styles.tvMiniTicketSmall}>
-                      {item.number != null ? `#${item.number}` : '—'}
-                    </span>
-                    <span className={styles.tvRecentName}>
-                      {item.patientName}
-                    </span>
-                    {item.complaint ? (
-                      <span className={styles.tvRecentComplaint}>
-                        {item.complaint}
-                      </span>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </aside>
-        </div>
-      </div>,
-      document.body
-    )
-
   return (
     <>
-      {tvPortal}
+      {tvPortal({
+        open: tvOpen,
+        close: closeTv,
+        loading,
+        cardConfig,
+        user,
+        board: tvBoard,
+        rootRef: tvRootRef,
+        recentCompleted: recentCompleted,
+        TV_POLL_MS
+      })}
+
       <DashboardCard
         title={cardConfig.title}
         icon={StethoscopeIcon}
