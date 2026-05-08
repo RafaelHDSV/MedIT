@@ -163,11 +163,6 @@ function tvPortal({
                     <span className={styles.tvRecentName}>
                       {item.patientName}
                     </span>
-                    {item.complaint ? (
-                      <span className={styles.tvRecentComplaint}>
-                        {item.complaint}
-                      </span>
-                    ) : null}
                   </li>
                 ))}
               </ul>
