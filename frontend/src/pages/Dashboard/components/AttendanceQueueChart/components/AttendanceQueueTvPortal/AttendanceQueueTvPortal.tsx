@@ -94,14 +94,6 @@ function tvPortal({
                   <div className={styles.tvHeroRisk}>
                     <RiskTag risk={board.hero.item.risk} />
                   </div>
-                  {board.hero.item.complaint ? (
-                    <p
-                      className={styles.tvHeroComplaint}
-                      title={board.hero.item.complaint}
-                    >
-                      {board.hero.item.complaint}
-                    </p>
-                  ) : null}
                 </>
               ) : (
                 <div className={styles.tvHeroEmpty}>

@@ -27,6 +27,10 @@
   background: linear-gradient(165deg, #0a0f1a 0%, #111827 45%, #0f172a 100%);
   color: #f1f5f9;
   overflow: hidden;
+
+  &:hover :global(.ant-btn-default) {
+    opacity: 1;
+  }
 }
 
 .tvHeader {
@@ -62,6 +66,8 @@
     color: #e0f2fe !important;
     background: rgba(14, 116, 144, 0.2) !important;
     font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
   :global(.ant-btn-default:hover) {
