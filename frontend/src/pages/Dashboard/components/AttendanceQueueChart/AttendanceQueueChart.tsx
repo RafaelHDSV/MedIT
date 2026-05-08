@@ -1,21 +1,21 @@
 import Button from '@/components/Button/Button'
-import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import Empty from '@/components/Empty/Empty'
+import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
+import type { Periods } from '@/interfaces/globals'
 import {
   AttendanceStatus,
   AttendanceStatusLabels
 } from '@/interfaces/IAttendance'
-import type { Periods } from '@/interfaces/globals'
 import type {
   IDashboardQueueItem,
   IDashboardRecentCompletedItem
 } from '@/interfaces/IDashboard'
 import { UserLevels } from '@/interfaces/IUser'
 import DashboardRepository from '@/repositories/DashboardRepository'
-import { StethoscopeIcon } from '@phosphor-icons/react'
+import { ArrowsOutIcon, StethoscopeIcon } from '@phosphor-icons/react'
 import {
   useCallback,
   useEffect,
@@ -199,7 +199,9 @@ function AttendanceQueueChart({
     }
 
     if (level === UserLevels.ADMIN || level === UserLevels.MEDIT) {
-      const inAtt = data.find((i) => i.status === AttendanceStatus.IN_ATTENDANCE)
+      const inAtt = data.find(
+        (i) => i.status === AttendanceStatus.IN_ATTENDANCE
+      )
       const inTri = data.find((i) => i.status === AttendanceStatus.IN_TRIAGE)
       const firstWait = data.find((i) =>
         WAITING_PIPELINE.includes(i.status as AttendanceStatus)
@@ -362,8 +364,12 @@ function AttendanceQueueChart({
               ) : tvBoard.hero ? (
                 <>
                   <p className={styles.tvHeroCaption}>{tvBoard.hero.caption}</p>
-                  <p className={styles.tvHeroTicket}>{ticketLabel(tvBoard.hero.item)}</p>
-                  <p className={styles.tvHeroName}>{tvBoard.hero.item.patientName}</p>
+                  <p className={styles.tvHeroTicket}>
+                    {ticketLabel(tvBoard.hero.item)}
+                  </p>
+                  <p className={styles.tvHeroName}>
+                    {tvBoard.hero.item.patientName}
+                  </p>
                   {tvBoard.hero.sub ? (
                     <p className={styles.tvHeroSub}>{tvBoard.hero.sub}</p>
                   ) : null}
@@ -371,7 +377,10 @@ function AttendanceQueueChart({
                     <RiskTag risk={tvBoard.hero.item.risk} />
                   </div>
                   {tvBoard.hero.item.complaint ? (
-                    <p className={styles.tvHeroComplaint} title={tvBoard.hero.item.complaint}>
+                    <p
+                      className={styles.tvHeroComplaint}
+                      title={tvBoard.hero.item.complaint}
+                    >
                       {tvBoard.hero.item.complaint}
                     </p>
                   ) : null}
@@ -402,8 +411,12 @@ function AttendanceQueueChart({
                 <ul className={styles.tvMiniList}>
                   {tvBoard.next.map((item) => (
                     <li key={String(item._id)} className={styles.tvMiniRow}>
-                      <span className={styles.tvMiniTicket}>{ticketLabel(item)}</span>
-                      <span className={styles.tvMiniName}>{item.patientName}</span>
+                      <span className={styles.tvMiniTicket}>
+                        {ticketLabel(item)}
+                      </span>
+                      <span className={styles.tvMiniName}>
+                        {item.patientName}
+                      </span>
                       <span className={styles.tvMiniMuted}>
                         {AttendanceStatusLabels[item.status]}
                       </span>
@@ -437,9 +450,13 @@ function AttendanceQueueChart({
                     <span className={styles.tvMiniTicketSmall}>
                       {item.number != null ? `#${item.number}` : '—'}
                     </span>
-                    <span className={styles.tvRecentName}>{item.patientName}</span>
+                    <span className={styles.tvRecentName}>
+                      {item.patientName}
+                    </span>
                     {item.complaint ? (
-                      <span className={styles.tvRecentComplaint}>{item.complaint}</span>
+                      <span className={styles.tvRecentComplaint}>
+                        {item.complaint}
+                      </span>
                     ) : null}
                   </li>
                 ))}
@@ -460,8 +477,8 @@ function AttendanceQueueChart({
         asideText={`${data?.length} ${cardConfig.asideText}`}
         gridArea='attendanceQueueChart'
         headerExtra={
-          <Button mode='outline' fontSize={12} buttonHeight='2rem' onClick={openTv}>
-            Tela cheia
+          <Button mode='icon' onClick={openTv}>
+            <ArrowsOutIcon size={22} />
           </Button>
         }
       >
