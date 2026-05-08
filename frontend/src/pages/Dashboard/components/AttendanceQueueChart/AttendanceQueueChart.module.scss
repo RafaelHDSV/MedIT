@@ -169,8 +169,8 @@
 .queueItemWithColumns {
   display: grid;
   grid-template-columns:
-    minmax(14rem, 2.2fr) minmax(5.25rem, 0.7fr) minmax(7.5rem, 1.2fr)
-    minmax(8.75rem, 1fr) minmax(7.5rem, 0.9fr) auto;
+    minmax(14rem, 2.4fr) minmax(5.25rem, 0.7fr) minmax(7.5rem, 1.2fr)
+    minmax(8.75rem, 1fr) minmax(7.5rem, 0.9fr);
   column-gap: 0.75rem;
   align-items: center;
 
@@ -185,14 +185,15 @@
     justify-self: start;
   }
 
-  button {
-    justify-self: end;
-    white-space: nowrap;
-  }
-
   @include max-md {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
   }
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

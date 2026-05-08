@@ -13,9 +13,11 @@ import type {
   IDashboardRecentCompletedItem
 } from '@/interfaces/IDashboard'
 import { UserLevels } from '@/interfaces/IUser'
+import AttendancesFlowRepository from '@/repositories/AttendancesFlowRepository'
 import DashboardRepository from '@/repositories/DashboardRepository'
+import { ROUTES } from '@/routes/constants'
 import { ArrowsOutIcon, StethoscopeIcon } from '@phosphor-icons/react'
-import { Tooltip } from 'antd'
+import { message, Tooltip } from 'antd'
 import {
   useCallback,
   useEffect,
@@ -24,6 +26,7 @@ import {
   useRef,
   useState
 } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styles from './AttendanceQueueChart.module.scss'
 import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/AttendanceQueueChartAdmin'
 import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
@@ -72,11 +75,13 @@ function AttendanceQueueChart({
   referenceDate
 }: IAttendanceQueueChartProps) {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [recentCompleted, setRecentCompleted] = useState<
     IDashboardRecentCompletedItem[]
   >([])
   const [loading, setLoading] = useState(true)
+  const [startingNext, setStartingNext] = useState(false)
   const [tvOpen, setTvOpen] = useState(false)
 
   const tvRootRef = useRef<HTMLDivElement>(null)
@@ -303,6 +308,65 @@ function AttendanceQueueChart({
     }
   }, [user?.level, data?.length])
 
+  const nextActionConfig = useMemo(() => {
+    if (user?.level === UserLevels.DOCTOR) {
+      return {
+        label: 'Iniciar atendimento',
+        emptyMessage: 'Nao ha pacientes elegiveis para iniciar atendimento.'
+      }
+    }
+
+    if (user?.level === UserLevels.NURSE) {
+      return {
+        label: 'Iniciar triagem',
+        emptyMessage: 'Nao ha pacientes elegiveis para iniciar triagem.'
+      }
+    }
+
+    return null
+  }, [user?.level])
+
+  const handleStartNext = useCallback(async () => {
+    if (!nextActionConfig) return
+
+    const nextItem = data[0]
+    if (!nextItem?._id) {
+      message.info(nextActionConfig.emptyMessage)
+      return
+    }
+
+    try {
+      setStartingNext(true)
+
+      if (user?.level === UserLevels.DOCTOR) {
+        await AttendancesFlowRepository.claimConsultation({
+          attendanceId: String(nextItem._id)
+        })
+      } else if (user?.level === UserLevels.NURSE) {
+        await AttendancesFlowRepository.claimTriage({
+          attendanceId: String(nextItem._id)
+        })
+      } else {
+        return
+      }
+
+      navigate(
+        ROUTES.ATTENDANCE_DETAILS.path.replace(
+          ':attendanceId',
+          String(nextItem._id)
+        )
+      )
+    } catch (err) {
+      handleApiError({
+        err,
+        defaultMessage: 'Atendimento ja assumido por outro profissional.'
+      })
+      await fetchQueue({ silent: true })
+    } finally {
+      setStartingNext(false)
+    }
+  }, [data, fetchQueue, navigate, nextActionConfig, user?.level])
+
   const content = useMemo(() => {
     const isNurse = user?.level === UserLevels.NURSE
 
@@ -344,11 +408,23 @@ function AttendanceQueueChart({
         asideText={`${data?.length} ${cardConfig.asideText}`}
         gridArea='attendanceQueueChart'
         headerExtra={
-          <Tooltip title='Abrir painel público' placement='top'>
-            <Button mode='outline-icon' onClick={openTv}>
-              <ArrowsOutIcon size={22} />
-            </Button>
-          </Tooltip>
+          <div className={styles.headerActions}>
+            {nextActionConfig && (
+              <Button
+                buttonHeight='2rem'
+                fontSize={12}
+                loading={startingNext}
+                onClick={() => void handleStartNext()}
+              >
+                {nextActionConfig.label}
+              </Button>
+            )}
+            <Tooltip title='Abrir painel público' placement='top'>
+              <Button mode='outline-icon' onClick={openTv}>
+                <ArrowsOutIcon size={22} />
+              </Button>
+            </Tooltip>
+          </div>
         }
       >
         <div className={styles.queueList}>{content}</div>
