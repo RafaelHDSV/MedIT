@@ -210,9 +210,11 @@ function Dashboard() {
           },
           {
             Icon: UsersThreeIcon,
-            value: dashboardStatusData?.assertiveness
-              ? `${dashboardStatusData?.assertiveness}%`
-              : 'n/a',
+            value:
+              typeof dashboardStatusData?.assertiveness === 'number' &&
+              Number.isFinite(dashboardStatusData.assertiveness)
+                ? `${dashboardStatusData.assertiveness}%`
+                : 'n/a',
             label: 'Assertividade IA vs Médico(a)'
           }
         ]
