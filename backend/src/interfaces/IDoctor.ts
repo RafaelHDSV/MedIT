@@ -52,6 +52,7 @@ export const DoctorSpecializationsLabels = {
 export interface IDoctor extends IBaseUser {
   crm: string
   specialization: DoctorSpecializations
+  workLocationLabel?: string
 }
 
 export interface DoctorFormValues {
@@ -64,4 +65,5 @@ export interface DoctorFormValues {
   cellphone: string
   crm: string
   specialization: DoctorSpecializations
+  workLocationLabel: string
 }

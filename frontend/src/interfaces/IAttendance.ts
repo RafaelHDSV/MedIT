@@ -47,6 +47,21 @@ export const AttendanceStatusLabels = {
   [AttendanceStatus.ATTENDANCE_COMPLETED]: 'Atendimento concluído'
 } as const
 
+export const PatientFlowNoticeKind = {
+  TRIAGE_START: 'triage_start',
+  CONSULT_START: 'consult_start'
+} as const
+export type PatientFlowNoticeKind =
+  (typeof PatientFlowNoticeKind)[keyof typeof PatientFlowNoticeKind]
+
+export interface IPatientFlowNotice {
+  kind: PatientFlowNoticeKind
+  locationLabel: string
+  createdAt: string | Date
+  actorUserId: string | ObjectId
+  actorLevel: UserLevels
+}
+
 export interface IVitalSigns {
   bloodPressure?: string
   heartRate?: number
@@ -117,6 +132,7 @@ export interface IAttendance extends IBaseInterface {
   openingSource?: AttendanceOpeningSource
   openedByUserId?: ObjectId | string
   openedByLevel?: UserLevels
+  patientFlowNotices?: IPatientFlowNotice[]
 }
 
 interface IAttendancePatient {

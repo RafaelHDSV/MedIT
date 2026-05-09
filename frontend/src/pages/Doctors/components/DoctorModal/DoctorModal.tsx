@@ -294,6 +294,20 @@ function ModalContent({
           </FormItem>
 
           <FormItem
+            label='Sala ou consultório (visto pelo paciente)'
+            name='workLocationLabel'
+            inputHeight={inputHeight}
+            rules={[
+              { required: true, message: 'Informe a sala ou o consultório' },
+              { max: 120, message: 'No máximo 120 caracteres' }
+            ]}
+            validateStatus={fieldErrors.workLocationLabel ? 'error' : undefined}
+            help={fieldErrors.workLocationLabel}
+          >
+            <Input placeholder='Ex.: Consultório 3, Sala de triagem B' />
+          </FormItem>
+
+          <FormItem
             label='CRM'
             name='crm'
             inputHeight={inputHeight}

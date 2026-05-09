@@ -166,7 +166,11 @@ function DoctorDetails() {
                   ? DoctorSpecializationsLabels[doctor.specialization]
                   : capitalize(doctor?.specialization)
             },
-            { label: 'CRM', value: doctor?.crm }
+            { label: 'CRM', value: doctor?.crm },
+            {
+              label: 'Sala / consultório (paciente)',
+              value: doctor?.workLocationLabel
+            }
           ]}
           loading={loading}
         />

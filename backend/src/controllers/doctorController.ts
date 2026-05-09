@@ -11,6 +11,7 @@ import { Doctor } from '../models/DoctorModel.js'
 import User from '../models/UserModel.js'
 import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import capitalize from '../utils/capitalize.js'
+import { sanitizeWorkLocationLabel } from '../utils/sanitizeWorkLocationLabel.js'
 
 export const getUsers = async (req: Request, res: Response) => {
   const { unitId } = req.query
@@ -43,10 +44,12 @@ export const createDoctor = async (req: Request, res: Response) => {
       birthDate,
       crm,
       specialization,
-      otherSpecialization
+      otherSpecialization,
+      workLocationLabel: workLocationLabelRaw
     } = req.body
 
     const errors: Record<string, string> = {}
+    const workLocationLabel = sanitizeWorkLocationLabel(workLocationLabelRaw)
 
     if (!name) errors.name = 'Nome é obrigatório'
     if (!cpf) errors.cpf = 'CPF é obrigatório'
@@ -57,6 +60,10 @@ export const createDoctor = async (req: Request, res: Response) => {
     if (!gender) errors.gender = 'Gênero é obrigatório'
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
+    if (!workLocationLabel) {
+      errors.workLocationLabel =
+        'Sala ou consultório é obrigatório (o paciente vê ao iniciar o atendimento).'
+    }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {
       errors.name = 'Nome deve conter pelo menos 3 caracteres e sobrenome'
@@ -126,7 +133,8 @@ export const createDoctor = async (req: Request, res: Response) => {
       crm,
       specialization: finalSpecialization,
       level: UserLevels.DOCTOR,
-      unitId: creatorUnitId
+      unitId: creatorUnitId,
+      workLocationLabel
     })
 
     await doctor.save()
@@ -166,10 +174,14 @@ export const editDoctor = async (req: Request, res: Response) => {
       birthDate,
       crm,
       specialization,
-      otherSpecialization
+      otherSpecialization,
+      workLocationLabel: workLocationLabelEditRaw
     } = req.body
 
     const errors: Record<string, string> = {}
+    const workLocationLabelEdit = sanitizeWorkLocationLabel(
+      workLocationLabelEditRaw
+    )
 
     if (!name) errors.name = 'Nome é obrigatório'
     if (!cpf) errors.cpf = 'CPF é obrigatório'
@@ -179,6 +191,10 @@ export const editDoctor = async (req: Request, res: Response) => {
     if (!gender) errors.gender = 'Gênero é obrigatório'
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
+    if (!workLocationLabelEdit) {
+      errors.workLocationLabel =
+        'Sala ou consultório é obrigatório (o paciente vê ao iniciar o atendimento).'
+    }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {
       errors.name = 'Nome deve conter pelo menos 3 caracteres e sobrenome'
@@ -233,6 +249,7 @@ export const editDoctor = async (req: Request, res: Response) => {
     doctor.birthDate = birthDate || doctor.birthDate
     doctor.crm = crm || doctor.crm
     doctor.specialization = finalSpecialization || doctor.specialization
+    doctor.workLocationLabel = workLocationLabelEdit
 
     await doctor.save()
 

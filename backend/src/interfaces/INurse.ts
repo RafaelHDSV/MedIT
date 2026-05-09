@@ -23,4 +23,5 @@ export const NurseShiftsLabels = {
 export interface INurse extends IBaseUser {
   coren: string
   shift: NurseShifts
+  workLocationLabel?: string
 }

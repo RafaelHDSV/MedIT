@@ -103,7 +103,8 @@ const createDoctorsByUnit: Script = {
           birthDate: faker.date.birthdate({ min: 25, max: 70, mode: 'age' }),
           unitId,
           crm: generateCRM(),
-          specialization: generateSpecialization()
+          specialization: generateSpecialization(),
+          workLocationLabel: `Consultorio ${faker.number.int({ min: 1, max: 30 })}`
         }
 
         try {

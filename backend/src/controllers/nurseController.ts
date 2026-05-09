@@ -12,6 +12,7 @@ import { Nurse } from '../models/NurseModel.js'
 import User from '../models/UserModel.js'
 import { suggestDiseasesFromReportedSymptoms } from '../services/symptomsDiseaseSuggestionService.js'
 import capitalize from '../utils/capitalize.js'
+import { sanitizeWorkLocationLabel } from '../utils/sanitizeWorkLocationLabel.js'
 
 export const getUsers = async (req: Request, res: Response) => {
   const { unitId } = req.query
@@ -43,10 +44,12 @@ export const createNurse = async (req: Request, res: Response) => {
       cellphone,
       birthDate,
       coren,
-      shift
+      shift,
+      workLocationLabel: workLocationLabelRaw
     } = req.body
 
     const errors: Record<string, string> = {}
+    const workLocationLabel = sanitizeWorkLocationLabel(workLocationLabelRaw)
 
     if (!name) errors.name = 'Nome é obrigatório'
     if (!cpf) errors.cpf = 'CPF é obrigatório'
@@ -57,6 +60,10 @@ export const createNurse = async (req: Request, res: Response) => {
     if (!gender) errors.gender = 'Gênero é obrigatório'
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
+    if (!workLocationLabel) {
+      errors.workLocationLabel =
+        'Sala ou local de triagem é obrigatório (o paciente vê ao iniciar a triagem).'
+    }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {
       errors.name = 'Nome deve conter pelo menos 3 caracteres e sobrenome'
@@ -115,7 +122,8 @@ export const createNurse = async (req: Request, res: Response) => {
       coren,
       shift,
       level: UserLevels.NURSE,
-      unitId: creatorUnitId
+      unitId: creatorUnitId,
+      workLocationLabel
     })
 
     await nurse.save()
@@ -154,10 +162,14 @@ export const editNurse = async (req: Request, res: Response) => {
       cellphone,
       birthDate,
       coren,
-      shift
+      shift,
+      workLocationLabel: workLocationLabelEditRaw
     } = req.body
 
     const errors: Record<string, string> = {}
+    const workLocationLabelEdit = sanitizeWorkLocationLabel(
+      workLocationLabelEditRaw
+    )
 
     if (!name) errors.name = 'Nome é obrigatório'
     if (!cpf) errors.cpf = 'CPF é obrigatório'
@@ -167,6 +179,10 @@ export const editNurse = async (req: Request, res: Response) => {
     if (!gender) errors.gender = 'Gênero é obrigatório'
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
+    if (!workLocationLabelEdit) {
+      errors.workLocationLabel =
+        'Sala ou local de triagem é obrigatório (o paciente vê ao iniciar a triagem).'
+    }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {
       errors.name = 'Nome deve conter pelo menos 3 caracteres e sobrenome'
@@ -220,6 +236,7 @@ export const editNurse = async (req: Request, res: Response) => {
     nurse.birthDate = birthDate || nurse.birthDate
     nurse.coren = coren || nurse.coren
     nurse.shift = shift || nurse.shift
+    nurse.workLocationLabel = workLocationLabelEdit
 
     await nurse.save()
 

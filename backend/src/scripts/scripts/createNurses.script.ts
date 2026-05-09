@@ -90,7 +90,8 @@ const createNursesByUnit: Script = {
           birthDate: faker.date.birthdate({ min: 20, max: 65, mode: 'age' }),
           unitId,
           coren: generateCOREN(),
-          shift: faker.helpers.arrayElement(Object.values(NurseShifts))
+          shift: faker.helpers.arrayElement(Object.values(NurseShifts)),
+          workLocationLabel: `Sala triagem ${faker.number.int({ min: 1, max: 10 })}`
         }
 
         try {

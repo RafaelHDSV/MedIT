@@ -379,6 +379,20 @@ function ModalContent({
               )}
             />
           </FormItem>
+
+          <FormItem
+            label='Sala ou local de triagem (visto pelo paciente)'
+            name='workLocationLabel'
+            inputHeight={inputHeight}
+            rules={[
+              { required: true, message: 'Informe a sala ou o local de triagem' },
+              { max: 120, message: 'No máximo 120 caracteres' }
+            ]}
+            validateStatus={fieldErrors.workLocationLabel ? 'error' : undefined}
+            help={fieldErrors.workLocationLabel}
+          >
+            <Input placeholder='Ex.: Sala de triagem 2' />
+          </FormItem>
         </div>
 
         <footer className={styles.footer}>

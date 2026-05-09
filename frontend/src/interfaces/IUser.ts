@@ -55,6 +55,7 @@ export interface ConfigFormValues {
   currentPassword?: string
   newPassword?: string
   confirmPassword?: string
+  workLocationLabel?: string
 }
 
 export interface IBaseUser extends IBaseInterface {

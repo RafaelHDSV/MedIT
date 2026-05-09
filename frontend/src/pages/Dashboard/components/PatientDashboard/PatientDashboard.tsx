@@ -21,6 +21,7 @@ import PatientQueueList from './components/PatientQueueList/PatientQueueList'
 import QueuePositionCard from './components/QueuePositionCard'
 import StatusCard from './components/StatusCard'
 import { NEXT_STATUS_MAP, type IPatientQueueItem } from './IPatientDashboard'
+import { getPatientStageNoticeMessage } from './getPatientStageNoticeMessage'
 import styles from './PatientDashboard.module.scss'
 
 const ACTIVE_STATUSES: AttendanceStatus[] = [
@@ -124,31 +125,34 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
     }
   }, [user?._id, user?.level, user?.unitId])
 
-  const fetchPatientAttendances = useCallback(async () => {
-    if (user?.level !== UserLevels.PATIENT || !user?._id) return
+  const fetchPatientAttendances = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      if (user?.level !== UserLevels.PATIENT || !user?._id) return
 
-    try {
-      setPatientAttendancesLoading(true)
+      try {
+        if (!opts?.silent) setPatientAttendancesLoading(true)
 
-      const response = await PatientsRepository.getAttendances({
-        patientId: user._id
-      })
-      const list = response.data as IAttendance[]
-      list.sort((a, b) => {
-        const tb = dayjs(b.updatedAt ?? b.date).valueOf()
-        const ta = dayjs(a.updatedAt ?? a.date).valueOf()
-        return tb - ta
-      })
-      setPatientAttendances(list)
-    } catch (err) {
-      handleApiError({
-        err,
-        defaultMessage: 'Erro ao pegar atendimentos do paciente'
-      })
-    } finally {
-      setPatientAttendancesLoading(false)
-    }
-  }, [user?._id, user?.level])
+        const response = await PatientsRepository.getAttendances({
+          patientId: user._id
+        })
+        const list = response.data as IAttendance[]
+        list.sort((a, b) => {
+          const tb = dayjs(b.updatedAt ?? b.date).valueOf()
+          const ta = dayjs(a.updatedAt ?? a.date).valueOf()
+          return tb - ta
+        })
+        setPatientAttendances(list)
+      } catch (err) {
+        handleApiError({
+          err,
+          defaultMessage: 'Erro ao pegar atendimentos do paciente'
+        })
+      } finally {
+        if (!opts?.silent) setPatientAttendancesLoading(false)
+      }
+    },
+    [user?._id, user?.level]
+  )
 
   const fetchSymptomOptions = useCallback(async () => {
     try {
@@ -164,6 +168,24 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
     fetchPatientAttendances()
     fetchSymptomOptions()
   }, [fetchQueue, fetchPatientAttendances, fetchSymptomOptions, reload])
+
+  const activeStatusForPoll = patientAttendances.find((a) =>
+    ACTIVE_STATUSES.includes(a.status)
+  )?.status
+
+  useEffect(() => {
+    if (user?.level !== UserLevels.PATIENT) return
+    const shouldPoll =
+      activeStatusForPoll === AttendanceStatus.IN_TRIAGE ||
+      activeStatusForPoll === AttendanceStatus.IN_ATTENDANCE
+    if (!shouldPoll) return
+
+    const id = window.setInterval(() => {
+      fetchPatientAttendances({ silent: true })
+    }, 20_000)
+
+    return () => window.clearInterval(id)
+  }, [user?.level, activeStatusForPoll, fetchPatientAttendances])
 
   const activeAttendance: Partial<IAttendance> | null = useMemo(() => {
     if (!patientAttendances.length) return null
@@ -213,6 +235,11 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
     return NEXT_STATUS_MAP[activeAttendance.status as AttendanceStatus] ?? null
   }, [activeAttendance])
 
+  const stageNoticeMessage = useMemo(
+    () => getPatientStageNoticeMessage(activeAttendance),
+    [activeAttendance]
+  )
+
   const handleConfirmArrival = async () => {
     if (!activeAttendance?._id) return
     try {
@@ -238,7 +265,18 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
 
   return (
     <>
-      {!isLoading && myQueueItem && patientsAheadCount <= 3 && (
+      {!isLoading && stageNoticeMessage && (
+        <Alert
+          className={styles.alertBanner}
+          message={stageNoticeMessage}
+          type='warning'
+        />
+      )}
+
+      {!isLoading &&
+        myQueueItem &&
+        patientsAheadCount <= 3 &&
+        !stageNoticeMessage && (
         <Alert
           className={styles.alertBanner}
           message={

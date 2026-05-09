@@ -7,6 +7,7 @@ import {
   AttendanceStatus,
   IPrescribedMedication,
   PatientDisposition,
+  PatientFlowNoticeKind,
   type IVitalSigns
 } from '../interfaces/IAttendance.js'
 import { UserGender, UserLevels } from '../interfaces/IUser.js'
@@ -23,6 +24,7 @@ import {
 } from '../services/symptomsDiseaseSuggestionService.js'
 import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
 import { parseFiniteNumber, parsePositiveInt } from '../utils/parseNumbers.js'
+import { sanitizeWorkLocationLabel } from '../utils/sanitizeWorkLocationLabel.js'
 
 const VALID_DISPOSITIONS = new Set<string>(Object.values(PatientDisposition))
 
@@ -72,6 +74,21 @@ const historyEntry = (status: AttendanceStatus) => ({
   status,
   changedAt: new Date()
 })
+
+function patientFlowNoticeEntry(
+  kind: PatientFlowNoticeKind,
+  locationLabel: string,
+  actorUserId: Types.ObjectId,
+  actorLevel: UserLevels
+) {
+  return {
+    kind,
+    locationLabel,
+    createdAt: new Date(),
+    actorUserId,
+    actorLevel
+  }
+}
 
 function parseVitalSignsFromBody(raw: unknown): IVitalSigns | undefined {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined
@@ -454,7 +471,15 @@ export const claimTriage = async (req: Request, res: Response) => {
           status: AttendanceStatus.IN_TRIAGE
         },
         $push: {
-          changesHistory: historyEntry(AttendanceStatus.IN_TRIAGE)
+          changesHistory: historyEntry(AttendanceStatus.IN_TRIAGE),
+          patientFlowNotices: patientFlowNoticeEntry(
+            PatientFlowNoticeKind.TRIAGE_START,
+            sanitizeWorkLocationLabel(
+              (user as { workLocationLabel?: string }).workLocationLabel
+            ),
+            new Types.ObjectId(String(user._id)),
+            UserLevels.NURSE
+          )
         }
       },
       { new: true }
@@ -569,7 +594,15 @@ export const claimDoctorConsult = async (req: Request, res: Response) => {
           status: AttendanceStatus.IN_ATTENDANCE
         },
         $push: {
-          changesHistory: historyEntry(AttendanceStatus.IN_ATTENDANCE)
+          changesHistory: historyEntry(AttendanceStatus.IN_ATTENDANCE),
+          patientFlowNotices: patientFlowNoticeEntry(
+            PatientFlowNoticeKind.CONSULT_START,
+            sanitizeWorkLocationLabel(
+              (user as { workLocationLabel?: string }).workLocationLabel
+            ),
+            new Types.ObjectId(String(user._id)),
+            UserLevels.DOCTOR
+          )
         }
       },
       { new: true }

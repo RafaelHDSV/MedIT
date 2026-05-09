@@ -24,6 +24,7 @@ export const NurseShiftsLabels = {
 export interface INurse extends IBaseUser {
   coren: string
   shift: NurseShifts
+  workLocationLabel?: string
 }
 
 export interface NurseFormValues {
@@ -40,6 +41,7 @@ export interface NurseFormValues {
   coren: string
   corenType: NurseCorenType
   shift: NurseShifts
+  workLocationLabel: string
 }
 
 export interface INurseFormErrors {
@@ -56,4 +58,5 @@ export interface INurseFormErrors {
   coren?: string
   corenType?: string
   shift?: string
+  workLocationLabel?: string
 }

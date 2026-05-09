@@ -7,6 +7,11 @@ const DoctorSchema = new mongoose.Schema<IDoctor>({
     type: String,
     required: true,
     lowercase: true
+  },
+  workLocationLabel: {
+    type: String,
+    trim: true,
+    maxlength: 120
   }
 })
 

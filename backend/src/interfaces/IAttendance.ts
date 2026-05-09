@@ -2,6 +2,21 @@ import { Types } from 'mongoose'
 import { IBaseInterface } from './IBaseInterface.js'
 import type { UserLevels } from './IUser.js'
 
+export const PatientFlowNoticeKind = {
+  TRIAGE_START: 'triage_start',
+  CONSULT_START: 'consult_start'
+} as const
+export type PatientFlowNoticeKind =
+  (typeof PatientFlowNoticeKind)[keyof typeof PatientFlowNoticeKind]
+
+export interface IPatientFlowNotice {
+  kind: PatientFlowNoticeKind
+  locationLabel: string
+  createdAt: Date
+  actorUserId: Types.ObjectId
+  actorLevel: UserLevels
+}
+
 export const AttendanceOpeningSource = {
   PATIENT_PRE_REGISTRATION: 'patientPreRegistration',
   NURSE_WALK_IN: 'nurseWalkIn'
@@ -95,6 +110,7 @@ export interface IAttendance extends IBaseInterface {
     status: AttendanceStatus
     changedAt: Date
   }[]
+  patientFlowNotices?: IPatientFlowNotice[]
   vitalSigns?: IVitalSigns
   painLevel?: number
   selfMedicated?: boolean

@@ -388,7 +388,8 @@ export const getAttendances = async (req: Request, res: Response) => {
           prescribedExams: 1,
           diagnosis: 1,
           createdAt: 1,
-          updatedAt: 1
+          updatedAt: 1,
+          patientFlowNotices: 1
         }
       }
     ])

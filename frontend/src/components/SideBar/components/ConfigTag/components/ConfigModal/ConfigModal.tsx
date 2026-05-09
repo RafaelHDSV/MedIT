@@ -202,6 +202,7 @@ function ConfigBaseContent({
       crm: currentUser?.crm,
       specialization: currentUser?.specialization,
       shift: currentUser?.shift,
+      workLocationLabel: currentUser?.workLocationLabel,
       weight: currentUser?.weight,
       height: currentUser?.height,
       bloodType: currentUser?.bloodType,
@@ -257,6 +258,7 @@ function ConfigBaseContent({
     if (currentUser.level === UserLevels.DOCTOR) {
       payload.crm = values.crm
       payload.specialization = values.specialization
+      payload.workLocationLabel = values.workLocationLabel
     }
 
     if (currentUser.level === UserLevels.NURSE) {
@@ -264,6 +266,7 @@ function ConfigBaseContent({
         payload.coren = `${String(values.coren).replace(/\D/g, '').slice(0, 9)}/${values.corenUf}-${values.corenType}`
       }
       payload.shift = values.shift
+      payload.workLocationLabel = values.workLocationLabel
     }
 
     if (currentUser.level === UserLevels.PATIENT) {
@@ -330,6 +333,14 @@ function ConfigBaseContent({
           {user?.coren && <DetailsLine label='COREN' value={user?.coren} />}
           {user?.shift && (
             <DetailsLine label='Turno' value={NurseShiftsLabels[user?.shift]} />
+          )}
+          {(user as { workLocationLabel?: string })?.workLocationLabel && (
+            <DetailsLine
+              label='Sala / local (paciente)'
+              value={
+                (user as { workLocationLabel?: string }).workLocationLabel
+              }
+            />
           )}
           {user?.crm && <DetailsLine label='CRM' value={user?.crm} />}
           {user?.specialization && (
@@ -456,6 +467,17 @@ function ConfigBaseContent({
                     )}
                   />
                 </FormItem>
+                <FormItem
+                  label='Sala ou consultório (visto pelo paciente)'
+                  name='workLocationLabel'
+                  inputHeight='2.5rem'
+                  rules={[
+                    { required: true, message: 'Informe a sala ou o consultório' },
+                    { max: 120, message: 'No máximo 120 caracteres' }
+                  ]}
+                >
+                  <Input placeholder='Ex.: Consultório 3' />
+                </FormItem>
               </>
             )}
 
@@ -509,6 +531,20 @@ function ConfigBaseContent({
                       })
                     )}
                   />
+                </FormItem>
+                <FormItem
+                  label='Sala ou local de triagem (visto pelo paciente)'
+                  name='workLocationLabel'
+                  inputHeight='2.5rem'
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Informe a sala ou o local de triagem'
+                    },
+                    { max: 120, message: 'No máximo 120 caracteres' }
+                  ]}
+                >
+                  <Input placeholder='Ex.: Sala de triagem 2' />
                 </FormItem>
               </>
             )}

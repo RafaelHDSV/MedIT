@@ -153,6 +153,10 @@ function NursesDetails() {
               value: nurse?.shift && NurseShiftsLabels[nurse.shift]
             },
             {
+              label: 'Sala / triagem (paciente)',
+              value: nurse?.workLocationLabel
+            },
+            {
               label: 'Telefone',
               value: masks(nurse?.cellphone, 'cellphone')
             },

@@ -8,6 +8,7 @@ import { Admin } from '../models/AdminModel.js'
 import { Unit } from '../models/UnitModel.js'
 import User from '../models/UserModel.js'
 import capitalize from '../utils/capitalize.js'
+import { sanitizeWorkLocationLabel } from '../utils/sanitizeWorkLocationLabel.js'
 
 const sanitizeString = (value: unknown) =>
   typeof value === 'string' ? value.trim() : ''
@@ -73,7 +74,8 @@ export const updateMe = async (req: Request, res: Response) => {
       height,
       bloodType,
       conditions,
-      allergies
+      allergies,
+      workLocationLabel: workLocationLabelRaw
     } = req.body ?? {}
 
     const errors: Record<string, string> = {}
@@ -141,6 +143,24 @@ export const updateMe = async (req: Request, res: Response) => {
       errors.bloodType = 'Tipo sanguíneo inválido'
     }
 
+    if (
+      user.level === UserLevels.DOCTOR &&
+      workLocationLabelRaw !== undefined &&
+      !sanitizeWorkLocationLabel(workLocationLabelRaw)
+    ) {
+      errors.workLocationLabel =
+        'Sala ou consultório é obrigatório (o paciente vê ao iniciar o atendimento).'
+    }
+
+    if (
+      user.level === UserLevels.NURSE &&
+      workLocationLabelRaw !== undefined &&
+      !sanitizeWorkLocationLabel(workLocationLabelRaw)
+    ) {
+      errors.workLocationLabel =
+        'Sala ou local de triagem é obrigatório (o paciente vê ao iniciar a triagem).'
+    }
+
     if (Object.keys(errors).length) {
       return res.status(400).json({ message: 'Campos inválidos', errors })
     }
@@ -165,11 +185,19 @@ export const updateMe = async (req: Request, res: Response) => {
     if (user.level === UserLevels.DOCTOR) {
       if (crm !== undefined) (user as any).crm = sanitizeString(crm)
       if (specialization !== undefined) (user as any).specialization = specialization
+      if (workLocationLabelRaw !== undefined) {
+        ;(user as any).workLocationLabel =
+          sanitizeWorkLocationLabel(workLocationLabelRaw)
+      }
     }
 
     if (user.level === UserLevels.NURSE) {
       if (coren !== undefined) (user as any).coren = sanitizeString(coren)
       if (shift !== undefined) (user as any).shift = shift
+      if (workLocationLabelRaw !== undefined) {
+        ;(user as any).workLocationLabel =
+          sanitizeWorkLocationLabel(workLocationLabelRaw)
+      }
     }
 
     if (user.level === UserLevels.PATIENT) {

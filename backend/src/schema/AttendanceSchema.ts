@@ -5,7 +5,8 @@ import {
   AttendanceStatus,
   IAttendance,
   IPrescribedMedication,
-  PatientDisposition
+  PatientDisposition,
+  PatientFlowNoticeKind
 } from '../interfaces/IAttendance.js'
 import { UserLevels } from '../interfaces/IUser.js'
 
@@ -99,6 +100,27 @@ const AttendanceSchema = new Schema<IAttendance>(
           type: Date,
           required: true,
           default: Date.now
+        }
+      }
+    ],
+    patientFlowNotices: [
+      {
+        kind: {
+          type: String,
+          enum: Object.values(PatientFlowNoticeKind),
+          required: true
+        },
+        locationLabel: { type: String, required: true, maxlength: 120 },
+        createdAt: { type: Date, required: true, default: Date.now },
+        actorUserId: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
+        actorLevel: {
+          type: String,
+          enum: Object.values(UserLevels),
+          required: true
         }
       }
     ],
