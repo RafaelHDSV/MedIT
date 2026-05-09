@@ -34,6 +34,47 @@ const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
 const attendanceIdFromParams = (value: string | string[] | undefined) =>
   String(Array.isArray(value) ? value[0] : value)
 
+export const lookupPatientByCpfForStaff = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const staff = await User.findById(req.userId)
+    if (!staff || staff.level !== UserLevels.NURSE) {
+      return res.status(403).json({
+        message:
+          'Apenas enfermeiros podem consultar cadastro por CPF por esta rota.'
+      })
+    }
+
+    const raw =
+      typeof req.query.cpf === 'string' ? req.query.cpf.trim() : ''
+    const cleanCpf = raw.replace(/\D/g, '')
+    if (!cleanCpf || !/^\d{11}$/.test(cleanCpf)) {
+      return res.status(400).json({ message: 'CPF inválido.' })
+    }
+
+    const patient = await Patient.findOne({ cpf: cleanCpf })
+      .select('name email cpf birthDate gender conditions allergies')
+      .lean()
+
+    if (!patient) {
+      return res.json({
+        message: 'Nenhum paciente encontrado com este CPF.',
+        data: null
+      })
+    }
+
+    return res.json({
+      message: 'Paciente encontrado.',
+      data: patient
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: 'Erro ao buscar paciente.' })
+  }
+}
+
 export const getUsers = async (req: Request, res: Response) => {
   const { unitId } = req.query
   if (!unitId || typeof unitId !== 'string') {

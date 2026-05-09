@@ -1,3 +1,5 @@
+@use '../../../../../../styles/abstract/breakpoints' as *;
+
 .container {
   max-height: 70vh;
   overflow-y: auto;
@@ -8,6 +10,27 @@
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 0.75rem;
+}
+
+.hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--gray, #666);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+  align-items: start;
+
+  @include max-md {
+    grid-template-columns: 1fr;
+  }
+}
+
+.span2 {
+  grid-column: 1 / -1;
 }
 
 .symptomsBlock {

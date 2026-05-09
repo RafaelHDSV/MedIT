@@ -21,6 +21,16 @@ export interface IPatient extends IBaseUser {
   allergies?: string[]
 }
 
+export interface IPatientWalkInLookup {
+  name: string
+  email: string
+  cpf: string
+  birthDate?: string | Date
+  gender?: UserGender
+  conditions?: string[]
+  allergies?: string[]
+}
+
 export interface PatientSignupBody {
   name: string
   cpf: string

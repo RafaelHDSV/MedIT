@@ -162,7 +162,7 @@ export interface IWalkInTriagePayload {
   patientName: string
   patientCpf: string
   patientEmail: string
-  patientPassword: string
+  patientPassword?: string
   mainComplaint: string
   painLevel: number
   selfMedicated: boolean

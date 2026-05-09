@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
 import type {
+  IPatientWalkInLookup,
   PatientFormValues,
   PatientSignupBody
 } from '@/interfaces/IPatient'
@@ -13,6 +14,15 @@ class PatientsRepositoy extends Repository {
       return this.api.get(`${this.path}`, {
         params: { unitId }
       })
+    })
+  }
+
+  async lookupPatientByCpf({ cpf }: { cpf: string }) {
+    return this.handle(() => {
+      return this.api.get<{ message: string; data: IPatientWalkInLookup | null }>(
+        `${this.path}/lookup-by-cpf`,
+        { params: { cpf } }
+      )
     })
   }
 
