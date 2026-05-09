@@ -1,5 +1,13 @@
 import { Types } from 'mongoose'
 import { IBaseInterface } from './IBaseInterface.js'
+import type { UserLevels } from './IUser.js'
+
+export const AttendanceOpeningSource = {
+  PATIENT_PRE_REGISTRATION: 'patientPreRegistration',
+  NURSE_WALK_IN: 'nurseWalkIn'
+} as const
+export type AttendanceOpeningSource =
+  (typeof AttendanceOpeningSource)[keyof typeof AttendanceOpeningSource]
 
 export const AttendanceRisk = {
   EMERGENCY: 'emergency',
@@ -98,4 +106,7 @@ export interface IAttendance extends IBaseInterface {
   patientDisposition?: PatientDisposition
   prescribedMedications?: IPrescribedMedication[]
   prescribedExams?: string[]
+  openingSource?: AttendanceOpeningSource
+  openedByUserId?: Types.ObjectId
+  openedByLevel?: UserLevels
 }

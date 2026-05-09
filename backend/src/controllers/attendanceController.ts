@@ -2,17 +2,21 @@ import { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import { toDiseaseLabelPt } from '../constants/diseaseLabelsPt.js'
 import {
+  AttendanceOpeningSource,
   AttendanceRisk,
   AttendanceStatus,
   IPrescribedMedication,
   PatientDisposition,
   type IVitalSigns
 } from '../interfaces/IAttendance.js'
-import { UserLevels } from '../interfaces/IUser.js'
+import { UserGender, UserLevels } from '../interfaces/IUser.js'
 import { Attendance } from '../models/AttendanceModel.js'
 import { Patient } from '../models/PatientModel.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
+import { Unit } from '../models/UnitModel.js'
 import User from '../models/UserModel.js'
+import capitalize from '../utils/capitalize.js'
+import normalizeStringArray from '../utils/normalizeStringArray.js'
 import {
   computeSuggestionDetailForDisease,
   suggestDiseasesFromReportedSymptoms
@@ -158,6 +162,265 @@ function sanitizeTriageCompletionFields(body: unknown): {
 
 const paramId = (value: string | string[] | undefined) =>
   String(Array.isArray(value) ? value[0] : value)
+
+const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
+  AttendanceStatus.ON_THE_WAY,
+  AttendanceStatus.WAITING_TRIAGE,
+  AttendanceStatus.IN_TRIAGE,
+  AttendanceStatus.TRIAGE_COMPLETED,
+  AttendanceStatus.WAITING_ATTENDANCE,
+  AttendanceStatus.IN_ATTENDANCE
+]
+
+const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
+  if (pain >= 9) return AttendanceRisk.VERY_URGENT
+  if (pain >= 7) return AttendanceRisk.URGENT
+  if (pain >= 4) return AttendanceRisk.LESS_URGENT
+  return AttendanceRisk.NOT_URGENT
+}
+
+export const createWalkInTriageAttendance = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const staff = await User.findById(req.userId)
+    if (!staff || staff.level !== UserLevels.NURSE) {
+      return res.status(403).json({
+        message:
+          'Apenas enfermeiros podem abrir atendimento presencial por esta rota.'
+      })
+    }
+    if (!staff.unitId) {
+      return res.status(400).json({ message: 'Usuário sem unidade vinculada.' })
+    }
+
+    const unitIdStr = String(staff.unitId)
+
+    const body = req.body as {
+      patientName?: string
+      patientCpf?: string
+      patientEmail?: string
+      patientPassword?: string
+      mainComplaint?: string
+      painLevel?: unknown
+      selfMedicated?: unknown
+      symptomStartDate?: string
+      conditions?: string | string[]
+      allergies?: string | string[]
+      generalObservation?: string
+      symptoms?: string[]
+      birthDate?: string
+      gender?: string
+    }
+
+    const errors: Record<string, string> = {}
+
+    const patientName =
+      typeof body.patientName === 'string' ? body.patientName.trim() : ''
+    if (!patientName) errors.patientName = 'Informe o nome completo do paciente'
+    else if (patientName.length < 3 || patientName.split(' ').length < 2) {
+      errors.patientName =
+        'Nome deve conter pelo menos 3 caracteres e sobrenome'
+    }
+
+    const cleanCpf =
+      typeof body.patientCpf === 'string'
+        ? body.patientCpf.replace(/\D/g, '')
+        : ''
+    if (!cleanCpf || !/^\d{11}$/.test(cleanCpf)) {
+      errors.patientCpf = 'CPF inválido'
+    }
+
+    const cleanEmail =
+      typeof body.patientEmail === 'string'
+        ? body.patientEmail.trim().toLowerCase()
+        : ''
+    if (!cleanEmail || !/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      errors.patientEmail = 'Email inválido'
+    }
+
+    if (!body.mainComplaint?.trim()) {
+      errors.mainComplaint = 'Informe a queixa principal'
+    }
+
+    const painLevelNumber = parseFiniteNumber(body.painLevel)
+    if (
+      painLevelNumber === undefined ||
+      painLevelNumber < 0 ||
+      painLevelNumber > 10
+    ) {
+      errors.painLevel =
+        'Informe um nível de dor válido entre 0 e 10 (número finito).'
+    }
+
+    if (typeof body.selfMedicated !== 'boolean') {
+      errors.selfMedicated =
+        'Informe automedicação (valor booleano: verdadeiro ou falso).'
+    }
+
+    if (!body.symptomStartDate) {
+      errors.symptomStartDate = 'Informe quando os sintomas começaram'
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        message: 'Corrija os campos obrigatórios antes de continuar.',
+        errors
+      })
+    }
+
+    const unit = await Unit.findById(unitIdStr)
+    if (!unit) {
+      return res.status(400).json({
+        message: 'Unidade de saúde não encontrada.'
+      })
+    }
+
+    let patient = await Patient.findOne({ cpf: cleanCpf })
+    const isNewPatient = !patient
+
+    if (isNewPatient) {
+      if (
+        typeof body.patientPassword !== 'string' ||
+        body.patientPassword.length < 6
+      ) {
+        return res.status(400).json({
+          message: 'Corrija os campos obrigatórios antes de continuar.',
+          errors: {
+            patientPassword: 'Senha deve ter no mínimo 6 caracteres'
+          }
+        })
+      }
+    } else if (patient!.email !== cleanEmail) {
+      return res.status(409).json({
+        message: 'O email informado não corresponde ao cadastro deste CPF.'
+      })
+    }
+
+    if (patient) {
+      const existingActive = await Attendance.findOne({
+        patientId: patient._id,
+        status: { $in: PATIENT_ACTIVE_ATTENDANCE_STATUSES }
+      })
+      if (existingActive) {
+        return res.status(409).json({
+          message: 'Este paciente já possui um atendimento em andamento.'
+        })
+      }
+    }
+
+    const symptomStart = new Date(body.symptomStartDate!)
+    if (Number.isNaN(symptomStart.getTime())) {
+      return res.status(400).json({
+        message: 'Data de início dos sintomas inválida.',
+        errors: { symptomStartDate: 'Data inválida' }
+      })
+    }
+
+    const normalizedSymptoms = Array.isArray(body.symptoms)
+      ? body.symptoms.map((s) => String(s).trim()).filter(Boolean)
+      : []
+
+    const normalizedConditions = normalizeStringArray(body.conditions)
+    const normalizedAllergies = normalizeStringArray(body.allergies)
+
+    try {
+      if (isNewPatient) {
+        patient = new Patient({
+          name: patientName,
+          cpf: cleanCpf,
+          email: cleanEmail,
+          password: body.patientPassword as string,
+          level: UserLevels.PATIENT,
+          unitId: new Types.ObjectId(unitIdStr)
+        })
+      } else {
+        patient!.name = patientName
+      }
+
+      if (body.birthDate) {
+        const bd = new Date(body.birthDate)
+        if (!Number.isNaN(bd.getTime())) {
+          patient!.birthDate = bd
+        }
+      }
+
+      if (
+        body.gender &&
+        Object.values(UserGender).includes(body.gender as UserGender)
+      ) {
+        patient!.gender = body.gender as UserGender
+      }
+
+      if (body.conditions !== undefined && body.conditions !== null) {
+        patient!.conditions = normalizedConditions
+      }
+      if (body.allergies !== undefined && body.allergies !== null) {
+        patient!.allergies = normalizedAllergies
+      }
+
+      if (!patient!.unitId) {
+        patient!.set('unitId', new Types.ObjectId(unitIdStr))
+      }
+
+      await patient!.save()
+    } catch (error: unknown) {
+      const err = error as { code?: number; keyValue?: Record<string, unknown> }
+      if (err.code === 11000) {
+        const field = Object.keys(err.keyValue || {})[0] || 'campo'
+        return res.status(400).json({
+          message: 'Campos inválidos',
+          errors: { [field]: `${capitalize(field)} já está em uso` }
+        })
+      }
+      throw error
+    }
+
+    const risk = provisionalRiskFromPain(painLevelNumber!)
+    const now = new Date()
+
+    const numberAgg = await Attendance.aggregate<{ max: number | null }>([
+      { $group: { _id: null, max: { $max: '$number' } } }
+    ])
+    const nextNumber = (numberAgg[0]?.max ?? 0) + 1
+
+    const attendance = await Attendance.create({
+      number: nextNumber,
+      complaint: body.mainComplaint!.trim(),
+      painLevel: painLevelNumber!,
+      selfMedicated: body.selfMedicated as boolean,
+      symptomStartDate: symptomStart,
+      symptoms: normalizedSymptoms,
+      conditions: normalizedConditions,
+      allergies: normalizedAllergies,
+      ...(body.generalObservation?.trim()
+        ? { generalObservation: body.generalObservation.trim() }
+        : {}),
+      date: now,
+      risk,
+      status: AttendanceStatus.WAITING_TRIAGE,
+      unitId: unitIdStr,
+      patientId: String(patient!._id),
+      openingSource: AttendanceOpeningSource.NURSE_WALK_IN,
+      openedByUserId: new Types.ObjectId(String(req.userId)),
+      openedByLevel: UserLevels.NURSE,
+      changesHistory: [
+        { status: AttendanceStatus.WAITING_TRIAGE, changedAt: now }
+      ]
+    })
+
+    return res.status(201).json({
+      message: 'Atendimento presencial registrado na fila de triagem.',
+      data: attendance
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({
+      message: 'Erro ao registrar atendimento presencial.'
+    })
+  }
+}
 
 export const claimTriage = async (req: Request, res: Response) => {
   try {

@@ -1,11 +1,13 @@
 import { Schema } from 'mongoose'
 import {
+  AttendanceOpeningSource,
   AttendanceRisk,
   AttendanceStatus,
   IAttendance,
   IPrescribedMedication,
   PatientDisposition
 } from '../interfaces/IAttendance.js'
+import { UserLevels } from '../interfaces/IUser.js'
 
 const VitalSignsSchema = new Schema(
   {
@@ -118,7 +120,19 @@ const AttendanceSchema = new Schema<IAttendance>(
       type: [PrescribedMedicationSchema],
       default: undefined
     },
-    prescribedExams: [{ type: String }]
+    prescribedExams: [{ type: String }],
+    openingSource: {
+      type: String,
+      enum: Object.values(AttendanceOpeningSource)
+    },
+    openedByUserId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    openedByLevel: {
+      type: String,
+      enum: Object.values(UserLevels)
+    }
   },
   {
     timestamps: true
