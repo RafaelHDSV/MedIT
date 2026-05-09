@@ -3,6 +3,7 @@ import type {
   IAttendanceDetails,
   ICompleteTriagePayload,
   IPrescribedMedication,
+  IWalkInTriagePayload,
   PatientDisposition
 } from '@/interfaces/IAttendance'
 import type {
@@ -41,6 +42,12 @@ class AttendancesFlowRepository extends Repository {
         { params: { disease } }
       )
     )
+  }
+
+  async createWalkInTriage(body: IWalkInTriagePayload) {
+    return this.handle(() => {
+      return this.api.post(`${this.path}/walk-in-triage`, body)
+    })
   }
 
   async claimTriage({ attendanceId }: { attendanceId: string }) {

@@ -16,7 +16,11 @@ import { UserLevels } from '@/interfaces/IUser'
 import AttendancesFlowRepository from '@/repositories/AttendancesFlowRepository'
 import DashboardRepository from '@/repositories/DashboardRepository'
 import { ROUTES } from '@/routes/constants'
-import { ArrowsOutIcon, StethoscopeIcon } from '@phosphor-icons/react'
+import {
+  ArrowsOutIcon,
+  StethoscopeIcon,
+  UserPlusIcon
+} from '@phosphor-icons/react'
 import { message, Tooltip } from 'antd'
 import {
   useCallback,
@@ -32,6 +36,7 @@ import AttendanceQueueChartAdmin from './components/AttendanceQueueChartAdmin/At
 import AttendanceQueueChartDoctor from './components/AttendanceQueueChartDoctor/AttendanceQueueChartDoctor'
 import AttendanceQueueChartNurse from './components/AttendanceQueueChartNurse/AttendanceQueueChartNurse'
 import tvPortal from './components/AttendanceQueueTvPortal/AttendanceQueueTvPortal'
+import WalkInTriageModal from './components/WalkInTriageModal/WalkInTriageModal'
 
 export interface IAttendanceItemProps {
   item?: IDashboardQueueItem
@@ -83,6 +88,7 @@ function AttendanceQueueChart({
   const [loading, setLoading] = useState(true)
   const [startingNext, setStartingNext] = useState(false)
   const [tvOpen, setTvOpen] = useState(false)
+  const [walkInOpen, setWalkInOpen] = useState(false)
 
   const tvRootRef = useRef<HTMLDivElement>(null)
   const enteredFullscreenRef = useRef(false)
@@ -390,6 +396,12 @@ function AttendanceQueueChart({
 
   return (
     <>
+      <WalkInTriageModal
+        open={walkInOpen}
+        onClose={() => setWalkInOpen(false)}
+        onSuccess={() => void fetchQueue({ silent: true })}
+      />
+
       {tvPortal({
         open: tvOpen,
         close: closeTv,
@@ -409,6 +421,23 @@ function AttendanceQueueChart({
         gridArea='attendanceQueueChart'
         headerExtra={
           <div className={styles.headerActions}>
+            {user?.level === UserLevels.NURSE && (
+              <Tooltip
+                title='Cadastrar paciente sem celular e entrar na fila'
+                placement='top'
+              >
+                <Button
+                  buttonHeight='2rem'
+                  fontSize={12}
+                  mode='outline'
+                  onClick={() => setWalkInOpen(true)}
+                >
+                  <UserPlusIcon size={18}  />
+                  Presencial
+                </Button>
+              </Tooltip>
+            )}
+            
             {nextActionConfig && (
               <Button
                 buttonHeight='2rem'
