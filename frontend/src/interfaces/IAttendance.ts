@@ -1,5 +1,13 @@
 import type { ObjectId } from 'mongoose'
 import type { IBaseInterface } from './IBaseInterface'
+import type { UserGender, UserLevels } from './IUser'
+
+export const AttendanceOpeningSource = {
+  PATIENT_PRE_REGISTRATION: 'patientPreRegistration',
+  NURSE_WALK_IN: 'nurseWalkIn'
+} as const
+export type AttendanceOpeningSource =
+  (typeof AttendanceOpeningSource)[keyof typeof AttendanceOpeningSource]
 
 export const AttendanceRisk = {
   EMERGENCY: 'emergency',
@@ -106,6 +114,9 @@ export interface IAttendance extends IBaseInterface {
   prescribedExams?: string[]
   iaTopSuggestion?: string
   isIaTopSuggestionMatchDiagnosis?: boolean
+  openingSource?: AttendanceOpeningSource
+  openedByUserId?: ObjectId | string
+  openedByLevel?: UserLevels
 }
 
 interface IAttendancePatient {
@@ -145,6 +156,23 @@ export interface IAttendanceDetails {
   }[]
   updatedAt?: string | Date
   patient?: IAttendancePatient
+}
+
+export interface IWalkInTriagePayload {
+  patientName: string
+  patientCpf: string
+  patientEmail: string
+  patientPassword: string
+  mainComplaint: string
+  painLevel: number
+  selfMedicated: boolean
+  symptomStartDate: string
+  symptoms?: string[]
+  conditions?: string
+  allergies?: string
+  generalObservation?: string
+  birthDate?: string
+  gender?: UserGender
 }
 
 export interface ICompleteTriagePayload {
