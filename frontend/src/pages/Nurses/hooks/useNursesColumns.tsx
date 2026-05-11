@@ -14,12 +14,16 @@ interface IUseNursesColumnsProps {
   setEditingNurse: (nurse: INurse | null) => void
   setEditModalOpen: (isOpen: boolean) => void
   fetchNurses: () => Promise<void>
+  readOnly?: boolean
+  unitNameById?: Map<string, string>
 }
 
 export function useNursesColumns({
   setEditingNurse,
   setEditModalOpen,
-  fetchNurses
+  fetchNurses,
+  readOnly = false,
+  unitNameById
 }: IUseNursesColumnsProps) {
   const navigate = useNavigate()
 
@@ -66,14 +70,35 @@ export function useNursesColumns({
 
   const commonColumns = getCommonColumns<INurse>({
     handleNavigateToDetails,
-    handleEdit,
-    handleDelete
+    handleEdit: readOnly ? undefined : handleEdit,
+    handleDelete: readOnly ? undefined : handleDelete
   })
 
-  const columns: ColumnsType<INurse> = useMemo(
-    () => [
+  const columns: ColumnsType<INurse> = useMemo(() => {
+    const cols: ColumnsType<INurse> = [
       commonColumns.id(),
-      commonColumns.name({}),
+      commonColumns.name({})
+    ]
+
+    if (unitNameById) {
+      cols.push({
+        title: 'Unidade',
+        key: 'unitId',
+        width: 160,
+        ellipsis: true,
+        render: (_: unknown, r: INurse) => (
+          <TooltipColumn
+            text={
+              r.unitId
+                ? unitNameById.get(String(r.unitId)) ?? String(r.unitId)
+                : undefined
+            }
+          />
+        )
+      })
+    }
+
+    cols.push(
       commonColumns.cpf(),
       commonColumns.email(),
       commonColumns.birthDate(),
@@ -87,11 +112,15 @@ export function useNursesColumns({
         render: (coren: string) => <TooltipColumn text={coren} />
       },
       commonColumns.createdAt(),
-      commonColumns.updatedAt(),
-      commonColumns.actions()
-    ],
-    [commonColumns]
-  )
+      commonColumns.updatedAt()
+    )
+
+    if (!readOnly) {
+      cols.push(commonColumns.actions())
+    }
+
+    return cols
+  }, [commonColumns, readOnly, unitNameById])
 
   return columns
 }

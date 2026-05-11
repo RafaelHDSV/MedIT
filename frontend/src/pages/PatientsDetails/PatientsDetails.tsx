@@ -3,8 +3,10 @@ import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
 import type { IAttendance } from '@/interfaces/IAttendance'
 import type { IPatient } from '@/interfaces/IPatient'
+import { UserLevels } from '@/interfaces/IUser'
 import PatientsRepository from '@/repositories/PatientsRepository'
 import UserRepository from '@/repositories/UserRepository'
 import { formatDate } from '@/utils/formatDate'
@@ -22,6 +24,8 @@ import PatientModal from '../Patients/components/PatientModal/PatientModal'
 import styles from './PatientsDetails.module.scss'
 
 function PatientsDetails() {
+  const { user } = useAuth()
+  const isMedit = user?.level === UserLevels.MEDIT
   const params = useParams<{ id: string }>()
   const [patient, setPatient] = useState<IPatient | null>(null)
   const [attendances, setAttendances] = useState<IAttendance[]>()
@@ -116,20 +120,22 @@ function PatientsDetails() {
     <section className={styles.container}>
       <AuthLayoutHeader
         actionComponent={
-          <Flex gap='1rem'>
-            <PatientModal
-              patient={patient}
-              buttonText='Editar paciente'
-              fetchPatientDetails={fetchPatientDetails}
-            />
+          !isMedit ? (
+            <Flex gap='1rem'>
+              <PatientModal
+                patient={patient}
+                buttonText='Editar paciente'
+                fetchPatientDetails={fetchPatientDetails}
+              />
 
-            <DeleteModal
-              user={patient}
-              label='paciente'
-              apiName='patients'
-              buttonText='Deletar paciente'
-            />
-          </Flex>
+              <DeleteModal
+                user={patient}
+                label='paciente'
+                apiName='patients'
+                buttonText='Deletar paciente'
+              />
+            </Flex>
+          ) : null
         }
       />
       <UserDetailsHeader

@@ -140,29 +140,36 @@ export function getCommonColumns<K extends { _id?: ObjectId }>({
       title: 'Ações',
       key: 'actions',
       width: 100,
-      render: (_action: string, record: K) => (
-        <Flex gap={8}>
-          <Tooltip title='Editar'>
-            <Button
-              mode='icon'
-              onClick={() => handleEdit?.(record)}
-              aria-label='Editar médico(a)'
-            >
-              <EditOutlined />
-            </Button>
-          </Tooltip>
+      render: (_action: string, record: K) => {
+        if (!handleEdit && !handleDelete) return null
+        return (
+          <Flex gap={8}>
+            {handleEdit && (
+              <Tooltip title='Editar'>
+                <Button
+                  mode='icon'
+                  onClick={() => handleEdit(record)}
+                  aria-label='Editar'
+                >
+                  <EditOutlined />
+                </Button>
+              </Tooltip>
+            )}
 
-          <Tooltip title='Deletar'>
-            <Button
-              mode='icon'
-              onClick={() => handleDelete?.(record)}
-              aria-label='Deletar médico(a)'
-            >
-              <DeleteOutlined />
-            </Button>
-          </Tooltip>
-        </Flex>
-      )
+            {handleDelete && (
+              <Tooltip title='Deletar'>
+                <Button
+                  mode='icon'
+                  onClick={() => handleDelete(record)}
+                  aria-label='Deletar'
+                >
+                  <DeleteOutlined />
+                </Button>
+              </Tooltip>
+            )}
+          </Flex>
+        )
+      }
     })
   }
 }

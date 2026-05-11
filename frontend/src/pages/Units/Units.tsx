@@ -113,7 +113,10 @@ function Units() {
                   <div
                     key={String(unit._id)}
                     className={`${styles.card} ${isActive ? styles.isActive : ''}`}
-                    onClick={() => handleToMedications(String(unit._id))}
+                    onClick={() => {
+                      if (!isMedit) handleToMedications(String(unit._id))
+                    }}
+                    style={{ cursor: isMedit ? 'default' : 'pointer' }}
                   >
                     <div className={styles.cardHeader}>
                       <h3>{unit.name}</h3>

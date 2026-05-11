@@ -38,7 +38,10 @@ export const getDashboardStatusCards = async (req: Request, res: Response) => {
       ? referenceDate
       : undefined
 
-  const unit = await getUnitService({ unitId: String(unitId) })
+  const unit =
+    level === UserLevels.ADMIN && unitId
+      ? await getUnitService({ unitId: String(unitId) })
+      : { status: 200, data: undefined }
 
   async function getAdminData(): Promise<IAdminStatusCard | undefined> {
     try {

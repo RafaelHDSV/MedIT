@@ -3,7 +3,9 @@ import {
   CalendarDotsIcon,
   ChartBarIcon,
   FirstAidIcon,
+  HospitalIcon,
   PillIcon,
+  ShieldCheckIcon,
   StethoscopeIcon,
   type Icon
 } from '@phosphor-icons/react'
@@ -58,6 +60,18 @@ const dashboard: IRoute = {
       UserLevels.NURSE,
       UserLevels.PATIENT
     ]
+  }
+}
+
+const admins: IRoute = {
+  name: ROUTES.ADMINS.name,
+  description: ROUTES.ADMINS.description,
+  path: ROUTES.ADMINS.path,
+  icon: ShieldCheckIcon,
+  meta: {
+    group: ROUTE_GROUP.USERS,
+    hidden: false,
+    levels: [UserLevels.MEDIT]
   }
 }
 
@@ -144,6 +158,17 @@ const units: IRoute = {
   name: ROUTES.UNITS.name,
   description: ROUTES.UNITS.description,
   path: ROUTES.UNITS.path,
+  icon: HospitalIcon,
+  meta: {
+    hidden: false,
+    levels: [UserLevels.MEDIT]
+  }
+}
+
+const partnersUnits: IRoute = {
+  name: ROUTES.PARTNERS_UNITS.name,
+  description: ROUTES.PARTNERS_UNITS.description,
+  path: ROUTES.PARTNERS_UNITS.path,
   meta: {
     hidden: true,
     levels: [
@@ -165,7 +190,6 @@ const medications: IRoute = {
     canGoBack: true,
     hidden: false,
     levels: [
-      UserLevels.MEDIT,
       UserLevels.ADMIN,
       UserLevels.DOCTOR,
       UserLevels.NURSE,
@@ -233,6 +257,7 @@ const routes = [
   signIn,
   signUp,
   dashboard,
+  admins,
   attendances,
   triages,
   triagesDetails,
@@ -243,6 +268,7 @@ const routes = [
   patients,
   patientDetails,
   units,
+  partnersUnits,
   medications,
   preRegistration,
   attendanceDetails

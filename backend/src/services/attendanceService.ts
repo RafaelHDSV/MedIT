@@ -676,6 +676,85 @@ export const getAttendanceByTime = async ({
   }
 }
 
+async function buildMeditGlobalQueue({
+  period,
+  referenceDate
+}: {
+  period?: string
+  referenceDate?: string
+}) {
+  const poolMatch: Record<string, unknown> = {
+    status: { $in: ACTIVE_STATUSES }
+  }
+  if (period) {
+    const { start, end } = getPeriodDateRange(period, referenceDate)
+    poolMatch.date = { $gte: start, $lte: end }
+  }
+
+  return Attendance.aggregate([
+    { $match: poolMatch },
+    { $sort: { date: 1 } },
+    { $limit: 200 },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'patientId',
+        foreignField: '_id',
+        as: 'patient'
+      }
+    },
+    {
+      $unwind: {
+        path: '$patient',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $addFields: {
+        riskPriority: {
+          $switch: {
+            branches: [
+              { case: { $eq: ['$risk', AttendanceRisk.EMERGENCY] }, then: 1 },
+              {
+                case: { $eq: ['$risk', AttendanceRisk.VERY_URGENT] },
+                then: 2
+              },
+              { case: { $eq: ['$risk', AttendanceRisk.URGENT] }, then: 3 },
+              {
+                case: { $eq: ['$risk', AttendanceRisk.LESS_URGENT] },
+                then: 4
+              },
+              { case: { $eq: ['$risk', AttendanceRisk.NOT_URGENT] }, then: 5 }
+            ],
+            default: 6
+          }
+        }
+      }
+    },
+    { $sort: { riskPriority: 1, date: 1 } },
+    {
+      $project: {
+        _id: 1,
+        number: 1,
+        dailyNumber: { $ifNull: ['$number', 1] },
+        patientName: { $ifNull: ['$patient.name', 'Paciente'] },
+        patientBirthDate: { $ifNull: ['$patient.birthDate', null] },
+        complaint: 1,
+        painLevel: 1,
+        selfMedicated: 1,
+        symptomStartDate: 1,
+        symptoms: 1,
+        generalObservation: 1,
+        conditions: 1,
+        allergies: 1,
+        date: 1,
+        status: 1,
+        risk: 1
+      }
+    }
+  ])
+}
+
 export const getAttendanceQueue = async ({
   unitId,
   level,
@@ -726,6 +805,15 @@ export const getAttendanceQueue = async ({
         return ACTIVE_STATUSES
       default:
         return ACTIVE_STATUSES
+    }
+  }
+
+  if (!unitId && level === UserLevels.MEDIT) {
+    try {
+      return await buildMeditGlobalQueue({ period, referenceDate })
+    } catch (err) {
+      console.error(err)
+      return []
     }
   }
 

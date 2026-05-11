@@ -14,7 +14,10 @@ class UserRepository extends Repository {
     })
   }
 
-  async getAdmins({ unitId, search }: { unitId?: string; search?: string } = {}) {
+  async getAdmins({
+    unitId,
+    search
+  }: { unitId?: string; search?: string } = {}) {
     return this.handle(() => {
       return this.api.get(`${this.path}/admins`, {
         params: { unitId, search }
@@ -37,6 +40,12 @@ class UserRepository extends Repository {
   }) {
     return this.handle(() => {
       return this.api.put(`${this.path}/admins/${adminId}`, body)
+    })
+  }
+
+  async deleteAdmin({ adminId }: { adminId: string }) {
+    return this.handle(() => {
+      return this.api.delete(`${this.path}/admins/${adminId}`)
     })
   }
 }

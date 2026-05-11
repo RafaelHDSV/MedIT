@@ -6,9 +6,9 @@ import {
   getUnit,
   getUnits
 } from '../controllers/unitController.js'
+import { UserLevels } from '../interfaces/IUser.js'
 import { authMiddleware } from '../middlewares/authMiddleware.js'
 import { roleMiddleware } from '../middlewares/roleMiddleware.js'
-import { UserLevels } from '../interfaces/IUser.js'
 
 const router = express.Router()
 

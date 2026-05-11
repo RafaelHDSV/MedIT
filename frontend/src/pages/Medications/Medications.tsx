@@ -1,5 +1,5 @@
-import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Alert from '@/components/Alert/Alert'
+import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import Empty from '@/components/Empty/Empty'
 import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
@@ -19,14 +19,14 @@ import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
 import getFullAddress from '@/utils/getFullAddress'
 import masks from '@/utils/masks'
+import { message } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
-import MedicationDetailsModal from './components/MedicationDetailsModal/MedicationDetailsModal'
 import EditMedicationModal from './components/EditMedicationModal/EditMedicationModal'
+import MedicationDetailsModal from './components/MedicationDetailsModal/MedicationDetailsModal'
 import MedicationModal from './components/MedicationModal/MedicationModal'
 import { MEDICATIONS_STATUS_MAP } from './medicationsConstants'
-import { message } from 'antd'
 
 function Medications() {
   const { user } = useAuth()
@@ -103,7 +103,7 @@ function Medications() {
   }, [searchTerm, medications])
 
   function handleGoBack() {
-    navigate(ROUTES.UNITS.path)
+    navigate(ROUTES.PARTNERS_UNITS.path)
   }
 
   function handleEditMedication(medication: IMedication) {
@@ -198,8 +198,9 @@ function Medications() {
           message={
             <>
               Clique na seta de voltar ao lado do título ou{' '}
-              <Link to={ROUTES.UNITS.path}>aqui</Link> para ver unidades
-              parceiras e encontrar o medicamento desejado em outras unidades
+              <Link to={ROUTES.PARTNERS_UNITS.path}>aqui</Link> para ver
+              unidades parceiras e encontrar o medicamento desejado em outras
+              unidades
             </>
           }
         />

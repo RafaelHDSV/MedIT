@@ -7,7 +7,7 @@ class NursesRepositoy extends Repository {
   async getNurses({ unitId }: { unitId?: string }) {
     return this.handle(() => {
       return this.api.get(`${this.path}`, {
-        params: { unitId }
+        params: unitId ? { unitId } : {}
       })
     })
   }

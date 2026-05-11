@@ -31,7 +31,7 @@ function parseOptionalNumber(value: unknown): number | undefined {
 export const getUser = async (req: Request, res: Response) => {
   const { id } = req.params
 
-  const user = await User.findById(id)
+  const user = await User.findById(id).select('-password -refreshToken')
   if (!user) {
     return res.status(404).json({ message: 'Usuário não encontrado', id })
   }
@@ -253,7 +253,9 @@ export const getAdmins = async (req: Request, res: Response) => {
 
     const admins = await Admin.find(filter as any)
       .sort({ createdAt: -1 })
+      .limit(2000)
       .select('-password -refreshToken')
+      .lean()
 
     return res.json({
       message: 'Administradores encontrados com sucesso!',
@@ -390,6 +392,23 @@ export const editAdmin = async (req: Request, res: Response) => {
 
     return res.status(500).json({
       message: 'Erro ao editar administrador',
+      error: error.message
+    })
+  }
+}
+
+export const deleteAdmin = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const admin = await Admin.findById(id)
+    if (!admin || admin.level !== UserLevels.ADMIN) {
+      return res.status(404).json({ message: 'Administrador não encontrado' })
+    }
+    await Admin.findByIdAndDelete(id)
+    return res.json({ message: 'Administrador removido com sucesso' })
+  } catch (error: any) {
+    return res.status(500).json({
+      message: 'Erro ao remover administrador',
       error: error.message
     })
   }

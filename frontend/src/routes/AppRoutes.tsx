@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import * as pages from '../pages/routerPages'
 import AuthRoute from './AuthRoute'
 import { ROUTES } from './constants'
+import MedicationsPageGate from './MedicationsPageGate'
 import UnauthRoute from './UnauthRoute'
 
 function AppRoutes() {
@@ -37,6 +38,7 @@ function AppRoutes() {
           }
         >
           <Route path={ROUTES.DASHBOARD.path} element={<pages.Dashboard />} />
+          <Route path={ROUTES.ADMINS.path} element={<pages.Admins />} />
           <Route path={ROUTES.DOCTORS.path} element={<pages.Doctors />} />
           <Route
             path={ROUTES.DOCTORS_DETAILS.path}
@@ -52,10 +54,10 @@ function AppRoutes() {
             path={ROUTES.PATIENTS_DETAILS.path}
             element={<pages.PatientsDetails />}
           />
-          <Route path={ROUTES.UNITS.path} element={<pages.Units />} />
+          <Route path={ROUTES.PARTNERS_UNITS.path} element={<pages.Units />} />
           <Route
             path={ROUTES.MEDICAMENTS.path}
-            element={<pages.Medications />}
+            element={<MedicationsPageGate />}
           />
           <Route
             path={ROUTES.ATTENDANCE_DETAILS.path}

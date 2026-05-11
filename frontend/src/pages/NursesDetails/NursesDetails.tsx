@@ -3,8 +3,10 @@ import DeleteModal from '@/components/DeleteModal/DeleteModal'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
 import { type IAttendance } from '@/interfaces/IAttendance'
 import { NurseShiftsLabels, type INurse } from '@/interfaces/INurse'
+import { UserLevels } from '@/interfaces/IUser'
 import NursesRepository from '@/repositories/NursesRepository'
 import UserRepository from '@/repositories/UserRepository'
 import { formatDate } from '@/utils/formatDate'
@@ -22,6 +24,8 @@ import NurseModal from '../Nurses/components/NurseModal/NurseModal'
 import styles from './NursesDetails.module.scss'
 
 function NursesDetails() {
+  const { user } = useAuth()
+  const isMedit = user?.level === UserLevels.MEDIT
   const params = useParams<{ id: string }>()
   const [nurse, setNurse] = useState<INurse | null>(null)
   const [attendances, setAttendances] = useState<IAttendance[]>([])
@@ -116,20 +120,22 @@ function NursesDetails() {
     <section>
       <AuthLayoutHeader
         actionComponent={
-          <Flex gap='1rem'>
-            <NurseModal
-              nurse={nurse}
-              buttonText='Editar enfermeiro(a)'
-              fetchNurseDetails={fetchNurseDetails}
-            />
+          !isMedit ? (
+            <Flex gap='1rem'>
+              <NurseModal
+                nurse={nurse}
+                buttonText='Editar enfermeiro(a)'
+                fetchNurseDetails={fetchNurseDetails}
+              />
 
-            <DeleteModal
-              user={nurse}
-              label='enfermeiro(a)'
-              apiName='nurses'
-              buttonText='Deletar enfermeiro(a)'
-            />
-          </Flex>
+              <DeleteModal
+                user={nurse}
+                label='enfermeiro(a)'
+                apiName='nurses'
+                buttonText='Deletar enfermeiro(a)'
+              />
+            </Flex>
+          ) : null
         }
       />
 

@@ -53,9 +53,19 @@ export const ROUTES = {
     path: '/auth/patients/:id'
   },
   UNITS: {
+    name: 'Unidades',
+    description: 'Visualize e gerencie as unidades.',
+    path: '/auth/units'
+  },
+  PARTNERS_UNITS: {
     name: 'Unidades parceiras',
     description: 'Visualize e gerencie as unidades.',
     path: '/auth/units'
+  },
+  ADMINS: {
+    name: 'Administradores',
+    description: 'Gerencie os administradores de unidade.',
+    path: '/auth/admins'
   },
   MEDICAMENTS: {
     name: 'Medicamentos',

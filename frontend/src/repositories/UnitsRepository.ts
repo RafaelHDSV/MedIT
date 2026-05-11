@@ -20,6 +20,12 @@ class UnitsRepository extends Repository {
     })
   }
 
+  async createUnit({ body }: { body: Record<string, unknown> }) {
+    return this.handle(() => {
+      return this.api.post(this.path, body)
+    })
+  }
+
   async editUnit({ id, body }: { id: string; body: Record<string, unknown> }) {
     return this.handle(() => {
       return this.api.put(`${this.path}/${id}`, body)

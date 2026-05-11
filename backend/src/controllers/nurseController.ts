@@ -16,14 +16,30 @@ import { sanitizeWorkLocationLabel } from '../utils/sanitizeWorkLocationLabel.js
 
 export const getUsers = async (req: Request, res: Response) => {
   const { unitId } = req.query
-  if (!unitId || typeof unitId !== 'string') {
+  const { userId } = req
+
+  const requester = await User.findById(userId).select('level')
+  const isMedit = requester?.level === UserLevels.MEDIT
+
+  if (!isMedit && (!unitId || typeof unitId !== 'string')) {
     return res.status(400).json({ message: 'O ID da unidade é inválido!' })
   }
 
-  const users = await User.find({
+  const unitFilter: Record<string, unknown> =
+    !isMedit
+      ? { unitId: new Types.ObjectId(String(unitId)) }
+      : typeof unitId === 'string' &&
+          unitId.trim() &&
+          Types.ObjectId.isValid(unitId.trim())
+        ? { unitId: new Types.ObjectId(unitId.trim()) }
+        : {}
+
+  const filter = {
     level: UserLevels.NURSE,
-    unitId: new Types.ObjectId(unitId)
-  } as any)
+    ...unitFilter
+  }
+
+  const users = await User.find(filter)
     .sort({ createdAt: -1 })
     .select('-password')
   if (!users || users.length === 0) {

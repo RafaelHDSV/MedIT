@@ -4,8 +4,10 @@ import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import UserDetailsCard from '@/components/UserDetailsCard/UserDetailsCard'
 import UserDetailsHeader from '@/components/UserDetailsHeader/UserDetailsHeader'
 import { handleApiError } from '@/helpers/handleApiError'
+import { useAuth } from '@/hooks/useAuth'
 import { type IAttendance } from '@/interfaces/IAttendance'
 import { DoctorSpecializationsLabels, type IDoctor } from '@/interfaces/IDoctor'
+import { UserLevels } from '@/interfaces/IUser'
 import DoctorsRepository from '@/repositories/DoctorsRepository'
 import UserRepository from '@/repositories/UserRepository'
 import capitalize from '@/utils/capitalize'
@@ -24,6 +26,8 @@ import DoctorModal from '../Doctors/components/DoctorModal/DoctorModal'
 import styles from './DoctorDetails.module.scss'
 
 function DoctorDetails() {
+  const { user } = useAuth()
+  const isMedit = user?.level === UserLevels.MEDIT
   const params = useParams<{ id: string }>()
   const [doctor, setDoctor] = useState<IDoctor | null>(null)
   const [attendances, setAttendances] = useState<IAttendance[]>()
@@ -114,20 +118,22 @@ function DoctorDetails() {
     <section>
       <AuthLayoutHeader
         actionComponent={
-          <Flex gap='1rem'>
-            <DoctorModal
-              doctor={doctor}
-              buttonText='Editar médico(a)'
-              fetchDoctorDetails={fetchDoctorDetails}
-            />
+          !isMedit ? (
+            <Flex gap='1rem'>
+              <DoctorModal
+                doctor={doctor}
+                buttonText='Editar médico(a)'
+                fetchDoctorDetails={fetchDoctorDetails}
+              />
 
-            <DeleteModal
-              user={doctor}
-              label='médico(a)'
-              apiName='doctors'
-              buttonText='Deletar médico(a)'
-            />
-          </Flex>
+              <DeleteModal
+                user={doctor}
+                label='médico(a)'
+                apiName='doctors'
+                buttonText='Deletar médico(a)'
+              />
+            </Flex>
+          ) : null
         }
       />
 

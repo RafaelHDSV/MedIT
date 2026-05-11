@@ -13,6 +13,7 @@ export const SignUp = lazy(() => import('../pages/SignUp/SignUp'))
 
 // AUTH PAGES
 export const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'))
+export const Admins = lazy(() => import('../pages/Admins/Admins'))
 export const Doctors = lazy(() => import('../pages/Doctors/Doctors'))
 export const DoctorDetails = lazy(
   () => import('../pages/DoctorDetails/DoctorDetails')
