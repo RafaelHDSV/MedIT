@@ -193,7 +193,7 @@ Estoque de medicamentos da unidade. Cada medicamento pertence a **uma** unidade 
 | category             | Categoria farmacológica                          | ENUM         | Não  | Domínio: analgesics, antibiotics, antivirals, antifungals, anticonvulsants, antidepressants, antipsicoticos, antiseptics, antivenoms, other |
 | description          | Descrição do medicamento                         | TEXT         | Não  | -                  |
 | requiresPrescription | Exige receita médica?                            | BOOLEAN      | Não  | Default: false     |
-| availabilityStatus   | Status de disponibilidade                        | ENUM         | Não  | Domínio: available / low stock / unavailable |
+| availabilityStatus   | Status de disponibilidade                        | ENUM         | Não  | Domínio: available / low_stock / unavailable |
 | stockQuantity        | Quantidade em estoque                            | INT          | Não  | ≥ 0                |
 | unitId               | Referência à unidade onde o estoque é mantido    | ObjectId     | Não  | FK → Unit          |
 | createdAt            | Data de criação                                  | DATETIME     | Não  | Gerado automaticamente |

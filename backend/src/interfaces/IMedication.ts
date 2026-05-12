@@ -3,7 +3,7 @@ import { IBaseInterface } from './IBaseInterface.js'
 
 export const MedicationAvailabilityStatus = {
   AVAILABLE: 'available',
-  LOW_STOCK: 'low stock',
+  LOW_STOCK: 'low_stock',
   UNAVAILABLE: 'unavailable'
 } as const
 export type MedicationAvailabilityStatus =
