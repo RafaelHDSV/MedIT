@@ -143,7 +143,10 @@ function UnitsModal({
             }
           ]}
         >
-          <Input placeholder='Somente números, ex: 11999999999' maxLength={11} />
+          <Input
+            placeholder='Somente números, ex: 11999999999'
+            maxLength={11}
+          />
         </Form.Item>
 
         <div style={{ fontWeight: 500, marginBottom: 8, fontSize: 14 }}>

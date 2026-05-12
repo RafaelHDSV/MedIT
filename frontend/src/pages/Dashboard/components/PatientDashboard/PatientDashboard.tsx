@@ -277,16 +277,16 @@ function PatientDashboard({ reload }: IPatientDashboardProps) {
         myQueueItem &&
         patientsAheadCount <= 3 &&
         !stageNoticeMessage && (
-        <Alert
-          className={styles.alertBanner}
-          message={
-            patientsAheadCount === 0
-              ? 'Chegou a sua vez! Dirija-se para a sua consulta.'
-              : `Faltam ${patientsAheadCount} paciente${patientsAheadCount !== 1 ? 's' : ''} para sua consulta`
-          }
-          type='info'
-        />
-      )}
+          <Alert
+            className={styles.alertBanner}
+            message={
+              patientsAheadCount === 0
+                ? 'Chegou a sua vez! Dirija-se para a sua consulta.'
+                : `Faltam ${patientsAheadCount} paciente${patientsAheadCount !== 1 ? 's' : ''} para sua consulta`
+            }
+            type='info'
+          />
+        )}
 
       <QueuePositionCard
         loading={isLoading}

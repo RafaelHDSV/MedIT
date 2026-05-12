@@ -385,7 +385,10 @@ function ModalContent({
             name='workLocationLabel'
             inputHeight={inputHeight}
             rules={[
-              { required: true, message: 'Informe a sala ou o local de triagem' },
+              {
+                required: true,
+                message: 'Informe a sala ou o local de triagem'
+              },
               { max: 120, message: 'No máximo 120 caracteres' }
             ]}
             validateStatus={fieldErrors.workLocationLabel ? 'error' : undefined}

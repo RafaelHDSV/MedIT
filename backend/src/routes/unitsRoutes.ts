@@ -12,7 +12,12 @@ import { roleMiddleware } from '../middlewares/roleMiddleware.js'
 
 const router = express.Router()
 
-router.get('/all', authMiddleware, roleMiddleware(UserLevels.MEDIT), getAllUnits)
+router.get(
+  '/all',
+  authMiddleware,
+  roleMiddleware(UserLevels.MEDIT),
+  getAllUnits
+)
 router.get('/', authMiddleware, getUnits)
 router.get('/:id', authMiddleware, getUnit)
 router.post('/', authMiddleware, roleMiddleware(UserLevels.MEDIT), createUnit)

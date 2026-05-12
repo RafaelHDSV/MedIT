@@ -15,9 +15,7 @@ const ACTIVE_STATUSES = [
   AttendanceStatus.WAITING_ATTENDANCE,
   AttendanceStatus.IN_ATTENDANCE
 ]
-const QUEUE_NUMBER_COMPLETED_STATUSES = [
-  AttendanceStatus.ATTENDANCE_COMPLETED
-]
+const QUEUE_NUMBER_COMPLETED_STATUSES = [AttendanceStatus.ATTENDANCE_COMPLETED]
 const ON_THE_WAY_ADVANTAGE_CAP_MINUTES = 30
 
 function scoreDiseaseFromProfile(

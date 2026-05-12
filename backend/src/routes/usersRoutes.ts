@@ -15,9 +15,24 @@ import { roleMiddleware } from '../middlewares/roleMiddleware.js'
 
 const router = express.Router()
 
-router.get('/admins', authMiddleware, roleMiddleware(UserLevels.MEDIT), getAdmins)
-router.post('/admins', authMiddleware, roleMiddleware(UserLevels.MEDIT), createAdmin)
-router.put('/admins/:id', authMiddleware, roleMiddleware(UserLevels.MEDIT), editAdmin)
+router.get(
+  '/admins',
+  authMiddleware,
+  roleMiddleware(UserLevels.MEDIT),
+  getAdmins
+)
+router.post(
+  '/admins',
+  authMiddleware,
+  roleMiddleware(UserLevels.MEDIT),
+  createAdmin
+)
+router.put(
+  '/admins/:id',
+  authMiddleware,
+  roleMiddleware(UserLevels.MEDIT),
+  editAdmin
+)
 router.delete(
   '/admins/:id',
   authMiddleware,

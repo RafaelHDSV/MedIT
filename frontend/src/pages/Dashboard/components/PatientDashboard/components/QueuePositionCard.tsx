@@ -30,9 +30,7 @@ function QueuePositionCard({
       {loading ? (
         <Skeleton active title={false} paragraph={{ rows: 1 }} />
       ) : myAttendanceDailyNumber ? (
-        <span className={styles.queuePosNumber}>
-          {myAttendanceDailyNumber}
-        </span>
+        <span className={styles.queuePosNumber}>{myAttendanceDailyNumber}</span>
       ) : (
         <span className={styles.queuePosEmpty}>—</span>
       )}

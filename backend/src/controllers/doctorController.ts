@@ -15,8 +15,8 @@ import { sanitizeWorkLocationLabel } from '../utils/sanitizeWorkLocationLabel.js
 
 export const getUsers = async (req: Request, res: Response) => {
   const { unitId } = req.query
-  const {userId} = req
-  
+  const { userId } = req
+
   const requester = await User.findById(userId).select('level')
   const isMedit = requester?.level === UserLevels.MEDIT
 
@@ -24,14 +24,13 @@ export const getUsers = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'O ID da unidade é inválido!' })
   }
 
-  const unitFilter: Record<string, unknown> =
-    !isMedit
-      ? { unitId: new Types.ObjectId(String(unitId)) }
-      : typeof unitId === 'string' &&
-          unitId.trim() &&
-          Types.ObjectId.isValid(unitId.trim())
-        ? { unitId: new Types.ObjectId(unitId.trim()) }
-        : {}
+  const unitFilter: Record<string, unknown> = !isMedit
+    ? { unitId: new Types.ObjectId(String(unitId)) }
+    : typeof unitId === 'string' &&
+        unitId.trim() &&
+        Types.ObjectId.isValid(unitId.trim())
+      ? { unitId: new Types.ObjectId(unitId.trim()) }
+      : {}
 
   const filter = {
     level: UserLevels.DOCTOR,

@@ -88,7 +88,7 @@ export function useDoctorsColumns({
           <TooltipColumn
             text={
               r.unitId
-                ? unitNameById.get(String(r.unitId)) ?? String(r.unitId)
+                ? (unitNameById.get(String(r.unitId)) ?? String(r.unitId))
                 : undefined
             }
           />

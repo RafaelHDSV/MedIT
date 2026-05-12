@@ -44,8 +44,7 @@ const createMeditUser: Script = {
 
     const email = await input({
       message: 'E-mail:',
-      validate: (v) =>
-        /^\S+@\S+\.\S+$/.test(v.trim()) || 'E-mail inválido'
+      validate: (v) => /^\S+@\S+\.\S+$/.test(v.trim()) || 'E-mail inválido'
     })
 
     const emailExists = await User.findOne({

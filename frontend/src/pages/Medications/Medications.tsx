@@ -270,7 +270,7 @@ function Medications() {
             {filterBy === 'name' ? (
               <Input
                 className={listTableStyles.searchInput}
-                placeholder="Buscar por nome do medicamento"
+                placeholder='Buscar por nome do medicamento'
                 allowClear
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -280,7 +280,7 @@ function Medications() {
                 className={listTableStyles.searchInput}
                 rootClassName={listTableStyles.filterSelectDropdown}
                 allowClear
-                placeholder="Filtrar por categoria"
+                placeholder='Filtrar por categoria'
                 options={MEDICATION_CATEGORY_FILTER_OPTIONS}
                 value={searchTerm || undefined}
                 onChange={(value) => setSearchTerm(value ?? '')}
@@ -290,7 +290,7 @@ function Medications() {
                 className={listTableStyles.searchInput}
                 rootClassName={listTableStyles.filterSelectDropdown}
                 allowClear
-                placeholder="Filtrar por status de disponibilidade"
+                placeholder='Filtrar por status de disponibilidade'
                 options={MEDICATION_STATUS_FILTER_OPTIONS}
                 value={searchTerm || undefined}
                 onChange={(value) => setSearchTerm(value ?? '')}

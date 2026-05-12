@@ -6,15 +6,13 @@ import { Script } from '../types.js'
 
 function buildLabel(unitName: string | undefined, level: string): string {
   const base = (unitName?.trim() || 'Unidade').slice(0, 80)
-  const suffix =
-    level === UserLevels.DOCTOR ? 'Consultório' : 'Triagem'
+  const suffix = level === UserLevels.DOCTOR ? 'Consultório' : 'Triagem'
   return sanitizeWorkLocationLabel(`${base} - ${suffix}`)
 }
 
 /** Usuarios sem unitId: texto generico ainda valido para cadastro/API. */
 function fallbackLabel(level: string): string {
-  const suffix =
-    level === UserLevels.DOCTOR ? 'Consultório' : 'Triagem'
+  const suffix = level === UserLevels.DOCTOR ? 'Consultório' : 'Triagem'
   return sanitizeWorkLocationLabel(`Unidade - ${suffix}`)
 }
 
@@ -93,7 +91,9 @@ const backfillWorkLocationFromUnit: Script = {
     console.log(`  Ja com label (pulados): ${skippedHasLabel}`)
     console.log(`  Sem alteracao:         ${skippedNoChange}`)
     console.log(
-      dryRun ? `  Seriam atualizados:   ${updated}` : `  Atualizados:          ${updated}`
+      dryRun
+        ? `  Seriam atualizados:   ${updated}`
+        : `  Atualizados:          ${updated}`
     )
     if (dryRun) {
       console.log(

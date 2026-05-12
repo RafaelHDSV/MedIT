@@ -337,9 +337,7 @@ function ConfigBaseContent({
           {(user as { workLocationLabel?: string })?.workLocationLabel && (
             <DetailsLine
               label='Sala / local (paciente)'
-              value={
-                (user as { workLocationLabel?: string }).workLocationLabel
-              }
+              value={(user as { workLocationLabel?: string }).workLocationLabel}
             />
           )}
           {user?.crm && <DetailsLine label='CRM' value={user?.crm} />}
@@ -472,7 +470,10 @@ function ConfigBaseContent({
                   name='workLocationLabel'
                   inputHeight='2.5rem'
                   rules={[
-                    { required: true, message: 'Informe a sala ou o consultório' },
+                    {
+                      required: true,
+                      message: 'Informe a sala ou o consultório'
+                    },
                     { max: 120, message: 'No máximo 120 caracteres' }
                   ]}
                 >

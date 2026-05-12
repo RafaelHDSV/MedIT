@@ -19,10 +19,10 @@ class PatientsRepositoy extends Repository {
 
   async lookupPatientByCpf({ cpf }: { cpf: string }) {
     return this.handle(() => {
-      return this.api.get<{ message: string; data: IPatientWalkInLookup | null }>(
-        `${this.path}/lookup-by-cpf`,
-        { params: { cpf } }
-      )
+      return this.api.get<{
+        message: string
+        data: IPatientWalkInLookup | null
+      }>(`${this.path}/lookup-by-cpf`, { params: { cpf } })
     })
   }
 

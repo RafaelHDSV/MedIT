@@ -41,7 +41,7 @@ function Patients() {
   }, [isMedit])
 
   useEffect(() => {
-     fetchUnits()
+    fetchUnits()
   }, [fetchUnits])
 
   const fetchPatients = useCallback(async () => {
@@ -63,7 +63,7 @@ function Patients() {
 
   useEffect(() => {
     if (!isMedit && !unitId) return
-     fetchPatients()
+    fetchPatients()
   }, [fetchPatients, isMedit, unitId])
 
   const columns = usePatientsColumns({

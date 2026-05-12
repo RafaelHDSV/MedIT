@@ -20,9 +20,7 @@ export const roleMiddleware = (...allowedLevels: UserLevels[]) => {
 
       next()
     } catch {
-      return res
-        .status(500)
-        .json({ message: 'Erro na validação de permissão' })
+      return res.status(500).json({ message: 'Erro na validação de permissão' })
     }
   }
 }

@@ -143,7 +143,7 @@ function Units() {
                 className={listTableStyles.searchInput}
                 rootClassName={listTableStyles.filterSelectDropdown}
                 allowClear
-                placeholder="Filtrar por status da unidade"
+                placeholder='Filtrar por status da unidade'
                 options={UNIT_STATUS_FILTER_OPTIONS}
                 value={searchTerm || undefined}
                 onChange={(value) => setSearchTerm(value ?? '')}

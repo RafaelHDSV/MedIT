@@ -284,7 +284,8 @@ function AttendanceDetails() {
         } catch (err) {
           handleApiError({
             err,
-            defaultMessage: 'Não foi possível devolver o atendimento para a fila.'
+            defaultMessage:
+              'Não foi possível devolver o atendimento para a fila.'
           })
         }
       }

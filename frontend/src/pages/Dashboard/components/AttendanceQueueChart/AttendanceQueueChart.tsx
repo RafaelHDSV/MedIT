@@ -432,12 +432,12 @@ function AttendanceQueueChart({
                   mode='outline'
                   onClick={() => setWalkInOpen(true)}
                 >
-                  <UserPlusIcon size={18}  />
+                  <UserPlusIcon size={18} />
                   Presencial
                 </Button>
               </Tooltip>
             )}
-            
+
             {nextActionConfig && (
               <Button
                 buttonHeight='2rem'

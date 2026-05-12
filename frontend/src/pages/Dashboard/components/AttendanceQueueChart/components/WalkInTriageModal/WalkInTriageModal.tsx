@@ -465,10 +465,7 @@ function WalkInTriageModal({
               <Button mode='outline' htmlType='button' onClick={onClose}>
                 Cancelar
               </Button>
-              <Button
-                htmlType='submit'
-                loading={loading || cpfLookupLoading}
-              >
+              <Button htmlType='submit' loading={loading || cpfLookupLoading}>
                 Registrar na fila
               </Button>
             </div>

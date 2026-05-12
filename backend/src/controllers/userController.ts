@@ -179,12 +179,15 @@ export const updateMe = async (req: Request, res: Response) => {
     if (birthDate !== undefined) user.birthDate = birthDate
     if (gender !== undefined) user.gender = gender
     if (cellphone !== undefined) {
-      user.cellphone = normalizedCellphone ? Number(normalizedCellphone) : undefined
+      user.cellphone = normalizedCellphone
+        ? Number(normalizedCellphone)
+        : undefined
     }
 
     if (user.level === UserLevels.DOCTOR) {
       if (crm !== undefined) (user as any).crm = sanitizeString(crm)
-      if (specialization !== undefined) (user as any).specialization = specialization
+      if (specialization !== undefined)
+        (user as any).specialization = specialization
       if (workLocationLabelRaw !== undefined) {
         ;(user as any).workLocationLabel =
           sanitizeWorkLocationLabel(workLocationLabelRaw)
@@ -211,7 +214,8 @@ export const updateMe = async (req: Request, res: Response) => {
 
       const normalizedConditions = normalizeStringArray(conditions)
       const normalizedAllergies = normalizeStringArray(allergies)
-      if (conditions !== undefined) (user as any).conditions = normalizedConditions
+      if (conditions !== undefined)
+        (user as any).conditions = normalizedConditions
       if (allergies !== undefined) (user as any).allergies = normalizedAllergies
     }
 
@@ -278,8 +282,7 @@ export const createAdmin = async (req: Request, res: Response) => {
       errors.name = 'Nome deve ter pelo menos 3 caracteres'
     if (!cpf || !/^\d{11}$/.test(String(cpf).replace(/\D/g, '')))
       errors.cpf = 'CPF inválido'
-    if (!email || !/^\S+@\S+\.\S+$/.test(email))
-      errors.email = 'Email inválido'
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Email inválido'
     if (!password || password.length < 6)
       errors.password = 'Senha deve ter no mínimo 6 caracteres'
     if (!unitId) errors.unitId = 'Unidade é obrigatória'
@@ -295,7 +298,10 @@ export const createAdmin = async (req: Request, res: Response) => {
     if (!unit) {
       return res
         .status(400)
-        .json({ message: 'Campos inválidos', errors: { unitId: 'Unidade não encontrada' } })
+        .json({
+          message: 'Campos inválidos',
+          errors: { unitId: 'Unidade não encontrada' }
+        })
     }
 
     const admin = new Admin({
@@ -371,7 +377,10 @@ export const editAdmin = async (req: Request, res: Response) => {
       if (!unit) {
         return res
           .status(400)
-          .json({ message: 'Campos inválidos', errors: { unitId: 'Unidade não encontrada' } })
+          .json({
+            message: 'Campos inválidos',
+            errors: { unitId: 'Unidade não encontrada' }
+          })
       }
       admin.unitId = new Types.ObjectId(unitId) as any
     }
