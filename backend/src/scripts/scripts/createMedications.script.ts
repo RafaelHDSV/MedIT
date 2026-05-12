@@ -2,7 +2,7 @@ import { Types } from 'mongoose'
 import {
   MedicationAvailabilityStatus,
   MedicationCategories
-} from '../../interfaces/IMedications.js'
+} from '../../interfaces/IMedication.js'
 import MedicationModel from '../../models/MedicationModel.js'
 import { Script } from '../types.js'
 

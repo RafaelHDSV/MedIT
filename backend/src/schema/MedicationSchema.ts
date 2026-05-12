@@ -3,7 +3,7 @@ import {
   IMedication,
   MedicationAvailabilityStatus,
   MedicationCategories
-} from '../interfaces/IMedications.js'
+} from '../interfaces/IMedication.js'
 
 const MedicationSchema = new mongoose.Schema<IMedication>(
   {

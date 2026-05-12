@@ -3,7 +3,7 @@ import { isValidObjectId } from 'mongoose'
 import {
   MedicationAvailabilityStatus,
   MedicationCategories
-} from '../interfaces/IMedications.js'
+} from '../interfaces/IMedication.js'
 import { UserLevels } from '../interfaces/IUser.js'
 import MedicationModel from '../models/MedicationModel.js'
 import UserModel from '../models/UserModel.js'
