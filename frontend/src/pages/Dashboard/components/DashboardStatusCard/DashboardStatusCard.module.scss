@@ -17,7 +17,8 @@
     height: auto;
     min-height: 5rem;
     padding: 0.75rem;
-    width: 15rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   @include max-md {

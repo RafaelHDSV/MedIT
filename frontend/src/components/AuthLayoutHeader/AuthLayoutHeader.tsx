@@ -73,7 +73,9 @@ function AuthLayoutHeader({
         <p className={descriptionStyles()}>{description}</p>
       </div>
 
-      {actionComponent && actionComponent}
+      {actionComponent ? (
+        <div className={styles.actions}>{actionComponent}</div>
+      ) : null}
     </header>
   )
 }
