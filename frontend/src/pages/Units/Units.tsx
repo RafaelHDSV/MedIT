@@ -1,6 +1,7 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
-import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
+import listTableStyles from '@/components/ListTable/ListTable.module.scss'
+import ReloadButton from '@/components/ReloadButton/ReloadButton'
 import Tag from '@/components/Tag/Tag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,12 +10,18 @@ import { UserLevels } from '@/interfaces/IUser'
 import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
 import getFullAddress from '@/utils/getFullAddress'
-import { Skeleton } from 'antd'
+import { Input, Select, Skeleton } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UnitsModal from './components/UnitsModal/UnitsModal'
 import styles from './Units.module.scss'
 import { getUnitStatus } from './unitsFunctions'
+
+const UNIT_FILTER_OPTIONS = [
+  { label: 'Nome', value: 'name' },
+  { label: 'Endereço', value: 'address' },
+  { label: 'Status', value: 'status' }
+]
 
 function Units() {
   const { user } = useAuth()
@@ -22,6 +29,9 @@ function Units() {
   const [units, setUnits] = useState<IUnit[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterBy, setFilterBy] = useState<'name' | 'address' | 'status'>(
+    'name'
+  )
   const [isModalOpen, setIsModalOpen] = useState(false)
   const activeUnitId = user?.unitId
 
@@ -29,18 +39,15 @@ function Units() {
 
   const fetchUnits = useCallback(async () => {
     setLoading(true)
-
     try {
       const response = isMedit
         ? await UnitsRepository.getAllUnits()
         : await UnitsRepository.getUnits({ activeUnitId })
 
-      const formatResponse = response?.data?.map((unit: IUnit) => {
-        return {
-          fullAddress: getFullAddress(unit.address),
-          ...unit
-        }
-      })
+      const formatResponse = response?.data?.map((unit: IUnit) => ({
+        fullAddress: getFullAddress(unit.address),
+        ...unit
+      }))
 
       setUnits(formatResponse ?? [])
     } catch (err) {
@@ -55,15 +62,39 @@ function Units() {
   }, [fetchUnits])
 
   const filteredUnits = useMemo(() => {
-    if (!searchTerm || searchTerm === '') return units
+    if (!searchTerm) return units
     const search = searchTerm.toLowerCase()
 
-    return units.filter(
-      (unit) =>
-        unit.name.toLowerCase().includes(search) ||
-        unit.fullAddress?.toLowerCase().includes(search)
-    )
-  }, [searchTerm, units])
+    return units.filter((unit) => {
+      switch (filterBy) {
+        case 'name':
+          return unit.name.toLowerCase().includes(search)
+        case 'address':
+          return unit.fullAddress?.toLowerCase().includes(search)
+        case 'status':
+          return getUnitStatus(unit).text.toLowerCase().includes(search)
+        default:
+          return true
+      }
+    })
+  }, [searchTerm, filterBy, units])
+
+  const searchPlaceholder = useMemo(() => {
+    switch (filterBy) {
+      case 'address':
+        return 'Buscar por endereço'
+      case 'status':
+        return 'Buscar por status'
+      default:
+        return 'Buscar por nome'
+    }
+  }, [filterBy])
+
+  function handleResetFilter() {
+    setFilterBy('name')
+    setSearchTerm('')
+    fetchUnits()
+  }
 
   function handleToMedications(unitId: string) {
     navigate(ROUTES.MEDICAMENTS.path.replace(':unitId', unitId))
@@ -88,23 +119,35 @@ function Units() {
           }
         />
 
-        {/* VIEIRA: Adicionar filtros igual médico */}
-        <FormItem name='search' inputHeight='2.5rem'>
-          <InputText
-            className='w-100'
-            placeholder='Buscar localização'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </FormItem>
+        <div className={listTableStyles.filters}>
+          <div className={listTableStyles.filtersGroup}>
+            <Select
+              className={listTableStyles.filterSelect}
+              rootClassName={listTableStyles.filterSelectDropdown}
+              value={filterBy}
+              options={UNIT_FILTER_OPTIONS}
+              onChange={(value) => {
+                setFilterBy(value)
+                setSearchTerm('')
+              }}
+            />
+            <Input
+              className={listTableStyles.searchInput}
+              placeholder={searchPlaceholder}
+              allowClear
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <ReloadButton onReload={handleResetFilter} />
+        </div>
 
         <div className={styles.grid}>
           {loading
-            ? Array.from({ length: 9 })?.map((_item, index) => {
-                return (
-                  <Skeleton.Button key={index} className={styles.skeleton} />
-                )
-              })
+            ? Array.from({ length: 9 }).map((_item, index) => (
+                <Skeleton.Button key={index} className={styles.skeleton} />
+              ))
             : filteredUnits?.map((unit) => {
                 const statusInfo = getUnitStatus(unit)
                 const isActive = activeUnitId === unit._id
@@ -120,7 +163,6 @@ function Units() {
                   >
                     <div className={styles.cardHeader}>
                       <h3>{unit.name}</h3>
-
                       <Tag status={statusInfo.status}>{statusInfo.text}</Tag>
                     </div>
 
