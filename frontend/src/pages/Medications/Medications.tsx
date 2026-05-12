@@ -2,13 +2,15 @@ import Alert from '@/components/Alert/Alert'
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Button from '@/components/Button/Button'
 import Empty from '@/components/Empty/Empty'
-import { FormItem, InputText } from '@/components/FormComponents/FormComponents'
 import { LayoutSpinner } from '@/components/LayoutSpinner/LayoutSpinner'
+import listTableStyles from '@/components/ListTable/ListTable.module.scss'
+import ReloadButton from '@/components/ReloadButton/ReloadButton'
 import Tag from '@/components/Tag/Tag'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
 import type { IMedication } from '@/interfaces/IMedication'
 import {
+  MedicationAvailabilityStatus,
   MedicationAvailabilityStatusLabels,
   MedicationCategoriesLabels
 } from '@/interfaces/IMedication'
@@ -19,7 +21,7 @@ import UnitsRepository from '@/repositories/UnitsRepository'
 import { ROUTES } from '@/routes/constants'
 import getFullAddress from '@/utils/getFullAddress'
 import masks from '@/utils/masks'
-import { message } from 'antd'
+import { Input, Select, message } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import styles from './Medications.module.scss'
@@ -27,6 +29,18 @@ import EditMedicationModal from './components/EditMedicationModal/EditMedication
 import MedicationDetailsModal from './components/MedicationDetailsModal/MedicationDetailsModal'
 import MedicationModal from './components/MedicationModal/MedicationModal'
 import { MEDICATIONS_STATUS_MAP } from './medicationsConstants'
+
+const FILTER_OPTIONS = [
+  { label: 'Nome', value: 'nome' },
+  { label: 'Categoria', value: 'categoria' },
+  { label: 'Status', value: 'status' }
+]
+
+const STATUS_SEARCH_MAP: Record<string, string> = {
+  [MedicationAvailabilityStatus.AVAILABLE]: 'disponível',
+  [MedicationAvailabilityStatus.LOW_STOCK]: 'estoque baixo',
+  [MedicationAvailabilityStatus.UNAVAILABLE]: 'indisponível'
+}
 
 function Medications() {
   const { user } = useAuth()
@@ -38,14 +52,11 @@ function Medications() {
   const [unitsLoading, setUnitsLoading] = useState(true)
   const [medicationsLoading, setMedicationsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterBy, setFilterBy] = useState<string>('nome')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [selectedMedication, setSelectedMedication] = useState<
-    IMedication | undefined
-  >()
-  const [editingMedication, setEditingMedication] = useState<
-    IMedication | undefined
-  >()
+  const [selectedMedication, setSelectedMedication] = useState<IMedication | undefined>()
+  const [editingMedication, setEditingMedication] = useState<IMedication | undefined>()
 
   const loading = unitsLoading || medicationsLoading
   const canAddMedication = MedicationModel.canAddMedication(user?.level)
@@ -54,7 +65,6 @@ function Medications() {
 
   const fetchUnitInfo = useCallback(async () => {
     setUnitsLoading(true)
-
     try {
       const response = await UnitsRepository.getUnit({ id: unitId })
       setUnit(response.data)
@@ -67,7 +77,6 @@ function Medications() {
 
   const fetchMedications = useCallback(async () => {
     setMedicationsLoading(true)
-
     try {
       const response = await MedicationsRepository.getMedications({ unitId })
       setMedications(response.data)
@@ -80,7 +89,6 @@ function Medications() {
 
   useEffect(() => {
     const hasUnitId = unitId !== ':unitId'
-
     if (hasUnitId) {
       fetchUnitInfo()
       fetchMedications()
@@ -92,15 +100,43 @@ function Medications() {
   }, [unitId, user?.unitId, fetchUnitInfo, fetchMedications, navigate])
 
   const filteredMedications = useMemo(() => {
-    if (!searchTerm || searchTerm === '') return medications
+    if (!searchTerm) return medications
     const search = searchTerm.toLowerCase()
 
-    return medications?.filter(
-      (medication) =>
-        medication.name.toLowerCase().includes(search) ||
-        medication.category.toLowerCase().includes(search)
-    )
-  }, [searchTerm, medications])
+    return medications.filter((medication) => {
+      if (filterBy === 'nome') {
+        return medication.name.toLowerCase().includes(search)
+      }
+      if (filterBy === 'categoria') {
+        const categoryLabel =
+          MedicationCategoriesLabels[medication.category]?.toLowerCase() ?? ''
+        return (
+          medication.category.toLowerCase().includes(search) ||
+          categoryLabel.includes(search)
+        )
+      }
+      if (filterBy === 'status') {
+        const statusLabel =
+          MedicationAvailabilityStatusLabels[medication.availabilityStatus]?.toLowerCase() ?? ''
+        const statusSearch =
+          STATUS_SEARCH_MAP[medication.availabilityStatus]?.toLowerCase() ?? ''
+        return statusLabel.includes(search) || statusSearch.includes(search)
+      }
+      return true
+    })
+  }, [searchTerm, filterBy, medications])
+
+  const searchPlaceholder = useMemo(() => {
+    if (filterBy === 'categoria') return 'Buscar por categoria do medicamento...'
+    if (filterBy === 'status') return 'Buscar por status (ex: disponível, estoque baixo...)'
+    return 'Buscar por nome do medicamento...'
+  }, [filterBy])
+
+  function handleResetFilter() {
+    setFilterBy('nome')
+    setSearchTerm('')
+    fetchMedications()
+  }
 
   function handleGoBack() {
     navigate(ROUTES.PARTNERS_UNITS.path)
@@ -111,30 +147,22 @@ function Medications() {
       message.warning('Você só pode editar medicamentos da sua unidade.')
       return
     }
-
     setEditingMedication(medication)
     setSelectedMedication(undefined)
     setIsEditModalOpen(true)
   }
 
   function content() {
-    if (loading) {
-      return <LayoutSpinner />
-    }
-
-    if (!medications || medications.length === 0) {
-      return <Empty />
-    }
+    if (loading) return <LayoutSpinner />
+    if (!medications || medications.length === 0) return <Empty />
 
     return (
-      <div className={styles.grid}>
+      <div className={styles.grid} style={{ marginTop: '1rem' }}>
         {filteredMedications?.map((medication) => (
           <div
             key={String(medication._id)}
             className={styles.card}
-            onClick={() => {
-              setSelectedMedication(medication)
-            }}
+            onClick={() => setSelectedMedication(medication)}
           >
             <div className={styles.cardInfo}>
               <span className={styles.title}>{medication.name}</span>
@@ -148,11 +176,7 @@ function Medications() {
                 status={MEDICATIONS_STATUS_MAP[medication.availabilityStatus]}
                 fontSize={12}
               >
-                {
-                  MedicationAvailabilityStatusLabels[
-                    medication.availabilityStatus
-                  ]
-                }
+                {MedicationAvailabilityStatusLabels[medication.availabilityStatus]}
               </Tag>
 
               {canSeeUnits && (
@@ -216,14 +240,29 @@ function Medications() {
             )
           }
         />
-        <FormItem name='search' inputHeight='2.5rem'>
-          <InputText
-            className='w-100'
-            placeholder='Buscar medicamento'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </FormItem>
+
+        <div className={listTableStyles.filters}>
+          <div className={listTableStyles.filtersGroup}>
+            <Select
+              className={listTableStyles.filterSelect}
+              rootClassName={listTableStyles.filterSelectDropdown}
+              value={filterBy}
+              options={FILTER_OPTIONS}
+              onChange={(value) => {
+                setFilterBy(value)
+                setSearchTerm('')
+              }}
+            />
+            <Input
+              className={listTableStyles.searchInput}
+              placeholder={searchPlaceholder}
+              allowClear
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <ReloadButton onReload={handleResetFilter} />
+        </div>
 
         {content()}
       </section>
