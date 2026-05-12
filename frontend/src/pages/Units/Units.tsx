@@ -23,6 +23,12 @@ const UNIT_FILTER_OPTIONS = [
   { label: 'Status', value: 'status' }
 ]
 
+const UNIT_STATUS_FILTER_OPTIONS = [
+  { label: 'Aberto', value: 'Aberto' },
+  { label: 'Fechado', value: 'Fechado' },
+  { label: 'Fechando', value: 'Fechando' }
+]
+
 function Units() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -63,16 +69,19 @@ function Units() {
 
   const filteredUnits = useMemo(() => {
     if (!searchTerm) return units
-    const search = searchTerm.toLowerCase()
 
     return units.filter((unit) => {
       switch (filterBy) {
-        case 'name':
+        case 'name': {
+          const search = searchTerm.toLowerCase()
           return unit.name.toLowerCase().includes(search)
-        case 'address':
+        }
+        case 'address': {
+          const search = searchTerm.toLowerCase()
           return unit.fullAddress?.toLowerCase().includes(search)
+        }
         case 'status':
-          return getUnitStatus(unit).text.toLowerCase().includes(search)
+          return getUnitStatus(unit).text === searchTerm
         default:
           return true
       }
@@ -83,8 +92,6 @@ function Units() {
     switch (filterBy) {
       case 'address':
         return 'Buscar por endereço'
-      case 'status':
-        return 'Buscar por status'
       default:
         return 'Buscar por nome'
     }
@@ -131,13 +138,25 @@ function Units() {
                 setSearchTerm('')
               }}
             />
-            <Input
-              className={listTableStyles.searchInput}
-              placeholder={searchPlaceholder}
-              allowClear
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            {filterBy === 'status' ? (
+              <Select
+                className={listTableStyles.searchInput}
+                rootClassName={listTableStyles.filterSelectDropdown}
+                allowClear
+                placeholder="Filtrar por status da unidade"
+                options={UNIT_STATUS_FILTER_OPTIONS}
+                value={searchTerm || undefined}
+                onChange={(value) => setSearchTerm(value ?? '')}
+              />
+            ) : (
+              <Input
+                className={listTableStyles.searchInput}
+                placeholder={searchPlaceholder}
+                allowClear
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            )}
           </div>
 
           <ReloadButton onReload={handleResetFilter} />

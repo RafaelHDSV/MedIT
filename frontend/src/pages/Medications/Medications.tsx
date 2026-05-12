@@ -12,6 +12,7 @@ import type { IMedication } from '@/interfaces/IMedication'
 import {
   MedicationAvailabilityStatus,
   MedicationAvailabilityStatusLabels,
+  MedicationCategories,
   MedicationCategoriesLabels
 } from '@/interfaces/IMedication'
 import type { IUnit } from '@/interfaces/IUnit'
@@ -35,6 +36,24 @@ const FILTER_OPTIONS = [
   { label: 'Categoria', value: 'category' },
   { label: 'Status', value: 'status' }
 ]
+
+const MEDICATION_CATEGORY_FILTER_OPTIONS = (
+  Object.values(MedicationCategories) as Array<
+    (typeof MedicationCategories)[keyof typeof MedicationCategories]
+  >
+).map((value) => ({
+  value,
+  label: MedicationCategoriesLabels[value]
+}))
+
+const MEDICATION_STATUS_FILTER_OPTIONS = (
+  Object.values(MedicationAvailabilityStatus) as Array<
+    (typeof MedicationAvailabilityStatus)[keyof typeof MedicationAvailabilityStatus]
+  >
+).map((value) => ({
+  value,
+  label: MedicationAvailabilityStatusLabels[value]
+}))
 
 function Medications() {
   const { user } = useAuth()
@@ -104,46 +123,22 @@ function Medications() {
 
   const filteredMedications = useMemo(() => {
     if (!searchTerm) return medications
-    const search = searchTerm.toLowerCase()
 
     return medications.filter((medication) => {
       switch (filterBy) {
-        case 'name':
+        case 'name': {
+          const search = searchTerm.toLowerCase()
           return medication.name.toLowerCase().includes(search)
+        }
         case 'category':
-          return (
-            MedicationCategoriesLabels[medication.category]
-              ?.toLowerCase()
-              .includes(search) ||
-            medication.category.toLowerCase().includes(search)
-          )
+          return medication.category === searchTerm
         case 'status':
-          return (
-            MedicationAvailabilityStatusLabels[medication.availabilityStatus]
-              ?.toLowerCase()
-              .includes(search) ||
-            MedicationAvailabilityStatus[
-              medication.availabilityStatus as keyof typeof MedicationAvailabilityStatus
-            ]
-              ?.toLowerCase()
-              .includes(search)
-          )
+          return medication.availabilityStatus === searchTerm
         default:
           return true
       }
     })
   }, [searchTerm, filterBy, medications])
-
-  const searchPlaceholder = useMemo(() => {
-    switch (filterBy) {
-      case 'category':
-        return 'Buscar por categoria do medicamento'
-      case 'status':
-        return 'Buscar por status'
-      default:
-        return 'Buscar por nome do medicamento'
-    }
-  }, [filterBy])
 
   function handleResetFilter() {
     setFilterBy('name')
@@ -272,13 +267,35 @@ function Medications() {
               }}
             />
 
-            <Input
-              className={listTableStyles.searchInput}
-              placeholder={searchPlaceholder}
-              allowClear
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            {filterBy === 'name' ? (
+              <Input
+                className={listTableStyles.searchInput}
+                placeholder="Buscar por nome do medicamento"
+                allowClear
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            ) : filterBy === 'category' ? (
+              <Select
+                className={listTableStyles.searchInput}
+                rootClassName={listTableStyles.filterSelectDropdown}
+                allowClear
+                placeholder="Filtrar por categoria"
+                options={MEDICATION_CATEGORY_FILTER_OPTIONS}
+                value={searchTerm || undefined}
+                onChange={(value) => setSearchTerm(value ?? '')}
+              />
+            ) : (
+              <Select
+                className={listTableStyles.searchInput}
+                rootClassName={listTableStyles.filterSelectDropdown}
+                allowClear
+                placeholder="Filtrar por status de disponibilidade"
+                options={MEDICATION_STATUS_FILTER_OPTIONS}
+                value={searchTerm || undefined}
+                onChange={(value) => setSearchTerm(value ?? '')}
+              />
+            )}
           </div>
 
           <ReloadButton onReload={handleResetFilter} />
