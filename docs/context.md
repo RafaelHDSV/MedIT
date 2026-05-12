@@ -19,6 +19,7 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
   - [5.12 Índice adicional de scripts do backend](#512-índice-adicional-de-scripts-do-backend)
 - [6. Arquitetura e stack](#6-arquitetura-e-stack)
   - [6.1 Mapa do repositório (pastas, rotas e cliente)](#61-mapa-do-repositório-pastas-rotas-e-cliente)
+    - [6.1.1 Rotas no cliente: mesmo path ou mesma página com metadados distintos](#611-rotas-no-cliente-mesmo-path-ou-mesma-página-com-metadados-distintos)
 - [7. Modelo de atendimento no código](#7-modelo-de-atendimento-no-código)
 - [8. Mecanismo inteligente (regras)](#8-mecanismo-inteligente-regras)
 - [9. Requisitos funcionais](#9-requisitos-funcionais)
@@ -141,6 +142,7 @@ No repositório, a classificação segue **cinco níveis** compatíveis com uma 
 - A listagem **parte da própria unidade** do usuário (estoque e cadastro locais).
 - Quando um item **não está disponível** na unidade atual, o sistema permite consultar **unidades parceiras** para localizar o medicamento em outro ponto da rede (apenas consulta / encaminhamento informativo, conforme regras de negócio e privacidade).
 - No modelo `IUnit` / `UnitSchema`, o campo **`partnerUnitIds`** (ObjectIds de outras unidades) materializa essa rede; pode ser preenchido pela interface administrativa ou, em ambientes de demonstração, por scripts de migração (ver [§5.12](#512-índice-adicional-de-scripts-do-backend)).
+- A listagem de unidades no menu combina entradas com o **mesmo path** `/auth/units` e metadados distintos (`ROUTES.UNITS` vs. `ROUTES.PARTNERS_UNITS`); ver [§6.1.1](#611-rotas-no-cliente-mesmo-path-ou-mesma-página-com-metadados-distintos).
 - Rota de medicamentos no front: **`/auth/units/:unitId/medications`** (constante `ROUTES.MEDICAMENTS` em `frontend/src/routes/constants.ts` — o identificador interno mantém o histórico `MEDICAMENTS`).
 - Edição de medicamento no backend: **`PUT /auth/medications/:medicationId`**. A API recalcula `availabilityStatus` com base em `stockQuantity` e **bloqueia edição para paciente**.
 - Isolamento por unidade na edição: usuário autenticado só pode editar medicamento cuja `unitId` seja igual à sua `user.unitId`; tentativa cruzada entre unidades retorna **403**.
@@ -312,11 +314,21 @@ MongoDB (Mongoose)
 - **`main.tsx`** — monta a árvore React, providers (Ant Design, auth).
 - **`routes/AppRoutes.tsx`** — **React Router**; rotas públicas em `/` (SignIn/SignUp com `UnauthRoute`) vs área autenticada em `/auth` com `AuthRoute` e `AuthLayout`; `pages/routerPages` centraliza exports das páginas.
 - **`routes/constants.ts`** — objeto `ROUTES` (paths) usado na navegação e no menu.
+
+#### 6.1.1 Rotas no cliente: mesmo path ou mesma página com metadados distintos
+
+No frontend, **é intencional** existir mais de uma chave em `ROUTES` (e mais de um item no array exportado por `routes.ts`) quando o objetivo é **variar título, descrição, visibilidade no menu e níveis permitidos** (`meta.levels`, `meta.hidden`, `icon`, `canGoBack`, etc.) sem duplicar a implementação da tela.
+
+- **Mesmo `path`, entradas distintas no menu** — Exemplo: `ROUTES.UNITS` e `ROUTES.PARTNERS_UNITS` apontam para **`/auth/units`**, mas servem contextos diferentes (gestão de unidades no nível MedIT vs. fluxo de “unidades parceiras” para outros perfis). Em `AppRoutes.tsx` basta **uma** declaração `<Route path={...} element={...} />` para esse URL; o menu usa a entrada correta conforme o usuário e o `meta`.
+- **Paths diferentes, mesma página React** — Exemplo: `ROUTES.ATTENDANCE_DETAILS` (`/auth/attendance/:attendanceId`) e `ROUTES.TRIAGES_DETAILS` (`/auth/triage/:attendanceId`) montam a mesma página **`AttendanceDetails`**, permitindo **URLs semânticas** e cabeçalhos/contexto de navegação alinhados à origem (médico vs. enfermeiro), histórico do browser e deep links coerentes, sem bifurcar a lógica principal da tela.
+
+Referência: `frontend/src/routes/constants.ts`, `frontend/src/routes/routes.ts`, `frontend/src/routes/AppRoutes.tsx`.
+
 - **`repositories/`** — um arquivo por agregado (`AuthRepository`, `DashboardRepository`, `PatientsRepository`, `AttendancesFlowRepository`, `MedicationsRepository`, `UnitsRepository`, `DoctorsRepository`, `NursesRepository`, `UserRepository`, **`SymptomsDiseasesRepository`**); padrão `extends Repository` + método `handle()` para extrair `data` da resposta Axios.
 - **`api/api.ts`** — instância Axios, interceptors de **Authorization** e **renovação de token** em `401` (refresh + retry; falha redireciona para `/`).
 - **`contexts/`** — `AuthProvider` / `useAuth` (token, usuário, nível `UserLevels`); config global do Ant Design.
 - **`hooks/`** — hooks reutilizáveis (`useAuth`, colunas de tabelas por página em `pages/.../hooks`).
-- **`pages/`** — telas por domínio (`Dashboard` com `AttendanceByTimeChart`, `AttendanceQueueChart` e variantes admin/médico/enfermeiro; `PreRegistration`; `AttendanceDetails` compartilhado com triagens; CRUDs de médicos, enfermeiros, pacientes, unidades, medicamentos; listagens de atendimentos).
+- **`pages/`** — telas por domínio (`Dashboard` com `AttendanceByTimeChart`, `AttendanceQueueChart` e variantes admin/médico/enfermeiro; `PreRegistration`; `AttendanceDetails` nas rotas de detalhe de atendimento e de triagem — ver [§6.1.1](#611-rotas-no-cliente-mesmo-path-ou-mesma-página-com-metadados-distintos); CRUDs de médicos, enfermeiros, pacientes, unidades, medicamentos; listagens de atendimentos).
 - **`components/`** — UI transversal (`FormComponents`, `MultiDatepicker`, `ListTable`, `SideBar`, `AuthLayoutHeader`, `RiskTag` / constantes de risco, etc.).
 - **`components/SideBar/.../ConfigModal`** — modal de configuração do usuário com visualização e autoedição dos dados válidos por perfil (nome, contato, dados profissionais/paciente e alteração de senha com `currentPassword` + `newPassword`).
 - **`helpers/handleApiError.ts`** — tratamento uniforme de erros de API (mensagens ao utilizador).
