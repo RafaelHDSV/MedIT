@@ -18,8 +18,8 @@ import styles from './Units.module.scss'
 import { getUnitStatus } from './unitsFunctions'
 
 const UNIT_FILTER_OPTIONS = [
-  { label: 'Nome', value: 'nome' },
-  { label: 'Endereço', value: 'endereco' },
+  { label: 'Nome', value: 'name' },
+  { label: 'Endereço', value: 'address' },
   { label: 'Status', value: 'status' }
 ]
 
@@ -29,7 +29,9 @@ function Units() {
   const [units, setUnits] = useState<IUnit[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterBy, setFilterBy] = useState<string>('nome')
+  const [filterBy, setFilterBy] = useState<'name' | 'address' | 'status'>(
+    'name'
+  )
   const [isModalOpen, setIsModalOpen] = useState(false)
   const activeUnitId = user?.unitId
 
@@ -64,24 +66,32 @@ function Units() {
     const search = searchTerm.toLowerCase()
 
     return units.filter((unit) => {
-      if (filterBy === 'nome') return unit.name.toLowerCase().includes(search)
-      if (filterBy === 'endereco') return unit.fullAddress?.toLowerCase().includes(search)
-      if (filterBy === 'status') {
-        const statusInfo = getUnitStatus(unit)
-        return statusInfo.text.toLowerCase().includes(search)
+      switch (filterBy) {
+        case 'name':
+          return unit.name.toLowerCase().includes(search)
+        case 'address':
+          return unit.fullAddress?.toLowerCase().includes(search)
+        case 'status':
+          return getUnitStatus(unit).text.toLowerCase().includes(search)
+        default:
+          return true
       }
-      return true
     })
   }, [searchTerm, filterBy, units])
 
   const searchPlaceholder = useMemo(() => {
-    if (filterBy === 'endereco') return 'Buscar por endereço...'
-    if (filterBy === 'status') return 'Buscar por status (ex: aberto, fechado...)'
-    return 'Buscar por nome...'
+    switch (filterBy) {
+      case 'address':
+        return 'Buscar por endereço'
+      case 'status':
+        return 'Buscar por status'
+      default:
+        return 'Buscar por nome'
+    }
   }, [filterBy])
 
   function handleResetFilter() {
-    setFilterBy('nome')
+    setFilterBy('name')
     setSearchTerm('')
     fetchUnits()
   }
@@ -129,10 +139,11 @@ function Units() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
           <ReloadButton onReload={handleResetFilter} />
         </div>
 
-        <div className={styles.grid} style={{ marginTop: '1rem' }}>
+        <div className={styles.grid}>
           {loading
             ? Array.from({ length: 9 }).map((_item, index) => (
                 <Skeleton.Button key={index} className={styles.skeleton} />
@@ -154,6 +165,7 @@ function Units() {
                       <h3>{unit.name}</h3>
                       <Tag status={statusInfo.status}>{statusInfo.text}</Tag>
                     </div>
+
                     <p className={styles.address}>{unit.fullAddress}</p>
                   </div>
                 )
