@@ -35,7 +35,7 @@ $unauth-logo-block: 2.75rem;
     padding: max(1.5rem, env(safe-area-inset-top))
       max(1.5rem, env(safe-area-inset-right)) 1.5rem
       max(1.5rem, env(safe-area-inset-left));
-    height: 100vh;
+    min-height: 100dvh;
     gap: 2rem;
   }
 

@@ -11,7 +11,15 @@
 .periodFilterGroup {
   display: inline-flex;
   align-items: stretch;
+  flex-wrap: wrap;
   max-width: 100%;
+  min-width: 0;
+
+  @include max-sm {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
 }
 
 .periodSelectPrefix {
@@ -22,18 +30,36 @@
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
   }
+
+  @include max-sm {
+    width: 100%;
+
+    :global(.ant-select-selector) {
+      border-radius: 0.5rem !important;
+    }
+  }
 }
 
 .periodDatePicker {
   flex: 1;
-  min-width: 10rem;
+  min-width: 0;
   width: 12rem;
+  max-width: 100%;
 
   :global(.ant-picker) {
     width: 100% !important;
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
     border-left: none !important;
+  }
+
+  @include max-sm {
+    width: 100%;
+
+    :global(.ant-picker) {
+      border-radius: 0.5rem !important;
+      border-left: 1px solid var(--border) !important;
+    }
   }
 }
 
@@ -57,8 +83,9 @@
       'dashboardCard1 dashboardCard2'
       'dashboardCard3 dashboardCard4'
       'dashboardCard5 dashboardCard6'
+      'attendanceQueueChart attendanceQueueChart'
       'attendanceByTimeChart attendanceByTimeChart';
-    grid-template-rows: repeat(3, auto) 1fr;
+    grid-template-rows: repeat(4, auto) 1fr;
   }
 
   @include max-md {
@@ -70,8 +97,8 @@
       'dashboardCard4'
       'dashboardCard5'
       'dashboardCard6'
+      'attendanceQueueChart'
       'attendanceByTimeChart';
-    grid-template-rows: repeat(4, auto) 1fr;
   }
 }
 
@@ -88,8 +115,9 @@
       'dashboardCard1 dashboardCard2'
       'dashboardCard3 dashboardCard4'
       'dashboardCard5 dashboardCard6'
+      'attendanceQueueChart attendanceQueueChart'
       'attendanceByTimeChart attendanceByTimeChart';
-    grid-template-rows: repeat(3, auto) 1fr;
+    grid-template-rows: repeat(4, auto) 1fr;
   }
 
   @include max-md {
@@ -103,7 +131,6 @@
       'dashboardCard6'
       'attendanceQueueChart'
       'attendanceByTimeChart';
-    grid-template-rows: repeat(5, auto) 1fr;
   }
 }
 

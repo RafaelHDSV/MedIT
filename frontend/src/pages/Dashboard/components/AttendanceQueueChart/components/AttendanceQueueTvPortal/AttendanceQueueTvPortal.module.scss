@@ -133,7 +133,7 @@
 
 .tvHeroMainRow {
   display: grid;
-  grid-template-columns: 10% minmax(0, 1fr);
+  grid-template-columns: fit-content(10%) minmax(0, 1fr);
   align-items: center;
   column-gap: 1.25rem;
 }
