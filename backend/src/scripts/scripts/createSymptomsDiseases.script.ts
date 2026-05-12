@@ -4189,7 +4189,7 @@ const createSymptomsDiseases = {
 
     /**
      * Medicamentos e exames sugeridos por condição — usado apenas no seed
-     * `createSymptomsDiaseases` para persistir em `SymptomsDisease`.
+     * `createSymptomsDiseases` para persistir em `SymptomsDisease`.
      * Chaves devem coincidir com o campo `disease` de cada documento.
      */
     const DISEASE_ADVICE_BY_NAME: Record<

@@ -43,7 +43,7 @@ Documento de visão do produto e do trabalho acadêmico, alinhado ao repositóri
 | Aplicação e API | `backend/` — Node.js, **Express 5**, TypeScript, execução dev com **tsx** (`tsx watch src/server.ts`) |
 | Persistência | MongoDB via **Mongoose 9**; modelos em `backend/src/models` e schemas em `backend/src/schema`; interfaces em `backend/src/interfaces` |
 | Segurança | JWT (access + refresh), bcrypt; rotas de negócio montadas sob prefixo `/auth/...` (ver [§6.1](#61-mapa-do-repositório-pastas-rotas-e-cliente)) |
-| Dados sintoma–doença | Coleção `SymptomsDisease`; carga via script em `backend/src/scripts/scripts/createSymptomsDiaseases.script.ts` |
+| Dados sintoma–doença | Coleção `SymptomsDisease`; carga via script em `backend/src/scripts/scripts/createSymptomsDiseases.script.ts` |
 
 Monorepo na raiz: `package.json` usa **Yarn** e **concurrently** — `yarn dev` instala/atualiza dependências (`yarn base`) e sobe frontend e backend em paralelo (`yarn dev:frontend` / `yarn dev:backend`). Testes de tipo: `yarn test` → `tsc` em cada pacote. Formatação: `yarn format` (Prettier em `frontend` e `backend`). Scripts de banco/dados: `yarn scripts` na raiz (delega a `cd backend && yarn scripts`). Na raiz existem ainda [`CONTRIBUTING.md`](CONTRIBUTING.md) e [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
