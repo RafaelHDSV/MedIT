@@ -9,11 +9,11 @@ import { useRef, type JSX, type ReactNode } from 'react'
 import { getMultiDatepickerFormat, useInputMask } from './constants'
 import styles from './MultiDatepicker.module.scss'
 import {
-  DayjsType,
-  INPUT_PARSE_FORMATS,
-  type DateValue,
-  type DayjsValue,
-  type RangeValue
+    DayjsType,
+    INPUT_PARSE_FORMATS,
+    type DateValue,
+    type DayjsValue,
+    type RangeValue
 } from './types'
 
 dayjs.extend(utc)
@@ -24,7 +24,7 @@ dayjs.locale('pt-br')
 type IMultiDatepickerContainerProps = JSX.IntrinsicElements['div'] & {
   menu: DropdownProps['menu']
   children: ReactNode
-  dateSelectorRef?: React.LegacyRef<HTMLButtonElement>
+  dateSelectorRef?: React.Ref<HTMLButtonElement>
 }
 
 export function MultiDatepickerContainer({

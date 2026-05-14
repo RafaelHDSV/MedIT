@@ -2,8 +2,8 @@ import Button from '@/components/Button/Button'
 import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import SymptomTag from '@/components/SymptomTag/SymptomTag'
 import {
-  type AttendanceRisk,
-  type VitalFieldDraft
+    type AttendanceRisk,
+    type VitalFieldDraft
 } from '@/interfaces/IAttendance'
 import masks from '@/utils/masks'
 import { Flex, Modal } from 'antd'
@@ -46,7 +46,7 @@ function ConfirmTriageModal({
       width={720}
       centered
       destroyOnHidden
-      maskClosable={!loading}
+      mask={{ closable: !loading }}
       closable={!loading}
     >
       <h2 className={styles.title}>Confirmar conclusão da triagem</h2>

@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button'
 import {
-  PatientDisposition,
-  PatientDispositionLabels,
-  type IPrescribedMedication
+    PatientDisposition,
+    PatientDispositionLabels,
+    type IPrescribedMedication
 } from '@/interfaces/IAttendance'
 import type { IDiseaseOption } from '@/interfaces/ISymptomDiseases'
 import { Flex, Input, Modal, Select } from 'antd'
@@ -141,7 +141,7 @@ function CompleteAttendanceModal({
       width={760}
       centered
       destroyOnHidden
-      maskClosable={!loading}
+      mask={{ closable: !loading }}
       closable={!loading}
     >
       <h2 className={styles.title}>Finalização do atendimento</h2>
@@ -153,7 +153,10 @@ function CompleteAttendanceModal({
           <div className={styles.field}>
             <label className={styles.label}>Diagnóstico</label>
             <Select
-              showSearch
+              showSearch={{ filterOption: (input, option) =>
+                String(option?.label ?? '')
+                  .toLowerCase()
+                  .includes(input.toLowerCase()) }}
               allowClear
               size='large'
               placeholder='Selecione o diagnóstico'
@@ -163,11 +166,7 @@ function CompleteAttendanceModal({
               }))}
               value={diagnosisKey}
               onChange={(value) => setDiagnosisKey(value)}
-              filterOption={(input, option) =>
-                String(option?.label ?? '')
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
+              
             />
           </div>
 

@@ -1,9 +1,9 @@
 import Button from '@/components/Button/Button'
 import {
-  FormItem,
-  InputDate,
-  InputSelect,
-  InputText
+    FormItem,
+    InputDate,
+    InputSelect,
+    InputText
 } from '@/components/FormComponents/FormComponents'
 import formStyles from '@/components/FormComponents/FormComponents.module.scss'
 import { DayjsType } from '@/components/MultiDatepicker/types'
@@ -190,7 +190,7 @@ function WalkInTriageModal({
       footer={null}
       centered
       width={920}
-      destroyOnClose
+      destroyOnHidden
     >
       <div className={styles.container}>
         <Form

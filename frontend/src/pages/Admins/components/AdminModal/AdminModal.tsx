@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button'
 import {
-  FormItem,
-  InputSelect,
-  InputText
+    FormItem,
+    InputSelect,
+    InputText
 } from '@/components/FormComponents/FormComponents'
 import { handleApiError } from '@/helpers/handleApiError'
 import type { IUnit } from '@/interfaces/IUnit'
@@ -116,7 +116,7 @@ function AdminModal({ admin, isOpen, onClose, onSaved, units }: Props) {
       open={isOpen}
       onCancel={handleClose}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}
