@@ -82,7 +82,7 @@ Narrativa completa e notas de API: [`context.md` §5.9](./context.md#59-jornada-
 - **Backfill:** script `backfill-work-location-from-unit` em `backend/src/scripts/scripts/backfillWorkLocationFromUnit.script.ts`:
   - `yarn scripts` → escolher o script, ou `yarn scripts backfill-work-location-from-unit` (conforme o runner).
   - Simular: `BACKFILL_WORK_LOCATION_DRY_RUN=1 yarn scripts backfill-work-location-from-unit`.
-  - Só preenche quem está **sem** label; numera por unidade (`Consultório 1`, `Sala triagem 2`, …).
+  - Preenche vazios ou **normaliza** labels antigas com nome da unidade; formato curto: `Consultório 1`, `Sala triagem 2` (numeração por unidade, sem repetir o nome da unidade no texto).
 
 ---
 

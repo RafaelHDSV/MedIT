@@ -76,8 +76,7 @@ export const createDoctor = async (req: Request, res: Response) => {
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
     if (!workLocationLabel) {
-      errors.workLocationLabel =
-        'Sala ou consultório é obrigatório (o paciente vê ao iniciar o atendimento).'
+      errors.workLocationLabel = 'Sala ou consultório é obrigatório.'
     }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {
@@ -207,8 +206,7 @@ export const editDoctor = async (req: Request, res: Response) => {
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
     if (!workLocationLabelEdit) {
-      errors.workLocationLabel =
-        'Sala ou consultório é obrigatório (o paciente vê ao iniciar o atendimento).'
+      errors.workLocationLabel = 'Sala ou consultório é obrigatório.'
     }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {

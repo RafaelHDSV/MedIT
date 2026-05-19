@@ -381,7 +381,7 @@ function ModalContent({
           </FormItem>
 
           <FormItem
-            label='Sala ou local de triagem (visto pelo paciente)'
+            label='Sala ou local de triagem'
             name='workLocationLabel'
             inputHeight={inputHeight}
             rules={[

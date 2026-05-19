@@ -76,8 +76,7 @@ export const createNurse = async (req: Request, res: Response) => {
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
     if (!workLocationLabel) {
-      errors.workLocationLabel =
-        'Sala ou local de triagem é obrigatório (o paciente vê ao iniciar a triagem).'
+      errors.workLocationLabel = 'Sala ou local de triagem é obrigatório.'
     }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {
@@ -195,8 +194,7 @@ export const editNurse = async (req: Request, res: Response) => {
     if (!cellphone) errors.cellphone = 'Telefone é obrigatório'
     if (!birthDate) errors.birthDate = 'Data de nascimento é obrigatória'
     if (!workLocationLabelEdit) {
-      errors.workLocationLabel =
-        'Sala ou local de triagem é obrigatório (o paciente vê ao iniciar a triagem).'
+      errors.workLocationLabel = 'Sala ou local de triagem é obrigatório.'
     }
 
     if (name && name.length < 3 && name.split(' ').length < 2) {

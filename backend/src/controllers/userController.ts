@@ -148,8 +148,7 @@ export const updateMe = async (req: Request, res: Response) => {
       workLocationLabelRaw !== undefined &&
       !sanitizeWorkLocationLabel(workLocationLabelRaw)
     ) {
-      errors.workLocationLabel =
-        'Sala ou consultório é obrigatório (o paciente vê ao iniciar o atendimento).'
+      errors.workLocationLabel = 'Sala ou consultório é obrigatório.'
     }
 
     if (
@@ -157,8 +156,7 @@ export const updateMe = async (req: Request, res: Response) => {
       workLocationLabelRaw !== undefined &&
       !sanitizeWorkLocationLabel(workLocationLabelRaw)
     ) {
-      errors.workLocationLabel =
-        'Sala ou local de triagem é obrigatório (o paciente vê ao iniciar a triagem).'
+      errors.workLocationLabel = 'Sala ou local de triagem é obrigatório.'
     }
 
     if (Object.keys(errors).length) {

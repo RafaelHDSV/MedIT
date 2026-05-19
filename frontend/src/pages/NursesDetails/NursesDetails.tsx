@@ -159,7 +159,7 @@ function NursesDetails() {
               value: nurse?.shift && NurseShiftsLabels[nurse.shift]
             },
             {
-              label: 'Sala / triagem (paciente)',
+              label: 'Sala / triagem',
               value: nurse?.workLocationLabel
             },
             {

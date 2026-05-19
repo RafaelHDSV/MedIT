@@ -174,7 +174,7 @@ function DoctorDetails() {
             },
             { label: 'CRM', value: doctor?.crm },
             {
-              label: 'Sala / consultório (paciente)',
+              label: 'Sala / consultório',
               value: doctor?.workLocationLabel
             }
           ]}

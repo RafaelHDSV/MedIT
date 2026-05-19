@@ -268,7 +268,7 @@ Além dos seeds detalhados em [§5.10](#510-seeds-de-demonstração-atendimentos
 
 **Correção de dados e enriquecimento**
 
-- `fix-units-data`, `update-address-unit`, `add-zipcode-unit`, `add-doctor-fields`, `add-number-to-attendances`, `add-timestamp-user`, `update-user-numbers`, `backfill-patient-health-data`, `backfill-work-location-from-unit` — preenche **`workLocationLabel`** vazio em médicos/enfermeiros (ex.: `Unidade - Consultório 1`, `Unidade - Sala triagem 2`; dry-run: `BACKFILL_WORK_LOCATION_DRY_RUN=1`), `normalize-allergies-conditions`, `normalize-nurses-coren`, `removeAgeProp`.
+- `fix-units-data`, `update-address-unit`, `add-zipcode-unit`, `add-doctor-fields`, `add-number-to-attendances`, `add-timestamp-user`, `update-user-numbers`, `backfill-patient-health-data`, `backfill-work-location-from-unit` — preenche/normaliza **`workLocationLabel`** em médicos/enfermeiros (ex.: `Consultório 1`, `Sala triagem 2`, sem nome da unidade; dry-run: `BACKFILL_WORK_LOCATION_DRY_RUN=1`), `normalize-allergies-conditions`, `normalize-nurses-coren`, `removeAgeProp`.
 
 ---
 

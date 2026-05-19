@@ -336,7 +336,7 @@ function ConfigBaseContent({
           )}
           {(user as { workLocationLabel?: string })?.workLocationLabel && (
             <DetailsLine
-              label='Sala / local (paciente)'
+              label='Sala / local'
               value={(user as { workLocationLabel?: string }).workLocationLabel}
             />
           )}
@@ -466,7 +466,7 @@ function ConfigBaseContent({
                   />
                 </FormItem>
                 <FormItem
-                  label='Sala ou consultório (visto pelo paciente)'
+                  label='Sala ou consultório'
                   name='workLocationLabel'
                   inputHeight='2.5rem'
                   rules={[
@@ -534,7 +534,7 @@ function ConfigBaseContent({
                   />
                 </FormItem>
                 <FormItem
-                  label='Sala ou local de triagem (visto pelo paciente)'
+                  label='Sala ou local de triagem'
                   name='workLocationLabel'
                   inputHeight='2.5rem'
                   rules={[
