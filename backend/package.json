@@ -8,7 +8,8 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "scripts": "tsx src/scripts/runner.js",
+    "scripts": "tsx src/scripts/runner.ts",
+    "scripts:create-attendances": "tsx src/scripts/runner.ts create-attendances",
     "format": "prettier --write src/"
   },
   "dependencies": {

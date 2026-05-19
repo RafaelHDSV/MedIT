@@ -10,7 +10,9 @@
     "test": "yarn base && concurrently -n frontend,backend -c blue,green \"yarn test:frontend\" \"yarn test:backend\"",
     "test:frontend": "cd frontend && yarn tsc",
     "test:backend": "cd backend && yarn tsc",
-    "scripts": "cd backend && yarn scripts"
+    "scripts": "cd backend && yarn scripts",
+    "scripts:create-attendances": "cd backend && yarn scripts:create-attendances",
+    "update": "yarn scripts:create-attendances"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

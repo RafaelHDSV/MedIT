@@ -75,6 +75,17 @@ Narrativa completa e notas de API: [`context.md` §5.9](./context.md#59-jornada-
 
 ---
 
+## Sala / consultório do profissional (`workLocationLabel`)
+
+- Médicos e enfermeiros expõem **`workLocationLabel`** (detalhe do profissional, aviso ao paciente no claim).
+- Cadastros novos já exigem o campo na API; dados antigos ou seeds incompletos podem ficar vazios.
+- **Backfill:** script `backfill-work-location-from-unit` em `backend/src/scripts/scripts/backfillWorkLocationFromUnit.script.ts`:
+  - `yarn scripts` → escolher o script, ou `yarn scripts backfill-work-location-from-unit` (conforme o runner).
+  - Simular: `BACKFILL_WORK_LOCATION_DRY_RUN=1 yarn scripts backfill-work-location-from-unit`.
+  - Só preenche quem está **sem** label; numera por unidade (`Consultório 1`, `Sala triagem 2`, …).
+
+---
+
 ## Dados clínicos e seeds
 
 - Base **sintoma–doença** na coleção **`SymptomsDisease`**; script de carga: `backend/src/scripts/scripts/createSymptomsDiseases.script.ts`.
