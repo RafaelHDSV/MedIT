@@ -1,3 +1,4 @@
+import ThemeToggle from '@/components/ThemeToggle/ThemeToggle'
 import { useAuth } from '@/hooks/useAuth'
 import SidebarModel from '@/models/SidebarModel'
 import { ROUTES } from '@/routes/constants'
@@ -171,7 +172,11 @@ function SideBar({
       </div>
 
       <div className={styles.footer}>
-        <ConfigTag isCompact={effectiveCompact} />
+        <div className={styles.footerOptions}>
+          <ThemeToggle isCompact={effectiveCompact} />
+          <ConfigTag isCompact={effectiveCompact} />
+        </div>
+
         <UserTag isCompact={effectiveCompact} />
       </div>
     </nav>

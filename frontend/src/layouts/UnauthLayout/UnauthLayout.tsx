@@ -1,5 +1,6 @@
 import AuthLayoutHeader from '@/components/AuthLayoutHeader/AuthLayoutHeader'
 import Logo from '@/components/Logo/Logo'
+import ThemeToggle from '@/components/ThemeToggle/ThemeToggle'
 import routes from '@/routes/routes'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { matchPath, Outlet, useLocation } from 'react-router-dom'
@@ -64,7 +65,10 @@ export default function UnauthLayout() {
           justifyContent: isSignUpPage ? 'flex-end' : 'center'
         }}
       >
-        <Logo className={styles.logo} />
+        <div className={styles.formTopRow}>
+          <Logo className={styles.logo} />
+          <ThemeToggle iconOnly placement='top' />
+        </div>
 
         <div className={styles.formContent}>
           <AuthLayoutHeader type='unauth' />

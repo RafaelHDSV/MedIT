@@ -1,10 +1,11 @@
-.tag {
+.toggle {
   outline: 0;
   border: none;
   background: none;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
   text-decoration: none;
   font-size: 1rem;
   color: var(--black);
@@ -20,15 +21,23 @@
     background: var(--primary-opaque);
     color: var(--primary-color);
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
 }
 
-.activeTag {
-  color: var(--primary-color);
-  background: var(--primary-opaque);
-  font-weight: bold;
-}
-
+/* Sidebar compact: mantém dimensões cheias, só oculta texto */
 .compact {
   justify-content: center;
   padding: 0.5rem;
+}
+
+/* UnauthLayout e outros contextos inline: dimensões automáticas */
+.iconOnly {
+  width: auto;
+  min-height: auto;
+  padding: 0.5rem;
+  justify-content: center;
 }

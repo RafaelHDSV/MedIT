@@ -1,8 +1,8 @@
 @use '../../styles/abstract/breakpoints' as *;
 
 .multi-datepicker {
-  --input-border-color: #d9d9d9;
-  --input-bg: #fff;
+  --input-border-color: var(--border);
+  --input-bg: transparent;
   --border-radius-base: 4px;
   --height-base: 32px;
   --primary-color: #1890ff;

@@ -5,8 +5,8 @@
 }
 
 .option {
-  --color: #000;
-  --bgColor: #fff;
+  --color: var(--black);
+  --bgColor: var(--white);
 
   flex: 1;
   min-width: 8rem;

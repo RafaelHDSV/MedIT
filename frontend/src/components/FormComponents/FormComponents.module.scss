@@ -21,11 +21,12 @@
     height: var(--input-height);
     padding: 0 1rem;
     border-radius: 0.5rem !important;
-    background-color: var(--white);
     transition: border-color 0.2s;
 
-    &:autofill {
+    &:autofill,
+    &:-webkit-autofill {
       box-shadow: 0 0 0px 1000px var(--white) inset !important;
+      -webkit-text-fill-color: var(--black) !important;
     }
 
     &:focus,
@@ -42,8 +43,10 @@
       padding: 0;
       height: auto;
 
-      &:autofill {
+      &:autofill,
+      &:-webkit-autofill {
         box-shadow: 0 0 0px 1000px var(--white) inset !important;
+        -webkit-text-fill-color: var(--black) !important;
       }
     }
   }
@@ -63,7 +66,6 @@
     .ant-select {
       padding: 0 1rem;
       border-radius: 0.5rem !important;
-      background-color: var(--white);
       transition: border-color 0.2s;
 
       &:focus,
@@ -104,7 +106,6 @@
     height: var(--input-height);
     padding: 0 1rem;
     border-radius: 0.5rem !important;
-    background-color: var(--white);
     transition: border-color 0.2s;
 
     &:focus,

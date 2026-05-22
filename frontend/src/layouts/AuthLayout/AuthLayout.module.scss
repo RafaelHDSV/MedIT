@@ -17,7 +17,7 @@
   margin: 0;
   padding: 0;
   border: none;
-  background: rgba(45, 49, 66, 0.45);
+  background: var(--overlay-backdrop);
   cursor: pointer;
   appearance: none;
 }

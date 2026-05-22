@@ -1,10 +1,27 @@
 import Empty from '@/components/Empty/Empty'
-import { theme as antdTheme, ConfigProvider } from 'antd'
+import { useTheme } from '@/hooks/useTheme'
+import { App, theme as antdTheme, ConfigProvider } from 'antd'
+import { useEffect, useMemo } from 'react'
 
 function AntdConfigProvider({ children }: { children: React.ReactNode }) {
-  const primaryColor = getComputedStyle(document.documentElement)
-    .getPropertyValue('--primary-color')
-    .trim()
+  const { theme } = useTheme()
+
+  const primaryColor = useMemo(
+    () =>
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--primary-color')
+        .trim(),
+    [theme]
+  )
+
+  const algorithm =
+    theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm
+
+  useEffect(() => {
+    ConfigProvider.config({
+      theme: { algorithm }
+    })
+  }, [algorithm])
 
   function renderEmpty() {
     return <Empty />
@@ -13,8 +30,8 @@ function AntdConfigProvider({ children }: { children: React.ReactNode }) {
   return (
     <ConfigProvider
       theme={{
-        algorithm: antdTheme.defaultAlgorithm,
-        token: { colorPrimary: primaryColor },
+        algorithm,
+        token: { colorPrimary: primaryColor || '#e8573f' },
         components: {
           Button: {
             paddingInline: '0'
@@ -137,7 +154,7 @@ function AntdConfigProvider({ children }: { children: React.ReactNode }) {
         }
       }}
     >
-      {children}
+      <App>{children}</App>
     </ConfigProvider>
   )
 }

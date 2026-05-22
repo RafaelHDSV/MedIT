@@ -11,6 +11,8 @@
 
 body {
   font-family: 'Figtree', sans-serif;
+  background-color: var(--background);
+  color: var(--black);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--secondary-color) transparent;

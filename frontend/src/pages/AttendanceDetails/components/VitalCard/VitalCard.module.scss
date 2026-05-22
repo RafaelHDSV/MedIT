@@ -9,28 +9,71 @@
   border-radius: 1rem;
   padding: 1.5rem;
 
+  /*
+   * .input pode ser:
+   *   a) o próprio <input class="ant-input"> quando não há suffix
+   *   b) o <span class="ant-input-affix-wrapper"> quando há suffix
+   * Em ambos, forçamos transparência e sem borda para mesclar com o card.
+   */
   .input {
-    border: none;
-    outline: none;
-    display: flex;
+    display: flex !important;
     justify-content: center;
     align-items: center;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--primary-color);
+    font-size: 26px !important;
+    font-weight: 700 !important;
+    color: var(--primary-color) !important;
     text-align: center;
 
-    :global(.ant-input),
-    :global(.ant-input-affix-wrapper) {
-      font-weight: 700;
-      width: auto !important;
-      min-width: 0 !important;
-      text-align: center;
-      padding: 0 !important;
+    /* Sem chrome de input */
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+
+    /* Placeholder — caso (a): .input é o próprio <input> */
+    &::placeholder {
+      color: var(--primary-color);
+      opacity: 0.4;
     }
 
-    &::placeholder {
-      color: var(--primary-opaque);
+    /* Focus/hover sem borda */
+    &:focus,
+    &:focus-within,
+    &:hover {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+
+    /* Caso (b): .input é o affix-wrapper, o <input> é filho */
+    :global(.ant-input) {
+      background: transparent !important;
+      background-color: transparent !important;
+      font-size: 26px !important;
+      font-weight: 700 !important;
+      color: var(--primary-color) !important;
+      text-align: center;
+      padding: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      width: auto !important;
+      min-width: 0 !important;
+
+      &::placeholder {
+        color: var(--primary-color);
+        opacity: 0.4;
+      }
+    }
+
+    /* Sufixo (ex.: "bpm", "°C", "%") */
+    :global(.ant-input-suffix) {
+      margin-inline-start: 0.25rem;
+      color: var(--primary-color);
+      font-size: 26px;
+      font-weight: 700;
     }
   }
 

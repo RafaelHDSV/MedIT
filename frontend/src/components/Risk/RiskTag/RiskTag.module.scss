@@ -1,6 +1,6 @@
 .tag {
-  --color: #000;
-  --bgColor: #fff;
+  --color: var(--black);
+  --bgColor: var(--white);
 
   color: var(--color);
   background-color: var(--bgColor);

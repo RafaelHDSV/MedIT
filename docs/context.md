@@ -408,6 +408,7 @@ flowchart LR
 ## 10. Requisitos não funcionais
 
 - Interface web responsiva.
+- **Tema claro e escuro:** alternância global via `ThemeProvider` (`frontend/src/contexts/ThemeContext/`), atributo `data-theme` em `<html>`, tokens em `variables.scss` (`:root` / `[data-theme='dark']`), persistência em `localStorage` (`medit:color-scheme`) e fallback `prefers-color-scheme` na primeira visita; script em `index.html` reduz flash na carga; Ant Design alterna `defaultAlgorithm` / `darkAlgorithm`; controle na `SideBar` (autenticado) e em `UnauthLayout` (login/cadastro).
 - Tempo de resposta da API adequado ao uso em unidade (meta do projeto: ordem de até ~2 s em operações típicas).
 - Disponibilidade dependente de implantação; o desenho visa serviço contínuo.
 - Proteção de credenciais e dados sensíveis (HTTPS em produção, segredos em variáveis de ambiente, hash de senhas).

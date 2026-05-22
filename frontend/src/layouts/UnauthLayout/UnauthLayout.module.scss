@@ -39,17 +39,30 @@ $unauth-logo-block: 2.75rem;
     gap: 2rem;
   }
 
-  .logo {
-    position: absolute;
-    top: 3rem;
-    left: 3rem;
+  .formTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+
+    @include min-md {
+      position: absolute;
+      top: 3rem;
+      left: 3rem;
+      right: 3rem;
+      width: auto;
+    }
 
     @include max-md {
-      position: relative;
-      top: auto;
-      left: auto;
       margin-bottom: 0.5rem;
     }
+  }
+
+  .logo {
+    position: relative;
+    top: auto;
+    left: auto;
   }
 
   .formContent {

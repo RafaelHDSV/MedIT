@@ -10,7 +10,7 @@
   height: 100%;
   background: var(--white);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--card-shadow);
   transition: transform 0.15s ease;
 
   @include max-md {
