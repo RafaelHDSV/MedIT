@@ -3,6 +3,7 @@ import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import Empty from '@/components/Empty/Empty'
 import { handleApiError } from '@/helpers/handleApiError'
 import { useAuth } from '@/hooks/useAuth'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import type { Periods } from '@/interfaces/globals'
 import {
   AttendanceStatus,
@@ -80,6 +81,7 @@ function AttendanceQueueChart({
   referenceDate
 }: IAttendanceQueueChartProps) {
   const { user } = useAuth()
+  const isMobile = useIsMobile()
   const navigate = useNavigate()
   const [data, setData] = useState<IDashboardQueueItem[]>([])
   const [recentCompleted, setRecentCompleted] = useState<
@@ -264,9 +266,14 @@ function AttendanceQueueChart({
   }, [])
 
   const openTv = useCallback(() => {
+    if (isMobile) return
     enteredFullscreenRef.current = false
     setTvOpen(true)
-  }, [])
+  }, [isMobile])
+
+  useEffect(() => {
+    if (tvOpen && isMobile) void closeTv()
+  }, [tvOpen, isMobile, closeTv])
 
   useLayoutEffect(() => {
     if (!tvOpen) return
@@ -448,11 +455,13 @@ function AttendanceQueueChart({
                 {nextActionConfig.label}
               </Button>
             )}
-            <Tooltip title='Abrir painel público' placement='top'>
-              <Button mode='outline-icon' onClick={openTv}>
-                <ArrowsOutIcon size={22} />
-              </Button>
-            </Tooltip>
+            {!isMobile && (
+              <Tooltip title='Abrir painel público' placement='top'>
+                <Button mode='outline-icon' onClick={openTv}>
+                  <ArrowsOutIcon size={22} />
+                </Button>
+              </Tooltip>
+            )}
           </div>
         }
       >
