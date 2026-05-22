@@ -1,7 +1,8 @@
-$bp-sm: 36rem; // 576px
-$bp-md: 48rem; // 768px
-$bp-lg: 62rem; // 992px
-$bp-xl: 75rem; // 1200px
+$bp-sm: 36rem;   //  576px
+$bp-md: 48rem;   //  768px
+$bp-lg: 62rem;   //  992px
+$bp-xl: 75rem;   // 1200px
+$bp-2xl: 90rem;  // 1440px — Laptop L
 
 @mixin max-sm {
   @media (max-width: #{$bp-sm - 0.0625rem}) {
@@ -23,6 +24,24 @@ $bp-xl: 75rem; // 1200px
 
 @mixin min-md {
   @media (min-width: #{$bp-md}) {
+    @content;
+  }
+}
+
+@mixin min-lg {
+  @media (min-width: #{$bp-lg}) {
+    @content;
+  }
+}
+
+@mixin min-xl {
+  @media (min-width: #{$bp-xl}) {
+    @content;
+  }
+}
+
+@mixin min-2xl {
+  @media (min-width: #{$bp-2xl}) {
     @content;
   }
 }
