@@ -12,6 +12,10 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+
+# allow vendor SDK dist
+!vendor/vieira-analytics/dist/
+!vendor/vieira-analytics/dist/**
 *.local
 
 # Editor directories and files

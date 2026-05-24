@@ -1,4 +1,4 @@
-import { Analytics } from '@vercel/analytics/react'
+import { VieiraAnalytics } from '@vieira/analytics/react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.scss'
@@ -6,6 +6,6 @@ import './index.scss'
 createRoot(document.getElementById('root')!).render(
   <>
     <App />
-    <Analytics />
+    <VieiraAnalytics projectKey="medit" />
   </>
 )
