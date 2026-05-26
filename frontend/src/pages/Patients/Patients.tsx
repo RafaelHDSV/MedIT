@@ -101,6 +101,8 @@ function Patients() {
             columns={columns}
             loading={loading}
             onReload={fetchPatients}
+            countLabel='pacientes'
+            countLabelSingular='paciente'
           />
         </Flex>
       </div>

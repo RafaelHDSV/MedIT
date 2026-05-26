@@ -103,6 +103,8 @@ function AdminsPage() {
               columns={columns}
               loading={loading}
               onReload={fetchAdmins}
+              countLabel='administradores'
+              countLabelSingular='administrador'
             />
           </Flex>
         </div>

@@ -106,6 +106,8 @@ function Doctors() {
             columns={columns}
             loading={loading}
             onReload={fetchDoctors}
+            countLabel='médicos'
+            countLabelSingular='médico'
           />
         </Flex>
       </div>

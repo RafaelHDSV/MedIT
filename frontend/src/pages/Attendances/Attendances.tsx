@@ -79,6 +79,8 @@ function Attendances({ userId, userType }: IAttendancesProps) {
           columns={columns}
           loading={loading}
           onReload={fetchAttendances}
+          countLabel='atendimentos'
+          countLabelSingular='atendimento'
         />
       </Flex>
     </div>

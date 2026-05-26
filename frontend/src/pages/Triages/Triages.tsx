@@ -49,6 +49,8 @@ function ITriages() {
           columns={columns}
           loading={loading}
           onReload={fetchAttendances}
+          countLabel='triagens'
+          countLabelSingular='triagem'
         />
       </Flex>
     </div>

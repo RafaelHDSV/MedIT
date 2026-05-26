@@ -50,18 +50,46 @@ const FIELD_MASKS: MaskMap = {
   email: null
 }
 
+const DEFAULT_COUNT_LABELS = {
+  plural: 'registros',
+  singular: 'registro'
+} as const
+
+function pickCountLabel(
+  count: number,
+  labels: { plural: string; singular?: string }
+): string {
+  return count === 1 && labels.singular ? labels.singular : labels.plural
+}
+
+function buildTotalText(
+  visibleTotal: number,
+  sourceTotal: number,
+  labels: { plural: string; singular?: string }
+): string {
+  if (visibleTotal !== sourceTotal) {
+    return `Exibindo ${visibleTotal} de ${sourceTotal} ${pickCountLabel(sourceTotal, labels)}`
+  }
+
+  return `Total: ${visibleTotal} ${pickCountLabel(visibleTotal, labels)}`
+}
+
 function ListTable<T extends SearchableItem>({
   dataSource,
   columns,
   pageSize = 15,
   loading,
-  onReload
+  onReload,
+  countLabel = DEFAULT_COUNT_LABELS.plural,
+  countLabelSingular = DEFAULT_COUNT_LABELS.singular
 }: {
   dataSource: T[]
   columns: ColumnType<T>[]
   pageSize?: number
   loading: boolean
   onReload: () => void
+  countLabel?: string
+  countLabelSingular?: string
 }) {
   const [searchField, setSearchField] = useState<SearchField>('number')
   const [search, setSearch] = useState('')
@@ -108,6 +136,11 @@ function ListTable<T extends SearchableItem>({
 
   const currentFieldLabel =
     FIELD_OPTIONS.find((f) => f.value === searchField)?.label ?? ''
+
+  const countLabels = useMemo(
+    () => ({ plural: countLabel, singular: countLabelSingular }),
+    [countLabel, countLabelSingular]
+  )
 
   useEffect(() => {
     setCurrentPageSize(pageSize)
@@ -176,9 +209,11 @@ function ListTable<T extends SearchableItem>({
           pagination={{
             current: currentPage,
             pageSize: currentPageSize,
-            hideOnSinglePage: true,
+            hideOnSinglePage: false,
             showSizeChanger: true,
             pageSizeOptions: ['10', '15', '20', '30', '50', '100'],
+            showTotal: (total) =>
+              buildTotalText(total, dataSource.length, countLabels),
             onChange: (page, size) => {
               setCurrentPage(page)
               setCurrentPageSize(size)
