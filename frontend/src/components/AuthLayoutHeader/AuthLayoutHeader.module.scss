@@ -40,20 +40,32 @@
     gap: 0.5rem;
 
     .backButton {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
       background: none;
       border: none;
       padding: 0;
-      transition: 150ms ease;
+      color: var(--black);
+      transition: color 150ms ease;
       cursor: pointer;
 
       &:hover {
         color: var(--primary-color);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+        border-radius: 0.25rem;
       }
     }
 
     .title {
       font-size: 24px;
       font-weight: 600;
+      color: var(--black);
       padding-bottom: 0.25rem;
 
       @include max-md {
