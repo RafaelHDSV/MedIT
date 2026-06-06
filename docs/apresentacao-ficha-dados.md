@@ -1,20 +1,28 @@
 # Ficha de dados — Apresentação TCC MedIT
 
+Dados para copy-paste na demonstração. Roteiro de falas e tempos: [`divisao-apresentacao-tcc.md`](./divisao-apresentacao-tcc.md).
+
 Senha (contas seed TCC): `fastpass`
 
-| Pessoa | Quem | Bloco | Login | Senha | Unidade (seed padrão) |
-|--------|------|-------|-------|-------|------------------------|
-| 1 | Brenda | Slides 1–4 | — | — | — |
-| 2 | Victor | Slides 5–6 | — | — | — |
-| 3 | Évellin | Slides 7–9 | — | — | — |
-| 4 | Rafael Vieira | Demo administrador | `admin.vieira@yopmail.com` | `fastpass` | `UPA 24h Zona Norte` |
-| 5 | Jonatas | Demo paciente | `patient.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
-| 6 | Matheus | Demo enfermeiro | `nurse.take@yopmail.com` | `fastpass` | `UBS Éden` |
-| 7 | Rafael Silva | Demo médico + encerramento | `doctor.rafa@yopmail.com` | `fastpass` | `UBS Wanel Ville` |
+## Cronograma e logins
+
+| Horário | Integrante | Bloco | Login | Senha | Unidade (seed) |
+|---------|------------|-------|-------|-------|----------------|
+| 00:00–02:00 | Brenda Silva | Slides 1–4 | — | — | — |
+| 02:00–03:30 | Victor Campos | Slides 5–6 | — | — | — |
+| 03:30–05:30 | Évellin Simões | Slides 7–9 | — | — | — |
+| 05:30–11:30 | Rafael Vieira | Demo administrador | `admin.vieira@yopmail.com` | `fastpass` | `UPA 24h Zona Norte` |
+| 11:30–14:15 | Jonatas Lima | Demo paciente | ver seção Jonatas | `fastpass` | `UBS Vila Barão` |
+| 14:15–16:45 | Matheus Chagas | Demo enfermeiro | `nurse.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
+| 16:45–20:00 | Rafael Silva | Demo médico + encerramento | `doctor.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
+
+**Ordem da demo:** administrador → paciente → enfermeiro → médico.
+
+**Mesmo atendimento (paciente → enfermeiro → médico):** usar contas da **mesma unidade** (`UBS Vila Barão` / apelido `jota` na tabela de referência). O admin (Rafael Vieira) usa unidade própria só no bloco de gestão.
 
 ---
 
-## Pessoa 4 — Rafael Vieira (administrador)
+## Rafael Vieira — Demo administrador
 
 ### Login
 
@@ -23,19 +31,12 @@ Senha (contas seed TCC): `fastpass`
 | E-mail ou CPF | `admin.vieira@yopmail.com` |
 | Senha | `fastpass` |
 
-### Dashboard — período
-
-| Campo | Valor |
-|-------|-------|
-| Período | `Semana` |
-| Data | data de hoje |
-
 ### Cadastrar médico(a)
 
 | Campo | Valor |
 |-------|-------|
 | Nome completo | `Dr. Demo Banca` |
-| CPF | `529.982.247-25` |
+| CPF | `457.924.950-09` |
 | Data de nascimento | `15/03/1985` |
 | Gênero | `Masculino` |
 | E-mail | `doctor.demo.banca@yopmail.com` |
@@ -68,17 +69,17 @@ Senha (contas seed TCC): `fastpass`
 | Turno | `Manhã` |
 | Sala ou local de triagem | `Sala triagem Demo 1` |
 
+### Editar enfermeiro(a)
+
+| Campo | Valor |
+|-------|-------|
+| Telefone | `(15) 99200-0099` |
+
 ### Editar paciente
 
 | Campo | Valor |
 |-------|-------|
 | Condições médicas | `Hipertensão controlada` |
-
-### Configurações (admin)
-
-| Campo | Valor |
-|-------|-------|
-| Telefone | `(15) 99300-0003` |
 
 ### Cadastrar medicamento
 
@@ -90,19 +91,29 @@ Senha (contas seed TCC): `fastpass`
 | Quantidade em estoque | `50` |
 | Necessita de receita médica? | `Não` |
 
----
-
-## Pessoa 5 — Jonatas (paciente)
-
-### Login
+### Editar medicamento
 
 | Campo | Valor |
 |-------|-------|
-| E-mail ou CPF | `patient.jota@yopmail.com` |
-| Senha | `fastpass` |
-| Unidade vinculada | `UBS Vila Barão` |
+| Quantidade em estoque | `45` |
 
-### Cadastro público — `/sign-up` (opcional)
+### Unidades parceiras
+
+Sem formulário — apenas exibir a rede. Se faltar item no estoque, apontar busca nas parceiras (somente consulta).
+
+### Configurações (admin)
+
+| Campo | Valor |
+|-------|-------|
+| Telefone | `(15) 99300-0003` |
+
+---
+
+## Jonatas Lima — Demo paciente
+
+Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confirmar chegada**.
+
+### Sign-up — `/sign-up` (ao vivo)
 
 | Campo | Valor |
 |-------|-------|
@@ -112,27 +123,52 @@ Senha (contas seed TCC): `fastpass`
 | E-mail | `patient.demo.banca@yopmail.com` |
 | Senha | `fastpass` |
 
+### Login (conta criada no sign-up ou seed de backup)
+
+| Campo | Valor |
+|-------|-------|
+| E-mail ou CPF | `patient.demo.banca@yopmail.com` |
+| Senha | `fastpass` |
+| Unidade vinculada | `UBS Vila Barão` |
+
+**Backup (se o sign-up apertar o tempo):** `patient.jota@yopmail.com` / `fastpass`
+
 ### Pré-cadastro
 
 | Campo | Valor |
 |-------|-------|
-| Queixa principal | `Febre e dor de garganta há dois dias` |
+| Queixa principal | `Dor de garganta` |
 | Nível de dor | `6` |
 | Se automedicou? | `Não` |
 | Quando os sintomas começaram? | 2 dias atrás |
 | Sintomas | `Febre`, `Dor de garganta` |
 | Observação geral | `Pré-atendimento para demonstração MedIT` |
 
+### Confirmar chegada
+
+| Ação | Detalhe |
+|------|---------|
+| Status antes | `Em Rota` |
+| Botão | Confirmar chegada ao hospital |
+| Status depois | entra na fila de triagem da unidade |
+
 ---
 
-## Pessoa 6 — Matheus (enfermeiro)
+## Matheus Chagas — Demo enfermeiro
 
 ### Login
 
 | Campo | Valor |
 |-------|-------|
-| E-mail ou CPF | `nurse.take@yopmail.com` |
+| E-mail ou CPF | `nurse.jota@yopmail.com` |
 | Senha | `fastpass` |
+
+### Fila de triagem
+
+| Ação | Detalhe |
+|------|---------|
+| Presencial | Apenas **apontar** o botão (cadastro sem celular) — não é obrigatório executar |
+| Iniciar triagem | Reserva o caso e abre o detalhe |
 
 ### Triagem — sinais vitais e risco
 
@@ -148,13 +184,13 @@ Senha (contas seed TCC): `fastpass`
 
 ---
 
-## Pessoa 7 — Rafael Silva (médico + encerramento)
+## Rafael Silva — Demo médico + encerramento
 
 ### Login
 
 | Campo | Valor |
 |-------|-------|
-| E-mail ou CPF | `doctor.rafa@yopmail.com` |
+| E-mail ou CPF | `doctor.jota@yopmail.com` |
 | Senha | `fastpass` |
 
 ### Finalizar atendimento
@@ -187,3 +223,4 @@ Todas com senha `fastpass`.
 | Médico | `doctor.demo.banca@yopmail.com` | `fastpass` |
 | Enfermeiro | `nurse.demo.banca@yopmail.com` | `fastpass` |
 | Paciente (sign-up) | `patient.demo.banca@yopmail.com` | `fastpass` |
+| Medicamento | `Medicamento Demo Banca` | (cadastro na unidade do admin) |
