@@ -281,8 +281,8 @@
 **Cena 2 — Dashboard e fila**
 
 - **Tela:** **Dashboard do enfermeiro** (`/auth/dashboard`) — card da fila de triagem.
-- **Ação:** Apontar pacientes em `Aguardando triagem`. Citar botão único **Iniciar triagem** (não há ação por linha). Opcional rápido: apontar botão **Presencial** ("cadastrar paciente sem celular").
-- **Fala:** "A fila mostra casos da mesma unidade ainda sem enfermeiro atribuído. O botão *Iniciar triagem* faz o claim atômico: evita que dois profissionais peguem o mesmo paciente."
+- **Ação:** Apontar pacientes em `Aguardando triagem`. Citar botão único **Iniciar triagem** (não há ação por linha). Apontar botão **Presencial** — cadastro de paciente sem celular, para quem chega direto na unidade.
+- **Fala:** "A fila mostra casos da mesma unidade ainda sem enfermeiro atribuído. O botão *Iniciar triagem* faz o claim atômico: evita que dois profissionais peguem o mesmo paciente. Ao lado, o botão *Presencial* permite cadastrar quem chegou sem ter feito o pré-atendimento pelo celular."
 
 **Cena 3 — Claim e abertura da triagem**
 

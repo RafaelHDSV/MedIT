@@ -72,7 +72,7 @@
 
 **[apresentação pessoal]** "Eu sou o Matheus Chagas, atuei no front-end, no fluxo de triagem e na interface do enfermeiro — e assumo essa etapa na demonstração."
 
-"Na fila de triagem, os pacientes da unidade ainda sem enfermeiro. Clico em Iniciar triagem — o sistema reserva o caso para o enfermeiro logado e abre o detalhe. Recebo o que o paciente informou no pré-atendimento — queixa e sintomas —, sem precisar perguntar de novo. Registro os sinais vitais — temperatura, pressão, frequência, saturação — e a classificação de risco. Ao concluir, o status vai para Aguardando atendimento médico e entra na fila do médico da unidade. No histórico, acompanho as triagens que realizei, com registro do que foi feito. Passo para o médico."
+"Na fila de triagem, os pacientes da unidade ainda sem enfermeiro. Aponto o botão Presencial — para cadastrar quem chegou sem celular — e sigo com Iniciar triagem: o sistema reserva o caso para o enfermeiro logado e abre o detalhe. Recebo o que o paciente informou no pré-atendimento — queixa e sintomas —, sem precisar perguntar de novo. Registro os sinais vitais — temperatura, pressão, frequência, saturação — e a classificação de risco. Ao concluir, o status vai para Aguardando atendimento médico e entra na fila do médico da unidade. No histórico, acompanho as triagens que realizei, com registro do que foi feito. Passo para o médico."
 
 ---
 
@@ -83,3 +83,16 @@
 "No perfil médico, continuamos o mesmo atendimento que saiu da triagem. Na fila, Iniciar atendimento — mesma reserva: um médico por caso. O médico já vê vitais, risco e sintomas, sem recomeçar. Na lateral, as Condições sugeridas com o percentual de compatibilidade; abrindo o detalhe, vejo os sintomas de referência e o que a base sugere, de forma clara. Para finalizar, seleciono o diagnóstico do catálogo, registro prescrição e exames e defino o destino do paciente. O atendimento fecha, com resumo e registro para histórico e indicadores."
 
 **[Slide 10 — Encerramento]** "Concluímos o MedIT: nos slides, contexto e arquitetura; na prática, gestão por unidade, cadastro de equipe, jornada do paciente, triagem organizada e atendimento com apoio por regras — do início ao fim. O sistema organiza o fluxo e apoia a decisão, sem substituir o profissional de saúde. Agradecemos a atenção da banca e ficamos à disposição para perguntas."
+
+---
+
+## Possíveis perguntas da banca
+
+| Pergunta | Resposta sugerida |
+|----------|-------------------|
+| Dois profissionais no mesmo caso? | Reserva na fila ao clicar Iniciar triagem ou Iniciar atendimento; a API valida o status e se já há responsável. |
+| Admin vê médicos de outras unidades? | Não; as listagens são filtradas pela unidade do usuário logado (`unitId` no token). |
+| Por que essa ordem na demo (admin, paciente, enfermeiro, médico)? | Ordem didática: primeiro a gestão da unidade, depois como o paciente entra no fluxo, em seguida triagem e consulta — não é a ordem cronológica de um único dia, é para mostrar o sistema completo. |
+| É diagnóstico automático? | Não; são sugestões por regras com percentual de compatibilidade; a decisão é do médico. |
+| LGPD? | Controle por perfil e minimização de exposição de dados; conformidade plena depende da instituição que implantar. |
+| Só dados de seed? | Não; demonstramos cadastro ao vivo (médico, enfermeiro e medicamento no admin; paciente no sign-up e pré-atendimento). |
