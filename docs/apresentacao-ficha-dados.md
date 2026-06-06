@@ -8,9 +8,9 @@ Senha (contas seed TCC): `fastpass`
 | 2 | Victor | Slides 5–6 | — | — | — |
 | 3 | Évellin | Slides 7–9 | — | — | — |
 | 4 | Rafael Vieira | Demo administrador | `admin.vieira@yopmail.com` | `fastpass` | `UPA 24h Zona Norte` |
-| 5 | Matheus | Demo enfermeiro | `nurse.take@yopmail.com` | `fastpass` | `UBS Éden` |
-| 6 | Rafael Silva | Demo médico | `doctor.rafa@yopmail.com` | `fastpass` | `UBS Wanel Ville` |
-| 7 | Jonatas | Demo paciente | `patient.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
+| 5 | Jonatas | Demo paciente | `patient.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
+| 6 | Matheus | Demo enfermeiro | `nurse.take@yopmail.com` | `fastpass` | `UBS Éden` |
+| 7 | Rafael Silva | Demo médico + encerramento | `doctor.rafa@yopmail.com` | `fastpass` | `UBS Wanel Ville` |
 
 ---
 
@@ -92,48 +92,7 @@ Senha (contas seed TCC): `fastpass`
 
 ---
 
-## Pessoa 5 — Matheus (enfermeiro)
-
-### Login
-
-| Campo | Valor |
-|-------|-------|
-| E-mail ou CPF | `nurse.take@yopmail.com` |
-| Senha | `fastpass` |
-
-### Triagem — sinais vitais e risco
-
-| Campo | Valor |
-|-------|-------|
-| Temperatura | `38,2` |
-| Pressão arterial | `130/85` |
-| Frequência cardíaca | `92` |
-| Saturação | `97` |
-| Escala de dor | `6` |
-| Classificação de risco | `Urgente` |
-| Observação | `Paciente com febre e odinofagia; pré-atendimento remoto` |
-
----
-
-## Pessoa 6 — Rafael Silva (médico)
-
-### Login
-
-| Campo | Valor |
-|-------|-------|
-| E-mail ou CPF | `doctor.rafa@yopmail.com` |
-| Senha | `fastpass` |
-
-### Finalizar atendimento
-
-| Campo | Valor |
-|-------|-------|
-| Texto do diagnóstico | `Quadro compatível com infecção de vias aéreas superiores` |
-| Destino do paciente | `Alta` |
-
----
-
-## Pessoa 7 — Jonatas (paciente)
+## Pessoa 5 — Jonatas (paciente)
 
 ### Login
 
@@ -163,6 +122,47 @@ Senha (contas seed TCC): `fastpass`
 | Quando os sintomas começaram? | 2 dias atrás |
 | Sintomas | `Febre`, `Dor de garganta` |
 | Observação geral | `Pré-atendimento para demonstração MedIT` |
+
+---
+
+## Pessoa 6 — Matheus (enfermeiro)
+
+### Login
+
+| Campo | Valor |
+|-------|-------|
+| E-mail ou CPF | `nurse.take@yopmail.com` |
+| Senha | `fastpass` |
+
+### Triagem — sinais vitais e risco
+
+| Campo | Valor |
+|-------|-------|
+| Temperatura | `38,2` |
+| Pressão arterial | `130/85` |
+| Frequência cardíaca | `92` |
+| Saturação | `97` |
+| Escala de dor | `6` |
+| Classificação de risco | `Urgente` |
+| Observação | `Paciente com febre e odinofagia; pré-atendimento remoto` |
+
+---
+
+## Pessoa 7 — Rafael Silva (médico + encerramento)
+
+### Login
+
+| Campo | Valor |
+|-------|-------|
+| E-mail ou CPF | `doctor.rafa@yopmail.com` |
+| Senha | `fastpass` |
+
+### Finalizar atendimento
+
+| Campo | Valor |
+|-------|-------|
+| Texto do diagnóstico | `Quadro compatível com infecção de vias aéreas superiores` |
+| Destino do paciente | `Alta` |
 
 ---
 
