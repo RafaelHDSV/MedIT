@@ -693,7 +693,7 @@ function ConfigModal({ isModalOpen, setIsModalOpen }: IConfigModalProps) {
   const [devClicked, setDevClicked] = useState(5)
   const [isEditing, setIsEditing] = useState(false)
   const validDevelopmerEmail = ['vieira', 'rafa', 'take']
-  const showDevUi = import.meta.env.DEV
+  const showDevUi = false
   const isBiggerModal = user?.level !== UserLevels.ADMIN
 
   function closeModal() {

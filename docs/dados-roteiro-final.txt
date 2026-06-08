@@ -1,0 +1,158 @@
+FICHA DE DADOS - APRESENTACAO TCC MedIT
+=========================================
+
+Roteiro de falas: docs/roteiro-final.md
+Senha (contas seed TCC): fastpass
+Unidade da demo (todos os blocos): UBS Vila Barao (apelido seed: jota)
+
+CRONOGRAMA E LOGINS
+-------------------
+
+05:30-11:30  Rafael Vieira   Demo administrador   admin.jota@yopmail.com   fastpass   UBS Vila Barao
+11:30-14:15  Jonatas Lima    Demo paciente        (ver secao Jonatas)      fastpass   UBS Vila Barao
+14:15-16:45  Matheus Chagas  Demo enfermeiro      nurse.jota@yopmail.com   fastpass   UBS Vila Barao
+16:45-20:00  Rafael Silva    Demo medico          doctor.jota@yopmail.com  fastpass   UBS Vila Barao
+
+Ordem da demo: administrador -> paciente -> enfermeiro -> medico
+Mesmo atendimento: todas as contas acima na mesma unidade (UBS Vila Barao)
+
+
+RAFAEL VIEIRA - DEMO ADMINISTRADOR
+----------------------------------
+
+Login
+  E-mail ou CPF: admin.jota@yopmail.com
+  Senha: fastpass
+
+Cadastrar medico(a)
+  Nome completo: Dr. Demo Banca
+  CPF: 457.924.950-09
+  Data de nascimento: 15/03/1985
+  Genero: Masculino
+  E-mail: doctor.demo.banca@yopmail.com
+  Senha: fastpass
+  Telefone: (15) 99100-0001
+  Sala ou consultorio: Consultorio Demo 1
+  CRM: 123456/SP
+  Especialidade: Medicina de Emergencia
+
+Editar medico
+  Telefone: (15) 99100-0099
+
+Cadastrar enfermeiro(a)
+  Nome completo: Enf. Demo Banca
+  CPF: 390.533.447-05
+  Data de nascimento: 20/07/1992
+  Genero: Feminino
+  E-mail: nurse.demo.banca@yopmail.com
+  Senha: fastpass
+  Telefone: (15) 99200-0002
+  UF do COREN: SP
+  COREN: 654321
+  Tipo do COREN: ENF
+  Turno: Manha
+  Sala ou local de triagem: Sala triagem Demo 1
+
+Editar enfermeiro(a)
+  Telefone: (15) 99200-0099
+
+Editar paciente
+  Condicoes medicas: Hipertensao controlada
+
+Cadastrar medicamento
+  Nome do medicamento: Medicamento Demo Banca
+  Categoria: Analgesicos
+  Descricao: Item cadastrado ao vivo na apresentacao TCC MedIT
+  Quantidade em estoque: 50
+  Necessita de receita medica?: Nao
+
+Editar medicamento
+  Quantidade em estoque: 45
+
+Configuracoes (admin)
+  Telefone: (15) 99300-0003
+
+
+JONATAS LIMA - DEMO PACIENTE
+----------------------------
+
+Fluxo: sign-up -> login -> pre-cadastro -> editar pre-atendimento (opcional) -> confirmar chegada
+
+Sign-up (/sign-up)
+  Nome: Paciente Demo Banca
+  CPF: 111.444.777-35
+  Unidade de saude: UBS Vila Barao
+  E-mail: patient.demo.banca@yopmail.com
+  Senha: fastpass
+
+Login
+  E-mail ou CPF: patient.demo.banca@yopmail.com
+  Senha: fastpass
+  Backup: patient.jota@yopmail.com / fastpass
+
+Pre-cadastro
+  Queixa principal: Dor de garganta
+  Nivel de dor: 10
+  Se automedicou?: Nao
+  Quando os sintomas comecaram?: 2 dias atras
+  Sintomas: Febre, Dor de garganta
+  Observacao geral: Pre-atendimento para demonstracao MedIT
+
+NOTA: nivel de dor 10 no pre-cadastro. Rotulo Emergencia na fila so apos triagem com classificacao Emergencia.
+
+Editar pre-atendimento (opcional)
+  Card Consulta atual -> icone lapis -> Editar pre-atendimento
+  Enquanto status Em Rota (onTheWay)
+
+Confirmar chegada
+  Status antes: Em Rota
+  Botao: Confirmar chegada ao hospital
+  Status depois: Aguardando triagem
+
+
+MATHEUS CHAGAS - DEMO ENFERMEIRO
+--------------------------------
+
+Login
+  E-mail ou CPF: nurse.jota@yopmail.com
+  Senha: fastpass
+
+Fila de triagem
+  Presencial: apontar botao (nao obrigatorio executar)
+  Iniciar triagem: reserva o caso Demo no topo da fila
+
+Triagem - sinais vitais e risco
+  Temperatura: 38,2
+  Pressao arterial: 130/85
+  Frequencia cardiaca: 92
+  Saturacao: 97
+  Escala de dor: 10
+  Classificacao de risco: Emergencia
+  Observacao: Paciente com febre e odinofagia; pre-atendimento remoto
+
+NOTA: Emergencia e definida na classificacao de risco na triagem, nao so pelo painLevel 10.
+
+
+RAFAEL SILVA - DEMO MEDICO
+--------------------------
+
+Login
+  E-mail ou CPF: doctor.jota@yopmail.com
+  Senha: fastpass
+
+Antes de iniciar
+  Menu: Historico de atendimentos
+  Consultar episodios anteriores do paciente
+
+Finalizar atendimento
+  Texto do diagnostico: Quadro compativel com infeccao de vias aereas superiores
+  Destino do paciente: Alta
+
+
+CONTAS CRIADAS AO VIVO NA DEMO
+------------------------------
+
+Medico: doctor.demo.banca@yopmail.com / fastpass
+Enfermeiro: nurse.demo.banca@yopmail.com / fastpass
+Paciente: patient.demo.banca@yopmail.com / fastpass
+Medicamento: Medicamento Demo Banca

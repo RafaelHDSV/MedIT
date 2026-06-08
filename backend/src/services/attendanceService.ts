@@ -18,6 +18,21 @@ const ACTIVE_STATUSES = [
 const QUEUE_NUMBER_COMPLETED_STATUSES = [AttendanceStatus.ATTENDANCE_COMPLETED]
 const ON_THE_WAY_ADVANTAGE_CAP_MINUTES = 30
 
+/** Pacientes/atendimentos de demonstracao (nome contem "Demo") sobem na fila. */
+const DEMO_QUEUE_PRIORITY = {
+  $cond: [
+    {
+      $regexMatch: {
+        input: { $ifNull: ['$patient.name', ''] },
+        regex: 'Demo',
+        options: 'i'
+      }
+    },
+    0,
+    1
+  ]
+} as const
+
 function scoreDiseaseFromProfile(
   profile: Record<string, number>,
   patientKeys: Set<string>
@@ -709,6 +724,7 @@ async function buildMeditGlobalQueue({
     },
     {
       $addFields: {
+        demoPriority: DEMO_QUEUE_PRIORITY,
         riskPriority: {
           $switch: {
             branches: [
@@ -729,7 +745,7 @@ async function buildMeditGlobalQueue({
         }
       }
     },
-    { $sort: { riskPriority: 1, date: 1 } },
+    { $sort: { demoPriority: 1, riskPriority: 1, date: 1 } },
     {
       $project: {
         _id: 1,
@@ -877,6 +893,7 @@ export const getAttendanceQueue = async ({
               -1
             ]
           },
+          demoPriority: DEMO_QUEUE_PRIORITY,
           riskPriority: {
             $switch: {
               branches: [
@@ -953,7 +970,7 @@ export const getAttendanceQueue = async ({
         }
       },
       {
-        $sort: { riskPriority: 1, queueSortDate: 1, date: 1 }
+        $sort: { demoPriority: 1, riskPriority: 1, queueSortDate: 1, date: 1 }
       },
       {
         $project: {

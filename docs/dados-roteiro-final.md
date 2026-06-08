@@ -1,8 +1,10 @@
 # Ficha de dados — Apresentação TCC MedIT
 
-Dados para copy-paste na demonstração. Roteiro de falas e tempos: [`divisao-apresentacao-tcc.md`](./divisao-apresentacao-tcc.md).
+Dados para copy-paste na demonstração. Roteiro de falas e tempos: [`roteiro-final.md`](./roteiro-final.md).
 
 Senha (contas seed TCC): `fastpass`
+
+**Unidade da demo (todos os blocos):** `UBS Vila Barão` (apelido seed: `jota`)
 
 ## Cronograma e logins
 
@@ -11,14 +13,14 @@ Senha (contas seed TCC): `fastpass`
 | 00:00–02:00 | Brenda Silva | Slides 1–4 | — | — | — |
 | 02:00–03:30 | Victor Campos | Slides 5–6 | — | — | — |
 | 03:30–05:30 | Évellin Simões | Slides 7–9 | — | — | — |
-| 05:30–11:30 | Rafael Vieira | Demo administrador | `admin.vieira@yopmail.com` | `fastpass` | `UPA 24h Zona Norte` |
+| 05:30–11:30 | Rafael Vieira | Demo administrador | `admin.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
 | 11:30–14:15 | Jonatas Lima | Demo paciente | ver seção Jonatas | `fastpass` | `UBS Vila Barão` |
 | 14:15–16:45 | Matheus Chagas | Demo enfermeiro | `nurse.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
 | 16:45–20:00 | Rafael Silva | Demo médico + encerramento | `doctor.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
 
 **Ordem da demo:** administrador → paciente → enfermeiro → médico.
 
-**Mesmo atendimento (paciente → enfermeiro → médico):** usar contas da **mesma unidade** (`UBS Vila Barão` / apelido `jota` na tabela de referência). O admin (Rafael Vieira) usa unidade própria só no bloco de gestão.
+**Mesmo atendimento (paciente → enfermeiro → médico):** todas as contas acima usam a **mesma unidade** (`UBS Vila Barão`).
 
 ---
 
@@ -28,7 +30,7 @@ Senha (contas seed TCC): `fastpass`
 
 | Campo | Valor |
 |-------|-------|
-| E-mail ou CPF | `admin.vieira@yopmail.com` |
+| E-mail ou CPF | `admin.jota@yopmail.com` |
 | Senha | `fastpass` |
 
 ### Cadastrar médico(a)
@@ -111,7 +113,7 @@ Sem formulário — apenas exibir a rede. Se faltar item no estoque, apontar bus
 
 ## Jonatas Lima — Demo paciente
 
-Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confirmar chegada**.
+Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar pré-atendimento** (opcional) → **confirmar chegada**.
 
 ### Sign-up — `/sign-up` (ao vivo)
 
@@ -138,11 +140,21 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confir
 | Campo | Valor |
 |-------|-------|
 | Queixa principal | `Dor de garganta` |
-| Nível de dor | `6` |
+| Nível de dor | `10` |
 | Se automedicou? | `Não` |
 | Quando os sintomas começaram? | 2 dias atrás |
 | Sintomas | `Febre`, `Dor de garganta` |
 | Observação geral | `Pré-atendimento para demonstração MedIT` |
+
+> **Nota:** o nível de dor **10** reforça a gravidade no pré-atendimento. O rótulo **Emergência** na fila só aparece depois que a enfermagem classifica o risco como **Emergência** na triagem (ver seção enfermeiro).
+
+### Editar pré-atendimento (opcional)
+
+| Ação | Detalhe |
+|------|---------|
+| Onde | Card **Consulta atual** no dashboard do paciente |
+| Botão | Ícone de lápis — **Editar pré-atendimento** |
+| Quando | Enquanto o status for **Em Rota** (`onTheWay`) |
 
 ### Confirmar chegada
 
@@ -151,6 +163,7 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confir
 | Status antes | `Em Rota` |
 | Botão | Confirmar chegada ao hospital |
 | Status depois | entra na fila de triagem da unidade |
+| Dashboard | Mostrar card de status atualizado (**Aguardando triagem**) |
 
 ---
 
@@ -167,7 +180,8 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confir
 
 | Ação | Detalhe |
 |------|---------|
-| Presencial | Apenas **apontar** o botão (cadastro sem celular) — não é obrigatório executar |
+| Presencial | Apontar o botão **Presencial** (cadastro sem celular) — não é obrigatório executar |
+| Prioridade | Paciente **Demo** deve aparecer no topo da fila |
 | Iniciar triagem | Reserva o caso e abre o detalhe |
 
 ### Triagem — sinais vitais e risco
@@ -178,9 +192,18 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confir
 | Pressão arterial | `130/85` |
 | Frequência cardíaca | `92` |
 | Saturação | `97` |
-| Escala de dor | `6` |
-| Classificação de risco | `Urgente` |
+| Escala de dor | `10` |
+| Classificação de risco | `Emergência` |
 | Observação | `Paciente com febre e odinofagia; pré-atendimento remoto` |
+
+> **Nota:** selecionar **Emergência** na classificação de risco é o que define o status de risco na fila e nos indicadores — não basta apenas o nível de dor 10 no pré-cadastro.
+
+### Após concluir triagem
+
+| Ação | Detalhe |
+|------|---------|
+| Status | **Aguardando atendimento** na fila médica |
+| Paciente | Dashboard do paciente atualiza o status (mencionar se couber tempo) |
 
 ---
 
@@ -192,6 +215,13 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confir
 |-------|-------|
 | E-mail ou CPF | `doctor.jota@yopmail.com` |
 | Senha | `fastpass` |
+
+### Antes de iniciar o atendimento
+
+| Ação | Detalhe |
+|------|---------|
+| Menu | **Histórico de atendimentos** |
+| Objetivo | Mostrar episódios anteriores do paciente (apoio clínico) antes de **Iniciar atendimento** |
 
 ### Finalizar atendimento
 
@@ -215,6 +245,8 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **confir
 | Rafael Vieira | `UPA 24h Zona Norte` | `admin.vieira@yopmail.com` | `doctor.vieira@yopmail.com` | `nurse.vieira@yopmail.com` | `patient.vieira@yopmail.com` |
 
 Todas com senha `fastpass`.
+
+**Na apresentação final:** usar sempre a coluna **Jonatas** (`jota` / `UBS Vila Barão`) para admin, paciente, enfermeiro e médico.
 
 ### Contas criadas ao vivo na demo
 
