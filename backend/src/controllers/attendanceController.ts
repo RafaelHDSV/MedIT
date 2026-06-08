@@ -190,6 +190,7 @@ const PATIENT_ACTIVE_ATTENDANCE_STATUSES: AttendanceStatus[] = [
 ]
 
 const provisionalRiskFromPain = (pain: number): AttendanceRisk => {
+  if (pain >= 10) return AttendanceRisk.EMERGENCY
   if (pain >= 9) return AttendanceRisk.VERY_URGENT
   if (pain >= 7) return AttendanceRisk.URGENT
   if (pain >= 4) return AttendanceRisk.LESS_URGENT

@@ -64,7 +64,7 @@
 
 **[apresentação pessoal]** "Eu sou o Jonatas Lima, atuei no front-end, no cadastro público e no pré-atendimento do paciente — e mostro essa jornada ao vivo."
 
-"A jornada começa no paciente, fora da unidade. Começo pelo sign-up na tela pública: cadastro um paciente ao vivo com nome, CPF, unidade de saúde, e-mail e senha — já ligado ao ponto de atendimento. No pré-cadastro, informa queixa, início dos sintomas, nível de dor e seleciona os sintomas — tudo organizado para a triagem. O status inicial é 'Em Rota': ainda não está na fila. Se precisar corrigir algo, uso **Editar pré-atendimento** no card da consulta atual — ainda em Em Rota. Ao confirmar chegada, o caso entra na fila — o **dashboard do paciente** atualiza o status para Aguardando triagem — e a enfermagem e o médico continuam o mesmo atendimento. Passo para a enfermagem."
+"A jornada começa no paciente, fora da unidade. Começo pelo sign-up na tela pública: cadastro um paciente ao vivo com nome, CPF, unidade de saúde, e-mail e senha — já ligado ao ponto de atendimento. No pré-cadastro, informa queixa, início dos sintomas, nível de dor e seleciona os sintomas, tudo organizado para a triagem. O status inicial é 'Em Rota': ainda não está na fila. Se precisar corrigir algo, uso **Editar pré-atendimento** no card da consulta atual — ainda em Em Rota. Ao confirmar chegada, o caso entra na fila — o **dashboard do paciente** atualiza o status para Aguardando triagem — e a enfermagem e o médico continuam o mesmo atendimento. Passo para a enfermagem."
 
 ---
 

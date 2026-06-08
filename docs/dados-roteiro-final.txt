@@ -3,18 +3,20 @@ FICHA DE DADOS - APRESENTACAO TCC MedIT
 
 Roteiro de falas: docs/roteiro-final.md
 Senha (contas seed TCC): fastpass
-Unidade da demo (todos os blocos): UBS Vila Barao (apelido seed: jota)
+Unidade da demo (todos os blocos): UPH 24h Zona Norte
+  Avenida Itavuvu, 19 - Vila Olimpia, Sorocaba - SP, 18075042
+  (apelido seed: jota)
 
 CRONOGRAMA E LOGINS
 -------------------
 
-05:30-11:30  Rafael Vieira   Demo administrador   admin.jota@yopmail.com   fastpass   UBS Vila Barao
-11:30-14:15  Jonatas Lima    Demo paciente        (ver secao Jonatas)      fastpass   UBS Vila Barao
-14:15-16:45  Matheus Chagas  Demo enfermeiro      nurse.jota@yopmail.com   fastpass   UBS Vila Barao
-16:45-20:00  Rafael Silva    Demo medico          doctor.jota@yopmail.com  fastpass   UBS Vila Barao
+05:30-11:30  Rafael Vieira   Demo administrador   admin.jota@yopmail.com   fastpass   UPH 24h Zona Norte
+11:30-14:15  Jonatas Lima    Demo paciente        (ver secao Jonatas)      fastpass   UPH 24h Zona Norte
+14:15-16:45  Matheus Chagas  Demo enfermeiro      nurse.jota@yopmail.com   fastpass   UPH 24h Zona Norte
+16:45-20:00  Rafael Silva    Demo medico          doctor.jota@yopmail.com  fastpass   UPH 24h Zona Norte
 
 Ordem da demo: administrador -> paciente -> enfermeiro -> medico
-Mesmo atendimento: todas as contas acima na mesma unidade (UBS Vila Barao)
+Mesmo atendimento: todas as contas acima na mesma unidade (UPH 24h Zona Norte)
 
 
 RAFAEL VIEIRA - DEMO ADMINISTRADOR
@@ -81,7 +83,7 @@ Fluxo: sign-up -> login -> pre-cadastro -> editar pre-atendimento (opcional) -> 
 Sign-up (/sign-up)
   Nome: Paciente Demo Banca
   CPF: 111.444.777-35
-  Unidade de saude: UBS Vila Barao
+  Unidade de saude: UPH 24h Zona Norte
   E-mail: patient.demo.banca@yopmail.com
   Senha: fastpass
 
@@ -98,7 +100,8 @@ Pre-cadastro
   Sintomas: Febre, Dor de garganta
   Observacao geral: Pre-atendimento para demonstracao MedIT
 
-NOTA: nivel de dor 10 no pre-cadastro. Rotulo Emergencia na fila so apos triagem com classificacao Emergencia.
+NOTA: nivel de dor 10 ja classifica o atendimento como Emergencia no pre-cadastro.
+      A enfermagem pode confirmar ou ajustar na triagem.
 
 Editar pre-atendimento (opcional)
   Card Consulta atual -> icone lapis -> Editar pre-atendimento
@@ -130,7 +133,7 @@ Triagem - sinais vitais e risco
   Classificacao de risco: Emergencia
   Observacao: Paciente com febre e odinofagia; pre-atendimento remoto
 
-NOTA: Emergencia e definida na classificacao de risco na triagem, nao so pelo painLevel 10.
+NOTA: Emergencia ja vem do pre-cadastro (dor 10); confirmar ou ajustar na triagem.
 
 
 RAFAEL SILVA - DEMO MEDICO

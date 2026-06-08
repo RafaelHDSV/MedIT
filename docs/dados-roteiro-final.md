@@ -4,7 +4,7 @@ Dados para copy-paste na demonstração. Roteiro de falas e tempos: [`roteiro-fi
 
 Senha (contas seed TCC): `fastpass`
 
-**Unidade da demo (todos os blocos):** `UBS Vila Barão` (apelido seed: `jota`)
+**Unidade da demo (todos os blocos):** `UPH 24h Zona Norte` — Avenida Itavuvu, 19 - Vila Olímpia, Sorocaba - SP, 18075042 (apelido seed: `jota`)
 
 ## Cronograma e logins
 
@@ -13,14 +13,14 @@ Senha (contas seed TCC): `fastpass`
 | 00:00–02:00 | Brenda Silva | Slides 1–4 | — | — | — |
 | 02:00–03:30 | Victor Campos | Slides 5–6 | — | — | — |
 | 03:30–05:30 | Évellin Simões | Slides 7–9 | — | — | — |
-| 05:30–11:30 | Rafael Vieira | Demo administrador | `admin.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
-| 11:30–14:15 | Jonatas Lima | Demo paciente | ver seção Jonatas | `fastpass` | `UBS Vila Barão` |
-| 14:15–16:45 | Matheus Chagas | Demo enfermeiro | `nurse.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
-| 16:45–20:00 | Rafael Silva | Demo médico + encerramento | `doctor.jota@yopmail.com` | `fastpass` | `UBS Vila Barão` |
+| 05:30–11:30 | Rafael Vieira | Demo administrador | `admin.jota@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
+| 11:30–14:15 | Jonatas Lima | Demo paciente | ver seção Jonatas | `fastpass` | `UPH 24h Zona Norte` |
+| 14:15–16:45 | Matheus Chagas | Demo enfermeiro | `nurse.jota@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
+| 16:45–20:00 | Rafael Silva | Demo médico + encerramento | `doctor.jota@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
 
 **Ordem da demo:** administrador → paciente → enfermeiro → médico.
 
-**Mesmo atendimento (paciente → enfermeiro → médico):** todas as contas acima usam a **mesma unidade** (`UBS Vila Barão`).
+**Mesmo atendimento (paciente → enfermeiro → médico):** todas as contas acima usam a **mesma unidade** (`UPH 24h Zona Norte`).
 
 ---
 
@@ -121,7 +121,7 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 |-------|-------|
 | Nome | `Paciente Demo Banca` |
 | CPF | `111.444.777-35` |
-| Unidade de saúde | `UBS Vila Barão` |
+| Unidade de saúde | `UPH 24h Zona Norte` |
 | E-mail | `patient.demo.banca@yopmail.com` |
 | Senha | `fastpass` |
 
@@ -131,7 +131,7 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 |-------|-------|
 | E-mail ou CPF | `patient.demo.banca@yopmail.com` |
 | Senha | `fastpass` |
-| Unidade vinculada | `UBS Vila Barão` |
+| Unidade vinculada | `UPH 24h Zona Norte` |
 
 **Backup (se o sign-up apertar o tempo):** `patient.jota@yopmail.com` / `fastpass`
 
@@ -146,7 +146,7 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 | Sintomas | `Febre`, `Dor de garganta` |
 | Observação geral | `Pré-atendimento para demonstração MedIT` |
 
-> **Nota:** o nível de dor **10** reforça a gravidade no pré-atendimento. O rótulo **Emergência** na fila só aparece depois que a enfermagem classifica o risco como **Emergência** na triagem (ver seção enfermeiro).
+> **Nota:** com nível de dor **10**, o sistema já classifica o atendimento como **Emergência** no pré-cadastro (risco provisório). A enfermagem pode confirmar ou ajustar a classificação na triagem (ver seção enfermeiro).
 
 ### Editar pré-atendimento (opcional)
 
@@ -196,7 +196,7 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 | Classificação de risco | `Emergência` |
 | Observação | `Paciente com febre e odinofagia; pré-atendimento remoto` |
 
-> **Nota:** selecionar **Emergência** na classificação de risco é o que define o status de risco na fila e nos indicadores — não basta apenas o nível de dor 10 no pré-cadastro.
+> **Nota:** o risco **Emergência** já vem do pré-cadastro quando a dor é 10; na triagem, confirme ou ajuste conforme a avaliação clínica.
 
 ### Após concluir triagem
 
@@ -239,14 +239,14 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 | Brenda | `UBS Vila Hortência` | `admin.brenda@yopmail.com` | `doctor.brenda@yopmail.com` | `nurse.brenda@yopmail.com` | `patient.brenda@yopmail.com` |
 | Victor | `UPA 24h Zona Sul` | `admin.victor@yopmail.com` | `doctor.victor@yopmail.com` | `nurse.victor@yopmail.com` | `patient.victor@yopmail.com` |
 | Évellin | `UBS Jardim Vera Cruz` | `admin.evellin@yopmail.com` | `doctor.evellin@yopmail.com` | `nurse.evellin@yopmail.com` | `patient.evellin@yopmail.com` |
-| Jonatas | `UBS Vila Barão` | `admin.jota@yopmail.com` | `doctor.jota@yopmail.com` | `nurse.jota@yopmail.com` | `patient.jota@yopmail.com` |
+| Jonatas | `UPH 24h Zona Norte` | `admin.jota@yopmail.com` | `doctor.jota@yopmail.com` | `nurse.jota@yopmail.com` | `patient.jota@yopmail.com` |
 | Matheus | `UBS Éden` | `admin.take@yopmail.com` | `doctor.take@yopmail.com` | `nurse.take@yopmail.com` | `patient.take@yopmail.com` |
 | Rafael Silva | `UBS Wanel Ville` | `admin.rafa@yopmail.com` | `doctor.rafa@yopmail.com` | `nurse.rafa@yopmail.com` | `patient.rafa@yopmail.com` |
 | Rafael Vieira | `UPA 24h Zona Norte` | `admin.vieira@yopmail.com` | `doctor.vieira@yopmail.com` | `nurse.vieira@yopmail.com` | `patient.vieira@yopmail.com` |
 
 Todas com senha `fastpass`.
 
-**Na apresentação final:** usar sempre a coluna **Jonatas** (`jota` / `UBS Vila Barão`) para admin, paciente, enfermeiro e médico.
+**Na apresentação final:** usar sempre a coluna **Jonatas** (`jota` / `UPH 24h Zona Norte`) para admin, paciente, enfermeiro e médico.
 
 ### Contas criadas ao vivo na demo
 
