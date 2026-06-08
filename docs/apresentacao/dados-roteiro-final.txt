@@ -1,7 +1,7 @@
 FICHA DE DADOS - APRESENTACAO TCC MedIT
 =========================================
 
-Roteiro de falas: docs/roteiro-final.md
+Roteiro de falas: docs/apresentacao/roteiro-final.md
 Senha (contas seed TCC): fastpass
 Unidade da demo (todos os blocos): UPH 24h Zona Norte
   Avenida Itavuvu, 19 - Vila Olimpia, Sorocaba - SP, 18075042
@@ -10,13 +10,17 @@ Unidade da demo (todos os blocos): UPH 24h Zona Norte
 CRONOGRAMA E LOGINS
 -------------------
 
-05:30-11:30  Rafael Vieira   Demo administrador   admin.jota@yopmail.com   fastpass   UPH 24h Zona Norte
-11:30-14:15  Jonatas Lima    Demo paciente        (ver secao Jonatas)      fastpass   UPH 24h Zona Norte
-14:15-16:45  Matheus Chagas  Demo enfermeiro      nurse.jota@yopmail.com   fastpass   UPH 24h Zona Norte
-16:45-20:00  Rafael Silva    Demo medico          doctor.jota@yopmail.com  fastpass   UPH 24h Zona Norte
+05:30-11:30  Rafael Vieira   Demo administrador   admin.jota@yopmail.com          fastpass   UPH 24h Zona Norte
+11:30-14:15  Jonatas Lima    Demo paciente        patient.demo.banca@yopmail.com  fastpass   UPH 24h Zona Norte
+14:15-16:45  Matheus Chagas  Demo enfermeiro      nurse.demo.banca@yopmail.com    fastpass   UPH 24h Zona Norte
+16:45-20:00  Rafael Silva    Demo medico          doctor.demo.banca@yopmail.com   fastpass   UPH 24h Zona Norte
 
 Ordem da demo: administrador -> paciente -> enfermeiro -> medico
-Mesmo atendimento: todas as contas acima na mesma unidade (UPH 24h Zona Norte)
+Mesmo atendimento: paciente no sign-up; enfermeiro e medico cadastrados ao vivo pelo admin (Demo Banca)
+
+IMPORTANTE: enfermeiro e medico DEVEM ser os criados no bloco do administrador
+  Enfermeiro: nurse.demo.banca@yopmail.com / fastpass
+  Medico:     doctor.demo.banca@yopmail.com / fastpass
 
 
 RAFAEL VIEIRA - DEMO ADMINISTRADOR
@@ -26,7 +30,7 @@ Login
   E-mail ou CPF: admin.jota@yopmail.com
   Senha: fastpass
 
-Cadastrar medico(a)
+Cadastrar medico(a)  -> usado depois por Rafael Silva
   Nome completo: Dr. Demo Banca
   CPF: 457.924.950-09
   Data de nascimento: 15/03/1985
@@ -41,7 +45,7 @@ Cadastrar medico(a)
 Editar medico
   Telefone: (15) 99100-0099
 
-Cadastrar enfermeiro(a)
+Cadastrar enfermeiro(a)  -> usado depois por Matheus Chagas
   Nome completo: Enf. Demo Banca
   CPF: 390.533.447-05
   Data de nascimento: 20/07/1992
@@ -116,8 +120,8 @@ Confirmar chegada
 MATHEUS CHAGAS - DEMO ENFERMEIRO
 --------------------------------
 
-Login
-  E-mail ou CPF: nurse.jota@yopmail.com
+Login (enfermeiro cadastrado ao vivo pelo admin)
+  E-mail ou CPF: nurse.demo.banca@yopmail.com
   Senha: fastpass
 
 Fila de triagem
@@ -139,8 +143,8 @@ NOTA: Emergencia ja vem do pre-cadastro (dor 10); confirmar ou ajustar na triage
 RAFAEL SILVA - DEMO MEDICO
 --------------------------
 
-Login
-  E-mail ou CPF: doctor.jota@yopmail.com
+Login (medico cadastrado ao vivo pelo admin)
+  E-mail ou CPF: doctor.demo.banca@yopmail.com
   Senha: fastpass
 
 Antes de iniciar
@@ -155,7 +159,7 @@ Finalizar atendimento
 CONTAS CRIADAS AO VIVO NA DEMO
 ------------------------------
 
-Medico: doctor.demo.banca@yopmail.com / fastpass
-Enfermeiro: nurse.demo.banca@yopmail.com / fastpass
-Paciente: patient.demo.banca@yopmail.com / fastpass
+Medico:     doctor.demo.banca@yopmail.com / fastpass  (bloco admin -> demo medico)
+Enfermeiro: nurse.demo.banca@yopmail.com / fastpass   (bloco admin -> demo enfermeiro)
+Paciente:   patient.demo.banca@yopmail.com / fastpass  (sign-up Jonatas)
 Medicamento: Medicamento Demo Banca

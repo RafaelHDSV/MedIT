@@ -14,13 +14,13 @@ Senha (contas seed TCC): `fastpass`
 | 02:00–03:30 | Victor Campos | Slides 5–6 | — | — | — |
 | 03:30–05:30 | Évellin Simões | Slides 7–9 | — | — | — |
 | 05:30–11:30 | Rafael Vieira | Demo administrador | `admin.jota@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
-| 11:30–14:15 | Jonatas Lima | Demo paciente | ver seção Jonatas | `fastpass` | `UPH 24h Zona Norte` |
-| 14:15–16:45 | Matheus Chagas | Demo enfermeiro | `nurse.jota@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
-| 16:45–20:00 | Rafael Silva | Demo médico + encerramento | `doctor.jota@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
+| 11:30–14:15 | Jonatas Lima | Demo paciente | `patient.demo.banca@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
+| 14:15–16:45 | Matheus Chagas | Demo enfermeiro | `nurse.demo.banca@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
+| 16:45–20:00 | Rafael Silva | Demo médico + encerramento | `doctor.demo.banca@yopmail.com` | `fastpass` | `UPH 24h Zona Norte` |
 
 **Ordem da demo:** administrador → paciente → enfermeiro → médico.
 
-**Mesmo atendimento (paciente → enfermeiro → médico):** todas as contas acima usam a **mesma unidade** (`UPH 24h Zona Norte`).
+**Mesmo atendimento (paciente → enfermeiro → médico):** paciente criado no sign-up; **enfermeiro e médico** são os cadastrados ao vivo pelo administrador (`nurse.demo.banca@...` e `doctor.demo.banca@...`). Todos na mesma unidade (`UPH 24h Zona Norte`).
 
 ---
 
@@ -169,11 +169,13 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 
 ## Matheus Chagas — Demo enfermeiro
 
+Login com o **enfermeiro cadastrado ao vivo** pelo administrador (bloco Rafael Vieira).
+
 ### Login
 
 | Campo | Valor |
 |-------|-------|
-| E-mail ou CPF | `nurse.jota@yopmail.com` |
+| E-mail ou CPF | `nurse.demo.banca@yopmail.com` |
 | Senha | `fastpass` |
 
 ### Fila de triagem
@@ -209,11 +211,13 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 
 ## Rafael Silva — Demo médico + encerramento
 
+Login com o **médico cadastrado ao vivo** pelo administrador (bloco Rafael Vieira).
+
 ### Login
 
 | Campo | Valor |
 |-------|-------|
-| E-mail ou CPF | `doctor.jota@yopmail.com` |
+| E-mail ou CPF | `doctor.demo.banca@yopmail.com` |
 | Senha | `fastpass` |
 
 ### Antes de iniciar o atendimento
@@ -246,7 +250,7 @@ Fluxo: **sign-up** → login (se necessário) → **pré-cadastro** → **editar
 
 Todas com senha `fastpass`.
 
-**Na apresentação final:** usar sempre a coluna **Jonatas** (`jota` / `UPH 24h Zona Norte`) para admin, paciente, enfermeiro e médico.
+**Na apresentação final:** admin e paciente usam contas `jota` / demo banca na unidade `UPH 24h Zona Norte`; **enfermeiro e médico** usam as contas **Demo Banca** criadas ao vivo no bloco do administrador.
 
 ### Contas criadas ao vivo na demo
 
