@@ -1,165 +1,388 @@
 FICHA DE DADOS - APRESENTACAO TCC MedIT
 =========================================
 
-Roteiro de falas: docs/apresentacao/roteiro-final.md
-Senha (contas seed TCC): fastpass
-Unidade da demo (todos os blocos): UPH 24h Zona Norte
-  Avenida Itavuvu, 19 - Vila Olimpia, Sorocaba - SP, 18075042
-  (apelido seed: jota)
+Roteiro de falas
+docs/apresentacao/roteiro-final.md
+
+Senha (contas seed TCC)
+fastpass
+
+Unidade da demo (todos os blocos)
+UPH 24h Zona Norte
+
+Endereco
+Avenida Itavuvu, 19 - Vila Olimpia, Sorocaba - SP, 18075042
+
+Apelido seed
+jota
+
 
 CRONOGRAMA E LOGINS
 -------------------
 
-05:30-11:30  Rafael Vieira   Demo administrador   admin.jota@yopmail.com          fastpass   UPH 24h Zona Norte
-11:30-14:15  Jonatas Lima    Demo paciente        patient.demo.banca@yopmail.com  fastpass   UPH 24h Zona Norte
-14:15-16:45  Matheus Chagas  Demo enfermeiro      nurse.demo.banca@yopmail.com    fastpass   UPH 24h Zona Norte
-16:45-20:00  Rafael Silva    Demo medico          doctor.demo.banca@yopmail.com   fastpass   UPH 24h Zona Norte
+--- Rafael Vieira - Demo administrador ---
+Horario
+05:30-11:30
+Login
+admin.jota@yopmail.com
+Senha
+fastpass
+Unidade
+UPH 24h Zona Norte
 
-Ordem da demo: administrador -> paciente -> enfermeiro -> medico
-Mesmo atendimento: paciente no sign-up; enfermeiro e medico cadastrados ao vivo pelo admin (Demo Banca)
+--- Jonatas Lima - Demo paciente ---
+Horario
+11:30-14:15
+Login
+patient.demo.banca@yopmail.com
+Senha
+fastpass
+Unidade
+UPH 24h Zona Norte
 
-IMPORTANTE: enfermeiro e medico DEVEM ser os criados no bloco do administrador
-  Enfermeiro: nurse.demo.banca@yopmail.com / fastpass
-  Medico:     doctor.demo.banca@yopmail.com / fastpass
+--- Matheus Chagas - Demo enfermeiro ---
+Horario
+14:15-16:45
+Login
+nurse.demo.banca@yopmail.com
+Senha
+fastpass
+Unidade
+UPH 24h Zona Norte
+
+--- Rafael Silva - Demo medico ---
+Horario
+16:45-20:00
+Login
+doctor.demo.banca@yopmail.com
+Senha
+fastpass
+Unidade
+UPH 24h Zona Norte
+
+Ordem da demo
+administrador -> paciente -> enfermeiro -> medico
+
+Mesmo atendimento
+paciente no sign-up; enfermeiro e medico cadastrados ao vivo pelo admin (Demo Banca)
+
+IMPORTANTE
+enfermeiro e medico DEVEM ser os criados no bloco do administrador
+
+Enfermeiro (login)
+nurse.demo.banca@yopmail.com
+
+Enfermeiro (senha)
+fastpass
+
+Medico (login)
+doctor.demo.banca@yopmail.com
+
+Medico (senha)
+fastpass
 
 
 RAFAEL VIEIRA - DEMO ADMINISTRADOR
 ----------------------------------
 
 Login
-  E-mail ou CPF: admin.jota@yopmail.com
-  Senha: fastpass
 
-Cadastrar medico(a)  -> usado depois por Rafael Silva
-  Nome completo: Dr. Demo Banca
-  CPF: 457.924.950-09
-  Data de nascimento: 15/03/1985
-  Genero: Masculino
-  E-mail: doctor.demo.banca@yopmail.com
-  Senha: fastpass
-  Telefone: (15) 99100-0001
-  Sala ou consultorio: Consultorio Demo 1
-  CRM: 123456/SP
-  Especialidade: Medicina de Emergencia
+E-mail ou CPF
+admin.jota@yopmail.com
+
+Senha
+fastpass
+
+Cadastrar medico(a) - usado depois por Rafael Silva
+
+Nome completo
+Dr. Demo Banca
+
+CPF
+457.924.950-09
+
+Data de nascimento
+15/03/1985
+
+Genero
+Masculino
+
+E-mail
+doctor.demo.banca@yopmail.com
+
+Senha
+fastpass
+
+Telefone
+(15) 99100-0001
+
+Sala ou consultorio
+Consultorio Demo 1
+
+CRM
+123456/SP
+
+Especialidade
+Medicina de Emergencia
 
 Editar medico
-  Telefone: (15) 99100-0099
 
-Cadastrar enfermeiro(a)  -> usado depois por Matheus Chagas
-  Nome completo: Enf. Demo Banca
-  CPF: 390.533.447-05
-  Data de nascimento: 20/07/1992
-  Genero: Feminino
-  E-mail: nurse.demo.banca@yopmail.com
-  Senha: fastpass
-  Telefone: (15) 99200-0002
-  UF do COREN: SP
-  COREN: 654321
-  Tipo do COREN: ENF
-  Turno: Manha
-  Sala ou local de triagem: Sala triagem Demo 1
+Telefone
+(15) 99100-0099
+
+Cadastrar enfermeiro(a) - usado depois por Matheus Chagas
+
+Nome completo
+Enf. Demo Banca
+
+CPF
+390.533.447-05
+
+Data de nascimento
+20/07/1992
+
+Genero
+Feminino
+
+E-mail
+nurse.demo.banca@yopmail.com
+
+Senha
+fastpass
+
+Telefone
+(15) 99200-0002
+
+UF do COREN
+SP
+
+COREN
+654321
+
+Tipo do COREN
+ENF
+
+Turno
+Manha
+
+Sala ou local de triagem
+Sala triagem Demo 1
 
 Editar enfermeiro(a)
-  Telefone: (15) 99200-0099
+
+Telefone
+(15) 99200-0099
 
 Editar paciente
-  Condicoes medicas: Hipertensao controlada
+
+Condicoes medicas
+Hipertensao controlada
 
 Cadastrar medicamento
-  Nome do medicamento: Medicamento Demo Banca
-  Categoria: Analgesicos
-  Descricao: Item cadastrado ao vivo na apresentacao TCC MedIT
-  Quantidade em estoque: 50
-  Necessita de receita medica?: Nao
+
+Nome do medicamento
+Medicamento Demo Banca
+
+Categoria
+Analgesicos
+
+Descricao
+Item cadastrado ao vivo na apresentacao TCC MedIT
+
+Quantidade em estoque
+50
+
+Necessita de receita medica?
+Nao
 
 Editar medicamento
-  Quantidade em estoque: 45
+
+Quantidade em estoque
+45
 
 Configuracoes (admin)
-  Telefone: (15) 99300-0003
+
+Telefone
+(15) 99300-0003
 
 
 JONATAS LIMA - DEMO PACIENTE
 ----------------------------
 
-Fluxo: sign-up -> login -> pre-cadastro -> editar pre-atendimento (opcional) -> confirmar chegada
+Fluxo
+sign-up -> login -> pre-cadastro -> editar pre-atendimento (opcional) -> confirmar chegada
 
 Sign-up (/sign-up)
-  Nome: Paciente Demo Banca
-  CPF: 111.444.777-35
-  Unidade de saude: UPH 24h Zona Norte
-  E-mail: patient.demo.banca@yopmail.com
-  Senha: fastpass
+
+Nome
+Paciente Demo Banca
+
+CPF
+111.444.777-35
+
+Unidade de saude
+UPH 24h Zona Norte
+
+E-mail
+patient.demo.banca@yopmail.com
+
+Senha
+fastpass
 
 Login
-  E-mail ou CPF: patient.demo.banca@yopmail.com
-  Senha: fastpass
-  Backup: patient.jota@yopmail.com / fastpass
+
+E-mail ou CPF
+patient.demo.banca@yopmail.com
+
+Senha
+fastpass
+
+Backup (e-mail)
+patient.jota@yopmail.com
+
+Backup (senha)
+fastpass
 
 Pre-cadastro
-  Queixa principal: Dor de garganta
-  Nivel de dor: 10
-  Se automedicou?: Nao
-  Quando os sintomas comecaram?: 2 dias atras
-  Sintomas: Febre, Dor de garganta
-  Observacao geral: Pre-atendimento para demonstracao MedIT
 
-NOTA: nivel de dor 10 ja classifica o atendimento como Emergencia no pre-cadastro.
-      A enfermagem pode confirmar ou ajustar na triagem.
+Queixa principal
+Dor de garganta
+
+Nivel de dor
+10
+
+Se automedicou?
+Nao
+
+Quando os sintomas comecaram?
+2 dias atras
+
+Sintomas
+Febre, Dor de garganta
+
+Observacao geral
+Pre-atendimento para demonstracao MedIT
+
+NOTA
+nivel de dor 10 ja classifica o atendimento como Emergencia no pre-cadastro. A enfermagem pode confirmar ou ajustar na triagem.
 
 Editar pre-atendimento (opcional)
-  Card Consulta atual -> icone lapis -> Editar pre-atendimento
-  Enquanto status Em Rota (onTheWay)
+
+Onde
+Card Consulta atual no dashboard do paciente
+
+Botao
+Icone lapis - Editar pre-atendimento
+
+Quando
+Enquanto status Em Rota (onTheWay)
 
 Confirmar chegada
-  Status antes: Em Rota
-  Botao: Confirmar chegada ao hospital
-  Status depois: Aguardando triagem
+
+Status antes
+Em Rota
+
+Botao
+Confirmar chegada ao hospital
+
+Status depois
+Aguardando triagem
 
 
 MATHEUS CHAGAS - DEMO ENFERMEIRO
 --------------------------------
 
 Login (enfermeiro cadastrado ao vivo pelo admin)
-  E-mail ou CPF: nurse.demo.banca@yopmail.com
-  Senha: fastpass
+
+E-mail ou CPF
+nurse.demo.banca@yopmail.com
+
+Senha
+fastpass
 
 Fila de triagem
-  Presencial: apontar botao (nao obrigatorio executar)
-  Iniciar triagem: reserva o caso Demo no topo da fila
+
+Presencial
+apontar botao (nao obrigatorio executar)
+
+Iniciar triagem
+reserva o caso Demo no topo da fila
 
 Triagem - sinais vitais e risco
-  Temperatura: 38,2
-  Pressao arterial: 130/85
-  Frequencia cardiaca: 92
-  Saturacao: 97
-  Escala de dor: 10
-  Classificacao de risco: Emergencia
-  Observacao: Paciente com febre e odinofagia; pre-atendimento remoto
 
-NOTA: Emergencia ja vem do pre-cadastro (dor 10); confirmar ou ajustar na triagem.
+Temperatura
+38,2
+
+Pressao arterial
+130/85
+
+Frequencia cardiaca
+92
+
+Saturacao
+97
+
+Escala de dor
+10
+
+Classificacao de risco
+Emergencia
+
+Observacao
+Paciente com febre e odinofagia; pre-atendimento remoto
+
+NOTA
+Emergencia ja vem do pre-cadastro (dor 10); confirmar ou ajustar na triagem.
 
 
 RAFAEL SILVA - DEMO MEDICO
 --------------------------
 
 Login (medico cadastrado ao vivo pelo admin)
-  E-mail ou CPF: doctor.demo.banca@yopmail.com
-  Senha: fastpass
+
+E-mail ou CPF
+doctor.demo.banca@yopmail.com
+
+Senha
+fastpass
 
 Antes de iniciar
-  Menu: Historico de atendimentos
-  Consultar episodios anteriores do paciente
+
+Menu
+Historico de atendimentos
+
+Objetivo
+Consultar episodios anteriores do paciente antes de Iniciar atendimento
 
 Finalizar atendimento
-  Texto do diagnostico: Quadro compativel com infeccao de vias aereas superiores
-  Destino do paciente: Alta
+
+Texto do diagnostico
+Quadro compativel com infeccao de vias aereas superiores
+
+Destino do paciente
+Alta
 
 
 CONTAS CRIADAS AO VIVO NA DEMO
 ------------------------------
 
-Medico:     doctor.demo.banca@yopmail.com / fastpass  (bloco admin -> demo medico)
-Enfermeiro: nurse.demo.banca@yopmail.com / fastpass   (bloco admin -> demo enfermeiro)
-Paciente:   patient.demo.banca@yopmail.com / fastpass  (sign-up Jonatas)
-Medicamento: Medicamento Demo Banca
+Medico (e-mail)
+doctor.demo.banca@yopmail.com
+
+Medico (senha)
+fastpass
+
+Enfermeiro (e-mail)
+nurse.demo.banca@yopmail.com
+
+Enfermeiro (senha)
+fastpass
+
+Paciente (e-mail)
+patient.demo.banca@yopmail.com
+
+Paciente (senha)
+fastpass
+
+Medicamento
+Medicamento Demo Banca
