@@ -6,7 +6,10 @@ import {
 } from '@/interfaces/IAttendance'
 import type { IDiseaseOption } from '@/interfaces/ISymptomDiseases'
 import { Flex, Input, Modal, Select } from 'antd'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { demoCompleteAttendance } from '@/demo/presentationData'
+import { pickDiagnosisKey } from '@/demo/demoAutofillHelpers'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import styles from './CompleteAttendanceModal.module.scss'
 
 export const DEFAULT_EXAM_CATALOG = [
@@ -109,6 +112,21 @@ function CompleteAttendanceModal({
       prev.includes(exam) ? prev.filter((e) => e !== exam) : [...prev, exam]
     )
   }
+
+  const fillDemoCompleteAttendance = useCallback(() => {
+    const diagnosisKeyValue = pickDiagnosisKey(
+      diseaseOptions,
+      demoCompleteAttendance.diagnosisLabelHints
+    )
+    if (diagnosisKeyValue) setDiagnosisKey(diagnosisKeyValue)
+    setDiagnosisText(demoCompleteAttendance.diagnosisText)
+    setDisposition(demoCompleteAttendance.patientDisposition)
+  }, [diseaseOptions])
+
+  useRegisterDemoAutofill(fillDemoCompleteAttendance, open, [
+    fillDemoCompleteAttendance,
+    open
+  ])
 
   function handleSubmit() {
     if (!diagnosisKey) return

@@ -1,3 +1,4 @@
+import DemoAutofillFab from '@/demo/DemoAutofillFab'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import * as pages from '../pages/routerPages'
 import AuthRoute from './AuthRoute'
@@ -8,6 +9,7 @@ import UnauthRoute from './UnauthRoute'
 function AppRoutes() {
   return (
     <BrowserRouter>
+      <DemoAutofillFab />
       <Routes>
         {/* Rotas públicas */}
         <Route

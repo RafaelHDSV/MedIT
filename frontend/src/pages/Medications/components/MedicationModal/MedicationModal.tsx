@@ -12,8 +12,10 @@ import {
 } from '@/interfaces/IMedication'
 import MedicationsRepository from '@/repositories/MedicationsRepository'
 import { Form, InputNumber, message, Modal, Radio } from 'antd'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { demoMedicationCreate } from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
 import styles from './MedicationModal.module.scss'
 
@@ -65,6 +67,15 @@ function MedicationModal({
     form.resetFields()
     setFieldErrors({})
   }
+
+  const fillDemoMedication = useCallback(() => {
+    form.setFieldsValue(demoMedicationCreate)
+  }, [form])
+
+  useRegisterDemoAutofill(fillDemoMedication, isModalOpen, [
+    fillDemoMedication,
+    isModalOpen
+  ])
 
   return (
     <Modal

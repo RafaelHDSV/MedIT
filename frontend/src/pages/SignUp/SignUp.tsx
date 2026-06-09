@@ -12,8 +12,14 @@ import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  DEMO_UNIT_NAME,
+  demoSignUp
+} from '@/demo/presentationData'
+import { findUnitOptionId } from '@/demo/demoAutofillHelpers'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import styles from '../../components/FormComponents/FormComponents.module.scss'
 
 interface ISignUpFormErrors {
@@ -63,6 +69,21 @@ function SignUp() {
       cancelled = true
     }
   }, [])
+
+  const fillDemoSignUp = useCallback(() => {
+    const unitId = findUnitOptionId(unitOptions, DEMO_UNIT_NAME)
+    formRef.setFieldsValue({
+      name: demoSignUp.name,
+      cpf: demoSignUp.cpf,
+      email: demoSignUp.email,
+      password: demoSignUp.password,
+      ...(unitId ? { unitId } : {})
+    })
+  }, [formRef, unitOptions])
+
+  useRegisterDemoAutofill(fillDemoSignUp, unitOptions.length > 0, [
+    fillDemoSignUp
+  ])
 
   const handleRegister = async () => {
     setFieldErrors({})

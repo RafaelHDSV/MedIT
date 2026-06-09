@@ -21,8 +21,14 @@ import masks from '@/utils/masks'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { parseDemoDate } from '@/demo/demoAutofillHelpers'
+import {
+  demoDoctorCreate,
+  demoDoctorEdit
+} from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
 import styles from './DoctorModal.module.scss'
 
@@ -116,6 +122,20 @@ function ModalContent({
       })
     }
   }, [doctor, form, isMappedSpecialization, isModalOpen])
+
+  const fillDemoDoctor = useCallback(() => {
+    if (isEditMode) {
+      form.setFieldsValue(demoDoctorEdit)
+      return
+    }
+
+    form.setFieldsValue({
+      ...demoDoctorCreate,
+      birthDate: parseDemoDate(demoDoctorCreate.birthDate)
+    })
+  }, [form, isEditMode])
+
+  useRegisterDemoAutofill(fillDemoDoctor, isModalOpen, [fillDemoDoctor, isModalOpen])
 
   return (
     <Modal

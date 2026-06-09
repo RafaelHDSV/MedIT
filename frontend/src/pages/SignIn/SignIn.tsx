@@ -5,9 +5,12 @@ import { ROUTES } from '@/routes/constants'
 import validators from '@/utils/validators'
 import { Flex, Form, Input } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import styles from '../../components/FormComponents/FormComponents.module.scss'
+import { useDemoAutofillContext } from '@/demo/DemoAutofillContext'
+import { demoLogins } from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import { useAuth } from '../../hooks/useAuth'
 
 export interface LoginPayload {
@@ -22,6 +25,20 @@ export default function SignIn() {
   const [formRef] = useForm()
   const [loading, setLoading] = useState(false)
   const identifierValue = Form.useWatch('identifier', formRef)
+  const demoContext = useDemoAutofillContext()
+
+  const fillDemoLogin = useCallback(() => {
+    const persona = demoContext?.loginPersona ?? 'admin'
+    const login = demoLogins[persona]
+    formRef.setFieldsValue({
+      identifier: login.identifier,
+      password: login.password
+    })
+  }, [demoContext?.loginPersona, formRef])
+
+  useRegisterDemoAutofill(fillDemoLogin, Boolean(demoContext?.enabled), [
+    fillDemoLogin
+  ])
 
   async function handleLogin() {
     setLoading(true)

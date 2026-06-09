@@ -38,7 +38,9 @@ import {
 } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import TextArea from 'antd/es/input/TextArea'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { demoAdminConfig } from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import styles from './ConfigModal.module.scss'
 
 function ConfigDevContent() {
@@ -228,6 +230,17 @@ function ConfigBaseContent({
     form.resetFields()
     setIsEditing(false)
   }
+
+  const fillDemoConfig = useCallback(() => {
+    if (currentUser.level === UserLevels.ADMIN) {
+      form.setFieldsValue(demoAdminConfig)
+    }
+  }, [currentUser.level, form])
+
+  useRegisterDemoAutofill(fillDemoConfig, isEditing, [
+    fillDemoConfig,
+    isEditing
+  ])
 
   async function handleSave(values: ConfigFormValues) {
     if (!isEditing) return

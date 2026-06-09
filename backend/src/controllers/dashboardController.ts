@@ -335,7 +335,11 @@ export const getDashboardAttendanceQueue = async (
       unitId: unitIdStr,
       level: levelValue,
       period: typeof period === 'string' ? period : undefined,
-      referenceDate: ref
+      referenceDate: ref,
+      viewerPatientId:
+        levelValue === UserLevels.PATIENT && req.userId
+          ? String(req.userId)
+          : undefined
     })
 
     res.json({

@@ -18,8 +18,10 @@ import PatientsRepository from '@/repositories/PatientsRepository'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { demoPatientEdit } from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import formStyles from '../../../../components/ListTable/ListTable.module.scss'
 import styles from './PatientModal.module.scss'
 
@@ -91,6 +93,15 @@ function ModalContent({
       })
     }
   }, [patient, form, fetchPatientDetails, isModalOpen])
+
+  const fillDemoPatient = useCallback(() => {
+    form.setFieldsValue(demoPatientEdit)
+  }, [form])
+
+  useRegisterDemoAutofill(fillDemoPatient, isModalOpen, [
+    fillDemoPatient,
+    isModalOpen
+  ])
 
   return (
     <Modal

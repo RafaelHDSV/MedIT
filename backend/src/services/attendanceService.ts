@@ -6,6 +6,7 @@ import { Attendance } from '../models/AttendanceModel.js'
 import SymptomsDiseasesModel from '../models/SymptomsDiseasesModel.js'
 import { getPeriodDateRange } from '../utils/getPeriodDateRange.js'
 import { getReportedSymptomsToDiseaseKeys } from '../utils/getReportedSymptomsToDiseaseKeys.js'
+import { maskSensitiveName } from '../utils/maskSensitiveName.js'
 
 const ACTIVE_STATUSES = [
   AttendanceStatus.ON_THE_WAY,
@@ -773,12 +774,14 @@ export const getAttendanceQueue = async ({
   unitId,
   level,
   period,
-  referenceDate
+  referenceDate,
+  viewerPatientId
 }: {
   unitId?: string
   level?: UserLevels
   period?: string
   referenceDate?: string
+  viewerPatientId?: string
 }) => {
   const isPatientLevel = level === UserLevels.PATIENT
   const queueSortDateExpression = isPatientLevel
@@ -1013,20 +1016,39 @@ export const getAttendanceQueue = async ({
     let operationalCursor = 0
     let onTheWayCursor = 0
 
+    const maskQueueItemForPatientViewer = <T extends { patientId?: unknown; patientName?: string }>(
+      item: T
+    ): T => {
+      if (!isPatientLevel || !viewerPatientId) return item
+
+      const patientId = item.patientId ? String(item.patientId) : undefined
+      const isOwnCase = patientId === String(viewerPatientId)
+      if (isOwnCase) return item
+
+      return {
+        ...item,
+        patientName: maskSensitiveName(item.patientName)
+      }
+    }
+
     return data.map((item) => {
+      let mapped = item
+
       if (item.status === AttendanceStatus.ON_THE_WAY) {
         onTheWayCursor += 1
-        return {
+        mapped = {
           ...item,
           dailyNumber: completedTodayCount + operationalTotal + onTheWayCursor
         }
+      } else {
+        operationalCursor += 1
+        mapped = {
+          ...item,
+          dailyNumber: completedTodayCount + operationalCursor
+        }
       }
 
-      operationalCursor += 1
-      return {
-        ...item,
-        dailyNumber: completedTodayCount + operationalCursor
-      }
+      return maskQueueItemForPatientViewer(mapped)
     })
   } catch (err) {
     console.error(err)

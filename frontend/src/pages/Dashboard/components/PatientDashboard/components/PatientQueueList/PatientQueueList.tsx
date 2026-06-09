@@ -2,6 +2,7 @@ import DashboardCard from '@/components/DashboardCard/DashboardCard'
 import { riskColors } from '@/components/Risk/riskConstants'
 import RiskTag from '@/components/Risk/RiskTag/RiskTag'
 import { AttendanceStatusLabels } from '@/interfaces/IAttendance'
+import { maskSensitiveName } from '@/utils/maskSensitiveName'
 import { StethoscopeIcon } from '@phosphor-icons/react'
 import type { IPatientQueueItem } from '../../IPatientDashboard'
 import styles from './PatientQueueList.module.scss'
@@ -55,7 +56,11 @@ function PatientQueueList({
         </div>
 
         <div className={styles.itemInfo}>
-          <span className={styles.itemName}>{item.patientName}</span>
+          <span className={styles.itemName}>
+            {maskSensitiveName(item.patientName, {
+              reveal: item.isCurrentUser
+            })}
+          </span>
           <span className={styles.itemStatus}>
             {AttendanceStatusLabels[item.status]}
           </span>

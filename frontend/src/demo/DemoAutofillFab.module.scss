@@ -1,0 +1,26 @@
+.fabRoot {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.personaSelect {
+  min-width: 9rem;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+}
+
+.fabButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
+}
+
+.fabLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}

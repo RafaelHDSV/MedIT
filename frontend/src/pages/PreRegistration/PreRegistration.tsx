@@ -11,8 +11,13 @@ import buildSymptomLabelMap from '@/utils/buildSymptomLabelMap'
 import { Flex, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { demoPreRegistration } from '@/demo/presentationData'
+import {
+  resolveSymptomKeysByLabels
+} from '@/demo/demoAutofillHelpers'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import type {
   IPreRegistrationErrors,
   PreRegistrationFormValues
@@ -264,6 +269,32 @@ function PreRegistration() {
       conditions: user?.conditions?.join(', ') || ''
     })
   }, [form, user?.allergies, user?.conditions])
+
+  const fillDemoPreRegistration = useCallback(() => {
+    form.setFieldsValue({
+      mainComplaint: demoPreRegistration.mainComplaint,
+      painLevel: demoPreRegistration.painLevel,
+      selfMedicated: demoPreRegistration.selfMedicated,
+      symptomStartDate: dayjs().subtract(
+        demoPreRegistration.symptomStartDaysAgo,
+        'day'
+      ),
+      generalObservation: demoPreRegistration.generalObservation,
+      unitId: user?.unitId ? String(user.unitId) : undefined
+    })
+    setSelectedSymptoms(
+      resolveSymptomKeysByLabels(
+        demoPreRegistration.symptomLabels,
+        symptomOptions
+      )
+    )
+  }, [form, symptomOptions, user?.unitId])
+
+  useRegisterDemoAutofill(
+    fillDemoPreRegistration,
+    symptomOptions.length > 0 && !initialLoading,
+    [fillDemoPreRegistration, initialLoading]
+  )
 
   return (
     <>

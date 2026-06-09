@@ -13,8 +13,10 @@ import { MedicationCategoriesLabels } from '@/interfaces/IMedication'
 import type { MedicationFormValues } from '@/interfaces/IMedication'
 import MedicationsRepository from '@/repositories/MedicationsRepository'
 import { Form, InputNumber, message, Modal, Radio } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { demoMedicationEdit } from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
 import styles from '../MedicationModal/MedicationModal.module.scss'
 
@@ -49,6 +51,15 @@ function EditMedicationModal({
       requiresPrescription: medication.requiresPrescription
     })
   }, [medication, isModalOpen, form])
+
+  const fillDemoMedicationEdit = useCallback(() => {
+    form.setFieldsValue(demoMedicationEdit)
+  }, [form])
+
+  useRegisterDemoAutofill(fillDemoMedicationEdit, isModalOpen, [
+    fillDemoMedicationEdit,
+    isModalOpen
+  ])
 
   async function onFinish(values: Omit<MedicationFormValues, 'unitId'>) {
     if (!medication?._id) return

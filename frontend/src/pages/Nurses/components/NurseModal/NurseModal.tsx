@@ -20,8 +20,14 @@ import NursesRepository from '@/repositories/NursesRepository'
 import validators, { birthDateValidator } from '@/utils/validators'
 import { Form, Input, message, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { parseDemoDate } from '@/demo/demoAutofillHelpers'
+import {
+  demoNurseCreate,
+  demoNurseEdit
+} from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import formStyles from '../../../../components/FormComponents/FormComponents.module.scss'
 import styles from './NurseModal.module.scss'
 
@@ -131,6 +137,20 @@ function ModalContent({
       })
     }
   }, [nurse, form, isModalOpen])
+
+  const fillDemoNurse = useCallback(() => {
+    if (isEditMode) {
+      form.setFieldsValue(demoNurseEdit)
+      return
+    }
+
+    form.setFieldsValue({
+      ...demoNurseCreate,
+      birthDate: parseDemoDate(demoNurseCreate.birthDate)
+    })
+  }, [form, isEditMode])
+
+  useRegisterDemoAutofill(fillDemoNurse, isModalOpen, [fillDemoNurse, isModalOpen])
 
   return (
     <Modal

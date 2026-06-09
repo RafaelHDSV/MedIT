@@ -29,6 +29,8 @@ import getAgeByBirthDate from '@/utils/getAgeByBirthDate'
 import { Flex, Modal, message, Spin } from 'antd'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { demoTriage } from '@/demo/presentationData'
+import { useRegisterDemoAutofill } from '@/demo/useRegisterDemoAutofill'
 import RiskSelector from '../../components/Risk/RiskSelector/RiskSelector'
 import styles from './AttendanceDetails.module.scss'
 import CompleteAttendanceModal, {
@@ -157,6 +159,26 @@ function AttendanceDetails() {
   const isNurse = user?.level === UserLevels.NURSE
   const isDoctor = user?.level === UserLevels.DOCTOR
   const shouldReleaseOnExitRef = useRef(true)
+
+  const fillDemoTriage = useCallback(() => {
+    if (!isNurse || completeModalOpen) return
+
+    setVitalDraft({
+      temperature: demoTriage.temperature,
+      bloodPressure: demoTriage.bloodPressure,
+      heartRate: demoTriage.heartRate,
+      oxygenSaturation: demoTriage.oxygenSaturation,
+      painLevel: demoTriage.painLevel
+    })
+    setSelectedRisk(demoTriage.risk)
+    setObservation(demoTriage.observation)
+  }, [completeModalOpen, isNurse])
+
+  useRegisterDemoAutofill(
+    fillDemoTriage,
+    isNurse && !completeModalOpen && !pageLoading && Boolean(attendance),
+    [fillDemoTriage, isNurse, completeModalOpen, pageLoading, attendance]
+  )
 
   const loadAttendance = useCallback(async () => {
     if (!attendanceId) return
