@@ -39,7 +39,7 @@ function DemoAutofillFab() {
       }
 
       event.preventDefault()
-      void context.triggerAutofill().then((filled) => {
+      void context?.triggerAutofill().then((filled) => {
         if (filled) {
           message.success('Campos preenchidos com dados da demo TCC')
         } else {
