@@ -78,7 +78,11 @@ function Medications() {
   >()
 
   const loading = unitsLoading || medicationsLoading
-  const canAddMedication = MedicationModel.canAddMedication(user?.level)
+  const canAddMedication = MedicationModel.canAddMedication(
+    user?.level,
+    user?.unitId,
+    unitId
+  )
   const canSeeUnits = MedicationModel.canSeeUnits(user?.level)
   const description = `${unit?.name} - ${getFullAddress(unit?.address)}`
 
@@ -151,7 +155,13 @@ function Medications() {
   }
 
   function handleEditMedication(medication: IMedication) {
-    if (String(user?.unitId) !== String(medication.unitId)) {
+    if (
+      !MedicationModel.canEditMedication(
+        user?.level,
+        user?.unitId,
+        medication.unitId ? String(medication.unitId) : undefined
+      )
+    ) {
       message.warning('Você só pode editar medicamentos da sua unidade.')
       return
     }

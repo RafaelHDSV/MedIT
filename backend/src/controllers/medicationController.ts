@@ -8,6 +8,44 @@ import { UserLevels } from '../interfaces/IUser.js'
 import MedicationModel from '../models/MedicationModel.js'
 import UserModel from '../models/UserModel.js'
 
+function getAvailabilityStatusByStockQuantity(
+  stockQuantity: number
+): MedicationAvailabilityStatus {
+  if (stockQuantity >= 30) return MedicationAvailabilityStatus.AVAILABLE
+  if (stockQuantity > 0) return MedicationAvailabilityStatus.LOW_STOCK
+  return MedicationAvailabilityStatus.UNAVAILABLE
+}
+
+async function assertMedicationWriteAccess(
+  req: Request,
+  res: Response,
+  targetUnitId: string
+) {
+  const user = await UserModel.findById(req.userId).select('level unitId')
+  if (!user) {
+    res.status(401).json({ message: 'Usuário não autenticado' })
+    return null
+  }
+
+  if (user.level === UserLevels.PATIENT) {
+    res.status(403).json({
+      message: 'Paciente não tem permissão para gerenciar medicamento'
+    })
+    return null
+  }
+
+  const userUnitId = user.unitId ? String(user.unitId) : undefined
+  if (!userUnitId || userUnitId !== String(targetUnitId)) {
+    res.status(403).json({
+      message:
+        'Você não tem permissão para gerenciar medicamentos de outra unidade'
+    })
+    return null
+  }
+
+  return user
+}
+
 export const getMedicationsByUnit = async (req: Request, res: Response) => {
   const { unitId } = req.params
 
@@ -75,15 +113,10 @@ export const createMedication = async (req: Request, res: Response) => {
       .json({ message: 'Erro de validações na criação do medicamento', errors })
   }
 
-  function getAvailabilityStatusByStockQuantity(
-    stockQuantity: number
-  ): MedicationAvailabilityStatus {
-    if (stockQuantity >= 30) return MedicationAvailabilityStatus.AVAILABLE
-    if (stockQuantity > 0) return MedicationAvailabilityStatus.LOW_STOCK
-    return MedicationAvailabilityStatus.UNAVAILABLE
-  }
-
   try {
+    const user = await assertMedicationWriteAccess(req, res, String(unitId))
+    if (!user) return
+
     const availabilityStatus =
       getAvailabilityStatusByStockQuantity(stockQuantity)
 
@@ -165,38 +198,18 @@ export const editMedication = async (req: Request, res: Response) => {
       .json({ message: 'Erro de validações na edição do medicamento', errors })
   }
 
-  function getAvailabilityStatusByStockQuantity(
-    stockQuantity: number
-  ): MedicationAvailabilityStatus {
-    if (stockQuantity >= 30) return MedicationAvailabilityStatus.AVAILABLE
-    if (stockQuantity > 0) return MedicationAvailabilityStatus.LOW_STOCK
-    return MedicationAvailabilityStatus.UNAVAILABLE
-  }
-
   try {
-    const user = await UserModel.findById(req.userId).select('level unitId')
-    if (!user) {
-      return res.status(401).json({ message: 'Usuário não autenticado' })
-    }
-    if (user.level === UserLevels.PATIENT) {
-      return res
-        .status(403)
-        .json({ message: 'Paciente não tem permissão para editar medicamento' })
-    }
-
     const medication = await MedicationModel.findById(medicationId)
     if (!medication) {
       return res.status(404).json({ message: 'Medicamento não encontrado' })
     }
 
-    const userUnitId = user.unitId ? String(user.unitId) : undefined
-    const medicationUnitId = String(medication.unitId)
-    if (!userUnitId || userUnitId !== medicationUnitId) {
-      return res.status(403).json({
-        message:
-          'Você não tem permissão para editar medicamentos de outra unidade'
-      })
-    }
+    const user = await assertMedicationWriteAccess(
+      req,
+      res,
+      String(medication.unitId)
+    )
+    if (!user) return
 
     const isDifferentUnit = String(medication.unitId) !== String(unitId)
     if (isDifferentUnit) {

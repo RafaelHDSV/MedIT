@@ -44,7 +44,6 @@ function MedicationDetailsModal({
 }: IMedicationDetailsModal) {
   const { user } = useAuth()
   const canSeeUnits = MedicationModel.canSeeUnits(user?.level)
-  const canEditMedication = MedicationModel.canEditMedication(user?.level)
   const isOpen = Boolean(selectedMedication)
 
   function resetMedication() {
@@ -61,8 +60,11 @@ function MedicationDetailsModal({
     stockQuantity,
     unitId
   } = selectedMedication
-  const canEditSelectedMedication =
-    canEditMedication && String(user?.unitId) === String(unitId)
+  const canEditSelectedMedication = MedicationModel.canEditMedication(
+    user?.level,
+    user?.unitId,
+    unitId ? String(unitId) : undefined
+  )
 
   return (
     <Modal
