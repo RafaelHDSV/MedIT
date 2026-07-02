@@ -1,7 +1,9 @@
+import { startKeepAlive } from '@rafaelhdsv/keep-alive'
 import cors from 'cors'
 import express from 'express'
 import connectDatabase from './config/database.js'
 import { PORT } from './globals/Config.js'
+import healthRoutes from './routes/healthRoutes.js'
 import attendancesRoutes from './routes/attendancesRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import dashboardRoutes from './routes/dashboardRoutes.js'
@@ -24,6 +26,8 @@ app.get('/', (_req, res) => {
   res.send('Back-end funcionando com sucesso!')
 })
 
+app.use(healthRoutes)
+
 const path = '/auth'
 
 app.use(`${path}`, authRoutes)
@@ -39,4 +43,5 @@ app.use(`${path}/symptoms-diseases`, symptomsDiseasesRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando em http://localhost:${PORT}`)
+  startKeepAlive({ path: '/health' })
 })
