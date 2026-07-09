@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite",
+      "installCommand": "yarn install --frozen-lockfile --force",
+      "buildCommand": "yarn build",
+      "outputDirectory": "dist",
+      "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+    },
+    "backend": {
+      "root": "backend",
+      "framework": "express",
+      "installCommand": "yarn install --frozen-lockfile --force",
+      "buildCommand": "yarn build"
+    }
+  },
+  "rewrites": [
+    { "source": "/health", "destination": { "type": "service", "service": "backend" } },
+    { "source": "/auth/:path*", "destination": { "type": "service", "service": "backend" } },
+    { "source": "/(.*)", "destination": { "type": "service", "service": "frontend" } }
+  ]
+}

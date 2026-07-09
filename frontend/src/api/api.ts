@@ -3,7 +3,9 @@ import { Modal } from 'antd'
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL
+  baseURL:
+    import.meta.env.VITE_BACKEND_URL ??
+    (import.meta.env.PROD ? '' : 'http://localhost:3693')
 })
 
 api.interceptors.request.use((config) => {

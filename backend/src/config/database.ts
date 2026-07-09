@@ -1,15 +1,31 @@
 import mongoose from 'mongoose'
 import { MONGO_URL } from '../globals/Config.js'
 
-async function connectDatabase() {
-  try {
-    await mongoose.connect(String(MONGO_URL))
+let initPromise: Promise<void> | null = null
 
-    console.log('MongoDB conectado com sucesso!')
-  } catch (error) {
-    console.error('Erro ao conectar no MongoDB', error)
-    process.exit(1)
+async function connectDatabase() {
+  if (mongoose.connection.readyState === 1) return
+  if (initPromise) {
+    await initPromise
+    return
   }
+
+  initPromise = (async () => {
+    try {
+      await mongoose.connect(String(MONGO_URL))
+      console.log('MongoDB conectado com sucesso!')
+    } catch (error) {
+      initPromise = null
+      console.error('Erro ao conectar no MongoDB', error)
+      throw error
+    }
+  })()
+
+  await initPromise
+}
+
+export async function ensureDatabase(): Promise<void> {
+  await connectDatabase()
 }
 
 export default connectDatabase
