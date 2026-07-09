@@ -1,4 +1,3 @@
-import { startKeepAlive } from '@rafaelhdsv/keep-alive'
 import cors from 'cors'
 import express from 'express'
 import connectDatabase from './config/database.js'
@@ -43,5 +42,4 @@ app.use(`${path}/symptoms-diseases`, symptomsDiseasesRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor está rodando em http://localhost:${PORT}`)
-  startKeepAlive({ path: '/health' })
 })
